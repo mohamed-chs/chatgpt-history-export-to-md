@@ -44,6 +44,8 @@ In the terminal or command prompt, run the script with this command:
 python main.py
 ```
 
+The default output location for the Markdown files is : `~/Documents/ChatGPT-Conversations/MD/`. The script will automatically create the directories if they didn't exist. (which is probably the case)
+
 #### Optional: Customize Script Inputs 🌟
 
 Feel free to customize the script's behavior using additional parameters:
