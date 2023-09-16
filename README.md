@@ -1,8 +1,8 @@
 ## ChatGPT History to Markdown Converter 🚀
 
-Welcome to the ChatGPT-Conversations to Markdown converter! This Python script helps you to convert conversations extracted from ChatGPT into a neatly formatted Markdown (MD) file. Follow the steps below to get started! 😄
+Welcome to the ChatGPT-Conversations to Markdown converter! This Python script helps you to convert conversations extracted from ChatGPT into neatly formatted Markdown (MD) files. Follow the steps below to get started! 😄
 
-Supports Code interpreter output.
+Supports **Code interpreter** output.
 
 #### Step 1: Setting Up 🛠
 
@@ -18,16 +18,12 @@ Download the entire script project from this GitHub page. You can do this by cli
 
 Once the ZIP file is downloaded, extract it to a convenient location on your pc (or mac).
 
-#### Step 4: Install Dependencies 🛒
+#### Step 4: Terminal time (it's ok) 🛒
 
-Open a terminal or command prompt and navigate to the directory where you extracted the files. Run the following command:
+Open a terminal or command prompt and navigate to the directory where you extracted the files. Should be something like this:
 
 ```bash
-
-# Replace "path/to/directory" with the path to your script's directory
-
-cd  path/to/directory
-
+cd  ~/Downloads/ChatGPT-history-export-to-Markdown-main
 ```
 
 #### Step 5: Organize Your Conversations 🗂
@@ -45,9 +41,7 @@ The script is set up to automatically look for the most recent ZIP file in your 
 In the terminal or command prompt, run the script using the following command:
 
 ```bash
-
 python  main.py
-
 ```
 
 Or alternatively, you can just hit "Run code" in any code editor.
@@ -63,9 +57,7 @@ You can customize the script's behavior using additional parameters:
 For example:
 
 ```bash
-
 python  main.py  --out_folder  "Obsidian_Vault/Chats"  --zip_file  "My downloads/my_chat.zip"
-
 ```
 
 This will extract and look for the `conversations.json` file in `~/My downloads/my_chat.zip`, and creates the MD files in `~/Obsidian_Vault/Chats`.
@@ -90,6 +82,6 @@ This is just a small thing I coded to help me see my convos in beautiful markdow
 
 I wasn't a fan of the clunky, and sometimes paid, chrome extensions.
 
-I'm working on automating it to add new conversations and updating old ones. Could be done with the help of a JavaScript bookmarklet or something like that, still trying out tho. Shouldn't take long.
+I'm working on automating it to add new conversations and updating old ones. Had some luck with a JavaScript bookmarklet, still ironing it out tho. Shouldn't take long.
 
 Feel free to fork this repository and make your enhancements or improvements.
