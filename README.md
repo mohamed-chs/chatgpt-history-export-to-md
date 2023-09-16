@@ -6,7 +6,7 @@ Supports **Code interpreter** output.
 
 #### Step 1: Setting Up 🛠
 
-<img src="images/python-logo.png" alt="Python Logo" width="50"/>
+<img src="images/python-logo.png" alt="Python Logo" width="70"/>
 
 You need to have Python 'snek 🐍' installed on your system. You can download it from the [official Python website](https://www.python.org/).
 
@@ -30,7 +30,7 @@ cd  ~/Downloads/ChatGPT-history-export-to-Markdown-main
 
 Before running the script, ensure that your ChatGPT conversations are in a ZIP file format.
 
-<img src="images/chatgpt-logo.png" alt="Python Logo" width="50"/>
+<img src="images/chatgpt-logo.png" alt="Python Logo" width="60"/>
 
 [This is how you can export your ChatGPT history and data](https://help.openai.com/en/articles/7260999-how-do-i-export-my-chatgpt-history-and-data).
 
@@ -41,10 +41,10 @@ The script is set up to automatically look for the most recent ZIP file in your 
 In the terminal or command prompt, run the script using the following command:
 
 ```bash
-python  main.py
+python main.py
 ```
 
-Or alternatively, you can just hit "Run code" in any code editor.
+Or alternatively, open the `main.py` file in any code editor where you can just hit "Run code".
 
 #### Optional: Customize Script Inputs 🌟
 
@@ -57,7 +57,7 @@ You can customize the script's behavior using additional parameters:
 For example:
 
 ```bash
-python  main.py  --out_folder  "Obsidian_Vault/Chats"  --zip_file  "My downloads/my_chat.zip"
+python main.py --out_folder "Obsidian_Vault/Chats" --zip_file "My downloads/my_chat.zip"
 ```
 
 This will extract and look for the `conversations.json` file in `~/My downloads/my_chat.zip`, and creates the MD files in `~/Obsidian_Vault/Chats`.
