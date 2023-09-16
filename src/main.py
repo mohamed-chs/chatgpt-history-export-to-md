@@ -71,7 +71,7 @@ def process_conversation(conversation, title_occurrences, path):
     save_conversation_to_md(title, conversation_text, title_occurrences, path, metadata)
 
 
-def main_logic(out_folder, zip_file):
+def main(out_folder, zip_file):
     """Main processing function."""
     if not os.path.isfile(zip_file):
         print(f"ZIP file not found: {zip_file}. Ensure the file exists.")
@@ -104,6 +104,6 @@ def main_logic(out_folder, zip_file):
         process_conversation(conversation, title_occurrences, out_folder)
 
 
-def main():
+if __name__ == "__main__":
     args = parse_arguments()
-    main_logic(args.out_folder, args.zip_file)
+    main(args.out_folder, args.zip_file)
