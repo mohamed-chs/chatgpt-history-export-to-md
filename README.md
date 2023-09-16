@@ -20,10 +20,10 @@ Once the ZIP file is downloaded, extract it to a convenient location on your pc 
 
 #### Step 4: Terminal time (it's ok) 🛒
 
-Open a terminal or command prompt and navigate to the directory where you extracted the files. Should be something like this:
+Open a terminal or command prompt and navigate to the directory where you extracted the files, and navigate to the `src` directory. Should be something like this:
 
 ```bash
-cd  ~/Downloads/ChatGPT-history-export-to-Markdown-main
+cd  ~/Downloads/ChatGPT-history-export-to-Markdown-main/src
 ```
 
 #### Step 5: Organize Your Conversations 🗂
