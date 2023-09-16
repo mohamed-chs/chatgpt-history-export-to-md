@@ -14,13 +14,9 @@ You need to have Python 'snek 🐍' installed on your system. You can download i
 
 You have two options here - you can either download the ZIP file or clone the GitHub repository.
 
-##### Option A: Download the ZIP
+##### Option A: Clone the Repository (Recommended)
 
-Click the green 'Code' button near the top right corner and choose the 'Download ZIP' option. Once downloaded, extract it to a convenient location on your computer.
-
-##### Option B: Clone the Repository (Recommended)
-
-If you have git installed, open a terminal or command prompt and run the following command to clone the repository:
+If you have git installed, open a terminal or command prompt (it's ok dw) and run the following command to clone the repository:
 
 ```bash
 git clone https://github.com/Mohamed-CHS/ChatGPT-history-export-to-Markdown.git
@@ -28,15 +24,34 @@ git clone https://github.com/Mohamed-CHS/ChatGPT-history-export-to-Markdown.git
 
 This will create a copy of the project in your local system.
 
-#### Step 3: Navigate to the Project Directory 📂
-
-Open a terminal or command prompt and navigate to the directory where you cloned or extracted the files. Here is how you can do it:
+(You may need to navigate first to a desired directory if you want, something like :
 
 ```bash
-cd path/to/ChatGPT-history-export-to-Markdown
+cd ~/Desktop/github-repos
 ```
 
-Replace `path/to` with the actual path where the project resides.
+then clone the repo there.
+)
+
+##### Option B: Download the ZIP
+
+Click the green 'Code' button near the top right corner and choose the 'Download ZIP' option. Once downloaded, extract it to a convenient location on your computer.
+
+#### Step 3: Navigate to the Project Directory 📂
+
+In the same terminal session (if you chose Option A), run the following command to navigate to the project's directory:
+
+```bash
+cd ChatGPT-history-export-to-Markdown
+```
+
+If you went with Option B, navigate to where you extracted the repo's ZIP fie. It may look something like this:
+
+```bash
+cd path/to/ChatGPT-history-export-to-Markdown-main
+```
+
+replace `path/to` with the actual path where the project resides.
 
 #### Step 4: Organize Your Conversations 🗂
 
@@ -55,8 +70,6 @@ In the terminal or command prompt, run the script using the following command:
 ```bash
 python main.py
 ```
-
-Or alternatively, you can open the `main.py` file in any code editor and just hit "Run code".
 
 #### Optional: Customize Script Inputs 🌟
 
@@ -81,7 +94,7 @@ Once the script runs successfully, check the specified output folder (or the def
 
 #### Help and Support 🆘
 
-Feel free to open and discuss issues [here](https://github.com/Mohamed-CHS/ChatGPT-history-export-to-Markdown/issues), or in the Reddit post [here](https://www.reddit.com/r/ChatGPT/comments/16k1ub5/i_made_a_simple_chatgpt_history_to_markdown/).
+Feel free to open and discuss issues [here](https://github.com/Mohamed-CHS/ChatGPT-history-export-to-Markdown/issues), or comment on the Reddit post [here](https://www.reddit.com/r/ChatGPT/comments/16k1ub5/i_made_a_simple_chatgpt_history_to_markdown/).
 
 #### Enjoy Your Conversations in Markdown! 🎈
 
