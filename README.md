@@ -84,4 +84,6 @@ I wasn't a fan of the clunky, and sometimes paid, chrome extensions.
 
 I'm working on automating it to add new conversations and updating old ones. Had some luck with a JavaScript bookmarklet, still ironing it out tho. Shouldn't take long.
 
+Side note, if you'd like your math to render beautifully on Obsidian (or another markdown previewer that supports MathJax), you should replace the Latex delimiters chatgpt usually uses : `\(...\)` and `\[...\]` with dollar sign ones : `$...$` and `$$...$$`. Note that this is **irreversible** tho, and it may not work consistently, depending on the implementation.
+
 Feel free to fork this repository and make your enhancements or improvements.
