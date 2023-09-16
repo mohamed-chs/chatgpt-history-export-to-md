@@ -36,7 +36,7 @@ Before running the script, ensure that your ChatGPT conversations are in a ZIP f
 
 <img src="images/chatgpt-logo.png" alt="Python Logo" width="50"/>
 
-[This is how you can export your ChatGPT history and data.](https://help.openai.com/en/articles/7260999-how-do-i-export-my-chatgpt-history-and-data).
+[This is how you can export your ChatGPT history and data](https://help.openai.com/en/articles/7260999-how-do-i-export-my-chatgpt-history-and-data).
 
 The script is set up to automatically look for the most recent ZIP file in your 'Downloads' folder (in `~/Downloads/`), and it will look for the `conversations.json` file in it. However, you can specify a different file or location if necessary (should be a folder that contains `conversations.json`).
 
@@ -68,7 +68,7 @@ python  main.py  --out_folder  "Obsidian_Vault/Chats"  --zip_file  "My downloads
 
 ```
 
-will extract and look for the `conversations.json` file in `~/My downloads/my_chat.zip`, and creates the MD files in `~/Obsidian_Vault/Chats`.
+This will extract and look for the `conversations.json` file in `~/My downloads/my_chat.zip`, and creates the MD files in `~/Obsidian_Vault/Chats`.
 
 (on **Windows**, '~/' would be 'C://Users/your_username/').
 
