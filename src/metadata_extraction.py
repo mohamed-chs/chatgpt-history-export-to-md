@@ -1,7 +1,7 @@
 # metadata_extraction.py
 
 import os
-from utils import timestamp_to_str
+from .utils import timestamp_to_str
 
 
 def extract_metadata_values(messages_mapping, key_path):

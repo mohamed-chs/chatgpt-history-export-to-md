@@ -4,9 +4,9 @@ import os
 import json
 import argparse
 from collections import defaultdict
-from utils import sanitize_title, extract_zip, get_most_recent_zip
-from message_processing import format_message_as_md
-from metadata_extraction import extract_metadata, save_conversation_to_md
+from src.utils import sanitize_title, extract_zip, get_most_recent_zip
+from src.message_processing import format_message_as_md
+from src.metadata_extraction import extract_metadata, save_conversation_to_md
 
 
 def get_absolute_path(path, home_directory):
