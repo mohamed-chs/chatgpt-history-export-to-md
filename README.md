@@ -10,23 +10,35 @@ Supports **Code interpreter** output.
 
 You need to have Python 'snek 🐍' installed on your system. You can download it from the [official Python website](https://www.python.org/).
 
-#### Step 2: Download the Script 📥
+#### Step 2: Get the Script 📥
 
-Download the entire script project from this GitHub page. You can do this by clicking the green 'Code' button near the top right corner and choosing the 'Download ZIP' option.
+You have two options here - you can either download the ZIP file or clone the GitHub repository.
 
-#### Step 3: Extract Files 📂
+##### Option A: Download the ZIP
 
-Once the ZIP file is downloaded, extract it to a convenient location on your pc (or mac).
+Click the green 'Code' button near the top right corner and choose the 'Download ZIP' option. Once downloaded, extract it to a convenient location on your computer.
 
-#### Step 4: Terminal time (it's ok) 🛒
+##### Option B: Clone the Repository (Recommended)
 
-Open a terminal or command prompt and navigate to the directory where you extracted the files, and navigate to the `src` directory. Should be something like this:
+If you have git installed, open a terminal or command prompt and run the following command to clone the repository:
 
 ```bash
-cd  ~/Downloads/ChatGPT-history-export-to-Markdown-main/src
+git clone https://github.com/Mohamed-CHS/ChatGPT-history-export-to-Markdown.git
 ```
 
-#### Step 5: Organize Your Conversations 🗂
+This will create a copy of the project in your local system.
+
+#### Step 3: Navigate to the Project Directory 📂
+
+Open a terminal or command prompt and navigate to the directory where you cloned or extracted the files. Here is how you can do it:
+
+```bash
+cd path/to/ChatGPT-history-export-to-Markdown
+```
+
+Replace `path/to` with the actual path where the project resides.
+
+#### Step 4: Organize Your Conversations 🗂
 
 Before running the script, ensure that your ChatGPT conversations are in a ZIP file format.
 
@@ -34,9 +46,9 @@ Before running the script, ensure that your ChatGPT conversations are in a ZIP f
 
 [This is how you can export your ChatGPT history and data](https://help.openai.com/en/articles/7260999-how-do-i-export-my-chatgpt-history-and-data).
 
-The script is set up to automatically look for the most recent ZIP file in your 'Downloads' folder (in `~/Downloads/`), and it will look for the `conversations.json` file in it. However, you can specify a different file or location if necessary (should be a folder that contains `conversations.json`).
+The script is set up to automatically look for the most recent ZIP file in your 'Downloads' folder (in `~/Downloads/`), but you can specify a different file or location if necessary.
 
-#### Step 6: Running the Script 🏃‍♂️
+#### Step 5: Running the Script 🏃‍♂️
 
 In the terminal or command prompt, run the script using the following command:
 
@@ -44,14 +56,13 @@ In the terminal or command prompt, run the script using the following command:
 python main.py
 ```
 
-Or alternatively, open the `main.py` file in any code editor where you can just hit "Run code".
+Or alternatively, you can open the `main.py` file in any code editor and just hit "Run code".
 
 #### Optional: Customize Script Inputs 🌟
 
 You can customize the script's behavior using additional parameters:
 
 - `--out_folder`: Specify the output folder where the MD files will be saved.
-
 - `--zip_file`: Specify the ZIP file containing the ChatGPT conversations to be converted.
 
 For example:
@@ -60,17 +71,17 @@ For example:
 python main.py --out_folder "Obsidian_Vault/Chats" --zip_file "My downloads/my_chat.zip"
 ```
 
-This will extract and look for the `conversations.json` file in `~/My downloads/my_chat.zip`, and creates the MD files in `~/Obsidian_Vault/Chats`.
+This will extract and look for the `conversations.json` file in `~/My downloads/my_chat.zip`, and create the MD files in `~/Obsidian_Vault/Chats`.
 
 (on **Windows**, '~/' would be 'C://Users/your_username/').
 
-#### Step 7: Check the Output 🎉
+#### Step 6: Check the Output 🎉
 
 Once the script runs successfully, check the specified output folder (or the default location) for the generated Markdown files. Each conversation will have its own file with details neatly formatted.
 
 #### Help and Support 🆘
 
-If you face any issues or have suggestions to improve the script, feel free to raise an issue on this GitHub page.
+Feel free to open and discuss issues [here](https://github.com/Mohamed-CHS/ChatGPT-history-export-to-Markdown/issues), or in the Reddit post [here](https://www.reddit.com/r/ChatGPT/comments/16k1ub5/i_made_a_simple_chatgpt_history_to_markdown/).
 
 #### Enjoy Your Conversations in Markdown! 🎈
 
