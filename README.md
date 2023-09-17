@@ -32,9 +32,9 @@ Before you run the script, make sure your ChatGPT conversations are in a ZIP fil
 
 <img src="images/chatgpt-logo.png" alt="ChatGPT Logo" width="60"/>
 
-[Learn how to export your ChatGPT history and data here](https://help.openai.com/en/articles/7260999-how-do-i-export-my-chatgpt-history-and-data).
+Learn how to export your ChatGPT history and data [here](https://help.openai.com/en/articles/7260999-how-do-i-export-my-chatgpt-history-and-data).
 
-The script will automatically find the most recent ZIP file in your 'Downloads' directory (in ~/Downloads/), but you can specify a different file or location if necessary.
+The script will automatically find the most recent ZIP file in your 'Downloads' directory (in `~/Downloads/`), but you can specify a different file or location if necessary.
 
 #### Step 5: Running the Script 🏃‍♂️
 
