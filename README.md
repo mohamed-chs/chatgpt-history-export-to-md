@@ -2,7 +2,9 @@
 
 Welcome to the ChatGPT-Conversations to Markdown converter! This Python script helps you to convert conversations extracted from ChatGPT into neatly formatted Markdown (MD) files. Follow the steps below to get started! 😄
 
-It also supports **Code interpreter** output.
+It also supports **Code interpreter** (Advanced Data Analysis) output.
+
+#### Examples here: [Chat link](https://chat.openai.com/share/27b6df58-a590-41ac-9eff-f567602fe692), [Screenshot](<samples/Fibonacci with Matrix Exponentiation.png>), [Markdown](<samples/Fibonacci with Matrix Exponentiation.md>).
 
 #### Step 1: Setting Up 🛠
 

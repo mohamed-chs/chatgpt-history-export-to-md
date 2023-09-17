@@ -26,7 +26,14 @@ def extract_metadata(conversation):
         "title": conversation.get("title", ""),
         "create_time": conversation.get("create_time", ""),
         "update_time": conversation.get("update_time", ""),
-        "total_messages": len(messages_mapping),
+        "total_messages": sum(
+            1
+            for _, value in messages_mapping.items()
+            if value.get("message")
+            and value["message"].get("content")
+            and value["message"]["content"].get("content_type") == "text"
+            and value["message"]["content"].get("parts")[0] != ""
+        ),
         "code_messages": sum(
             1
             for _, value in messages_mapping.items()
@@ -65,7 +72,7 @@ def sanitize_yaml_value(value):
 def build_metadata_block(metadata):
     """Build a markdown block containing metadata."""
     return f"""---
-"id": {sanitize_yaml_value(metadata["id"])}
+"link": "https://chat.openai.com/c/{metadata["id"]}"
 "title": {sanitize_yaml_value(metadata["title"])}
 "time_created": {sanitize_yaml_value(timestamp_to_str(metadata["create_time"]))}
 "time_updated": {sanitize_yaml_value(timestamp_to_str(metadata["update_time"]))}
@@ -74,8 +81,8 @@ def build_metadata_block(metadata):
 "code_messages": {sanitize_yaml_value(metadata["code_messages"])}
 "message_types": {sanitize_yaml_value(', '.join(metadata["message_types"]))}
 "custom_instructions":
-  "What would you like ChatGPT to know about you to provide better responses?": {sanitize_yaml_value(metadata.get("about_user_message"))}
-  "How would you like ChatGPT to respond?": {sanitize_yaml_value(metadata.get("about_model_message"))}
+  "about_user_message": {sanitize_yaml_value(metadata.get("about_user_message"))}
+  "about_model_message": {sanitize_yaml_value(metadata.get("about_model_message"))}
 ---
 
 """

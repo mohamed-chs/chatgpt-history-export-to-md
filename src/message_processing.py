@@ -33,7 +33,11 @@ def format_message_as_md(message):
     if not message or not message.get("author"):
         return ""
 
-    heading = determine_heading(message["author"].get("role"))
+    author_role = message["author"].get("role")
+    if author_role == "system":
+        return ""
+
+    heading = determine_heading(author_role)
     content = extract_content_from_message(message)
 
     if "text" in message.get("content", {}):
