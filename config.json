@@ -1,5 +1,6 @@
 {
   "user_title": "User",
   "assistant_title": "Assistant",
-  "latex_delimiters": "default"
+  "latex_delimiters": "default",
+  "date_format": "default"
 }
