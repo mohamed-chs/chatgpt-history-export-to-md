@@ -11,8 +11,11 @@ from src.metadata_extraction import extract_metadata, save_conversation_to_md
 
 def get_absolute_path(path, home_directory):
     """Convert a potentially relative path to an absolute path, relative to the home directory."""
-    if path.startswith(("/", "\\")):
+    if path.startswith(("~", home_directory)):
+        path = os.path.expanduser(path)
+    elif path.startswith(("/", "\\")):
         path = path[1:]
+
     if not os.path.isabs(path):
         path = os.path.join(home_directory, path)
     return os.path.abspath(path)
