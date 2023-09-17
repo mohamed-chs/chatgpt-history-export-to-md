@@ -72,17 +72,17 @@ def sanitize_yaml_value(value):
 def build_metadata_block(metadata):
     """Build a markdown block containing metadata."""
     return f"""---
-"link": "https://chat.openai.com/c/{metadata["id"]}"
-"title": {sanitize_yaml_value(metadata["title"])}
-"time_created": {sanitize_yaml_value(timestamp_to_str(metadata["create_time"]))}
-"time_updated": {sanitize_yaml_value(timestamp_to_str(metadata["update_time"]))}
-"model": {sanitize_yaml_value(metadata["model_slug"])}
-"total_messages": {sanitize_yaml_value(metadata["total_messages"])}
-"code_messages": {sanitize_yaml_value(metadata["code_messages"])}
-"message_types": {sanitize_yaml_value(', '.join(metadata["message_types"]))}
-"custom_instructions":
-  "about_user_message": {sanitize_yaml_value(metadata.get("about_user_message"))}
-  "about_model_message": {sanitize_yaml_value(metadata.get("about_model_message"))}
+link: "https://chat.openai.com/c/{metadata["id"]}"
+title: {sanitize_yaml_value(metadata["title"])}
+time_created: {sanitize_yaml_value(timestamp_to_str(metadata["create_time"]))}
+time_updated: {sanitize_yaml_value(timestamp_to_str(metadata["update_time"]))}
+model: {sanitize_yaml_value(metadata["model_slug"])}
+total_messages: {sanitize_yaml_value(metadata["total_messages"])}
+code_messages: {sanitize_yaml_value(metadata["code_messages"])}
+message_types: {sanitize_yaml_value(', '.join(metadata["message_types"]))}
+custom_instructions:
+  about_user_message: {sanitize_yaml_value(metadata.get("about_user_message"))}
+  about_model_message: {sanitize_yaml_value(metadata.get("about_model_message"))}
 ---
 
 """
