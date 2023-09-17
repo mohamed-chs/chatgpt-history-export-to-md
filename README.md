@@ -2,7 +2,7 @@
 
 Welcome to the ChatGPT-Conversations to Markdown converter! This Python script helps you to convert conversations extracted from ChatGPT into neatly formatted Markdown (MD) files. Follow the steps below to get started! 😄
 
-Supports **Code interpreter** output.
+It also supports **Code interpreter** output.
 
 #### Step 1: Setting Up 🛠
 
@@ -67,17 +67,17 @@ This will extract and look for the `conversations.json` file in `~/My downloads/
 
 After running the script, check the output folder for your neatly formatted Markdown files.
 
-#### Issues and contributions 🆘
+### Issues and contributions 🆘
 
 Feel free to fork this repository and make your enhancements or improvements. (it still leaves a lot to be desired 😅)
 
 If you encounter any issues or have questions, feel free to open a discussion [here](https://github.com/Mohamed-CHS/ChatGPT-history-export-to-Markdown/issues) or in the Reddit post [here](https://www.reddit.com/r/ChatGPT/comments/16k1ub5/i_made_a_simple_chatgpt_history_to_markdown/).
 
-#### Enjoy Your Conversations in Markdown! 🎈
+### Enjoy Your Conversations in Markdown! 🎈
 
 I hope you find this tool useful for enjoying your ChatGPT conversations in a new, neat, and organized format!
 
-#### Notes
+### Notes
 
 This is just a small thing I coded to help me see my convos in beautiful markdown, in Obsidian (my note-taking app).
 
