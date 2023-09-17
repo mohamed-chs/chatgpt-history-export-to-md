@@ -69,7 +69,7 @@ After running the script, check the output folder for your neatly formatted Mark
 
 #### Issues and contributions 🆘
 
-Feel free to fork this repository and make your enhancements or improvements, it still leaves a lot to be desired.
+Feel free to fork this repository and make your enhancements or improvements. (it still leaves a lot to be desired 😅)
 
 If you encounter any issues or have questions, feel free to open a discussion [here](https://github.com/Mohamed-CHS/ChatGPT-history-export-to-Markdown/issues) or in the Reddit post [here](https://www.reddit.com/r/ChatGPT/comments/16k1ub5/i_made_a_simple_chatgpt_history_to_markdown/).
 
