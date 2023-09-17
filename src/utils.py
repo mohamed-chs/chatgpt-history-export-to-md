@@ -5,6 +5,11 @@ import re
 import datetime
 import zipfile
 from glob import glob
+import sys
+
+# Checking Python version
+if sys.version_info[0] < 3:
+    raise Exception("Python 3 or a more recent version is required.")
 
 # Pre-compiled pattern for disallowed characters
 DISALLOWED_CHARS_PATTERN = re.compile(r'[<>:"/\\|?*\n\r\t\f\v]')
@@ -25,7 +30,9 @@ def extract_zip(zip_filepath):
 def get_most_recent_zip():
     """Get the most recent ZIP file from the '~/Downloads' directory."""
     try:
-        downloads_path = os.path.join(os.path.expanduser("~"), "Downloads")
+        from pathlib import Path
+
+        downloads_path = str(Path.home() / "Downloads")
 
         if not os.path.isdir(downloads_path):
             raise FileNotFoundError(
