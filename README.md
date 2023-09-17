@@ -26,7 +26,7 @@ Next, navigate to the project directory by using the following command in your t
 cd ChatGPT-history-export-to-Markdown
 ```
 
-#### Step 4: Organize Your Conversations 🗂
+#### Step 4: Download Your Conversations data 🗂
 
 Before you run the script, make sure your ChatGPT conversations are in a ZIP file format.
 
