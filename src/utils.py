@@ -17,7 +17,7 @@ def extract_zip(zip_filepath):
 
         with zipfile.ZipFile(zip_filepath, "r") as zip_ref:
             zip_ref.extractall(extract_folder)
-            print(f"Successfully extracted all files to {extract_folder}")
+            print(f"Successfully extracted ZIP file to '{extract_folder}'")
     except Exception as e:
         print(f"An error occurred while extracting the ZIP file: {e}")
 
@@ -58,3 +58,13 @@ def timestamp_to_str(timestamp):
     except ValueError as e:
         print(f"Invalid timestamp value: {e}")
         return None
+
+
+def format_title(title, max_length=50):
+    """Formats the title to a single line with a maximum length."""
+    single_line_title = " ".join(title.splitlines())
+    return (
+        single_line_title[:max_length] + "..."
+        if len(single_line_title) > max_length
+        else single_line_title
+    )

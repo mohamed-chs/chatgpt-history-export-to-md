@@ -4,7 +4,7 @@ import os
 import json
 import argparse
 from collections import defaultdict
-from src.utils import sanitize_title, extract_zip, get_most_recent_zip
+from src.utils import sanitize_title, extract_zip, get_most_recent_zip, format_title
 from src.message_processing import format_message_as_md
 from src.metadata_extraction import extract_metadata, save_conversation_to_md
 
@@ -87,7 +87,7 @@ def main(out_folder, zip_file):
         return
 
     os.makedirs(out_folder, exist_ok=True)
-    print(f"Using directory '{out_folder}' for output.")
+    print(f"Writing MD files in : '{out_folder}' ...")
 
     try:
         with open(json_filepath, "r") as file:
@@ -100,8 +100,24 @@ def main(out_folder, zip_file):
         return
 
     title_occurrences = defaultdict(int)
-    for conversation in conversations:
+    total_conversations = len(conversations)
+    for i, conversation in enumerate(conversations):
+        title = get_sanitized_and_sorted_messages(conversation)[0]
+        title = format_title(title)
         process_conversation(conversation, title_occurrences, out_folder)
+
+        print(f"\n\x1b[KProcessing chat: {title}", end="", flush=True)
+        print(
+            f"\x1b[A\rProcessed {i+1}/{total_conversations} conversations",
+            end="",
+            flush=True,
+        )
+
+    print(
+        f"\r\n\r\nProcessing completed.",
+        end="\n\n",
+        flush=True,
+    )
 
 
 if __name__ == "__main__":
