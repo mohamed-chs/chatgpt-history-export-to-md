@@ -1,0 +1,23 @@
+--- Folder Layout ---
+[.git] (...)
+[.github] (...)
+.gitignore
+ansi_formatter.py
+config.json
+[images]
+    ├── chatgpt-logo.png
+    └── python-logo.png
+LICENSE
+main.py
+private.txt
+README.md
+[samples]
+    ├── Fibonacci with Matrix Exponentiation.md
+    └── Fibonacci with Matrix Exponentiation.png
+[src]
+    ├── message_processing.py
+    ├── metadata_extraction.py
+    ├── utils.py
+    ├── __init__.py
+    └── [__pycache__] (...)
+testing.py
