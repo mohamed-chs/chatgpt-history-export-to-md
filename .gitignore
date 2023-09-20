@@ -3,3 +3,4 @@ node_modules/
 private.txt
 testing.py
 ansi_formatter.py
+.venv/

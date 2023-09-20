@@ -1,6 +1,11 @@
 # message_processing.py
 
+import json
 from typing import Any, Optional
+
+# Load the role mapping from a JSON file
+with open("config.json") as f:
+    config = json.load(f)
 
 
 def determine_heading(author_role: Optional[str]) -> str:
@@ -11,8 +16,20 @@ def determine_heading(author_role: Optional[str]) -> str:
     - author_role (Optional[str]): The role of the author.
 
     Returns:
-    - str: A capitalized version of the author's role or "(other)" if not provided.
+    - str: A modified version of the author's role based on a configuration file, or "(other)" if not provided.
     """
+
+    role_mapping: dict[str, Any] = {
+        "system": config.get("system_title", "System"),
+        "user": config.get("user_title", "User"),
+        "assistant": config.get("assistant_title", "Assistant"),
+        "tool": config.get("tool_title", "Tool"),
+    }
+
+    # Determine the heading based on the role mapping
+    if author_role in role_mapping:
+        return role_mapping[author_role]
+
     return author_role.capitalize() if author_role else "(other)"
 
 
@@ -83,6 +100,6 @@ def format_message_as_md(message: dict[str, Any]) -> str:
     content: str | None = extract_content_from_message(message)
 
     if "text" in message.get("content", {}):
-        heading += "\n### Code Interpreter..."
+        heading += "\n### Code Environment :"
 
     return f"# {heading}\n{content}\n\n"
