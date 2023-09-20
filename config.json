@@ -1,6 +1,6 @@
 {
-  "user_title": "User",
-  "assistant_title": "Assistant",
-  "latex_delimiters": "default",
-  "date_format": "default"
+  "system_title": "System",
+  "user_title": "Me",
+  "assistant_title": "ChatGPT",
+  "tool_title": "Code output"
 }

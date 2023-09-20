@@ -2,22 +2,22 @@
 [.git] (...)
 [.github] (...)
 .gitignore
-ansi_formatter.py
+[.mypy_cache] (...)
+[.venv] (...)
 config.json
+[demo]
+    ├── Fibonacci with Matrix Exponentiation.md
+    └── Fibonacci with Matrix Exponentiation.png
 [images]
     ├── chatgpt-logo.png
     └── python-logo.png
 LICENSE
 main.py
-private.txt
+project_layout.txt
 README.md
-[samples]
-    ├── Fibonacci with Matrix Exponentiation.md
-    └── Fibonacci with Matrix Exponentiation.png
 [src]
     ├── message_processing.py
     ├── metadata_extraction.py
     ├── utils.py
     ├── __init__.py
     └── [__pycache__] (...)
-testing.py
