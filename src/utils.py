@@ -10,8 +10,8 @@ from pathlib import Path
 from typing import Optional
 
 # Checking Python version to ensure compatibility
-if sys.version_info[0] < 3:
-    raise Exception("Python 3 or a more recent version is required.")
+if sys.version_info < (3, 10):
+    raise Exception("Python 3.10 or a more recent version is required.")
 
 # Pre-compiled pattern for disallowed characters in file names
 DISALLOWED_CHARS_PATTERN = re.compile(r'[<>:"/\\|?*\n\r\t\f\v]')
