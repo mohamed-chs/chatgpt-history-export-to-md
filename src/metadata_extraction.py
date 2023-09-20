@@ -1,13 +1,26 @@
 # metadata_extraction.py
 
 import os
+from typing import Any
+
 from .utils import timestamp_to_str
 
 
-def extract_metadata_values(messages_mapping, key_path):
-    """Extract metadata values following the specified key path from the messages mapping."""
-    keys = key_path.split(".")
-    data = [
+def extract_metadata_values(
+    messages_mapping: dict[str, dict[str, Any]], key_path: str
+) -> str | Any:
+    """Extract metadata values from a mapping using the specified key path.
+
+    Args:
+        messages_mapping (dict[str, dict[str, Any]]): The mapping of messages to extract metadata from
+        key_path (str): The dot-separated key path to follow in the extraction
+
+    Returns:
+        str | Any: The extracted metadata value, or "-" if no data is found
+    """
+
+    keys: list[str] = key_path.split(".")
+    data: list[Any] = [
         value["message"]
         for _, value in messages_mapping.items()
         if value.get("message")
@@ -17,23 +30,35 @@ def extract_metadata_values(messages_mapping, key_path):
     return data[0] if data else "-"
 
 
-def extract_metadata(conversation):
-    """Extract metadata from a conversation."""
+def extract_metadata(conversation: dict[str, Any]) -> dict[str, Any]:
+    """Extract metadata from a conversation dictionary.
+
+    Args:
+        conversation (dict[str, Any]): The conversation data
+
+    Returns:
+        dict[str, Any]: A dictionary with extracted metadata
+    """
+
     messages_mapping = conversation.get("mapping", {})
 
-    return {
-        "id": conversation.get("conversation_id", ""),
-        "title": conversation.get("title", ""),
-        "create_time": conversation.get("create_time", ""),
-        "update_time": conversation.get("update_time", ""),
-        "total_messages": sum(
+    def get_text_content_messages(messages_mapping: dict[str, dict[str, Any]]) -> int:
+        """Helper function to get text content messages count."""
+        return sum(
             1
             for _, value in messages_mapping.items()
             if value.get("message")
             and value["message"].get("content")
             and value["message"]["content"].get("content_type") == "text"
             and value["message"]["content"].get("parts")[0] != ""
-        ),
+        )
+
+    return {
+        "id": conversation.get("conversation_id", ""),
+        "title": conversation.get("title", ""),
+        "create_time": conversation.get("create_time", ""),
+        "update_time": conversation.get("update_time", ""),
+        "total_messages": get_text_content_messages(messages_mapping),
         "code_messages": sum(
             1
             for _, value in messages_mapping.items()
@@ -58,19 +83,35 @@ def extract_metadata(conversation):
     }
 
 
-def sanitize_yaml_value(value):
-    """Escape problematic characters and wrap the value in quotes."""
+def sanitize_yaml_value(value: Any) -> str | int:
+    """Sanitize a value for inclusion in YAML by escaping problematic characters and wrapping the value in quotes.
+
+    Args:
+        value (Any): The value to sanitize
+
+    Returns:
+        str | int: The sanitized value
+    """
+
     if value is None:
         return '"-"'
     if isinstance(value, int):
         return value
     # Escape double quotes and wrap the value in double quotes
-    sanitized = '"' + str(value).replace('"', r"\"") + '"'
+    sanitized: str = '"' + str(value).replace('"', r"\"") + '"'
     return sanitized
 
 
-def build_metadata_block(metadata):
-    """Build a markdown block containing metadata."""
+def build_metadata_block(metadata: dict[str, Any]) -> str:
+    """Build a markdown block containing metadata information.
+
+    Args:
+        metadata (dict[str, Any]): The metadata dictionary
+
+    Returns:
+        str: A string representing a markdown block
+    """
+
     return f"""---
 link: "https://chat.openai.com/c/{metadata["id"]}"
 title: {sanitize_yaml_value(metadata["title"])}
@@ -89,15 +130,28 @@ custom_instructions:
 
 
 def save_conversation_to_md(
-    title, conversation_text, title_occurrences, path, metadata
-):
-    """Save the conversation to a markdown file."""
-    occurrence = title_occurrences[title]
-    filename = title + (f" ({occurrence})" if occurrence > 0 else "")
-    title_occurrences[title] += 1
-    file_path = os.path.join(path, f"{filename}.md")
+    title: str,
+    conversation_text: str,
+    title_occurrences: dict[str, int],
+    path: str,
+    metadata: dict[str, Any],
+) -> None:
+    """Save a conversation along with its metadata to a markdown file.
 
-    metadata_block = build_metadata_block(metadata)
+    Args:
+        title (str): The title of the conversation
+        conversation_text (str): The conversation text
+        title_occurrences (dict[str, int]): A dictionary to keep track of title occurrences
+        path (str): The path where the markdown file should be saved
+        metadata (dict[str, Any]): The metadata dictionary
+    """
+
+    occurrence: int = title_occurrences[title]
+    filename: str = title + (f" ({occurrence})" if occurrence > 0 else "")
+    title_occurrences[title] += 1
+    file_path: str = os.path.join(path, f"{filename}.md")
+
+    metadata_block: str = build_metadata_block(metadata)
 
     try:
         with open(file_path, "w", encoding="utf-8") as md_file:

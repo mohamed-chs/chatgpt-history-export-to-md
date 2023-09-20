@@ -1,16 +1,27 @@
 # main.py
 
-import os
-import json
 import argparse
+import json
+import os
 from collections import defaultdict
-from src.utils import sanitize_title, extract_zip, get_most_recent_zip, format_title
+from typing import Any
+
 from src.message_processing import format_message_as_md
 from src.metadata_extraction import extract_metadata, save_conversation_to_md
+from src.utils import extract_zip, format_title, get_most_recent_zip, sanitize_title
 
 
-def get_absolute_path(path, home_directory):
-    """Convert a potentially relative path to an absolute path, relative to the home directory."""
+def get_absolute_path(path: str, home_directory: str) -> str:
+    """Convert a potentially relative path to an absolute path, relative to the home directory.
+
+    Args:
+        path (str): The input path (either relative or absolute).
+        home_directory (str): The home directory path.
+
+    Returns:
+        str: The absolute path.
+    """
+
     if path.startswith(("~", home_directory)):
         path = os.path.expanduser(path)
     elif path.startswith(("/", "\\")):
@@ -21,15 +32,20 @@ def get_absolute_path(path, home_directory):
     return os.path.abspath(path)
 
 
-def parse_arguments():
-    """Parse command-line arguments."""
-    parser = argparse.ArgumentParser(description="Process some JSON files.")
+def parse_arguments() -> argparse.Namespace:
+    """Parse command-line arguments.
 
-    home_directory = os.path.expanduser("~")
-    default_out_folder = os.path.join(
+    Returns:
+        argparse.Namespace: Parsed arguments.
+    """
+
+    parser = argparse.ArgumentParser(description="Process some JSON files.")
+    home_directory: str = os.path.expanduser("~")
+
+    default_out_folder: str = os.path.join(
         home_directory, "Documents", "ChatGPT-Conversations", "MD"
     )
-    default_zip_file = get_most_recent_zip()
+    default_zip_file: str | None = get_most_recent_zip()
 
     parser.add_argument(
         "--out_folder",
@@ -49,33 +65,53 @@ def parse_arguments():
     return args
 
 
-def get_sanitized_and_sorted_messages(conversation):
-    """Sanitize and sort messages from the conversation."""
-    title = sanitize_title(conversation["title"])
-    sorted_messages = sorted(
+def get_sanitized_and_sorted_messages(conversation: dict[str, Any]) -> tuple[str, str]:
+    """Sanitize and sort messages from the conversation.
+
+    Args:
+        conversation (dict): The conversation data.
+
+    Returns:
+        tuple[str, str]: The sanitized title and the formatted conversation text.
+    """
+
+    title: str = sanitize_title(conversation["title"])
+    sorted_messages: list[Any] = sorted(
         conversation["mapping"].items(),
         key=lambda x: 0
         if not x[1]["message"] or x[1]["message"].get("create_time") is None
         else x[1]["message"]["create_time"],
     )
-    conversation_text = "".join(
-        [
-            format_message_as_md(value.get("message", {}))
-            for key, value in sorted_messages
-        ]
+    conversation_text: str = "".join(
+        [format_message_as_md(value.get("message", {})) for _, value in sorted_messages]
     )
     return title, conversation_text
 
 
-def process_conversation(conversation, title_occurrences, path):
-    """Process a single conversation."""
+def process_conversation(
+    conversation: dict[str, Any], title_occurrences: defaultdict[str, int], path: str
+) -> None:
+    """Process a single conversation and save it to a Markdown file.
+
+    Args:
+        conversation (dict): The conversation data.
+        title_occurrences (defaultdict[str, int]): A dictionary tracking the occurrences of each title.
+        path (str): The output path.
+    """
+
     title, conversation_text = get_sanitized_and_sorted_messages(conversation)
-    metadata = extract_metadata(conversation)
+    metadata: dict[str, Any] = extract_metadata(conversation)
     save_conversation_to_md(title, conversation_text, title_occurrences, path, metadata)
 
 
-def main(out_folder, zip_file):
-    """Main processing function."""
+def main(out_folder: str, zip_file: str) -> None:
+    """Main processing function.
+
+    Args:
+        out_folder (str): The output folder path.
+        zip_file (str): The ZIP file path.
+    """
+
     if not os.path.isfile(zip_file):
         print(f"ZIP file not found: {zip_file}. Ensure the file exists.")
         return
@@ -102,10 +138,11 @@ def main(out_folder, zip_file):
         print(f"Unexpected error reading {json_filepath}: {e}")
         return
 
-    title_occurrences = defaultdict(int)
-    total_conversations = len(conversations)
+    title_occurrences: defaultdict[str, int] = defaultdict(int)
+    total_conversations: int = len(conversations)
+
     for i, conversation in enumerate(conversations):
-        title = get_sanitized_and_sorted_messages(conversation)[0]
+        title: str = get_sanitized_and_sorted_messages(conversation)[0]
         title = format_title(title)
         process_conversation(conversation, title_occurrences, out_folder)
 
