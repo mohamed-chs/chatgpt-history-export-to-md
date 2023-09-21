@@ -17,7 +17,7 @@ You need to have Python 'snek 🐍' installed on your system. You can download i
 To get the script, you'll want to clone this GitHub repository to your local system. Open a terminal or command prompt and run the following command:
 
 ```bash
-git clone https://github.com/Mohamed-CHS/ChatGPT-history-export-to-Markdown.git
+git clone https://github.com/Mohamed-CHS/chatgpt-history-export-to-md.git
 ```
 
 #### Step 3: Navigate to the Project Directory 📂
@@ -25,7 +25,7 @@ git clone https://github.com/Mohamed-CHS/ChatGPT-history-export-to-Markdown.git
 Next, navigate to the project directory by using the following command in your terminal or command prompt:
 
 ```bash
-cd ChatGPT-history-export-to-Markdown
+cd chatgpt-history-export-to-md
 ```
 
 #### Step 4: Download Your Conversations data 🗂
@@ -73,7 +73,7 @@ After running the script, check the output folder for your neatly formatted Mark
 
 Feel free to fork this repository and make your enhancements or improvements. (it still leaves a lot to be desired 😅)
 
-If you encounter any issues or have questions, feel free to open a discussion [here](https://github.com/Mohamed-CHS/ChatGPT-history-export-to-Markdown/issues) or in the Reddit post [here](https://www.reddit.com/r/ChatGPT/comments/16k1ub5/i_made_a_simple_chatgpt_history_to_markdown/).
+If you encounter any issues or have questions, feel free to open a discussion [here](https://github.com/Mohamed-CHS/chatgpt-history-export-to-md/issues) or in the Reddit post [here](https://www.reddit.com/r/ChatGPT/comments/16k1ub5/i_made_a_simple_chatgpt_history_to_markdown/).
 
 ### Enjoy Your Conversations in Markdown! 🎈
 
