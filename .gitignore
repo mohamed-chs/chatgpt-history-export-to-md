@@ -1,6 +1,6 @@
 __pycache__/
 node_modules/
-private.txt
-testing.py
 ansi_formatter.py
 .venv/
+.mypy_cache
+.pytest_cache
