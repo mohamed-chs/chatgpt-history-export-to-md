@@ -1,9 +1,14 @@
 # metadata_extraction.py
 
+import json
 import os
 from typing import Any
 
-from .utils import timestamp_to_str
+from .utils import replace_delimiters, timestamp_to_str as tts
+
+# Load the configuration JSON file
+with open("config.json") as file:
+    config = json.load(file)
 
 
 def extract_metadata_values(
@@ -112,21 +117,31 @@ def build_metadata_block(metadata: dict[str, Any]) -> str:
         str: A string representing a markdown block
     """
 
-    return f"""---
-link: "https://chat.openai.com/c/{metadata["id"]}"
-title: {sanitize_yaml_value(metadata["title"])}
-time_created: {sanitize_yaml_value(timestamp_to_str(metadata["create_time"]))}
-time_updated: {sanitize_yaml_value(timestamp_to_str(metadata["update_time"]))}
-model: {sanitize_yaml_value(metadata["model_slug"])}
-total_messages: {sanitize_yaml_value(metadata["total_messages"])}
-code_messages: {sanitize_yaml_value(metadata["code_messages"])}
-message_types: {sanitize_yaml_value(', '.join(metadata["message_types"]))}
-custom_instructions:
-  about_user_message: {sanitize_yaml_value(metadata.get("about_user_message"))}
-  about_model_message: {sanitize_yaml_value(metadata.get("about_model_message"))}
----
+    syv = sanitize_yaml_value
 
-"""
+    block_parts: list[str] = ["---"]
+
+    metadata_mapping: dict[str, str] = {
+        "chat_link": f'chat_link: "https://chat.openai.com/c/{metadata["id"]}"',
+        "title": f"title: {syv(metadata['title'])}",
+        "time_created": f"time_created: {syv(tts(metadata['create_time']))}",
+        "time_updated": f"time_updated: {syv(tts(metadata['update_time']))}",
+        "model": f"model: {syv(metadata['model_slug'])}",
+        "total_messages": f"total_messages: {syv(metadata['total_messages'])}",
+        "code_messages": f"code_messages: {syv(metadata['code_messages'])}",
+        "message_types": f"message_types: {syv(', '.join(metadata['message_types']))}",
+        "custom_instructions": f"""custom_instructions:
+  about_user_message: {syv(metadata.get('about_user_message'))}
+  about_model_message: {syv(metadata.get('about_model_message'))}""",
+    }
+
+    for key, value in metadata_mapping.items():
+        if config["yaml_header"].get(key):
+            block_parts.append(value)
+
+    block_parts.append("---\n\n")
+
+    return "\n".join(block_parts)
 
 
 def save_conversation_to_md(
@@ -158,6 +173,11 @@ def save_conversation_to_md(
             md_file.write(metadata_block)
             md_file.write(f"# {title}\n\n")
             md_file.write(conversation_text)
+
+        # Replace all the LaTeX bracket delimiters in the MD file with dollar sign ones.
+        delimiters_default: bool = config.get("delimiters_default", True)
+        if not delimiters_default:
+            replace_delimiters(file_path)
 
         # Set the file's modification time based on 'Time Updated'
         os.utime(file_path, (metadata["update_time"], metadata["update_time"]))

@@ -2,5 +2,17 @@
   "system_title": "System",
   "user_title": "Me",
   "assistant_title": "ChatGPT",
-  "tool_title": "Code output"
+  "tool_title": "Code output",
+  "delimiters_default": true,
+  "yaml_header": {
+    "chat_link": true,
+    "title": true,
+    "time_created": true,
+    "time_updated": true,
+    "model": true,
+    "total_messages": true,
+    "code_messages": true,
+    "message_types": true,
+    "custom_instructions": true
+  }
 }

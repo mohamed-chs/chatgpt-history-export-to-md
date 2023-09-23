@@ -1,0 +1,11 @@
+{
+    "editor.inlayHints.enabled": "offUnlessPressed",
+    "editor.inlayHints.padding": true,
+    "python.analysis.inlayHints.functionReturnTypes": true,
+    "python.analysis.inlayHints.pytestParameters": true,
+    "python.analysis.inlayHints.variableTypes": true,
+    "python.analysis.inlayHints.callArgumentNames": "partial",
+    "editor.bracketPairColorization.independentColorPoolPerBracketType": true,
+    "python.analysis.typeCheckingMode": "strict",
+    "workbench.startupEditor": "readme"
+}

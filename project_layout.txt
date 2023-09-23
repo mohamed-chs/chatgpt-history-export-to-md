@@ -3,14 +3,22 @@
 [.github] (...)
 .gitignore
 [.mypy_cache] (...)
-[.venv] (...)
+[.pytest_cache] (...)
 config.json
 [demo]
-    ├── Fibonacci with Matrix Exponentiation.md
-    └── Fibonacci with Matrix Exponentiation.png
+    ├── Fibonacci-dollar-signs.md
+    ├── Fibonacci.md
+    └── Fibonacci.png
 [images]
-    ├── chatgpt-logo.png
-    └── python-logo.png
+    ├── chat.openai-bottom-left-widget.png
+    ├── chat.openai-confirm-export.png
+    ├── chat.openai-data-controls.png
+    ├── chat.openai-email.png
+    ├── chat.openai-settings.png
+    ├── chatgpt-logo.svg
+    ├── git-logo.png
+    ├── python-logo.png
+    └── zip-file-content.png
 LICENSE
 main.py
 project_layout.txt

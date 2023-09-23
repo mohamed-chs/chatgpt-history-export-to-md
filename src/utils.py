@@ -116,3 +116,25 @@ def format_title(title: str, max_length: int = 50) -> str:
         if len(single_line_title) > max_length
         else single_line_title
     )
+
+
+def replace_delimiters(file_name: str) -> None:
+    """Replace all the LaTeX bracket delimiters in the MD file with dollar sign ones.
+
+    Args:
+        file_name (str): The Markdown file to modify.
+    """
+
+    with open(file_name, "r", encoding="utf-8") as file:
+        content: str = file.read()
+
+        # Use regular expressions to replace delimiters
+        # Be careful to ensure we don't match nested or broken delimiters.
+        # Replace \[ ... \] first to avoid overlap with \( ... \)
+        content = re.sub(r"\\\[", "$$", content)
+        content = re.sub(r"\\\]", "$$", content)
+        content = re.sub(r"\\\(", "$", content)
+        content = re.sub(r"\\\)", "$", content)
+
+    with open(file_name, "w", encoding="utf-8") as file:
+        file.write(content)

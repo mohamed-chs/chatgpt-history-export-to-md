@@ -3,7 +3,7 @@
 import json
 from typing import Any, Optional
 
-# Load the role mapping from a JSON file
+# Load the configuration JSON file
 with open("config.json") as f:
     config = json.load(f)
 
