@@ -2,18 +2,15 @@
 
 Welcome to the ChatGPT Conversations to Markdown converter! This Python script helps you to convert your entire ChatGPT history and data export into neatly formatted Markdown files.
 
-It adds YAML headers, and also includes **Code interpreter** (Advanced Data Analysis) input / output.
+<img src="images/chatgpt-logo.svg" alt="ChatGPT Logo" width="70"/>
+
+It adds **YAML** headers, and also includes **Code interpreter** (Advanced Data Analysis) input / output.
 
 #### See Examples : [Screenshot](demo/Fibonacci.png), [Markdown](demo/Fibonacci.md), [Markdown with dollar signs](demo/Fibonacci-dollar-signs.md), [Chat link](https://chat.openai.com/share/27b6df58-a590-41ac-9eff-f567602fe692).
 
 ## Quick setup
 
-<!--
-#### Step 1: Setting Up 🛠
-
-<img src="images/python-logo.png" alt="Python Logo" width="70"/>
-
-You need to have Python 'snek 🐍' installed on your system. You can download it from the [official Python website](https://www.python.org/). -->
+See [Prerequisites](#prerequisites).
 
 ### Step 1: Clone the Repository 📥
 
@@ -117,6 +114,16 @@ You can also modify the [config.json](config.json) file, to customize the output
 
 Change `"delimiters_default"` to `false` to replace all $\LaTeX$ bracket delimiters : `\(...\)` and `\[...\]`, with dollar sign ones : `$...$` and `$$...$$`, if you'd like your math to render beautifully in Markdown readers that support **MathJax** (like Obsidian).
 
+### Issues and contributions 🆘
+
+Feel free to fork this repository and make your enhancements or improvements. ALL contributions are welcome !
+
+If you encounter any issues or have questions, feel free to open a discussion [here](https://github.com/mohamed-chs/chatgpt-history-export-to-md/issues) or leave a comment on the Reddit post [here](https://www.reddit.com/r/ChatGPT/comments/16k1ub5/i_made_a_simple_chatgpt_history_to_markdown/).
+
+### Enjoy Your Conversations in Markdown! 🎈
+
+Hopefully, you find value in this tool. If you do, giving it a star ⭐ on the repository would mean a lot. Thank you!
+
 ### Prerequisites
 
 <img src="images/python-logo.png" alt="Python Logo" width="70" style="margin-right: 20px;"/> <img src="images/git-logo.png" alt="Git Logo" width="70"/>
@@ -126,16 +133,6 @@ You can download them from :
 
 - [Official Python website](https://www.python.org/downloads/)
 - [Official Git website](https://git-scm.com/downloads)
-
-### Issues and contributions 🆘
-
-Feel free to fork this repository and make your enhancements or improvements. ALL contributions are welcome !
-
-If you encounter any issues or have questions, feel free to open a discussion [here](https://github.com/mohamed-chs/chatgpt-history-export-to-md/issues) or leave a comment on the Reddit post [here](https://www.reddit.com/r/ChatGPT/comments/16k1ub5/i_made_a_simple_chatgpt_history_to_markdown/).
-
-### Enjoy Your Conversations in Markdown! 🎈
-
-I hope you find this tool useful for enjoying your ChatGPT conversations in a new, neat, and organized format!
 
 ### Notes
 
