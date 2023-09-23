@@ -23,7 +23,7 @@ git clone https://github.com/mohamed-chs/chatgpt-history-export-to-md.git
 Next, navigate to the project directory by using the following command:
 
 ```bash
-cd ChatGPT-history-export-to-Markdown
+cd chatgpt-history-export-to-md
 ```
 
 ### Step 2: Download Your Conversations data 🗂
