@@ -4,9 +4,6 @@ title: "Fibonacci with Matrix Exponentiation"
 time_created: "17 Sep 2023, 02:13:00"
 time_updated: "17 Sep 2023, 02:13:34"
 model: "gpt-4-code-interpreter"
-total_messages: 3
-code_messages: 1
-message_types: "execution_output, code, text"
 custom_instructions:
   about_user_message: "I'm a math and CS student, and I like simple and clever solutions."
   about_model_message: "You're a proficient and helpful AI programming and research assistant."

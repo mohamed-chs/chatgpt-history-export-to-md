@@ -1,4 +1,4 @@
-# Your entire ChatGPT data in beautiful Markdown ! <img src="images/markdown.png" alt="Markdown Logo" width="50"/>
+# Your entire ChatGPT data in beautiful Markdown <img src="images/markdown.png" alt="Markdown Logo" width="50"/>
 
 Welcome to the ChatGPT Conversations to Markdown converter! This Python script helps you to convert your entire ChatGPT history and data export into neatly formatted Markdown files.
 
@@ -113,6 +113,8 @@ You can also modify the [config.json](config.json) file, to customize the output
 ```
 
 Change `"delimiters_default"` to `false` to replace all $\LaTeX$ bracket delimiters : `\(...\)` and `\[...\]`, with dollar sign ones : `$...$` and `$$...$$`, if you'd like your math to render beautifully in Markdown readers that support **MathJax** (like Obsidian).
+
+You can also configure the YAML header in the `config.json` to add or remove fields.
 
 ### Issues and contributions 🆘
 

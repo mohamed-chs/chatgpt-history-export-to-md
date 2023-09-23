@@ -3,7 +3,7 @@
   "user_title": "Me",
   "assistant_title": "ChatGPT",
   "tool_title": "Code output",
-  "delimiters_default": false,
+  "delimiters_default": true,
   "yaml_header": {
     "chat_link": true,
     "title": true,
