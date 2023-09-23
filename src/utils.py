@@ -11,7 +11,7 @@ from typing import Optional
 
 # Checking Python version to ensure compatibility
 if sys.version_info < (3, 10):
-    raise Exception("Python 3.10 or a more recent version is required.")
+    raise RuntimeError("Python 3.10 or a more recent version is required.")
 
 # Pre-compiled pattern for disallowed characters in file names
 DISALLOWED_CHARS_PATTERN = re.compile(r'[<>:"/\\|?*\n\r\t\f\v]')
@@ -30,8 +30,10 @@ def extract_zip(zip_filepath: str) -> None:
         with zipfile.ZipFile(zip_filepath, "r") as zip_ref:
             zip_ref.extractall(extract_folder)
             print(f"Successfully extracted ZIP file to '{extract_folder}'")
-    except Exception as e:
-        print(f"An error occurred while extracting the ZIP file: {e}")
+    except zipfile.BadZipFile as error:
+        print(f"The ZIP file is corrupted or invalid: {error}")
+    except IOError as error:
+        print(f"I/O error occurred while extracting the ZIP file: {error}")
 
 
 def get_most_recent_zip() -> Optional[str]:
@@ -42,7 +44,7 @@ def get_most_recent_zip() -> Optional[str]:
         FileNotFoundError: If no ZIP files are found in the 'Downloads' directory.
 
     Returns:
-        Optional[str]: The path to the most recent ZIP file, or None if no ZIP files are found or an error occurs.
+        Optional[str]: Path to the most recent ZIP file in 'Downloads', or None
     """
 
     try:
@@ -59,8 +61,8 @@ def get_most_recent_zip() -> Optional[str]:
             raise FileNotFoundError("No ZIP files found in the 'Downloads' directory.")
 
         return max(zip_files, key=os.path.getctime)
-    except Exception as e:
-        print(f"An error occurred while looking for the ZIP file: {e}")
+    except FileNotFoundError as error:
+        print(f"An error occurred while looking for the ZIP file: {error}")
         return None
 
 
@@ -92,15 +94,13 @@ def timestamp_to_str(timestamp: float) -> Optional[str]:
         dt_object = datetime.datetime.utcfromtimestamp(timestamp)
         formatted_timestamp: str = dt_object.strftime("%d %b %Y, %H:%M:%S")
         return formatted_timestamp
-    except ValueError as e:
-        print(f"Invalid timestamp value: {e}")
+    except ValueError as error:
+        print(f"Invalid timestamp value: {error}")
         return None
 
 
 def format_title(title: str, max_length: int = 50) -> str:
-    """Formats the title to a single line with a specified maximum length. If the title is longer than the maximum
-    length, it is truncated and "..." is appended. Used for printing the output in the terminal, not for the actual file
-    names.
+    """Formats the title, for better printing the output in the terminal.
 
     Args:
         title (str): The title to format.

@@ -95,7 +95,7 @@ def process_conversation(
 
     Args:
         conversation (dict): The conversation data.
-        title_occurrences (defaultdict[str, int]): A dictionary tracking the occurrences of each title.
+        title_occurrences (defaultdict[str, int]): Tracks the occurrences of each title.
         path (str): The output path.
     """
 
@@ -129,13 +129,13 @@ def main(out_folder: str, zip_file: str) -> None:
     print(f"Writing MD files in : '{out_folder}' ...")
 
     try:
-        with open(json_filepath, "r") as file:
+        with open(json_filepath, "r", encoding="utf-8") as file:
             conversations = json.load(file)
     except json.JSONDecodeError:
         print(f"Error decoding JSON from {json_filepath}.")
         return
-    except Exception as e:
-        print(f"Unexpected error reading {json_filepath}: {e}")
+    except IOError as error:
+        print(f"I/O error reading {json_filepath}: {error}")
         return
 
     title_occurrences: defaultdict[str, int] = defaultdict(int)
@@ -154,12 +154,12 @@ def main(out_folder: str, zip_file: str) -> None:
         )
 
     print(
-        f"\r\n\r\nProcessing completed.",
+        "\r\n\r\nProcessing completed.",
         end="\n\n",
         flush=True,
     )
 
 
 if __name__ == "__main__":
-    args = parse_arguments()
-    main(args.out_folder, args.zip_file)
+    ARGS = parse_arguments()
+    main(ARGS.out_folder, ARGS.zip_file)

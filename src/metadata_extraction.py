@@ -4,10 +4,11 @@ import json
 import os
 from typing import Any
 
-from .utils import replace_delimiters, timestamp_to_str as tts
+from .utils import replace_delimiters
+from .utils import timestamp_to_str as tts
 
 # Load the configuration JSON file
-with open("config.json") as file:
+with open("config.json", encoding="utf-8") as file:
     config = json.load(file)
 
 
@@ -17,7 +18,7 @@ def extract_metadata_values(
     """Extract metadata values from a mapping using the specified key path.
 
     Args:
-        messages_mapping (dict[str, dict[str, Any]]): The mapping of messages to extract metadata from
+        messages_mapping (dict[str, dict[str, Any]]): Mapping of messages to extract metadata from
         key_path (str): The dot-separated key path to follow in the extraction
 
     Returns:
@@ -89,10 +90,10 @@ def extract_metadata(conversation: dict[str, Any]) -> dict[str, Any]:
 
 
 def sanitize_yaml_value(value: Any) -> str | int:
-    """Sanitize a value for inclusion in YAML by escaping problematic characters and wrapping the value in quotes.
+    """Escape problematic characters and wrap the value in quotes.
 
     Args:
-        value (Any): The value to sanitize
+        value (Any): The value to sanitize, to be included in the YAML header
 
     Returns:
         str | int: The sanitized value
@@ -185,5 +186,3 @@ def save_conversation_to_md(
         print(f"Directory not found: {path}. Please ensure it exists.")
     except PermissionError:
         print(f"Permission denied to write to {file_path}. Check your permissions.")
-    except Exception as e:
-        print(f"Failed to write to file {file_path}. Error: {e}")

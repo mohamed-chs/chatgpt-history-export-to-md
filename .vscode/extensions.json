@@ -4,6 +4,8 @@
         "ms-python.black-formatter",
         "usernamehw.errorlens",
         "njqdev.vscode-python-typehint",
-        "ms-python.mypy-type-checker"
+        "ms-python.mypy-type-checker",
+        "ms-python.python",
+        "ms-python.pylint"
     ]
 }
