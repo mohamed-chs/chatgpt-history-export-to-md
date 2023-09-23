@@ -18,15 +18,12 @@ DISALLOWED_CHARS_PATTERN = re.compile(r'[<>:"/\\|?*\n\r\t\f\v]')
 
 
 def extract_zip(zip_filepath: str) -> None:
-    """
-    Extract the contents of the specified ZIP file.
+    """Extract the contents of the specified ZIP file.
 
     Args:
         zip_filepath (str): The file path of the ZIP file to extract.
-
-    Raises:
-        Exception: If any error occurs during the extraction.
     """
+
     try:
         extract_folder: str = os.path.splitext(os.path.abspath(zip_filepath))[0]
 
@@ -38,15 +35,16 @@ def extract_zip(zip_filepath: str) -> None:
 
 
 def get_most_recent_zip() -> Optional[str]:
-    """
-    Get the most recent ZIP file from the '~/Downloads' directory.
+    """Get the most recent ZIP file from the '~/Downloads' directory.
+
+    Raises:
+        FileNotFoundError: If the 'Downloads' directory is not found.
+        FileNotFoundError: If no ZIP files are found in the 'Downloads' directory.
 
     Returns:
         Optional[str]: The path to the most recent ZIP file, or None if no ZIP files are found or an error occurs.
-
-    Raises:
-        FileNotFoundError: If the 'Downloads' directory or ZIP files are not found.
     """
+
     try:
         downloads_path = str(Path.home() / "Downloads")
 
@@ -67,8 +65,7 @@ def get_most_recent_zip() -> Optional[str]:
 
 
 def sanitize_title(title: str) -> str:
-    """
-    Sanitize the title by replacing disallowed characters with '-'.
+    """Sanitize the title by replacing disallowed characters with '-'.
 
     Args:
         title (str): The title to sanitize.
@@ -76,13 +73,13 @@ def sanitize_title(title: str) -> str:
     Returns:
         str: The sanitized title.
     """
+
     sanitized_title: str = DISALLOWED_CHARS_PATTERN.sub("-", title.strip())
     return sanitized_title
 
 
 def timestamp_to_str(timestamp: float) -> Optional[str]:
-    """
-    Convert a Unix timestamp to a formatted string.
+    """Convert a Unix timestamp to a formatted string.
 
     Args:
         timestamp (float): The Unix timestamp to convert.
@@ -90,6 +87,7 @@ def timestamp_to_str(timestamp: float) -> Optional[str]:
     Returns:
         Optional[str]: The formatted timestamp as a string, or None if the input is invalid.
     """
+
     try:
         dt_object = datetime.datetime.utcfromtimestamp(timestamp)
         formatted_timestamp: str = dt_object.strftime("%d %b %Y, %H:%M:%S")
@@ -100,9 +98,9 @@ def timestamp_to_str(timestamp: float) -> Optional[str]:
 
 
 def format_title(title: str, max_length: int = 50) -> str:
-    """
-    Formats the title to a single line with a specified maximum length. If the title is longer than the maximum
-    length, it is truncated and "..." is appended.
+    """Formats the title to a single line with a specified maximum length. If the title is longer than the maximum
+    length, it is truncated and "..." is appended. Used for printing the output in the terminal, not for the actual file
+    names.
 
     Args:
         title (str): The title to format.
@@ -111,6 +109,7 @@ def format_title(title: str, max_length: int = 50) -> str:
     Returns:
         str: The formatted title.
     """
+
     single_line_title: str = " ".join(title.splitlines())
     return (
         single_line_title[:max_length] + "..."
