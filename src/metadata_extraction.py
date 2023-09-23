@@ -1,9 +1,14 @@
 # metadata_extraction.py
 
+import json
 import os
 from typing import Any
 
-from .utils import timestamp_to_str
+from .utils import replace_delimiters, timestamp_to_str
+
+# Load the configuration JSON file
+with open("config.json") as f:
+    config = json.load(f)
 
 
 def extract_metadata_values(
@@ -113,7 +118,7 @@ def build_metadata_block(metadata: dict[str, Any]) -> str:
     """
 
     return f"""---
-link: "https://chat.openai.com/c/{metadata["id"]}"
+chat_link: "https://chat.openai.com/c/{metadata["id"]}"
 title: {sanitize_yaml_value(metadata["title"])}
 time_created: {sanitize_yaml_value(timestamp_to_str(metadata["create_time"]))}
 time_updated: {sanitize_yaml_value(timestamp_to_str(metadata["update_time"]))}
@@ -158,6 +163,11 @@ def save_conversation_to_md(
             md_file.write(metadata_block)
             md_file.write(f"# {title}\n\n")
             md_file.write(conversation_text)
+
+        # Replace all the LaTeX bracket delimiters in the MD file with dollar sign ones.
+        delimiters_default: bool = config.get("delimiters_default", True)
+        if not delimiters_default:
+            replace_delimiters(file_path)
 
         # Set the file's modification time based on 'Time Updated'
         os.utime(file_path, (metadata["update_time"], metadata["update_time"]))
