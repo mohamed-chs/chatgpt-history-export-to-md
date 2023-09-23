@@ -1,4 +1,4 @@
-# Your entire ChatGPT data in beautiful Markdown 🚀
+# Your entire ChatGPT data in beautiful Markdown ! <img src="images/markdown.png" alt="Markdown Logo" width="50"/>
 
 Welcome to the ChatGPT Conversations to Markdown converter! This Python script helps you to convert your entire ChatGPT history and data export into neatly formatted Markdown files.
 
@@ -105,8 +105,8 @@ You can also modify the [config.json](config.json) file, to customize the output
 ```json
 {
   "system_title": "System",
-  "user_title": "YOUR NAME", // Default : "Me"
-  "assistant_title": "My AI", // Default : "ChatGPT"
+  "user_title": "YOUR NAME",
+  "assistant_title": "My AI",
   "tool_title": "Code output",
   "delimiters_default": true
 }
