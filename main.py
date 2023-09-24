@@ -1,4 +1,39 @@
-# main.py
+"""ChatGPT Conversations Processor.
+
+This module processes exported ChatGPT conversation data from a ZIP file
+and saves the conversations as individual Markdown (MD) files. It provides
+functions to parse command-line arguments, sanitize and sort messages, and
+handle conversation metadata.
+
+The module leverages utility functions from other modules for tasks like
+ZIP extraction, message formatting, title sanitization, and metadata extraction.
+
+Functions:
+    - get_absolute_path(path: str, home_directory: str) -> str:
+        Convert a relative path to an absolute path based on the home directory.
+    
+    - parse_arguments() -> argparse.Namespace:
+        Parse the command-line arguments and return them as an argparse.Namespace object.
+
+    - get_sanitized_and_sorted_messages(conversation: dict[str, Any]) -> tuple[str, str]:
+        Retrieve sanitized titles and sorted messages from the given conversation.
+
+    - process_conversation(
+        conversation: dict[str, Any], title_occurrences: defaultdict[str, int], path: str
+        ) -> None:
+        Handle a single conversation and save its content as an MD file.
+
+    - main(out_folder: str, zip_file: str) -> None:
+        The main processing function, orchestrating the extraction and saving processes.
+
+Attributes:
+    ARGS (argparse.Namespace): Parsed command-line arguments.
+
+Todo:
+    - Add error handling for potential missing keys in JSON.
+    - Implement better logging instead of print statements.
+    - Integrate a progress bar for processing conversations.
+"""
 
 import argparse
 import json
@@ -118,7 +153,9 @@ def main(out_folder: str, zip_file: str) -> None:
 
     extract_zip(zip_file)
 
-    json_filepath = os.path.join(os.path.splitext(zip_file)[0], "conversations.json")
+    json_filepath: str = os.path.join(
+        os.path.splitext(zip_file)[0], "conversations.json"
+    )
     if not os.path.isfile(json_filepath):
         print(
             f"Expected JSON file not found: {json_filepath}. Check the contents of the ZIP file."

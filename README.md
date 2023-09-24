@@ -2,15 +2,16 @@
 
 Welcome to the ChatGPT Conversations to Markdown converter! This Python script helps you to convert your entire ChatGPT history and data export into neatly formatted Markdown files.
 
-<img src="images/chatgpt-logo.svg" alt="ChatGPT Logo" width="70"/>
+It adds **YAML** headers (*optional, included by default*), and also includes **Code interpreter** (Advanced Data Analysis) input / output.
 
-It adds **YAML** headers, and also includes **Code interpreter** (Advanced Data Analysis) input / output.
+
+<img src="images/chatgpt-logo.svg" alt="ChatGPT Logo" width="70"/>
 
 #### See Examples : [Screenshot](demo/Fibonacci.png), [Markdown](demo/Fibonacci.md), [Markdown with dollar signs](demo/Fibonacci-dollar-signs.md), [Chat link](https://chat.openai.com/share/27b6df58-a590-41ac-9eff-f567602fe692).
 
 ## Quick setup
 
-See [Prerequisites](#prerequisites).
+> See [Prerequisites](#prerequisites). (just Python and Git and you're good to go. **No external dependencies !**)
 
 ### Step 1: Clone the Repository 📥
 
@@ -136,9 +137,11 @@ You can download them from :
 - [Official Python website](https://www.python.org/downloads/)
 - [Official Git website](https://git-scm.com/downloads)
 
+Yep, no external dependencies needed.
+
 ### Notes
 
-This is just a small thing I coded to help me see my convos in beautiful markdown, in Obsidian (my note-taking app).
+This is just a small thing I coded to help me see my convos in beautiful markdown, in [Obsidian](https://obsidian.md/) (my note-taking app).
 
 I wasn't a fan of the clunky, and sometimes paid, chrome extensions.
 

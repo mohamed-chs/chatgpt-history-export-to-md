@@ -1,4 +1,37 @@
-# message_processing.py
+"""Message Processing Module.
+
+This module provides functionalities to process, format, and extract information 
+from messages, especially focusing on converting messages into markdown format. 
+Additionally, it allows for determining headings based on the author's role and 
+handles Python script content specially to format it as markdown code.
+
+The module relies on a configuration file named 'config.json' to get default
+values and mappings.
+
+Attributes:
+    config (dict[str, Any]): Configuration loaded from "config.json", providing 
+    default titles and other settings.
+
+Functions:
+    determine_heading(author_role: Optional[str]) -> str:
+        Determines a heading based on the author's role, referring to `config`.
+    
+    get_content_from_parts(content_data: dict[str, Any]) -> Optional[str]:
+        Extracts the primary content from the 'parts' of content data.
+
+    format_python_script(content_data: dict[str, Any]) -> Optional[str]:
+        Formats content data containing Python code as markdown.
+
+    extract_content_from_message(message: dict[str, Any]) -> Optional[str]:
+        Extracts content (normal or Python code) from a given message.
+
+    format_message_as_md(message: dict[str, Any]) -> str:
+        Converts a message dictionary into a markdown formatted string.
+
+Note:
+    This module assumes the presence of a 'config.json' in the same directory, 
+    which should be in valid JSON format.
+"""
 
 import json
 from typing import Any, Optional
@@ -16,7 +49,7 @@ def determine_heading(author_role: Optional[str]) -> str:
     - author_role (Optional[str]): The role of the author.
 
     Returns:
-    - str: A modified version of the author's role based on a configuration file, or "(other)" if not provided.
+    - str: A version of the author's role based on a configuration file.
     """
 
     role_mapping: dict[str, Any] = {

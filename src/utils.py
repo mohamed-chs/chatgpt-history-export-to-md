@@ -1,4 +1,44 @@
-# utils.py
+"""Utilities for File Handling, String Manipulation, and Time Conversion.
+
+This module contains a set of utilities that provide various operations
+related to ZIP file extraction, string formatting and sanitation,
+timestamp conversion, and LaTeX delimiter modification in Markdown files.
+
+When importing this module, ensure that you have Python 3.10 or a more
+recent version to maintain compatibility with the type hints and other
+features.
+
+Attributes:
+    DISALLOWED_CHARS_PATTERN (Pattern): A pre-compiled regex pattern for
+        detecting characters disallowed in file names.
+
+Functions:
+    extract_zip(zip_filepath: str) -> None:
+        Extracts the specified ZIP file.
+
+    get_most_recent_zip() -> Optional[str]:
+        Fetches the path of the most recent ZIP file in the '~/Downloads' directory.
+
+    sanitize_title(title: str) -> str:
+        Sanitizes a title by replacing disallowed characters with '-'.
+
+    timestamp_to_str(timestamp: float) -> Optional[str]:
+        Converts a Unix timestamp to a formatted string.
+
+    format_title(title: str, max_length: int = 50) -> str:
+        Formats a title for better display in the terminal.
+
+    replace_delimiters(file_name: str) -> None:
+        Replaces LaTeX bracket delimiters in a Markdown file with dollar sign delimiters.
+
+Raises:
+    RuntimeError: If the Python version is below 3.10.
+
+Todo:
+    - Improve ZIP extraction with support for password-protected files.
+    - Extend sanitize_title to cover more edge cases.
+    - Refactor the regex patterns for LaTeX delimiter replacements to account for nested delimiters.
+"""
 
 import datetime
 import os
@@ -10,6 +50,7 @@ from pathlib import Path
 from typing import Optional
 
 # Checking Python version to ensure compatibility
+# specifically for the new type hints syntax
 if sys.version_info < (3, 10):
     raise RuntimeError("Python 3.10 or a more recent version is required.")
 
