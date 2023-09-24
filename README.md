@@ -178,7 +178,7 @@ Yep, no external dependencies needed.
 - [ ] output folder (currently set by default or via command line arguments)
 - [ ] more configs ...
 
-> See also : [JavaScript Todo](javascript/how_to_use#still-working-on)
+> See also : [JavaScript Todo](javascript/how_to_use.md#still-working-on)
 
 ### Notes
 
