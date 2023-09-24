@@ -126,7 +126,7 @@ You can also configure the YAML header in the `config.json` to add or remove fie
 
 Feel free to fork this repository and make your enhancements or improvements. ALL contributions are welcome !
 
-If you encounter any issues or have questions, feel free to open a issue / discussion [here](https://github.com/mohamed-chs/chatgpt-history-export-to-md/issues).
+If you encounter any issues or have questions, feel free to open an [issue](https://github.com/mohamed-chs/chatgpt-history-export-to-md/issues) / [discussion](https://github.com/mohamed-chs/chatgpt-history-export-to-md/discussions).
 
 ### Enjoy Your Conversations in Markdown! 🎈
 
