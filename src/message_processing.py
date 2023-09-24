@@ -1,12 +1,4 @@
-"""Message Processing Module.
-
-This module provides functionalities to process, format, and extract information 
-from messages, especially focusing on converting messages into markdown format. 
-Additionally, it allows for determining headings based on the author's role and 
-handles Python script content specially to format it as markdown code.
-
-The module relies on a configuration file named 'config.json' to get default
-values and mappings.
+"""Message Processing
 
 Attributes:
     config (dict[str, Any]): Configuration loaded from "config.json", providing 
@@ -15,11 +7,8 @@ Attributes:
 Functions:
     determine_heading(author_role: Optional[str]) -> str:
         Determines a heading based on the author's role, referring to `config`.
-    
-    get_content_from_parts(content_data: dict[str, Any]) -> Optional[str]:
-        Extracts the primary content from the 'parts' of content data.
 
-    format_python_script(content_data: dict[str, Any]) -> Optional[str]:
+    format_code(content_data: dict[str, Any]) -> Optional[str]:
         Formats content data containing Python code as markdown.
 
     extract_content_from_message(message: dict[str, Any]) -> Optional[str]:
@@ -31,6 +20,9 @@ Functions:
 Note:
     This module assumes the presence of a 'config.json' in the same directory, 
     which should be in valid JSON format.
+    
+Todo:
+    - Format more content data, for example : plugin use
 """
 
 import json
@@ -42,14 +34,13 @@ with open("config.json", encoding="utf-8") as f:
 
 
 def determine_heading(author_role: Optional[str]) -> str:
-    """
-    Determine the heading based on the author's role.
+    """Determine the heading based on the author's role.
 
     Args:
-    - author_role (Optional[str]): The role of the author.
+        author_role (Optional[str]): The role of the author.
 
     Returns:
-    - str: A version of the author's role based on a configuration file.
+        str: A version of the author's role based on a configuration file.
     """
 
     role_mapping: dict[str, Any] = {
@@ -66,62 +57,49 @@ def determine_heading(author_role: Optional[str]) -> str:
     return author_role.capitalize() if author_role else "(other)"
 
 
-def get_content_from_parts(content_data: dict[str, Any]) -> Optional[str]:
-    """
-    Extract the primary content from the 'parts' of content data, if available.
+def format_code(content_data: dict[str, Any]) -> Optional[str]:
+    """Format content data containing Python code as markdown.
 
     Args:
-    - content_data (dict[str, Any]): The content data dictionary.
+        content_data (dict[str, Any]): The content data dictionary.
 
     Returns:
-    - Optional[str]: The primary content or None if not present.
+        Optional[str]: Formatted Python code as markdown or None if not present.
     """
-    return content_data.get("parts", [None])[0]
 
-
-def format_python_script(content_data: dict[str, Any]) -> Optional[str]:
-    """
-    Format content data containing Python code as markdown.
-
-    Args:
-    - content_data (dict[str, Any]): The content data dictionary.
-
-    Returns:
-    - Optional[str]: Formatted Python code as markdown or None if not present.
-    """
     text: Any | None = content_data.get("text")
     return f"```python\n{text}\n```" if text else None
 
 
 def extract_content_from_message(message: dict[str, Any]) -> Optional[str]:
-    """
-    Extract content from a message.
+    """Extract content from a message.
 
     Args:
-    - message (dict[str, Any]): The message dictionary.
+        message (dict[str, Any]): The message dictionary.
 
     Returns:
-    - Optional[str]: The content extracted from the message.
+        Optional[str]: The content extracted from the message.
     """
+
     content_data = message.get("content", {})
 
-    content: str | None = get_content_from_parts(content_data)
+    content: str | None = content_data.get("parts", [None])[0]
     if content is None:
-        content = format_python_script(content_data)
+        content = format_code(content_data)
 
     return content
 
 
 def format_message_as_md(message: dict[str, Any]) -> str:
-    """
-    Format a message as markdown.
+    """Format a message as markdown.
 
     Args:
-    - message (dict[str, Any]): The message dictionary.
+        message (dict[str, Any]): The message dictionary.
 
     Returns:
-    - str: The message formatted as markdown.
+        str: The message formatted as markdown.
     """
+
     if not message or not message.get("author"):
         return ""
 

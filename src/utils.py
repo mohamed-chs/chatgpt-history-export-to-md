@@ -1,12 +1,4 @@
-"""Utilities for File Handling, String Manipulation, and Time Conversion.
-
-This module contains a set of utilities that provide various operations
-related to ZIP file extraction, string formatting and sanitation,
-timestamp conversion, and LaTeX delimiter modification in Markdown files.
-
-When importing this module, ensure that you have Python 3.10 or a more
-recent version to maintain compatibility with the type hints and other
-features.
+"""Utility Functions
 
 Attributes:
     DISALLOWED_CHARS_PATTERN (Pattern): A pre-compiled regex pattern for
@@ -35,8 +27,6 @@ Raises:
     RuntimeError: If the Python version is below 3.10.
 
 Todo:
-    - Improve ZIP extraction with support for password-protected files.
-    - Extend sanitize_title to cover more edge cases.
     - Refactor the regex patterns for LaTeX delimiter replacements to account for nested delimiters.
 """
 

@@ -1,10 +1,4 @@
-"""Metadata Extraction for Conversations.
-
-This module contains utilities for extracting and processing metadata from 
-conversations. The primary objective is to help facilitate the extraction of
-relevant metadata from conversation data, sanitize it, and save it in an
-organized markdown format. The metadata typically includes conversation 
-identifiers, timestamps, message counts, types, and specific content.
+"""Metadata Extraction
 
 The module performs various tasks:
     - Loading a configuration file to aid in metadata extraction.
@@ -24,13 +18,8 @@ Functions:
     - build_metadata_block: Constructs a markdown block for metadata.
     - save_conversation_to_md: Save conversation data and metadata to a markdown file.
 
-Note:
-    The module leverages helper functions from the 'utils' module for tasks 
-    like delimiter replacement and timestamp formatting.
-
 Todo:
-    - Consider refactoring to support different formats beyond markdown.
-    - Introduce better error handling for data inconsistencies.
+    - Support different formats beyond markdown
 """
 
 import json

@@ -1,12 +1,4 @@
-"""ChatGPT Conversations Processor.
-
-This module processes exported ChatGPT conversation data from a ZIP file
-and saves the conversations as individual Markdown (MD) files. It provides
-functions to parse command-line arguments, sanitize and sort messages, and
-handle conversation metadata.
-
-The module leverages utility functions from other modules for tasks like
-ZIP extraction, message formatting, title sanitization, and metadata extraction.
+"""main module
 
 Functions:
     - get_absolute_path(path: str, home_directory: str) -> str:
@@ -30,9 +22,9 @@ Attributes:
     ARGS (argparse.Namespace): Parsed command-line arguments.
 
 Todo:
-    - Add error handling for potential missing keys in JSON.
-    - Implement better logging instead of print statements.
-    - Integrate a progress bar for processing conversations.
+    - Better command line output formatting
+    - Configs from the command line
+    - Link to submit issues or feedback
 """
 
 import argparse

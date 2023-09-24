@@ -142,6 +142,26 @@ You can download them from :
 
 Yep, no external dependencies needed.
 
+### TODO
+
+**command line**
+
+- [ ] Nicer command line output formatting
+- [ ] More configs from the command line (overwrite the config.json)
+- [ ] Link to submit issues or feedback
+- [ ] more todos ...
+
+**general**
+
+- [ ] JavaScript to regularly update conversations
+- [ ] Update past conversations
+- [ ] Add HTML as an output option
+- [ ] Format more content data, for example : plugin use
+- [ ] Support different response selections in a chat
+- [ ] Extract more data from the JSON files, like user feedback per message
+- [ ] Option to add metadata for each individual message
+- [ ] more todos ...
+
 ### Notes
 
 This is just a small thing I coded to help me see my convos in beautiful markdown, in [Obsidian](https://obsidian.md/) (my note-taking app).
