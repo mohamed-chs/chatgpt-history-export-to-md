@@ -159,7 +159,7 @@ Feel free to add or check items.
 - [ ] More robust testing setup
 - [ ] Data visualizations : chat times, frequency, models, word clouds, etc...
 - [ ] Data analysis : categories and more classifications based on topics, concepts, programming tools, etc ...
-- [ ] Integration with Obsidian (whatever that looks like)
+- [ ] Integration with Obsidian (folders and subfolders, tags, ...)
 - [ ] Add HTML as an output option
 - [ ] Format more content data, for example : plugin use
 - [ ] Support different response selections in a chat
