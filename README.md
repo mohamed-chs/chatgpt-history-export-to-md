@@ -100,6 +100,8 @@ python main.py --out_folder "Obsidian_Vault/Chats" --zip_file "My downloads/my_c
 
 This will extract and look for the `conversations.json` file in `~/My downloads/my_chat.zip`, and create the MD files in `~/Obsidian_Vault/Chats`.
 
+<img src="images/obsidian-logo.png" alt="Obsidian Logo" width="50"/>
+
 (on **Windows**, `~/` refers to `C:/Users/{your_username}/`).
 
 #### `config.json`
@@ -127,6 +129,7 @@ You can also configure the YAML header in the `config.json` to add or remove fie
 Feel free to fork this repository and make your enhancements or improvements. ALL contributions are welcome !
 
 If you encounter any issues or have questions, feel free to open an [issue](https://github.com/mohamed-chs/chatgpt-history-export-to-md/issues) / [discussion](https://github.com/mohamed-chs/chatgpt-history-export-to-md/discussions).
+See also : [HN post](https://news.ycombinator.com/item?id=37636701).
 
 ### Enjoy Your Conversations in Markdown! 🎈
 
