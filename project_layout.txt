@@ -4,7 +4,9 @@
 .gitignore
 [.mypy_cache] (...)
 [.pytest_cache] (...)
+[.vscode] (...)
 config.json
+CONTRIBUTING.md
 [demo]
     ├── Fibonacci-dollar-signs.md
     ├── Fibonacci.md
@@ -17,15 +19,22 @@ config.json
     ├── chat.openai-settings.png
     ├── chatgpt-logo.svg
     ├── git-logo.png
+    ├── markdown.png
     ├── python-logo.png
     └── zip-file-content.png
+[javascript]
+    ├── bookmarklet.js
+    ├── cdnjs.cloudflare.com_ajax_libs_jszip_3.10.1_jszip.min.js
+    └── how_to.md
 LICENSE
 main.py
 project_layout.txt
 README.md
+requirements.txt
 [src]
     ├── message_processing.py
     ├── metadata_extraction.py
     ├── utils.py
     ├── __init__.py
     └── [__pycache__] (...)
+[__pycache__] (...)

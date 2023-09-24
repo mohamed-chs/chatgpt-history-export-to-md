@@ -111,7 +111,7 @@ You can also modify the [config.json](config.json) file, to customize the output
   "system_title": "System",
   "user_title": "YOUR NAME",
   "assistant_title": "My AI",
-  "tool_title": "Code output",
+  "tool_title": "Code output (or plugin name)",
   "delimiters_default": true
 }
 ```
@@ -122,9 +122,11 @@ You can also configure the YAML header in the `config.json` to add or remove fie
 
 ### Issues and contributions 🆘
 
+> See [CONTRIBUTING.md](CONTRIBUTING.md).
+
 Feel free to fork this repository and make your enhancements or improvements. ALL contributions are welcome !
 
-If you encounter any issues or have questions, feel free to open a discussion [here](https://github.com/mohamed-chs/chatgpt-history-export-to-md/issues) or leave a comment on the Reddit post [here](https://www.reddit.com/r/ChatGPT/comments/16k1ub5/i_made_a_simple_chatgpt_history_to_markdown/).
+If you encounter any issues or have questions, feel free to open a issue / discussion [here](https://github.com/mohamed-chs/chatgpt-history-export-to-md/issues).
 
 ### Enjoy Your Conversations in Markdown! 🎈
 
@@ -144,6 +146,23 @@ Yep, no external dependencies needed.
 
 ### TODO
 
+**general**
+
+- [x] keep external dependencies to a minimum (0 so far)
+- [x] Javascript to download more conversations, see [Javascript](javascript)
+- [ ] Add new conversations to the MD folder
+- [ ] Update past conversations
+- [ ] More robust testing setup
+- [ ] Data visualizations : chat times, frequency, models, word clouds, etc...
+- [ ] Data analysis : categories and more classifications based on topics, concepts, programming tools, etc ...
+- [ ] Integration with Obsidian (whatever that looks like)
+- [ ] Add HTML as an output option
+- [ ] Format more content data, for example : plugin use
+- [ ] Support different response selections in a chat
+- [ ] Extract more data from the JSON files, like user feedback per message
+- [ ] Option to add metadata for each individual message
+- [ ] more todos ...
+
 **command line**
 
 - [ ] Nicer command line output formatting
@@ -151,16 +170,13 @@ Yep, no external dependencies needed.
 - [ ] Link to submit issues or feedback
 - [ ] more todos ...
 
-**general**
+**configs.json**
 
-- [ ] JavaScript to regularly update conversations
-- [ ] Update past conversations
-- [ ] Add HTML as an output option
-- [ ] Format more content data, for example : plugin use
-- [ ] Support different response selections in a chat
-- [ ] Extract more data from the JSON files, like user feedback per message
-- [ ] Option to add metadata for each individual message
-- [ ] more todos ...
+- [x] change user, assistant, and system names
+- [x] yaml header elements
+- [ ] specific configs for each individual conversation / conversation type
+- [ ] output folder (currently set by default or via command line arguments)
+- [ ] more configs ...
 
 ### Notes
 
