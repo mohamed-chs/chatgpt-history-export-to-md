@@ -2,8 +2,7 @@
 
 Welcome to the ChatGPT Conversations to Markdown converter! This Python script helps you to convert your entire ChatGPT history and data export into neatly formatted Markdown files.
 
-It adds **YAML** headers (*optional, included by default*), and also includes **Code interpreter** (Advanced Data Analysis) input / output.
-
+It adds **YAML** headers (_optional, included by default_), and also includes **Code interpreter** (Advanced Data Analysis) input / output.
 
 <img src="images/chatgpt-logo.svg" alt="ChatGPT Logo" width="70"/>
 
@@ -31,10 +30,12 @@ cd chatgpt-history-export-to-md
 
 Before you run the script, make sure your ChatGPT conversations are in a ZIP file format.
 
-<details>
-  <summary>Click to EXPAND instructions :</summary>
+<details id="download-instructions">
+  <summary>How to download : (click to expand/collapse)</summary>
+
+<hr>
   
-  1.  Sign in to ChatGPT at https://chat.openai.com
+1.  Sign in to ChatGPT at https://chat.openai.com
 
 2.  At the bottom of the left side bar, click on your profile name, the on **Settings**
 
@@ -60,9 +61,11 @@ Before you run the script, make sure your ChatGPT conversations are in a ZIP fil
 
     ![ZIP File Content](images/zip-file-content.png)
 
+    [↑ Collapse](#download-instructions)
+
 </details>
 
->
+<hr>
 
 The script will automatically find the most recent ZIP file in your 'Downloads' directory (in `~/Downloads/`), but you can specify a different file or location if necessary.
 
