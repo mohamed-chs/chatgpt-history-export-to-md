@@ -100,6 +100,8 @@ python main.py --out_folder "Obsidian_Vault/Chats" --zip_file "My downloads/my_c
 
 This will extract and look for the `conversations.json` file in `~/My downloads/my_chat.zip`, and create the MD files in `~/Obsidian_Vault/Chats`.
 
+<img src="images/obsidian-logo.png" alt="Obsidian Logo" width="50"/>
+
 (on **Windows**, `~/` refers to `C:/Users/{your_username}/`).
 
 #### `config.json`
