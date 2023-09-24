@@ -5,9 +5,9 @@
 - Then, past [this code](bookmarklet.js) and hit 'Enter'
 
 This is a very rudimentary js script, and it needs more error handling. I've tried it on Chrome, and it works so far.
-Could break at anytime if OpenAI changes their data permissions for the `/backend-api/` API.
+Could break at anytime if OpenAI changes their data permissions or the `/backend-api/` API.
 
-Why can't I just use a CDN link in bookmarklet.js to load the JSZIP instead of having to copy-paste the code into the dev console first? Because of the Content Security Policy (CSP) on the chat.openai.com website.
+Why can't I just use a CDN link in bookmarklet.js to load the JSZIP instead of having to copy-paste the code into the dev console first? cuz of the Content Security Policy (CSP) on the chat.openai.com website.
 
 Feel free to modify the script to your liking. Would also appreciate sharing the modified version with others here via a PR.
 
@@ -15,6 +15,7 @@ Feel free to modify the script to your liking. Would also appreciate sharing the
 
 - [ ] add support to add new conversations to the Markdown output folder
 - [ ] update old ones
+- [ ] more seamless api rate limit handling (currently just pauses for a minute after ~50 chat downloads)
 - [ ] update the data analysis and visualization
 - [ ] better widget UI (added error messages and progress and such,
 so you can close the dev console and still be kept informed on the process)
