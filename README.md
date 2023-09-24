@@ -150,8 +150,8 @@ Yep, no external dependencies needed.
 
 - [x] keep external dependencies to a minimum (0 so far)
 - [x] Javascript to download more conversations, see [Javascript](javascript)
-- [ ] Add new conversations to the MD folder
-- [ ] Update past conversations
+- [ ] Add new downloaded conversations to the MD folder
+- [ ] Update past conversations if changed
 - [ ] More robust testing setup
 - [ ] Data visualizations : chat times, frequency, models, word clouds, etc...
 - [ ] Data analysis : categories and more classifications based on topics, concepts, programming tools, etc ...
@@ -177,6 +177,8 @@ Yep, no external dependencies needed.
 - [ ] specific configs for each individual conversation / conversation type
 - [ ] output folder (currently set by default or via command line arguments)
 - [ ] more configs ...
+
+> See also : [JavaScript Todo](javascript/how_to_use#still-working-on)
 
 ### Notes
 
