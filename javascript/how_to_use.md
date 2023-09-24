@@ -17,8 +17,8 @@ Feel free to modify the script to your liking. Would also appreciate sharing the
 - [ ] update old ones
 - [ ] more seamless api rate limit handling (currently just pauses for a minute after ~50 chat downloads)
 - [ ] update the data analysis and visualization
-- [ ] better widget UI (added error messages and progress and such,
-so you can close the dev console and still be kept informed on the process)
+- [ ] better widget UI (add error messages and progress and such,
+so you can close the dev console and still be kept informed on the download process)
 - [ ] add instructions on how to create a bookmarklet
 (how to minify the js script, make it url valid, then creating the bookmark in the browser.
 Maybe do all these in-house? but that might need the uglify-js npm dependency ...)
