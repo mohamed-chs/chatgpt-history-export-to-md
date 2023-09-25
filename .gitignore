@@ -2,5 +2,5 @@ __pycache__/
 node_modules/
 .venv/
 
-# my own visualization of my personal data
+# testing visualizations on my personal data
 visualization/
