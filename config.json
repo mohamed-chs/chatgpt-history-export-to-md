@@ -13,6 +13,7 @@
     "total_messages": true,
     "code_messages": true,
     "message_types": true,
+    "used_plugins": true,
     "custom_instructions": true
   },
   "data_visualizations": {}

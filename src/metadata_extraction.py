@@ -20,6 +20,7 @@ Functions:
 
 Todo:
     - Support different formats beyond markdown
+    - Extract "invoked_plugin" names
 """
 
 import json
@@ -108,6 +109,15 @@ def extract_metadata(conversation: dict[str, Any]) -> dict[str, Any]:
             messages_mapping, "metadata.user_context_message_data.about_user_message"
         ),
         "model_slug": extract_metadata_values(messages_mapping, "metadata.model_slug"),
+        "used_plugins": list(
+            set(
+                value["message"]["metadata"]["invoked_plugin"]["namespace"]
+                for _, value in messages_mapping.items()
+                if value.get("message")
+                and value["message"].get("metadata")
+                and value["message"]["metadata"].get("invoked_plugin")
+            )
+        ),
     }
 
 
@@ -153,6 +163,7 @@ def build_metadata_block(metadata: dict[str, Any]) -> str:
         "total_messages": f"total_messages: {syv(metadata['total_messages'])}",
         "code_messages": f"code_messages: {syv(metadata['code_messages'])}",
         "message_types": f"message_types: {syv(', '.join(metadata['message_types']))}",
+        "used_plugins": f"used_plugins: {syv(', '.join(metadata['used_plugins']))}",
         "custom_instructions": f"""custom_instructions:
   about_user_message: {syv(metadata.get('about_user_message'))}
   about_model_message: {syv(metadata.get('about_model_message'))}""",
