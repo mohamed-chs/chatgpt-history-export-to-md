@@ -83,6 +83,8 @@ The default output location for the Markdown files is : `~/Documents/ChatGPT-Con
 
 And that's it! After running the script, check the output folder for your neatly formatted Markdown files.
 
+<a href="https://twitter.com/share?ref_src=twsrc%5Etfw" class="twitter-share-button" data-size="large" data-text="So, this is what my ENTIRE ChatGPT history looks like ..." data-hashtags="chatgpt_history" data-related="theSoCalled_" data-show-count="false">Tweet</a><script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+
 ### Optional: Customize the Script's behavior 🌟
 
 #### command line parameters
