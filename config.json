@@ -14,5 +14,6 @@
     "code_messages": true,
     "message_types": true,
     "custom_instructions": true
-  }
+  },
+  "data_visualizations": {}
 }
