@@ -198,3 +198,13 @@ This is just a small thing I coded to help me see my convos in beautiful markdow
 I wasn't a fan of the clunky, and sometimes paid, chrome extensions.
 
 I'm working on automating it to add new conversations and updating old ones. Had some luck with a JavaScript bookmarklet, still ironing it out tho. Shouldn't take long.
+
+### Star History
+
+<a href="https://star-history.com/#mohamed-chs/chatgpt-history-export-to-md&Timeline">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=mohamed-chs/chatgpt-history-export-to-md&type=Timeline&theme=dark" />
+    <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=mohamed-chs/chatgpt-history-export-to-md&type=Timeline" />
+    <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=mohamed-chs/chatgpt-history-export-to-md&type=Timeline" />
+  </picture>
+</a>
