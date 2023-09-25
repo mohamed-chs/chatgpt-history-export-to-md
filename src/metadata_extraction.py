@@ -154,6 +154,12 @@ def build_metadata_block(metadata: dict[str, Any]) -> str:
 
     block_parts: list[str] = ["---"]
 
+    # longer custom instructions break the obsidian frontmatter.
+    custom_instructions = json.dumps(
+        f"""about_user_message: {syv(metadata.get('about_user_message'))}
+        about_model_message: {syv(metadata.get('about_model_message'))}"""
+    )
+
     metadata_mapping: dict[str, str] = {
         "chat_link": f'chat_link: "https://chat.openai.com/c/{metadata["id"]}"',
         "title": f"title: {syv(metadata['title'])}",
@@ -164,9 +170,7 @@ def build_metadata_block(metadata: dict[str, Any]) -> str:
         "code_messages": f"code_messages: {syv(metadata['code_messages'])}",
         "message_types": f"message_types: {syv(', '.join(metadata['message_types']))}",
         "used_plugins": f"used_plugins: {syv(', '.join(metadata['used_plugins']))}",
-        "custom_instructions": f"""custom_instructions:
-  about_user_message: {syv(metadata.get('about_user_message'))}
-  about_model_message: {syv(metadata.get('about_model_message'))}""",
+        "custom_instructions": f"custom_instructions: {custom_instructions}",
     }
 
     for key, value in metadata_mapping.items():
