@@ -30,6 +30,7 @@ Todo:
 import argparse
 import json
 import os
+import pathlib
 from collections import defaultdict
 from typing import Any
 
@@ -183,10 +184,16 @@ def main(out_folder: str, zip_file: str) -> None:
         )
 
     print(
-        "\r\n\r\nProcessing completed.",
+        "\r\n\r\nProcessing completed 🎉.",
         end="\n\n",
         flush=True,
     )
+
+    path = pathlib.Path(out_folder).resolve()
+
+    uri = path.as_uri()
+
+    print(f"Check the output here : {uri}")
 
 
 if __name__ == "__main__":
