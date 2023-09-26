@@ -1,5 +1,7 @@
 # Your entire ChatGPT data in beautiful Markdown <img src="images/markdown.png" alt="Markdown Logo" width="50"/>
 
+## You can now try out Word Clouds 🔡☁️ on your data !
+
 ![GitHub last commit](https://img.shields.io/github/last-commit/mohamed-chs/chatgpt-history-export-to-md)
 ![GitHub issues](https://img.shields.io/github/issues/mohamed-chs/chatgpt-history-export-to-md)
 
