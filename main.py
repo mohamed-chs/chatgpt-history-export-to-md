@@ -1,26 +1,5 @@
 """main module
 
-Functions:
-    - get_absolute_path(path: str, home_directory: str) -> str:
-        Convert a relative path to an absolute path based on the home directory.
-    
-    - parse_arguments() -> argparse.Namespace:
-        Parse the command-line arguments and return them as an argparse.Namespace object.
-
-    - get_sanitized_and_sorted_messages(conversation: dict[str, Any]) -> tuple[str, str]:
-        Retrieve sanitized titles and sorted messages from the given conversation.
-
-    - process_conversation(
-        conversation: dict[str, Any], title_occurrences: defaultdict[str, int], path: str
-        ) -> None:
-        Handle a single conversation and save its content as an MD file.
-
-    - main(out_folder: str, zip_file: str) -> None:
-        The main processing function, orchestrating the extraction and saving processes.
-
-Attributes:
-    ARGS (argparse.Namespace): Parsed command-line arguments.
-
 Todo:
     - Better command line output formatting
     - Configs from the command line

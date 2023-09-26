@@ -1,26 +1,8 @@
 """Metadata Extraction
 
-The module performs various tasks:
-    - Loading a configuration file to aid in metadata extraction.
-    - Extracting specific metadata values from a nested structure.
-    - Sanitizing values to be used in YAML format.
-    - Building markdown blocks for metadata.
-    - Saving the conversation and its associated metadata to a markdown file.
-
-Attributes:
-    config (dict): Configuration loaded from the 'config.json' file. Determines
-    specific behaviors and settings for metadata extraction and saving.
-
-Functions:
-    - extract_metadata_values: Retrieve specific metadata from nested mappings.
-    - extract_metadata: Extracts essential metadata from a conversation.
-    - sanitize_yaml_value: Ensures values are correctly formatted for YAML.
-    - build_metadata_block: Constructs a markdown block for metadata.
-    - save_conversation_to_md: Save conversation data and metadata to a markdown file.
-
 Todo:
-    - Support different formats beyond markdown
-    - Extract "invoked_plugin" names
+    - [ ] Support different output formats beyond markdown
+    - [x] Extract "invoked_plugin" names
 """
 
 import json

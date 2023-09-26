@@ -1,28 +1,7 @@
 """Message Processing
-
-Attributes:
-    config (dict[str, Any]): Configuration loaded from "config.json", providing 
-    default titles and other settings.
-
-Functions:
-    determine_heading(author_role: Optional[str]) -> str:
-        Determines a heading based on the author's role, referring to `config`.
-
-    format_code(content_data: dict[str, Any]) -> Optional[str]:
-        Formats content data containing Python code as markdown.
-
-    extract_content_from_message(message: dict[str, Any]) -> Optional[str]:
-        Extracts content (normal or Python code) from a given message.
-
-    format_message_as_md(message: dict[str, Any]) -> str:
-        Converts a message dictionary into a markdown formatted string.
-
-Note:
-    This module assumes the presence of a 'config.json' in the same directory, 
-    which should be in valid JSON format.
     
 Todo:
-    - Format more content data, for example : plugin use
+    - [x] Format more content data, for example : plugin use
 """
 
 import json

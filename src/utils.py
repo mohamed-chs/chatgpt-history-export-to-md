@@ -1,31 +1,5 @@
 """Utility Functions
 
-Attributes:
-    DISALLOWED_CHARS_PATTERN (Pattern): A pre-compiled regex pattern for
-        detecting characters disallowed in file names.
-
-Functions:
-    extract_zip(zip_filepath: str) -> None:
-        Extracts the specified ZIP file.
-
-    get_most_recent_zip() -> Optional[str]:
-        Fetches the path of the most recent ZIP file in the '~/Downloads' directory.
-
-    sanitize_title(title: str) -> str:
-        Sanitizes a title by replacing disallowed characters with '-'.
-
-    timestamp_to_str(timestamp: float) -> Optional[str]:
-        Converts a Unix timestamp to a formatted string.
-
-    format_title(title: str, max_length: int = 50) -> str:
-        Formats a title for better display in the terminal.
-
-    replace_delimiters(file_name: str) -> None:
-        Replaces LaTeX bracket delimiters in a Markdown file with dollar sign delimiters.
-
-Raises:
-    RuntimeError: If the Python version is below 3.10.
-
 Todo:
     - Refactor the regex patterns for LaTeX delimiter replacements to account for nested delimiters.
 """
