@@ -2,7 +2,6 @@
 
 ![GitHub last commit](https://img.shields.io/github/last-commit/mohamed-chs/chatgpt-history-export-to-md)
 ![GitHub issues](https://img.shields.io/github/issues/mohamed-chs/chatgpt-history-export-to-md)
-![GitHub contributors](https://img.shields.io/github/contributors/mohamed-chs/chatgpt-history-export-to-md)
 ![GitHub license](https://img.shields.io/github/license/mohamed-chs/chatgpt-history-export-to-md)
 
 ![You're good to go](https://img.shields.io/badge/you're_good-to_go-blue)
