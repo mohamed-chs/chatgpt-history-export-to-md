@@ -6,12 +6,13 @@ Todo:
     - Link to submit issues or feedback
 """
 
-import argparse
 import json
 import os
 import pathlib
 from collections import defaultdict
 from typing import Any
+
+import questionary
 
 from src.message_processing import format_message_as_md
 from src.metadata_extraction import extract_metadata, save_conversation_to_md
@@ -37,39 +38,6 @@ def get_absolute_path(path: str, home_directory: str) -> str:
     if not os.path.isabs(path):
         path = os.path.join(home_directory, path)
     return os.path.abspath(path)
-
-
-def parse_arguments() -> argparse.Namespace:
-    """Parse command-line arguments.
-
-    Returns:
-        argparse.Namespace: Parsed arguments.
-    """
-
-    parser = argparse.ArgumentParser(description="Process some JSON files.")
-    home_directory: str = os.path.expanduser("~")
-
-    default_out_folder: str = os.path.join(
-        home_directory, "Documents", "ChatGPT-Conversations", "MD"
-    )
-    default_zip_file: str | None = get_most_recent_zip()
-
-    parser.add_argument(
-        "--out_folder",
-        help="The path to the output folder.",
-        default=default_out_folder,
-    )
-    parser.add_argument(
-        "--zip_file",
-        help="The path to the exported ZIP file.",
-        default=default_zip_file,
-    )
-
-    args = parser.parse_args()
-    args.out_folder = get_absolute_path(args.out_folder, home_directory)
-    args.zip_file = get_absolute_path(args.zip_file, home_directory)
-
-    return args
 
 
 def get_sanitized_and_sorted_messages(conversation: dict[str, Any]) -> tuple[str, str]:
@@ -111,13 +79,32 @@ def process_conversation(
     save_conversation_to_md(title, conversation_text, title_occurrences, path, metadata)
 
 
-def main(out_folder: str, zip_file: str) -> None:
+# default values
+HOME: str = os.path.expanduser("~")
+
+default_out_folder: str = os.path.join(HOME, "Documents", "ChatGPT-Conversations", "MD")
+default_zip_file: str = get_most_recent_zip()
+
+
+def main():
     """Main processing function.
 
     Args:
         out_folder (str): The output folder path.
         zip_file (str): The ZIP file path.
     """
+
+    out_folder: str = questionary.text(
+        "Enter the path to the Markdown output folder :", default=default_out_folder
+    ).ask()
+
+    out_folder = get_absolute_path(out_folder, HOME)
+
+    zip_file: str = questionary.text(
+        "Enter the path to the exported ZIP file :", default_zip_file
+    ).ask()
+
+    zip_file = get_absolute_path(zip_file, HOME)
 
     if not os.path.isfile(zip_file):
         print(f"ZIP file not found: {zip_file}. Ensure the file exists.")
@@ -176,5 +163,4 @@ def main(out_folder: str, zip_file: str) -> None:
 
 
 if __name__ == "__main__":
-    ARGS = parse_arguments()
-    main(ARGS.out_folder, ARGS.zip_file)
+    main()

@@ -12,44 +12,6 @@ with open("config.json", encoding="utf-8") as f:
     config = json.load(f)
 
 
-def determine_heading(author_role: Optional[str]) -> str:
-    """Determine the heading based on the author's role.
-
-    Args:
-        author_role (Optional[str]): The role of the author.
-
-    Returns:
-        str: A version of the author's role based on a configuration file.
-    """
-
-    role_mapping: dict[str, Any] = {
-        "system": config.get("system_title", "System"),
-        "user": config.get("user_title", "User"),
-        "assistant": config.get("assistant_title", "Assistant"),
-        "tool": config.get("tool_title", "Tool"),
-    }
-
-    # Determine the heading based on the role mapping
-    if author_role in role_mapping:
-        return role_mapping[author_role]
-
-    return author_role.capitalize() if author_role else "(other)"
-
-
-def format_code(content_data: dict[str, Any]) -> Optional[str]:
-    """Format content data containing Python code as markdown.
-
-    Args:
-        content_data (dict[str, Any]): The content data dictionary.
-
-    Returns:
-        Optional[str]: Formatted Python code as markdown or None if not present.
-    """
-
-    text: Any | None = content_data.get("text")
-    return f"```python\n{text}\n```" if text else None
-
-
 def extract_content_from_message(message: dict[str, Any]) -> Optional[str]:
     """Extract content from a message.
 
@@ -60,11 +22,12 @@ def extract_content_from_message(message: dict[str, Any]) -> Optional[str]:
         Optional[str]: The content extracted from the message.
     """
 
-    content_data = message.get("content", {})
+    content_data = message["content"]
 
     content: str | None = content_data.get("parts", [None])[0]
     if content is None:
-        content = format_code(content_data)
+        text = content_data.get("text")
+        content = f"```python\n{text}\n```"
 
     return content
 
@@ -86,7 +49,19 @@ def format_message_as_md(message: dict[str, Any]) -> str:
     if author_role == "system":
         return ""
 
-    heading: str = determine_heading(author_role)
+    role_mapping: dict[str, Any] = {
+        "system": config["system_title"],
+        "user": config["user_title"],
+        "assistant": config["assistant_title"],
+        "tool": config["tool_title"],
+    }
+
+    heading = (
+        role_mapping[author_role]
+        if author_role in role_mapping
+        else "(message author unknown)"
+    )
+
     content: str | None = extract_content_from_message(message)
 
     if "text" in message.get("content", {}):

@@ -29,7 +29,37 @@ Next, navigate to the project directory by using the following command:
 cd chatgpt-history-export-to-md
 ```
 
-### Step 2: Download Your Conversations data 🗂
+### Step 2: Set Up the Environment 🛠️
+
+Before running the script, you need to set up a virtual environment and install the required dependencies.
+
+First, create a virtual environment:
+
+```bash
+python -m venv .venv
+```
+
+Activate the virtual environment:
+
+- On Windows:
+
+```bash
+.venv\Scripts\activate
+```
+
+- On Linux or MacOS:
+
+```bash
+source .venv/bin/activate
+```
+
+Now, install the necessary packages using:
+
+```bash
+pip install -r requirements.txt
+```
+
+### Step 3: Download Your Conversations data 🗂
 
 Before you run the script, make sure your ChatGPT conversations are in a ZIP file format.
 
@@ -72,19 +102,19 @@ Before you run the script, make sure your ChatGPT conversations are in a ZIP fil
 
 The script will automatically find the most recent ZIP file in your 'Downloads' directory (in `~/Downloads/`), but you can specify a different file or location if necessary.
 
-### Step 3: Running the Script 🏃‍♂️
+### Step 4: Running the Script 🏃‍♂️
 
-In the terminal or command prompt, run the script with this command:
+With the environment set up, you can now run the script. In the terminal or command prompt, execute:
 
 ```bash
 python main.py
 ```
 
-The default output location for the Markdown files is : `~/Documents/ChatGPT-Conversations/MD/`. The script will automatically create the directories if they didn't exist. Feel free to [customize](#optional-customize-the-scripts-behavior-🌟) the script's behavior.
+Now, follow the instructions on screen and choose your desired options, the script will handle the rest.
 
-### Step 4: Check the Output 🎉
+### Step 5: Check the Output 🎉
 
-And that's it! After running the script, check the output folder for your neatly formatted Markdown files.
+And that's it! After running the script, head over to the output folder to see your neatly formatted Markdown files.
 
 [![Tweet](https://img.shields.io/twitter/url?style=social&url=https%3A%2F%2Fgithub.com%2Fyourusername%2Fyourrepository)](https://twitter.com/intent/tweet?text=So%2C%20this%20is%20what%20my%20entire%20ChatGPT%20history%20looks%20like%20...%0D%0A%0D%0Aby%20%40theSoCalled_%20on%20GitHub%20%3A%20http%3A%2F%2Fbit.ly%2F3ZuHCCK)
 
@@ -92,26 +122,13 @@ And that's it! After running the script, check the output folder for your neatly
 
 ### Optional: Customize the Script's behavior 🌟
 
-#### command line parameters
-
-Feel free to customize the script's behavior using additional parameters:
-
-- `--out_folder`: Specify the output folder where the MD files will be saved.
-- `--zip_file`: Specify the ZIP file containing the ChatGPT conversations to be converted.
-
-Here is an example command:
+Using the `config.json`, you can modify the script's default parameters. Running
 
 ```bash
-python main.py --out_folder "Obsidian_Vault/Chats" --zip_file "My downloads/my_chat.zip"
+python main.py --config
 ```
 
-This will extract and look for the `conversations.json` file in `~/My downloads/my_chat.zip`, and create the MD files in `~/Obsidian_Vault/Chats`.
-
-<img src="images/obsidian-logo.png" alt="Obsidian Logo" width="50"/>
-
-(on **Windows**, `~/` refers to `C:/Users/{your_username}/`).
-
-#### `config.json`
+will skip the on screen instructions and run the script on the parameters in the JSON file.
 
 You can also modify the [config.json](config.json) file, to customize the output :
 

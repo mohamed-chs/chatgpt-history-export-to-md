@@ -41,7 +41,7 @@ def extract_zip(zip_filepath: str) -> None:
         print(f"I/O error occurred while extracting the ZIP file: {error}")
 
 
-def get_most_recent_zip() -> Optional[str]:
+def get_most_recent_zip() -> str:
     """Get the most recent ZIP file from the '~/Downloads' directory.
 
     Raises:
@@ -68,7 +68,7 @@ def get_most_recent_zip() -> Optional[str]:
         return max(zip_files, key=os.path.getctime)
     except FileNotFoundError as error:
         print(f"An error occurred while looking for the ZIP file: {error}")
-        return None
+        return ""
 
 
 def sanitize_title(title: str) -> str:
