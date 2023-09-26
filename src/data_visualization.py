@@ -9,9 +9,24 @@ import json
 import os
 from typing import Any
 
+import nltk  # type: ignore
 from nltk.corpus import stopwords  # type: ignore
 from wordcloud import WordCloud  # type: ignore
 import matplotlib.pyplot as plt  # type: ignore
+
+
+# This function will check if the stopwords are available. If not, it will download them.
+def ensure_stopwords_downloaded():
+    try:
+        # Try to access the stopwords. If this throws an error, it means they aren't downloaded.
+        nltk.data.find("corpora/stopwords")  # type: ignore
+    except LookupError:
+        # If the stopwords aren't found, download them.
+        nltk.download("stopwords")  # type: ignore
+
+
+# Run the function
+ensure_stopwords_downloaded()
 
 
 def simplify(conversation: dict[str, Any]) -> dict[str, Any]:
