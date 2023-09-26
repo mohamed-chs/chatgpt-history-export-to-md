@@ -16,7 +16,7 @@ import matplotlib.pyplot as plt  # type: ignore
 
 def simplify(conversation: dict[str, Any]) -> dict[str, Any]:
     simple_convo: dict[str, Any] = {}
-    simple_convo["title"] = conversation["title"]
+    simple_convo["title"] = conversation.get("title", "Untitled")
     simple_convo["create_time"] = conversation["create_time"]
     simple_convo["update_time"] = conversation["update_time"]
     simple_convo["id"] = conversation["id"]

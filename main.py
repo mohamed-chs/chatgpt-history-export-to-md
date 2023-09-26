@@ -60,7 +60,7 @@ def get_sanitized_and_sorted_messages(conversation: dict[str, Any]) -> tuple[str
         tuple[str, str]: The sanitized title and the formatted conversation text.
     """
 
-    title: str = PATTERN.sub("-", conversation["title"].strip())
+    title: str = PATTERN.sub("-", conversation.get("title", "Untitled").strip())
     sorted_messages: list[Any] = sorted(
         conversation["mapping"].items(),
         key=lambda x: 0
