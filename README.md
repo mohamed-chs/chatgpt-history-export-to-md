@@ -2,10 +2,6 @@
 
 ![GitHub last commit](https://img.shields.io/github/last-commit/mohamed-chs/chatgpt-history-export-to-md)
 ![GitHub issues](https://img.shields.io/github/issues/mohamed-chs/chatgpt-history-export-to-md)
-![GitHub contributors](https://img.shields.io/github/contributors/mohamed-chs/chatgpt-history-export-to-md)
-![GitHub license](https://img.shields.io/github/license/mohamed-chs/chatgpt-history-export-to-md)
-
-![You're good to go](https://img.shields.io/badge/you're_good-to_go-blue)
 
 Welcome to the ChatGPT Conversations to Markdown converter! This Python script helps you to convert your entire ChatGPT history and data export into neatly formatted Markdown files.
 
@@ -90,7 +86,7 @@ The default output location for the Markdown files is : `~/Documents/ChatGPT-Con
 
 And that's it! After running the script, check the output folder for your neatly formatted Markdown files.
 
-[![Tweet](https://img.shields.io/twitter/url?style=social&url=https%3A%2F%2Fgithub.com%2Fyourusername%2Fyourrepository)](https://twitter.com/intent/tweet?text=So%2C%20this%20is%20what%20my%20ENTIRE%20ChatGPT%20history%20looks%20like%20...%0D%0A%0D%0Aby%20%40theSoCalled_%20on%20github%20%3A%20https%3A%2F%2FGitHub.com%2Fmohamed-chs%2Fchatgpt-history-export-to-md%0D%0A)
+[![Tweet](https://img.shields.io/twitter/url?style=social&url=https%3A%2F%2Fgithub.com%2Fyourusername%2Fyourrepository)](https://twitter.com/intent/tweet?text=So%2C%20this%20is%20what%20my%20entire%20ChatGPT%20history%20looks%20like%20...%0D%0A%0D%0Aby%20%40theSoCalled_%20on%20GitHub%20%3A%20http%3A%2F%2Fbit.ly%2F3ZuHCCK)
 
 - [ ] a tweet should be fun when I later add the actual data visualizations. Feel free to implement your own data visualizations [here](src/data_visualization.py), and create a pull request, then check this box (I know you want to)
 
@@ -205,19 +201,3 @@ This is just a small thing I coded to help me see my convos in beautiful markdow
 I wasn't a fan of the clunky, and sometimes paid, chrome extensions.
 
 I'm working on automating it to add new conversations and updating old ones. Had some luck with a JavaScript bookmarklet, still ironing it out tho. Shouldn't take long.
-
-### Star History
-
-<a href="https://star-history.com/#mohamed-chs/chatgpt-history-export-to-md&Timeline">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=mohamed-chs/chatgpt-history-export-to-md&type=Date&theme=dark" />
-    <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=mohamed-chs/chatgpt-history-export-to-md&type=Date" />
-    <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=mohamed-chs/chatgpt-history-export-to-md&type=Date" />
-  </picture>
-</a>
-
-### Donate ❤️
-
-Thank you for considering supporting a student's modest open source work !
-
-<a href="https://www.buymeacoffee.com/mohamedchs" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" ></a>

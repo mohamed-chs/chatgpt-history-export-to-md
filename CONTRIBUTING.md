@@ -29,6 +29,8 @@ Never contributed to a project before? No worries! Everyone’s been there, and 
 7. **Pull Request It! 💌**
    Open a Pull Request back here. I’m super excited to see what you’ve done!
 
+   Feel free to include images or other media to **showcase** the changes you implemented in action, for **easier reviewing experience** ;)
+
 ## 💡 Where to Start?
 
 Feeling a bit lost? No problemo! Check out the `Issues` tab for any bugs 🐛, enhancements 💄, or good first issues 🌈. If you have a cool idea, don’t hesitate to open a new issue and share your thoughts!
