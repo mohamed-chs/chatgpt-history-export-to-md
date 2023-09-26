@@ -1,31 +1,5 @@
 """Utility Functions
 
-Attributes:
-    DISALLOWED_CHARS_PATTERN (Pattern): A pre-compiled regex pattern for
-        detecting characters disallowed in file names.
-
-Functions:
-    extract_zip(zip_filepath: str) -> None:
-        Extracts the specified ZIP file.
-
-    get_most_recent_zip() -> Optional[str]:
-        Fetches the path of the most recent ZIP file in the '~/Downloads' directory.
-
-    sanitize_title(title: str) -> str:
-        Sanitizes a title by replacing disallowed characters with '-'.
-
-    timestamp_to_str(timestamp: float) -> Optional[str]:
-        Converts a Unix timestamp to a formatted string.
-
-    format_title(title: str, max_length: int = 50) -> str:
-        Formats a title for better display in the terminal.
-
-    replace_delimiters(file_name: str) -> None:
-        Replaces LaTeX bracket delimiters in a Markdown file with dollar sign delimiters.
-
-Raises:
-    RuntimeError: If the Python version is below 3.10.
-
 Todo:
     - Refactor the regex patterns for LaTeX delimiter replacements to account for nested delimiters.
 """
@@ -37,7 +11,6 @@ import sys
 import zipfile
 from glob import glob
 from pathlib import Path
-from typing import Optional
 
 # Checking Python version to ensure compatibility
 # specifically for the new type hints syntax
@@ -45,7 +18,7 @@ if sys.version_info < (3, 10):
     raise RuntimeError("Python 3.10 or a more recent version is required.")
 
 # Pre-compiled pattern for disallowed characters in file names
-DISALLOWED_CHARS_PATTERN = re.compile(r'[<>:"/\\|?*\n\r\t\f\v]')
+PATTERN = re.compile(r'[<>:"/\\|?*\n\r\t\f\v]')
 
 
 def extract_zip(zip_filepath: str) -> None:
@@ -67,7 +40,7 @@ def extract_zip(zip_filepath: str) -> None:
         print(f"I/O error occurred while extracting the ZIP file: {error}")
 
 
-def get_most_recent_zip() -> Optional[str]:
+def get_most_recent_zip() -> str:
     """Get the most recent ZIP file from the '~/Downloads' directory.
 
     Raises:
@@ -94,24 +67,10 @@ def get_most_recent_zip() -> Optional[str]:
         return max(zip_files, key=os.path.getctime)
     except FileNotFoundError as error:
         print(f"An error occurred while looking for the ZIP file: {error}")
-        return None
+        return ""
 
 
-def sanitize_title(title: str) -> str:
-    """Sanitize the title by replacing disallowed characters with '-'.
-
-    Args:
-        title (str): The title to sanitize.
-
-    Returns:
-        str: The sanitized title.
-    """
-
-    sanitized_title: str = DISALLOWED_CHARS_PATTERN.sub("-", title.strip())
-    return sanitized_title
-
-
-def timestamp_to_str(timestamp: float) -> Optional[str]:
+def timestamp_to_str(timestamp: float) -> str:
     """Convert a Unix timestamp to a formatted string.
 
     Args:
@@ -121,13 +80,9 @@ def timestamp_to_str(timestamp: float) -> Optional[str]:
         Optional[str]: The formatted timestamp as a string, or None if the input is invalid.
     """
 
-    try:
-        dt_object = datetime.datetime.utcfromtimestamp(timestamp)
-        formatted_timestamp: str = dt_object.strftime("%d %b %Y, %H:%M:%S")
-        return formatted_timestamp
-    except ValueError as error:
-        print(f"Invalid timestamp value: {error}")
-        return None
+    dt_object = datetime.datetime.utcfromtimestamp(timestamp)
+    formatted_timestamp: str = dt_object.strftime("%d %b %Y, %H:%M:%S")
+    return formatted_timestamp
 
 
 def format_title(title: str, max_length: int = 50) -> str:

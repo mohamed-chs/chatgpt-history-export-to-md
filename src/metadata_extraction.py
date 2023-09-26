@@ -1,26 +1,8 @@
 """Metadata Extraction
 
-The module performs various tasks:
-    - Loading a configuration file to aid in metadata extraction.
-    - Extracting specific metadata values from a nested structure.
-    - Sanitizing values to be used in YAML format.
-    - Building markdown blocks for metadata.
-    - Saving the conversation and its associated metadata to a markdown file.
-
-Attributes:
-    config (dict): Configuration loaded from the 'config.json' file. Determines
-    specific behaviors and settings for metadata extraction and saving.
-
-Functions:
-    - extract_metadata_values: Retrieve specific metadata from nested mappings.
-    - extract_metadata: Extracts essential metadata from a conversation.
-    - sanitize_yaml_value: Ensures values are correctly formatted for YAML.
-    - build_metadata_block: Constructs a markdown block for metadata.
-    - save_conversation_to_md: Save conversation data and metadata to a markdown file.
-
 Todo:
-    - Support different formats beyond markdown
-    - Extract "invoked_plugin" names
+    - [ ] Support different output formats beyond markdown
+    - [x] Extract "invoked_plugin" names
 """
 
 import json
@@ -140,7 +122,7 @@ def sanitize_yaml_value(value: Any) -> str | int:
     return sanitized
 
 
-def build_metadata_block(metadata: dict[str, Any]) -> str:
+def build_metadata_block(metadata: dict[str, Any], yaml_config: dict[str, bool]) -> str:
     """Build a markdown block containing metadata information.
 
     Args:
@@ -174,7 +156,7 @@ def build_metadata_block(metadata: dict[str, Any]) -> str:
     }
 
     for key, value in metadata_mapping.items():
-        if config["yaml_header"].get(key):
+        if yaml_config.get(key):
             block_parts.append(value)
 
     block_parts.append("---\n\n")
@@ -188,6 +170,8 @@ def save_conversation_to_md(
     title_occurrences: dict[str, int],
     path: str,
     metadata: dict[str, Any],
+    delimiters: bool,
+    yaml_config: dict[str, bool],
 ) -> None:
     """Save a conversation along with its metadata to a markdown file.
 
@@ -204,7 +188,7 @@ def save_conversation_to_md(
     title_occurrences[title] += 1
     file_path: str = os.path.join(path, f"{filename}.md")
 
-    metadata_block: str = build_metadata_block(metadata)
+    metadata_block: str = build_metadata_block(metadata, yaml_config)
 
     try:
         with open(file_path, "w", encoding="utf-8") as md_file:
@@ -213,8 +197,7 @@ def save_conversation_to_md(
             md_file.write(conversation_text)
 
         # Replace all the LaTeX bracket delimiters in the MD file with dollar sign ones.
-        delimiters_default: bool = config.get("delimiters_default", True)
-        if not delimiters_default:
+        if not delimiters:
             replace_delimiters(file_path)
 
         # Set the file's modification time based on 'Time Updated'
