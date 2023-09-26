@@ -5,3 +5,4 @@ node_modules/
 # testing visualizations on my personal data
 visualization/
 dev.ipynb
+dev.py

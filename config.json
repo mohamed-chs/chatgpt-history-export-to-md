@@ -1,10 +1,12 @@
 {
-  "system_title": "System",
-  "user_title": "Me",
-  "assistant_title": "ChatGPT",
-  "tool_title": "Code output",
+  "roles": {
+    "system_title": "System",
+    "user_title": "Me",
+    "assistant_title": "ChatGPT",
+    "tool_title": "Code Output"
+  },
   "delimiters_default": true,
-  "yaml_header": {
+  "yaml_headers": {
     "chat_link": true,
     "title": true,
     "time_created": true,

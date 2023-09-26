@@ -9,6 +9,7 @@ Todo:
 import json
 import os
 import pathlib
+import re
 from collections import defaultdict
 from typing import Any
 
@@ -16,7 +17,14 @@ import questionary
 
 from src.message_processing import format_message_as_md
 from src.metadata_extraction import extract_metadata, save_conversation_to_md
-from src.utils import extract_zip, format_title, get_most_recent_zip, sanitize_title
+from src.utils import extract_zip, format_title, get_most_recent_zip
+
+# Load the configuration JSON file
+with open("config.json", encoding="utf-8") as c_file:
+    config = json.load(c_file)
+
+# Pre-compiled pattern for disallowed characters in file names
+PATTERN = re.compile(r'[<>:"/\\|?*\n\r\t\f\v]')
 
 
 def get_absolute_path(path: str, home_directory: str) -> str:
@@ -50,7 +58,7 @@ def get_sanitized_and_sorted_messages(conversation: dict[str, Any]) -> tuple[str
         tuple[str, str]: The sanitized title and the formatted conversation text.
     """
 
-    title: str = sanitize_title(conversation["title"])
+    title: str = PATTERN.sub("-", conversation["title"].strip())
     sorted_messages: list[Any] = sorted(
         conversation["mapping"].items(),
         key=lambda x: 0
@@ -58,7 +66,10 @@ def get_sanitized_and_sorted_messages(conversation: dict[str, Any]) -> tuple[str
         else x[1]["message"]["create_time"],
     )
     conversation_text: str = "".join(
-        [format_message_as_md(value.get("message", {})) for _, value in sorted_messages]
+        [
+            format_message_as_md(value.get("message", {}), config["roles"])
+            for _, value in sorted_messages
+        ]
     )
     return title, conversation_text
 
@@ -76,7 +87,17 @@ def process_conversation(
 
     title, conversation_text = get_sanitized_and_sorted_messages(conversation)
     metadata: dict[str, Any] = extract_metadata(conversation)
-    save_conversation_to_md(title, conversation_text, title_occurrences, path, metadata)
+    delimiters = config["delimiters_default"]
+    yaml_config = config["yaml_headers"]
+    save_conversation_to_md(
+        title,
+        conversation_text,
+        title_occurrences,
+        path,
+        metadata,
+        delimiters,
+        yaml_config,
+    )
 
 
 # default values
@@ -105,6 +126,55 @@ def main():
     ).ask()
 
     zip_file = get_absolute_path(zip_file, HOME)
+
+    ### COMMAND LINE CONFIGURATIONS -------------
+
+    # Roles Configuration
+    print("Configuring roles titles:")
+    config["roles"]["system_title"] = questionary.text(
+        "System Title:", default=config["roles"]["system_title"]
+    ).ask()
+    config["roles"]["user_title"] = questionary.text(
+        "User Title:", default=config["roles"]["user_title"]
+    ).ask()
+    config["roles"]["assistant_title"] = questionary.text(
+        "Assistant Title:", default=config["roles"]["assistant_title"]
+    ).ask()
+    config["roles"]["tool_title"] = questionary.text(
+        "Tool Title:", default=config["roles"]["tool_title"]
+    ).ask()
+
+    # Delimiters Configuration
+    config["delimiters_default"] = questionary.confirm(
+        "Use default delimiters?", default=config["delimiters_default"]
+    ).ask()
+
+    # YAML Headers Configuration
+    print("Configuring YAML headers:")
+
+    selected_headers = questionary.checkbox(
+        "Select the headers you want to include:",
+        choices=list(config["yaml_headers"].keys()),
+    ).ask()
+
+    for header in config["yaml_headers"].keys():
+        config["yaml_headers"][header] = header in selected_headers
+
+    # # Data Visualizations Configuration
+    # # Assuming that data visualizations are a dictionary with boolean values
+    # print("Configuring Data Visualizations:")
+    # for viz, value in config["data_visualizations"].items():
+    #     config["data_visualizations"][viz] = questionary.confirm(
+    #         f"Enable {viz}?", default=value
+    #     ).ask()
+
+    # Save updated configuration
+    with open("config.json", "w", encoding="utf-8") as a_file:
+        json.dump(config, a_file, indent=2)
+
+    print("Configuration has been updated and saved to 'config.json'")
+
+    ### -------------------------------
 
     if not os.path.isfile(zip_file):
         print(f"ZIP file not found: {zip_file}. Ensure the file exists.")

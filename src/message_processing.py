@@ -4,12 +4,7 @@ Todo:
     - [x] Format more content data, for example : plugin use
 """
 
-import json
 from typing import Any, Optional
-
-# Load the configuration JSON file
-with open("config.json", encoding="utf-8") as f:
-    config = json.load(f)
 
 
 def extract_content_from_message(message: dict[str, Any]) -> Optional[str]:
@@ -32,7 +27,7 @@ def extract_content_from_message(message: dict[str, Any]) -> Optional[str]:
     return content
 
 
-def format_message_as_md(message: dict[str, Any]) -> str:
+def format_message_as_md(message: dict[str, Any], roles: dict[str, str]) -> str:
     """Format a message as markdown.
 
     Args:
@@ -50,10 +45,10 @@ def format_message_as_md(message: dict[str, Any]) -> str:
         return ""
 
     role_mapping: dict[str, Any] = {
-        "system": config["system_title"],
-        "user": config["user_title"],
-        "assistant": config["assistant_title"],
-        "tool": config["tool_title"],
+        "system": roles["system_title"],
+        "user": roles["user_title"],
+        "assistant": roles["assistant_title"],
+        "tool": roles["tool_title"],
     }
 
     heading = (

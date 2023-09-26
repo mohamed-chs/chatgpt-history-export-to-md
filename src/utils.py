@@ -11,7 +11,6 @@ import sys
 import zipfile
 from glob import glob
 from pathlib import Path
-from typing import Optional
 
 # Checking Python version to ensure compatibility
 # specifically for the new type hints syntax
@@ -19,7 +18,7 @@ if sys.version_info < (3, 10):
     raise RuntimeError("Python 3.10 or a more recent version is required.")
 
 # Pre-compiled pattern for disallowed characters in file names
-DISALLOWED_CHARS_PATTERN = re.compile(r'[<>:"/\\|?*\n\r\t\f\v]')
+PATTERN = re.compile(r'[<>:"/\\|?*\n\r\t\f\v]')
 
 
 def extract_zip(zip_filepath: str) -> None:
@@ -71,21 +70,7 @@ def get_most_recent_zip() -> str:
         return ""
 
 
-def sanitize_title(title: str) -> str:
-    """Sanitize the title by replacing disallowed characters with '-'.
-
-    Args:
-        title (str): The title to sanitize.
-
-    Returns:
-        str: The sanitized title.
-    """
-
-    sanitized_title: str = DISALLOWED_CHARS_PATTERN.sub("-", title.strip())
-    return sanitized_title
-
-
-def timestamp_to_str(timestamp: float) -> Optional[str]:
+def timestamp_to_str(timestamp: float) -> str:
     """Convert a Unix timestamp to a formatted string.
 
     Args:
@@ -95,13 +80,9 @@ def timestamp_to_str(timestamp: float) -> Optional[str]:
         Optional[str]: The formatted timestamp as a string, or None if the input is invalid.
     """
 
-    try:
-        dt_object = datetime.datetime.utcfromtimestamp(timestamp)
-        formatted_timestamp: str = dt_object.strftime("%d %b %Y, %H:%M:%S")
-        return formatted_timestamp
-    except ValueError as error:
-        print(f"Invalid timestamp value: {error}")
-        return None
+    dt_object = datetime.datetime.utcfromtimestamp(timestamp)
+    formatted_timestamp: str = dt_object.strftime("%d %b %Y, %H:%M:%S")
+    return formatted_timestamp
 
 
 def format_title(title: str, max_length: int = 50) -> str:

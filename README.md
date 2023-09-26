@@ -122,29 +122,9 @@ And that's it! After running the script, head over to the output folder to see y
 
 ### Optional: Customize the Script's behavior 🌟
 
-Using the `config.json`, you can modify the script's default parameters. Running
+Using the `config.json`, you can modify the script's default parameters.
 
-```bash
-python main.py --config
-```
-
-will skip the on screen instructions and run the script on the parameters in the JSON file.
-
-You can also modify the [config.json](config.json) file, to customize the output :
-
-```json
-{
-  "system_title": "System",
-  "user_title": "YOUR NAME",
-  "assistant_title": "My AI",
-  "tool_title": "Code output (or plugin name)",
-  "delimiters_default": true
-}
-```
-
-Change `"delimiters_default"` to `false` to replace all $\LaTeX$ bracket delimiters : `\(...\)` and `\[...\]`, with dollar sign ones : `$...$` and `$$...$$`, if you'd like your math to render beautifully in Markdown readers that support **MathJax** (like Obsidian).
-
-You can also configure the YAML header in the `config.json` to add or remove fields.
+For example, set `"delimiters_default"` to `false` to replace all $\LaTeX$ bracket delimiters : `\(...\)` and `\[...\]`, with dollar sign ones : `$...$` and `$$...$$`, if you'd like your math to render beautifully in Markdown readers that support **MathJax** (like Obsidian).
 
 ### Issues and contributions 🆘
 
