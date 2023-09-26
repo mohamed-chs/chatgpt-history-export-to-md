@@ -11,6 +11,7 @@ import os
 import pathlib
 import re
 from collections import defaultdict
+from random import randint
 from typing import Any
 
 import questionary
@@ -18,6 +19,7 @@ import questionary
 from src.message_processing import format_message_as_md
 from src.metadata_extraction import extract_metadata, save_conversation_to_md
 from src.utils import extract_zip, format_title, get_most_recent_zip
+from src.data_visualization import create_wordcloud
 
 # Load the configuration JSON file
 with open("config.json", encoding="utf-8") as c_file:
@@ -103,7 +105,7 @@ def process_conversation(
 # default values
 HOME: str = os.path.expanduser("~")
 
-default_out_folder: str = os.path.join(HOME, "Documents", "ChatGPT-Conversations", "MD")
+default_out_folder: str = os.path.join(HOME, "Documents", "ChatGPT-Conversations")
 default_zip_file: str = get_most_recent_zip()
 
 
@@ -192,7 +194,25 @@ def main():
         return
 
     os.makedirs(out_folder, exist_ok=True)
-    print(f"Writing MD files in : '{out_folder}' ...")
+
+    # create wordcloud
+
+    want_wordcloud = questionary.confirm("Do you want a word cloud ?").ask()
+
+    if want_wordcloud:
+        font_number = int(
+            questionary.text(
+                "Pick a font number from 1 to 41 (or surprise me -->", default=str(randint(0, 40))
+            ).ask()
+        )
+        
+        colormap_number = int(
+            questionary.text(
+                "Pick a colormap number from 1 to 44 (or surprise me -->", default=str(randint(0, 43))
+            ).ask()
+        )
+
+        create_wordcloud(json_filepath, out_folder, "user", font_number, colormap_number)
 
     try:
         with open(json_filepath, "r", encoding="utf-8") as file:
@@ -207,10 +227,15 @@ def main():
     title_occurrences: defaultdict[str, int] = defaultdict(int)
     total_conversations: int = len(conversations)
 
+    markdown_path = os.path.join(out_folder, "Markdown")
+
+    print(f"Writing MD files in : '{markdown_path}' ...")
+
     for i, conversation in enumerate(conversations):
         title: str = get_sanitized_and_sorted_messages(conversation)[0]
         title = format_title(title)
-        process_conversation(conversation, title_occurrences, out_folder)
+        os.makedirs(markdown_path, exist_ok=True)
+        process_conversation(conversation, title_occurrences, markdown_path)
 
         print(f"\n\x1b[KProcessing chat: {title}", end="", flush=True)
         print(

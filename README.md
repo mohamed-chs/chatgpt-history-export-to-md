@@ -13,7 +13,7 @@ It adds **YAML** headers (_optional, included by default_), and also includes **
 
 ## Quick setup
 
-> See [Prerequisites](#prerequisites). (just Python and Git and you're good to go. **No external dependencies !**)
+> See [Prerequisites](#prerequisites). (just Python and Git and you're good to go.)
 
 ### Step 1: Clone the Repository 📥
 
