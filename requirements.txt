@@ -1,5 +1,5 @@
 matplotlib==3.7.2
 nltk==3.8.1
-prompt_toolkit==3.0.39
+prompt_toolkit
 questionary==2.0.1
 wordcloud==1.9.2
