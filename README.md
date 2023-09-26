@@ -215,9 +215,3 @@ I'm working on automating it to add new conversations and updating old ones. Had
     <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=mohamed-chs/chatgpt-history-export-to-md&type=Date" />
   </picture>
 </a>
-
-### Donate ❤️
-
-Thank you for considering supporting a student's modest open source work !
-
-<a href="https://www.buymeacoffee.com/mohamedchs" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" ></a>
