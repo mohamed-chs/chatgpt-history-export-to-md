@@ -35,7 +35,7 @@ Never contributed to a project before? No worries! Everyone’s been there, and 
 
 Feeling a bit lost? No problemo! Check out the `Issues` tab for any bugs 🐛, enhancements 💄, or good first issues 🌈. If you have a cool idea, don’t hesitate to open a new issue and share your thoughts!
 
-Also see [Project Todo section](README.md#todo) and [JavaScript Todo](javascript/how_to_use.md#still-working-on). Feel free to add or check items.
+Also see [Project Todo](TODO.md) and [JavaScript Todo](javascript/how_to_use.md#still-working-on). Feel free to add or check items.
 
 ## 📚 Documentation is Your Pal!
 
