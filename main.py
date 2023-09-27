@@ -202,17 +202,21 @@ def main():
     if want_wordcloud:
         font_number = int(
             questionary.text(
-                "Pick a font number from 1 to 41 (or surprise me -->", default=str(randint(0, 40))
-            ).ask()
-        )
-        
-        colormap_number = int(
-            questionary.text(
-                "Pick a colormap number from 1 to 44 (or surprise me -->", default=str(randint(0, 43))
+                "Pick a font number from 1 to 41 (or surprise me -->",
+                default=str(randint(0, 40)),
             ).ask()
         )
 
-        create_wordcloud(json_filepath, out_folder, "user", font_number, colormap_number)
+        colormap_number = int(
+            questionary.text(
+                "Pick a colormap number from 1 to 44 (or surprise me -->",
+                default=str(randint(0, 43)),
+            ).ask()
+        )
+
+        create_wordcloud(
+            json_filepath, out_folder, "user", font_number, colormap_number
+        )
 
     try:
         with open(json_filepath, "r", encoding="utf-8") as file:
@@ -228,13 +232,13 @@ def main():
     total_conversations: int = len(conversations)
 
     markdown_path = os.path.join(out_folder, "Markdown")
+    os.makedirs(markdown_path, exist_ok=True)
 
     print(f"Writing MD files in : '{markdown_path}' ...")
 
     for i, conversation in enumerate(conversations):
         title: str = get_sanitized_and_sorted_messages(conversation)[0]
         title = format_title(title)
-        os.makedirs(markdown_path, exist_ok=True)
         process_conversation(conversation, title_occurrences, markdown_path)
 
         print(f"\n\x1b[KProcessing chat: {title}", end="", flush=True)

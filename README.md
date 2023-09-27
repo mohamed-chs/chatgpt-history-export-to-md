@@ -167,12 +167,6 @@ You can download them from :
 - [Official Python website](https://www.python.org/downloads/)
 - [Official Git website](https://git-scm.com/downloads)
 
-Yep, no external dependencies needed.
-
----
-
->See [TODO](TODO.md).
-
 ### Notes
 
 This is just a small thing I coded to help me see my convos in beautiful markdown, in [Obsidian](https://obsidian.md/) (my note-taking app).
@@ -180,3 +174,7 @@ This is just a small thing I coded to help me see my convos in beautiful markdow
 I wasn't a fan of the clunky, and sometimes paid, chrome extensions.
 
 I'm working on automating it to add new conversations and updating old ones. Had some luck with a JavaScript bookmarklet, still ironing it out tho. Shouldn't take long.
+
+> See [TODO](TODO.md).
+
+> If you want the last working version with absolutely no external dependencies (no virtual environment needed), you can find it [here](https://github.com/mohamed-chs/chatgpt-history-export-to-md/tree/fe13a701fe8653c9f946b1e12979ce3bfe7104b8).
