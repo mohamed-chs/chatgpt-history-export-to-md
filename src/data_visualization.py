@@ -56,9 +56,7 @@ def create_wordcloud(
     with open(json_filepath, "r", encoding="utf-8") as file:
         conversations = json.load(file)
 
-    text_filepath = os.path.join(
-        out_folder_parent, f"all-the-conversations_{author}.txt"
-    )
+    text_filepath = os.path.join(out_folder_parent, f"Prompts_{author}.txt")
 
     with open(text_filepath, "w", encoding="utf-8") as file:
         for conversation in conversations:
@@ -66,16 +64,17 @@ def create_wordcloud(
 
             conversation_text = [
                 message["content"]["parts"][0]
+                for message in simple_convo["messages"]
                 if (
                     "author" in message
                     and "parts" in message["content"]
                     and message["author"]["role"] == f"{author}"
                 )
-                else ""
-                for message in simple_convo["messages"]
             ]
 
-            file.write(" ".join(conversation_text))
+            file.write(
+                f"{conversation_text[0]} \n{'-'*200}\n"
+            )  # just the first message (Prompt)
 
     # Predefined stop words from NLTK
     languages = ["english", "french", "german", "arabic", "russian"]
