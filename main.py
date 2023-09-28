@@ -20,7 +20,7 @@ import questionary
 from src.message_processing import format_message_as_md
 from src.metadata_extraction import extract_metadata, save_conversation_to_md
 from src.utils import extract_zip, format_title, get_most_recent_zip
-from src.data_visualization import create_wordcloud
+from src.data_visualization import create_wordcloud, create_graph
 from src.custom_json_files import create_custom_instructions_json
 
 # Load the configuration JSON file
@@ -155,8 +155,10 @@ def main():
 
     # generating custom instructions.json file
 
+    print("Writing 'custom_instructions.json' file...\n")
+
     deduplication_mode = config["deduplication_mode"] = questionary.select(
-        "Select a deduplication mode for the custom instructions :",
+        "Select which custom instructions to keep in this JSON file (in case of duplicates) :",
         choices=["all", "latest", "earliest"],
         default=config["deduplication_mode"],
     ).ask()
@@ -247,6 +249,10 @@ def main():
             end="\n\n",
             flush=True,
         )
+
+    # creating prompts per day graph
+
+    create_graph(json_filepath, out_folder)
 
     # create wordcloud
 

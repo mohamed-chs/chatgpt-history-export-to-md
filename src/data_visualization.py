@@ -11,8 +11,11 @@ import json
 import os
 from typing import Any
 
-import matplotlib.pyplot as plt  # type: ignore
+import matplotlib.dates as mdates
+import matplotlib.pyplot as plt
 import nltk  # type: ignore
+import pandas as pd
+import seaborn as sns  # type: ignore
 from nltk.corpus import stopwords  # type: ignore
 from wordcloud import WordCloud  # type: ignore
 
@@ -128,9 +131,6 @@ def create_wordcloud(
 
     # List of files containing custom stop words
     files = [
-        # "assets/stopwords/kagglesdsdata_datasets_arabic.txt",
-        # "assets/stopwords/kagglesdsdata_datasets_english.txt",
-        # "assets/stopwords/kagglesdsdata_datasets_french.txt",
         "assets/stopwords/programming-languages-keywords.txt",
     ]
 
@@ -178,4 +178,110 @@ def create_wordcloud(
 
     wordcloud.to_file(wordcloud_path)  # type: ignore
 
-    print(f"Word Cloud 🔡☁️ created successfully ! :\n'{os.path.basename(wordcloud_path)}'\n")
+    print(
+        f"Word Cloud 🔡☁️ created successfully ! :\n'{os.path.basename(wordcloud_path)}'\n"
+    )
+
+
+# writing graph function ...
+
+
+def create_graph(
+    json_filepath: str,
+    out_folder_parent: str,
+):
+    print("Creating Graph ...\n")
+
+    with open(json_filepath, "r", encoding="utf-8") as file:
+        conversations = json.load(file)
+
+    all_timestamps: list[float] = []
+
+    for conversation in conversations:
+        simple_convo = simplify(conversation)
+
+        conv_timestamps = [
+            message["create_time"]
+            for message in simple_convo["messages"]
+            if message["author"]["role"] == "user"
+        ]
+
+        all_timestamps.extend(conv_timestamps)  # type: ignore
+
+    plt.style.use("seaborn-darkgrid")
+
+    timestamps = pd.DataFrame(all_timestamps, columns=["timestamp"])  # type: ignore
+    timestamps["datetime"] = pd.to_datetime(timestamps["timestamp"], unit="s")  # type: ignore
+
+    daily_counts = timestamps.groupby(timestamps["datetime"].dt.date).size()  # type: ignore
+
+    plt.figure(figsize=(15, 7))  # type: ignore
+
+    daily_counts.plot(
+        kind="line",
+        marker="o",
+        linestyle="-",
+        linewidth=2,
+        markersize=8,
+        color="royalblue",
+        markeredgecolor="white",
+        markeredgewidth=0.5,
+    )
+
+    plt.title("ChatGPT Prompts per Day", fontsize=20, fontweight="bold", pad=20)  # type: ignore
+    plt.xlabel("Month", fontsize=16, labelpad=15)  # type: ignore
+    plt.ylabel("Number of Prompts", fontsize=16, labelpad=15)  # type: ignore
+    plt.xticks(fontsize=14)  # type: ignore
+    plt.yticks(fontsize=14)  # type: ignore
+
+    ax = plt.gca()  # type: ignore
+    ax.xaxis.set_major_locator(mdates.MonthLocator())  # type: ignore
+    ax.xaxis.set_major_formatter(mdates.DateFormatter("%B"))  # type: ignore
+
+    plt.xticks(rotation=45)  # type: ignore
+
+    plt.grid(True, linestyle="--", linewidth=0.5, alpha=0.7)  # type: ignore
+
+    plt.tight_layout()  # type: ignore
+
+    graph_path = os.path.join(out_folder_parent, "prompts_per_day.png")
+
+    plt.savefig(graph_path)  # type: ignore
+
+    print(f"Graph 📈 Done !\n")
+
+
+# writing heatmap function ...
+
+
+# def create_heatmap(
+#     json_filepath: str,
+#     out_folder_parent: str,
+#     colormap: str,
+#     start_month: str = "January",
+#     end_month: str = current_month_name,
+# ):
+#     # Load JSON data
+#     with open(json_filepath, "r", encoding="utf-8") as file:
+#         conversations = json.load(file)
+
+#     start_timestamp = get_unix_timestamp(start_month)
+#     end_timestamp = get_unix_timestamp(end_month)
+
+#     all_timestamps = []
+
+#     for conversation in conversations:
+#         if conversation["create_time"] < start_timestamp:
+#             continue
+#         if conversation["create_time"] > end_timestamp:
+#             continue
+
+#         simple_convo = simplify(conversation)
+
+#         conv_timestamps = [
+#             message["create_time"]
+#             for message in simple_convo["messages"]
+#             if message["author"]["role"] == "user"
+#         ]
+
+#         all_timestamps.extend(conv_timestamps)  # type: ignore

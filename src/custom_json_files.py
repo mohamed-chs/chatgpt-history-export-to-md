@@ -54,10 +54,8 @@ def create_custom_instructions_json(
         custom_instructions.extend(seen_messages.values())  # type: ignore
 
     ci_json_filepath = os.path.join(out_folder, "custom_instructions.json")
-    
-    print("Writing 'custom_instructions.json' file...\n")
 
     with open(ci_json_filepath, "w", encoding="utf-8") as file:
         json.dump(custom_instructions, file, indent=2, ensure_ascii=False)
-        
+
     print("Done!\n")

@@ -7,10 +7,12 @@
 [.venv] (...)
 [.vscode] (...)
 [assets]
+    ├── colormaps.txt
     ├── [demo]
-        ├── Fibonacci-dollar-signs.md
         ├── Fibonacci.md
-        └── Fibonacci.png
+        ├── Fibonacci.png
+        ├── wordcloud_sample.png
+        └── wordcloud_sample2.png
     ├── [fonts]
         ├── AmaticSC-Bold.ttf
         ├── AmaticSC-Regular.ttf
@@ -66,9 +68,7 @@
         ├── python-logo.png
         └── zip-file-content.png
     └── [stopwords]
-        ├── kagglesdsdata_datasets_arabic.txt
-        ├── kagglesdsdata_datasets_english.txt
-        └── kagglesdsdata_datasets_french.txt
+        └── programming-languages-keywords.txt
 config.json
 CONTRIBUTING.md
 [dev] (...)
@@ -84,6 +84,7 @@ project_layout.txt
 README.md
 requirements.txt
 [src]
+    ├── custom_json_files.py
     ├── data_visualization.py
     ├── message_processing.py
     ├── metadata_extraction.py

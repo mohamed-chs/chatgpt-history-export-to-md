@@ -1,7 +1,8 @@
 {
   "want_markdown": true,
-  "deduplication_mode": "earliest",
+  "deduplication_mode": "latest",
   "want_wordclouds": true,
+  "want_heatmaps": true,
   "roles": {
     "system_title": "System",
     "user_title": "Me",
@@ -29,6 +30,12 @@
       "font": "ArchitectsDaughter-Regular",
       "colormap": "prism",
       "custom_stopwords": []
+    },
+    "heatmaps": {
+      "all_months": true,
+      "start_month": "April",
+      "end_month": "June",
+      "colormap": "prism"
     }
   }
 }

@@ -1,6 +1,6 @@
 # Your entire ChatGPT data in beautiful Markdown <img src="assets/images/markdown.png" alt="Markdown Logo" width="50"/>
 
-## You can now try out Word Clouds 🔡☁️ on your data !
+## You can now also try out Word Clouds 🔡☁️ on your data, see graphs 📈 of your prompt history, and get all your custom instructions 🤖 in one place !
 
 ![GitHub last commit](https://img.shields.io/github/last-commit/mohamed-chs/chatgpt-history-export-to-md)
 ![GitHub issues](https://img.shields.io/github/issues/mohamed-chs/chatgpt-history-export-to-md)
@@ -9,9 +9,11 @@ Welcome to the ChatGPT Conversations to Markdown converter! This Python script h
 
 It adds **YAML** headers (_optional, included by default_), and also includes **Code interpreter** (Advanced Data Analysis) input / output.
 
+**New :** Data visualizations, and custom instructions.
+
 <img src="assets/images/chatgpt-logo.svg" alt="ChatGPT Logo" width="70"/>
 
-#### See Examples : [Screenshot](assets/demo/Fibonacci.png), [Markdown](assets/demo/Fibonacci.md), [Markdown with dollar signs](assets/demo/Fibonacci-dollar-signs.md), [Chat link](https://chat.openai.com/share/27b6df58-a590-41ac-9eff-f567602fe692).
+#### See Examples : [Screenshot](assets/demo/Fibonacci.png), [Markdown](assets/demo/Fibonacci.md), Word clouds : [sample 1](assets/demo/wordcloud_sample.png) , [sample 2](assets/demo/wordcloud_sample2.png).
 
 ## Quick setup
 
@@ -130,11 +132,11 @@ Now, follow the instructions on screen and choose your desired options, the scri
 
 ### Step 5: Check the Output 🎉
 
-And that's it! After running the script, head over to the output folder to see your neatly formatted Markdown files.
+And that's it! After running the script, head over to the output folder to see your nice word clouds, graphs, and neatly formatted Markdown files. Enjoy !
 
-[![Tweet](https://img.shields.io/twitter/url?style=social&url=https%3A%2F%2Fgithub.com%2Fyourusername%2Fyourrepository)](https://twitter.com/intent/tweet?text=So%2C%20this%20is%20what%20my%20entire%20ChatGPT%20history%20looks%20like%20...%0D%0A%0D%0Aby%20%40theSoCalled_%20on%20GitHub%20%3A%20http%3A%2F%2Fbit.ly%2F3ZuHCCK)
+Tweet your data findings :
 
-- [ ] a tweet should be fun when I later add the actual data visualizations. Feel free to implement your own data visualizations [here](src/data_visualization.py), and create a pull request, then check this box (I know you want to)
+[![Tweet](https://img.shields.io/twitter/url?style=social&url=https%3A%2F%2Fgithub.com%2Fyourusername%2Fyourrepository)](https://twitter.com/intent/tweet?text=So%2C%20this%20is%20what%20my%20entire%20ChatGPT%20history%20looks%20like%20...%0D%0A%0D%0Ahttp%3A%2F%2Fbit.ly%2F3ZuHCCK)
 
 ### Optional: Customize the Script's behavior 🌟
 
@@ -167,7 +169,7 @@ Feel free to fork this repository and make your enhancements or improvements. AL
 If you encounter any issues or have questions, feel free to open an [issue](https://github.com/mohamed-chs/chatgpt-history-export-to-md/issues) / [discussion](https://github.com/mohamed-chs/chatgpt-history-export-to-md/discussions).
 See also : [HN post](https://news.ycombinator.com/item?id=37636701).
 
-### Enjoy Your Conversations in Markdown! 🎈
+### Enjoy Your ChatGPT Data ! 🎈
 
 Hopefully, you find value in this tool. If you do, giving it a star ⭐ on the repository would mean a lot. Thank you!
 
