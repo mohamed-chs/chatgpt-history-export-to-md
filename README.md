@@ -144,21 +144,18 @@ Using the `config.json`, you can modify the script's default parameters.
 
 For example, set `"delimiters_default"` to `false` to replace all $\LaTeX$ bracket delimiters : `\(...\)` and `\[...\]`, with dollar sign ones : `$...$` and `$$...$$`, if you'd like your math to render beautifully in Markdown readers that support **MathJax** (like Obsidian).
 
-### Acknowledgements 🌟
+## Acknowledgments 🙌
 
-Big love to the following libraries that jazzed up this project!
+Massive shout-out to some incredible tools that made this project come to life:
 
-- **[matplotlib](https://github.com/matplotlib/matplotlib)**: For making my data jump into vibrant visualizations. Art meets science, indeed! 📊
+- **matplotlib** ([repo](https://github.com/matplotlib/matplotlib)) for those crisp visuals.
+- **nltk** ([repo](https://github.com/nltk/nltk)) for the NLP magic.
+- **pandas** ([repo](https://github.com/pandas-dev/pandas)) – because who can handle data without it?
+- **questionary** ([repo](https://github.com/tmbo/questionary)) for those sleek command line interactions.
+- **seaborn** ([repo](https://github.com/mwaskom/seaborn)) for taking my plots up a notch.
+- **wordcloud** ([repo](https://github.com/amueller/word_cloud)) for those awesome cloud visualizations.
 
-- **[nltk](https://github.com/nltk/nltk)**: Unpacking the magic of language has never been smoother. You're the NLP MVP! 📖
-
-- **[prompt_toolkit](https://github.com/prompt-toolkit/python-prompt-toolkit)**: Command-line interfaces got a whole lot cooler with you. Kudos! 💻
-
-- **[questionary](https://github.com/tmbo/questionary)**: For making CLI interactions fun and intuitive. Here's to engaging conversations! 💬
-
-- **[wordcloud](https://github.com/amueller/word_cloud)**: Thanks for the visual treat with those playful word clouds. Text never looked better! ☁️
-
-Major kudos to the developers and contributors. Your tools made this project shine! 🚀
+Thanks to these projects and their contributors for the hard work that went into developing these invaluable tools!
 
 ### Issues and contributions 🆘
 
