@@ -33,7 +33,7 @@ def extract_zip(zip_filepath: str) -> None:
 
         with zipfile.ZipFile(zip_filepath, "r") as zip_ref:
             zip_ref.extractall(extract_folder)
-            print(f"Successfully extracted ZIP file to '{extract_folder}'")
+            print(f"Successfully extracted ZIP file to '{extract_folder}'.\n")
     except zipfile.BadZipFile as error:
         print(f"The ZIP file is corrupted or invalid: {error}")
     except IOError as error:

@@ -5,14 +5,16 @@ Todo:
     of the conversations' data as possible.
 """
 
+import calendar
+import datetime
 import json
 import os
 from typing import Any
 
+import matplotlib.pyplot as plt  # type: ignore
 import nltk  # type: ignore
 from nltk.corpus import stopwords  # type: ignore
 from wordcloud import WordCloud  # type: ignore
-import matplotlib.pyplot as plt  # type: ignore
 
 
 # This function will check if the stopwords are available. If not, it will download them.
@@ -45,21 +47,65 @@ def simplify(conversation: dict[str, Any]) -> dict[str, Any]:
     return simple_convo
 
 
+# Get the current date
+now = datetime.datetime.now()
+
+# Extract the month and year
+current_month_name = calendar.month_name[now.month]
+current_year = now.year
+
+
+def get_unix_timestamp(month: str, year: int = 2023) -> int:
+    """Get the UNIX timestamp for the first day of the given month and year."""
+
+    # Convert month name to its corresponding number
+    month_number = list(calendar.month_abbr).index(month.capitalize()[:3])
+
+    if month_number == 0:
+        raise ValueError(f"Invalid month name: {month}")
+
+    dt = datetime.datetime(year, month_number, 1)
+
+    # Convert the datetime object to UNIX timestamp
+    timestamp = int(dt.timestamp())
+
+    return timestamp
+
+
+def get_font_name(font_path: str):
+    return os.path.splitext(os.path.basename(font_path))[0]
+
+
 def create_wordcloud(
     json_filepath: str,
     out_folder_parent: str,
     author: str,
     font_path: str,
     colormap: str,
+    start_month: str = "January",
+    end_month: str = current_month_name,
 ):
     # Load JSON data
     with open(json_filepath, "r", encoding="utf-8") as file:
         conversations = json.load(file)
 
-    text_filepath = os.path.join(out_folder_parent, f"Prompts_{author}.txt")
+    font_name = get_font_name(font_path)
+
+    text_filepath = os.path.join(
+        out_folder_parent,
+        f"01-{start_month} to 01-{end_month} Prompts.txt",
+    )
+
+    start_timestamp = get_unix_timestamp(start_month)
+    end_timestamp = get_unix_timestamp(end_month)
 
     with open(text_filepath, "w", encoding="utf-8") as file:
         for conversation in conversations:
+            if conversation["create_time"] < start_timestamp:
+                continue
+            if conversation["create_time"] > end_timestamp:
+                continue
+
             simple_convo = simplify(conversation)
 
             conversation_text = [
@@ -82,9 +128,10 @@ def create_wordcloud(
 
     # List of files containing custom stop words
     files = [
-        "assets/stopwords/kagglesdsdata_datasets_arabic.txt",
-        "assets/stopwords/kagglesdsdata_datasets_english.txt",
-        "assets/stopwords/kagglesdsdata_datasets_french.txt",
+        # "assets/stopwords/kagglesdsdata_datasets_arabic.txt",
+        # "assets/stopwords/kagglesdsdata_datasets_english.txt",
+        # "assets/stopwords/kagglesdsdata_datasets_french.txt",
+        "assets/stopwords/programming-languages-keywords.txt",
     ]
 
     # Read the custom stop words from each file and add to the list
@@ -108,7 +155,7 @@ def create_wordcloud(
     cleaned_text = " ".join(words)
 
     # Generate Word Cloud
-    print("Creating Word Cloud ...")
+    print("Creating Word Cloud ...\n")
 
     wordcloud = WordCloud(  # type: ignore
         # mask=mask,  # Uncomment this if using a mask
@@ -124,14 +171,11 @@ def create_wordcloud(
 
     os.makedirs(os.path.join(out_folder_parent, "Wordclouds"), exist_ok=True)
 
-    def get_font_name(font_path: str):
-        return os.path.splitext(os.path.basename(font_path))[0]
-
     wordcloud_path = os.path.join(
         out_folder_parent,
-        f"Wordclouds/{get_font_name(font_path)}_{colormap}_{author}_wordcloud.png",
+        f"Wordclouds/01-{start_month} to 01-{end_month} {font_name} {colormap} wordcloud.png",
     )
 
     wordcloud.to_file(wordcloud_path)  # type: ignore
 
-    print("Word Cloud 🔡☁️ created successfully !")
+    print(f"Word Cloud 🔡☁️ created successfully ! :\n'{os.path.basename(wordcloud_path)}'\n")

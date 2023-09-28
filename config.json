@@ -1,5 +1,6 @@
 {
   "want_markdown": true,
+  "deduplication_mode": "earliest",
   "want_wordclouds": true,
   "roles": {
     "system_title": "System",
@@ -22,8 +23,12 @@
   },
   "data_viz": {
     "wordclouds": {
+      "all_months": true,
+      "start_month": "April",
+      "end_month": "June",
       "font": "ArchitectsDaughter-Regular",
-      "colormap": "Spectral"
+      "colormap": "prism",
+      "custom_stopwords": []
     }
   }
 }

@@ -24,6 +24,12 @@ Feel free to add or check items.
 - [ ] Option to add metadata for each individual message
 - [ ] more todos ...
 
+**visualizations**
+
+- [ ] Rename fonts and colormaps to more human-readable names
+- [ ] Reduce the number of fonts and colormaps (test and dump the ugly ones)
+- [ ] Automatically make all word clouds for all time periods
+
 **command line**
 
 - [x] Nicer command line output formatting
