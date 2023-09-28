@@ -115,10 +115,12 @@ def main():
     """
 
     out_folder: str = questionary.text(
-        "Enter the path to the Markdown output folder :", default=default_out_folder
+        "Enter the path to the output folder :", default=default_out_folder
     ).ask()
 
     out_folder = get_absolute_path(out_folder)
+
+    os.makedirs(out_folder, exist_ok=True)
 
     zip_file: str = questionary.text(
         "Enter the path to the exported ZIP file :", default_zip_file
@@ -141,60 +143,89 @@ def main():
         )
         return
 
-    # Roles Configuration
-    print("Configuring message headers:")
+    # generating markdown files
 
-    config["roles"]["system_title"] = questionary.text(
-        "System message header:", default=config["roles"]["system_title"]
+    want_markdown = config["want_markdown"] = questionary.confirm(
+        "Do you want to generate markdown files ?", default=config["want_markdown"]
     ).ask()
 
-    config["roles"]["user_title"] = questionary.text(
-        "User message header:", default=config["roles"]["user_title"]
-    ).ask()
+    if want_markdown:
+        # Roles Configuration
+        print("Configuring message headers:")
 
-    config["roles"]["assistant_title"] = questionary.text(
-        "Assistant message header:", default=config["roles"]["assistant_title"]
-    ).ask()
+        config["roles"]["system_title"] = questionary.text(
+            "System message header:", default=config["roles"]["system_title"]
+        ).ask()
 
-    config["roles"]["tool_title"] = questionary.text(
-        "Tool message header:", default=config["roles"]["tool_title"]
-    ).ask()
+        config["roles"]["user_title"] = questionary.text(
+            "User message header:", default=config["roles"]["user_title"]
+        ).ask()
 
-    # Delimiters Configuration
-    config["delimiters_default"] = questionary.confirm(
-        "Use default LaTeX delimiters?", default=config["delimiters_default"]
-    ).ask()
+        config["roles"]["assistant_title"] = questionary.text(
+            "Assistant message header:", default=config["roles"]["assistant_title"]
+        ).ask()
 
-    # YAML Headers Configuration
-    print("Configuring YAML headers:")
+        config["roles"]["tool_title"] = questionary.text(
+            "Tool message header:", default=config["roles"]["tool_title"]
+        ).ask()
 
-    selected_headers = questionary.checkbox(
-        "Select the headers you want to include:",
-        choices=list(config["yaml_headers"].keys()),
-    ).ask()
+        # Delimiters Configuration
+        config["delimiters_default"] = questionary.confirm(
+            "Use default LaTeX delimiters?", default=config["delimiters_default"]
+        ).ask()
 
-    for header in config["yaml_headers"].keys():
-        config["yaml_headers"][header] = header in selected_headers
+        # YAML Headers Configuration
+        print("Configuring YAML headers:")
 
-    # # Data Visualizations Configuration
-    # # Assuming that data visualizations are a dictionary with boolean values
-    # print("Configuring Data Visualizations:")
-    # for viz, value in config["data_visualizations"].items():
-    #     config["data_visualizations"][viz] = questionary.confirm(
-    #         f"Enable {viz}?", default=value
-    #     ).ask()
+        selected_headers = questionary.checkbox(
+            "Select the headers you want to include:",
+            choices=list(config["yaml_headers"].keys()),
+        ).ask()
 
-    # Save updated configuration
-    with open("config.json", "w", encoding="utf-8") as a_file:
-        json.dump(config, a_file, indent=2)
+        for header in config["yaml_headers"].keys():
+            config["yaml_headers"][header] = header in selected_headers
 
-    print("Configuration has been updated and saved to 'config.json'")
+        try:
+            with open(json_filepath, "r", encoding="utf-8") as file:
+                conversations = json.load(file)
+        except json.JSONDecodeError:
+            print(f"Error decoding JSON from '{json_filepath}'.")
+            return
+        except IOError as error:
+            print(f"I/O error reading '{json_filepath}': {error}")
+            return
 
-    os.makedirs(out_folder, exist_ok=True)
+        title_occurrences: defaultdict[str, int] = defaultdict(int)
+        total_conversations: int = len(conversations)
+
+        markdown_path = os.path.join(out_folder, "Markdown")
+        os.makedirs(markdown_path, exist_ok=True)
+
+        print(f"Writing MD files in :\n'{markdown_path}' ...")
+
+        for i, conversation in enumerate(conversations):
+            title: str = get_sanitized_and_sorted_messages(conversation)[0]
+            title = format_title(title)
+            process_conversation(conversation, title_occurrences, markdown_path)
+
+            print(f"\n\x1b[KProcessing chat: '{title}'", end="", flush=True)
+            print(
+                f"\x1b[A\rProcessed {i+1}/{total_conversations} conversations",
+                end="",
+                flush=True,
+            )
+
+        print(
+            "\r\n\r\nProcessing completed 🎉.",
+            end="\n\n",
+            flush=True,
+        )
 
     # create wordcloud
 
-    want_wordcloud = questionary.confirm("Do you want a word cloud ?").ask()
+    want_wordclouds = config["want_wordclouds"] = questionary.confirm(
+        "Do you want a word cloud ?", default=config["want_wordclouds"]
+    ).ask()
 
     def get_font_path(font_name: str):
         return f"assets/fonts/{font_name}.ttf"
@@ -205,54 +236,28 @@ def main():
     with open("assets/colormaps.txt", "r", encoding="utf-8") as file:
         colormaps = file.read().splitlines()
 
-    if want_wordcloud:
-        font = questionary.select(
-            "Select a font for the word cloud :", choices=fonts
+    if want_wordclouds:
+        font = config["data_viz"]["wordclouds"]["font"] = questionary.select(
+            "Select a font for the word cloud :",
+            choices=fonts,
+            default=config["data_viz"]["wordclouds"]["font"],
         ).ask()
 
         font_path = get_font_path(font)
 
-        colormap = questionary.select(
-            "Select a color theme for the word cloud :", choices=colormaps
+        colormap = config["data_viz"]["wordclouds"]["colormap"] = questionary.select(
+            "Select a color theme for the word cloud :",
+            choices=colormaps,
+            default=config["data_viz"]["wordclouds"]["colormap"],
         ).ask()
 
         create_wordcloud(json_filepath, out_folder, "user", font_path, colormap)
 
-    try:
-        with open(json_filepath, "r", encoding="utf-8") as file:
-            conversations = json.load(file)
-    except json.JSONDecodeError:
-        print(f"Error decoding JSON from '{json_filepath}'.")
-        return
-    except IOError as error:
-        print(f"I/O error reading '{json_filepath}': {error}")
-        return
+    # Save updated configuration
+    with open("config.json", "w", encoding="utf-8") as a_file:
+        json.dump(config, a_file, indent=2)
 
-    title_occurrences: defaultdict[str, int] = defaultdict(int)
-    total_conversations: int = len(conversations)
-
-    markdown_path = os.path.join(out_folder, "Markdown")
-    os.makedirs(markdown_path, exist_ok=True)
-
-    print(f"Writing MD files in :\n'{markdown_path}' ...")
-
-    for i, conversation in enumerate(conversations):
-        title: str = get_sanitized_and_sorted_messages(conversation)[0]
-        title = format_title(title)
-        process_conversation(conversation, title_occurrences, markdown_path)
-
-        print(f"\n\x1b[KProcessing chat: '{title}'", end="", flush=True)
-        print(
-            f"\x1b[A\rProcessed {i+1}/{total_conversations} conversations",
-            end="",
-            flush=True,
-        )
-
-    print(
-        "\r\n\r\nProcessing completed 🎉.",
-        end="\n\n",
-        flush=True,
-    )
+    print("Configuration has been updated and saved to 'config.json'")
 
     path = pathlib.Path(out_folder).resolve()
 

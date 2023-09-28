@@ -1,4 +1,6 @@
 {
+  "want_markdown": true,
+  "want_wordclouds": true,
   "roles": {
     "system_title": "System",
     "user_title": "Me",
@@ -18,10 +20,10 @@
     "used_plugins": true,
     "custom_instructions": true
   },
-  "data_visualizations": {
-    "word_clouds": {
-      "font_number": 0,
-      "colormap_number": 0
+  "data_viz": {
+    "wordclouds": {
+      "font": "ArchitectsDaughter-Regular",
+      "colormap": "Spectral"
     }
   }
 }
