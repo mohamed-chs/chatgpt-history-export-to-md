@@ -15,7 +15,7 @@ It adds **YAML** headers (_optional, included by default_), and also includes **
 
 ## Quick setup
 
-> See [Prerequisites](#prerequisites). (just Python and Git and you're good to go.)
+> See [Prerequisites](#prerequisites). (Just Python and Git, and you're good to go.)
 
 ### Step 1: Clone the Repository 📥
 
@@ -43,27 +43,33 @@ python -m venv .venv
 
 Activate the virtual environment:
 
-- On **Windows**, using `cmd.exe` (*Command Prompt*):
+#### On Windows:
+
+Using Command Prompt (`cmd.exe`):
 
 ```bash
 .venv\Scripts\activate.bat
 ```
 
-- On **Windows**, using *PowerShell*:
+Or, if you're using PowerShell:
 
-```bash
+```powershell
 .venv\Scripts\Activate.ps1
 ```
 
-- On **Linux** or **MacOS**:
+If you encounter an error about script execution in PowerShell, try running:
+
+```powershell
+powershell -ExecutionPolicy ByPass -File .venv\Scripts\Activate.ps1
+```
+
+#### On Linux or MacOS:
 
 ```bash
 source .venv/bin/activate
 ```
 
----
-
-Now, install the necessary packages using:
+After activation, install the necessary packages using:
 
 ```bash
 pip install -r requirements.txt
