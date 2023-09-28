@@ -203,6 +203,6 @@ def save_conversation_to_md(
         # Set the file's modification time based on 'Time Updated'
         os.utime(file_path, (metadata["update_time"], metadata["update_time"]))
     except FileNotFoundError:
-        print(f"Directory not found: {path}. Please ensure it exists.")
+        print(f"Directory not found: '{path}'. Please ensure it exists.")
     except PermissionError:
-        print(f"Permission denied to write to {file_path}. Check your permissions.")
+        print(f"Permission denied to write to '{file_path}'. Check your permissions.")

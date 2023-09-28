@@ -3,6 +3,6 @@ node_modules/
 .venv/
 
 # testing visualizations on my personal data
-visualization/
+dev/
 dev.ipynb
 dev.py

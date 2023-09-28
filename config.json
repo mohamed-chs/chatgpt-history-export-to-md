@@ -18,5 +18,10 @@
     "used_plugins": true,
     "custom_instructions": true
   },
-  "data_visualizations": {}
+  "data_visualizations": {
+    "word_clouds": {
+      "font_number": 0,
+      "colormap_number": 0
+    }
+  }
 }

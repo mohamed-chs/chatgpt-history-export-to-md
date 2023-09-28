@@ -1,4 +1,4 @@
-# Your entire ChatGPT data in beautiful Markdown <img src="images/markdown.png" alt="Markdown Logo" width="50"/>
+# Your entire ChatGPT data in beautiful Markdown <img src="assets/images/markdown.png" alt="Markdown Logo" width="50"/>
 
 ## You can now try out Word Clouds 🔡☁️ on your data !
 
@@ -9,9 +9,9 @@ Welcome to the ChatGPT Conversations to Markdown converter! This Python script h
 
 It adds **YAML** headers (_optional, included by default_), and also includes **Code interpreter** (Advanced Data Analysis) input / output.
 
-<img src="images/chatgpt-logo.svg" alt="ChatGPT Logo" width="70"/>
+<img src="assets/images/chatgpt-logo.svg" alt="ChatGPT Logo" width="70"/>
 
-#### See Examples : [Screenshot](demo/Fibonacci.png), [Markdown](demo/Fibonacci.md), [Markdown with dollar signs](demo/Fibonacci-dollar-signs.md), [Chat link](https://chat.openai.com/share/27b6df58-a590-41ac-9eff-f567602fe692).
+#### See Examples : [Screenshot](assets/demo/Fibonacci.png), [Markdown](assets/demo/Fibonacci.md), [Markdown with dollar signs](assets/demo/Fibonacci-dollar-signs.md), [Chat link](https://chat.openai.com/share/27b6df58-a590-41ac-9eff-f567602fe692).
 
 ## Quick setup
 
@@ -88,27 +88,27 @@ Before you run the script, make sure your ChatGPT conversations are in a ZIP fil
 
 2.  At the bottom of the left side bar, click on your profile name, the on **Settings**
 
-    ![Bottom-left Widget](images/chat.openai-bottom-left-widget.png)
+    ![Bottom-left Widget](assets/images/chat.openai-bottom-left-widget.png)
 
 3.  Go to **Data controls**
 
-    ![Settings](images/chat.openai-settings.png)
+    ![Settings](assets/images/chat.openai-settings.png)
 
 4.  In the "Data Controls" menu, click on _Export data_ : **Export**
 
-    ![Data Controls](images/chat.openai-data-controls.png)
+    ![Data Controls](assets/images/chat.openai-data-controls.png)
 
 5.  In the confirmation modal click **Confirm export**
 
-    ![Confirm Export](images/chat.openai-confirm-export.png)
+    ![Confirm Export](assets/images/chat.openai-confirm-export.png)
 
 6.  You should get an email with your data, in 2 ~ 5 minutes (check your **inbox**)
 
-    ![Email](images/chat.openai-email.png)
+    ![Email](assets/images/chat.openai-email.png)
 
 7.  Click **Download data export** to download a `.zip` file containing your entire chat history and other data.
 
-    ![ZIP File Content](images/zip-file-content.png)
+    ![ZIP File Content](assets/images/zip-file-content.png)
 
     [↑ Collapse](#download-instructions)
 
@@ -173,7 +173,7 @@ Hopefully, you find value in this tool. If you do, giving it a star ⭐ on the r
 
 ### Prerequisites
 
-<img src="images/python-logo.png" alt="Python Logo" width="70" style="margin-right: 20px;"/> <img src="images/git-logo.png" alt="Git Logo" width="70"/>
+<img src="assets/images/python-logo.png" alt="Python Logo" width="70" style="margin-right: 20px;"/> <img src="assets/images/git-logo.png" alt="Git Logo" width="70"/>
 
 Make sure you have **Python** (version >= 3.10), and **Git** installed.
 You can download them from :

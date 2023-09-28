@@ -11,7 +11,6 @@ import os
 import pathlib
 import re
 from collections import defaultdict
-from random import randint
 from typing import Any
 
 import questionary
@@ -28,25 +27,30 @@ with open("config.json", encoding="utf-8") as c_file:
 # Pre-compiled pattern for disallowed characters in file names
 PATTERN = re.compile(r'[<>:"/\\|?*\n\r\t\f\v]')
 
+# default values
+HOME: str = os.path.expanduser("~")
 
-def get_absolute_path(path: str, home_directory: str) -> str:
+default_out_folder: str = os.path.join(HOME, "Documents", "My ChatGPT Data")
+default_zip_file: str = get_most_recent_zip()
+
+
+def get_absolute_path(path: str) -> str:
     """Convert a potentially relative path to an absolute path, relative to the home directory.
 
     Args:
         path (str): The input path (either relative or absolute).
-        home_directory (str): The home directory path.
 
     Returns:
         str: The absolute path.
     """
 
-    if path.startswith(("~", home_directory)):
+    if path.startswith(("~", HOME)):
         path = os.path.expanduser(path)
     elif path.startswith(("/", "\\")):
         path = path[1:]
 
     if not os.path.isabs(path):
-        path = os.path.join(home_directory, path)
+        path = os.path.join(HOME, path)
     return os.path.abspath(path)
 
 
@@ -102,13 +106,6 @@ def process_conversation(
     )
 
 
-# default values
-HOME: str = os.path.expanduser("~")
-
-default_out_folder: str = os.path.join(HOME, "Documents", "ChatGPT-Conversations")
-default_zip_file: str = get_most_recent_zip()
-
-
 def main():
     """Main processing function.
 
@@ -121,34 +118,51 @@ def main():
         "Enter the path to the Markdown output folder :", default=default_out_folder
     ).ask()
 
-    out_folder = get_absolute_path(out_folder, HOME)
+    out_folder = get_absolute_path(out_folder)
 
     zip_file: str = questionary.text(
         "Enter the path to the exported ZIP file :", default_zip_file
     ).ask()
 
-    zip_file = get_absolute_path(zip_file, HOME)
+    zip_file = get_absolute_path(zip_file)
 
-    ### COMMAND LINE CONFIGURATIONS -------------
+    extract_zip(zip_file)
+
+    if not os.path.isfile(zip_file):
+        print(f"ZIP file not found: '{zip_file}'. Ensure the file exists.")
+        return
+
+    json_filepath: str = os.path.join(
+        os.path.splitext(zip_file)[0], "conversations.json"
+    )
+    if not os.path.isfile(json_filepath):
+        print(
+            f"Expected JSON file not found: '{json_filepath}'. Check the contents of the ZIP file."
+        )
+        return
 
     # Roles Configuration
-    print("Configuring roles titles:")
+    print("Configuring message headers:")
+
     config["roles"]["system_title"] = questionary.text(
-        "System Title:", default=config["roles"]["system_title"]
+        "System message header:", default=config["roles"]["system_title"]
     ).ask()
+
     config["roles"]["user_title"] = questionary.text(
-        "User Title:", default=config["roles"]["user_title"]
+        "User message header:", default=config["roles"]["user_title"]
     ).ask()
+
     config["roles"]["assistant_title"] = questionary.text(
-        "Assistant Title:", default=config["roles"]["assistant_title"]
+        "Assistant message header:", default=config["roles"]["assistant_title"]
     ).ask()
+
     config["roles"]["tool_title"] = questionary.text(
-        "Tool Title:", default=config["roles"]["tool_title"]
+        "Tool message header:", default=config["roles"]["tool_title"]
     ).ask()
 
     # Delimiters Configuration
     config["delimiters_default"] = questionary.confirm(
-        "Use default delimiters?", default=config["delimiters_default"]
+        "Use default LaTeX delimiters?", default=config["delimiters_default"]
     ).ask()
 
     # YAML Headers Configuration
@@ -176,56 +190,42 @@ def main():
 
     print("Configuration has been updated and saved to 'config.json'")
 
-    ### -------------------------------
-
-    if not os.path.isfile(zip_file):
-        print(f"ZIP file not found: {zip_file}. Ensure the file exists.")
-        return
-
-    extract_zip(zip_file)
-
-    json_filepath: str = os.path.join(
-        os.path.splitext(zip_file)[0], "conversations.json"
-    )
-    if not os.path.isfile(json_filepath):
-        print(
-            f"Expected JSON file not found: {json_filepath}. Check the contents of the ZIP file."
-        )
-        return
-
     os.makedirs(out_folder, exist_ok=True)
 
     # create wordcloud
 
     want_wordcloud = questionary.confirm("Do you want a word cloud ?").ask()
 
+    def get_font_path(font_name: str):
+        return f"assets/fonts/{font_name}.ttf"
+
+    fonts = os.listdir("assets/fonts")
+    fonts = [os.path.splitext(font)[0] for font in fonts]
+
+    with open("assets/colormaps.txt", "r", encoding="utf-8") as file:
+        colormaps = file.read().splitlines()
+
     if want_wordcloud:
-        font_number = int(
-            questionary.text(
-                "Pick a font number from 1 to 41 (or surprise me -->",
-                default=str(randint(0, 40)),
-            ).ask()
-        )
+        font = questionary.select(
+            "Select a font for the word cloud :", choices=fonts
+        ).ask()
 
-        colormap_number = int(
-            questionary.text(
-                "Pick a colormap number from 1 to 44 (or surprise me -->",
-                default=str(randint(0, 43)),
-            ).ask()
-        )
+        font_path = get_font_path(font)
 
-        create_wordcloud(
-            json_filepath, out_folder, "user", font_number, colormap_number
-        )
+        colormap = questionary.select(
+            "Select a color theme for the word cloud :", choices=colormaps
+        ).ask()
+
+        create_wordcloud(json_filepath, out_folder, "user", font_path, colormap)
 
     try:
         with open(json_filepath, "r", encoding="utf-8") as file:
             conversations = json.load(file)
     except json.JSONDecodeError:
-        print(f"Error decoding JSON from {json_filepath}.")
+        print(f"Error decoding JSON from '{json_filepath}'.")
         return
     except IOError as error:
-        print(f"I/O error reading {json_filepath}: {error}")
+        print(f"I/O error reading '{json_filepath}': {error}")
         return
 
     title_occurrences: defaultdict[str, int] = defaultdict(int)
@@ -234,14 +234,14 @@ def main():
     markdown_path = os.path.join(out_folder, "Markdown")
     os.makedirs(markdown_path, exist_ok=True)
 
-    print(f"Writing MD files in : '{markdown_path}' ...")
+    print(f"Writing MD files in :\n'{markdown_path}' ...")
 
     for i, conversation in enumerate(conversations):
         title: str = get_sanitized_and_sorted_messages(conversation)[0]
         title = format_title(title)
         process_conversation(conversation, title_occurrences, markdown_path)
 
-        print(f"\n\x1b[KProcessing chat: {title}", end="", flush=True)
+        print(f"\n\x1b[KProcessing chat: '{title}'", end="", flush=True)
         print(
             f"\x1b[A\rProcessed {i+1}/{total_conversations} conversations",
             end="",

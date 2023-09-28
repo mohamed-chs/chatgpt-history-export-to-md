@@ -49,8 +49,8 @@ def create_wordcloud(
     json_filepath: str,
     out_folder_parent: str,
     author: str,
-    font_number: int = 0,
-    colormap_number: int = 0,
+    font_path: str,
+    colormap: str,
 ):
     # Load JSON data
     with open(json_filepath, "r", encoding="utf-8") as file:
@@ -73,7 +73,7 @@ def create_wordcloud(
             ]
 
             file.write(
-                f"{conversation_text[0]} \n{'-'*200}\n"
+                f"{conversation_text[0]} \n\n{'-'*100}\n\n"
             )  # just the first message (Prompt)
 
     # Predefined stop words from NLTK
@@ -82,9 +82,9 @@ def create_wordcloud(
 
     # List of files containing custom stop words
     files = [
-        "stopwords/kagglesdsdata_datasets_arabic.txt",
-        "stopwords/kagglesdsdata_datasets_english.txt",
-        "stopwords/kagglesdsdata_datasets_french.txt",
+        "assets/stopwords/kagglesdsdata_datasets_arabic.txt",
+        "assets/stopwords/kagglesdsdata_datasets_english.txt",
+        "assets/stopwords/kagglesdsdata_datasets_french.txt",
     ]
 
     # Read the custom stop words from each file and add to the list
@@ -107,76 +107,12 @@ def create_wordcloud(
     ]
     cleaned_text = " ".join(words)
 
-    def font_path(font_name: str):
-        return f"fonts/{font_name}.ttf"
-
-    fonts = os.listdir("fonts")
-    fonts = [os.path.splitext(font)[0] for font in fonts]
-
-    selected_font = fonts[font_number]
-
-    colormaps = [
-        # Perceptually Uniform Sequential
-        "viridis",
-        "plasma",
-        "inferno",
-        "magma",
-        "cividis",
-        # Sequential
-        "Blues",
-        "Greens",
-        "Oranges",
-        "Purples",
-        "Greys",
-        "Reds",
-        "YlGnBu",
-        "YlOrRd",
-        "OrRd",
-        # Sequential (Multi-Hue)
-        "GnBu",
-        "BuGn",
-        "PuBu",
-        "BuPu",
-        "YlGn",
-        "PiYG",
-        # Diverging
-        "RdBu",
-        "RdGy",
-        "RdYlBu",
-        "Spectral",
-        "coolwarm",
-        "bwr",
-        # Cyclic
-        "hsv",
-        "twilight",
-        "twilight_shifted",
-        # Qualitative
-        "Pastel1",
-        "Pastel2",
-        "Set1",
-        "Set2",
-        "Set3",
-        "tab10",
-        "tab20",
-        "tab20c",
-        # Miscellaneous
-        "rainbow",
-        "gist_earth",
-        "terrain",
-        "ocean",
-        "gist_stern",
-        "prism",
-        "flag",
-    ]
-
-    colormap = colormaps[colormap_number]
-
     # Generate Word Cloud
     print("Creating Word Cloud ...")
 
     wordcloud = WordCloud(  # type: ignore
         # mask=mask,  # Uncomment this if using a mask
-        font_path=font_path(selected_font),  # Point to a font file if you have one
+        font_path=font_path,  # Point to a font file if you have one
         background_color="white",
         max_font_size=100,
         contour_width=3,
@@ -188,9 +124,14 @@ def create_wordcloud(
 
     os.makedirs(os.path.join(out_folder_parent, "Wordclouds"), exist_ok=True)
 
+    def get_font_name(font_path: str):
+        return os.path.splitext(os.path.basename(font_path))[0]
+
     wordcloud_path = os.path.join(
         out_folder_parent,
-        f"Wordclouds/{selected_font}_{colormap}_{author}_wordcloud.png",
+        f"Wordclouds/{get_font_name(font_path)}_{colormap}_{author}_wordcloud.png",
     )
 
     wordcloud.to_file(wordcloud_path)  # type: ignore
+
+    print("Word Cloud 🔡☁️ created successfully !")
