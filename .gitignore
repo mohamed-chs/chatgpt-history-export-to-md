@@ -2,7 +2,12 @@ __pycache__/
 node_modules/
 .venv/
 
-# testing visualizations on my personal data
+# testing models and visualizations on my personal data
 dev/
 dev.ipynb
 dev.py
+
+# trying out the MVC architecture
+models/
+views/
+controllers/

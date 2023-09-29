@@ -134,15 +134,25 @@ Now, follow the instructions on screen and choose your desired options, the scri
 
 And that's it! After running the script, head over to the output folder to see your nice word clouds, graphs, and neatly formatted Markdown files. Enjoy !
 
-Tweet your data findings :
+_tweet your data findings_
 
 [![Tweet](https://img.shields.io/twitter/url?style=social&url=https%3A%2F%2Fgithub.com%2Fyourusername%2Fyourrepository)](https://twitter.com/intent/tweet?text=So%2C%20this%20is%20what%20my%20entire%20ChatGPT%20history%20looks%20like%20...%0D%0A%0D%0Ahttp%3A%2F%2Fbit.ly%2F3ZuHCCK)
 
-### Optional: Customize the Script's behavior 🌟
+### Share Your Feedback! 💌
 
-Using the `config.json`, you can modify the script's default parameters.
+I hope you find this tool useful. I'm continuously looking to improve on this, but, I need your help for that.
 
-For example, set `"delimiters_default"` to `false` to replace all $\LaTeX$ bracket delimiters : `\(...\)` and `\[...\]`, with dollar sign ones : `$...$` and `$$...$$`, if you'd like your math to render beautifully in Markdown readers that support **MathJax** (like Obsidian).
+Whether you're a tech wizard or you're new to all this (especially if you're new to all this), I'd love to hear about your journey with the tool. Found a quirk? Have a suggestion? Or just want to send some good vibes? I'm all ears!
+
+**Here's how you can share your thoughts:**
+
+1. **GitHub Issues**: For more specific feedback or if you've stumbled upon a bug, please open an [issue](https://github.com/mohamed-chs/chatgpt-history-export-to-md/issues). This helps me track and address them effectively.
+
+2. **GitHub Discussions**: If you just want to share your general experience, have a suggestion, or maybe a cool idea for a new feature, jump into the [discussions](https://github.com/mohamed-chs/chatgpt-history-export-to-md/discussions) page. It's a more casual space where we can chat.
+
+And if you've had a great experience, consider giving the project a star ⭐. It keeps me motivated and helps others discover it!
+
+Thank you for being awesome! 🌟
 
 ## Acknowledgments 🙌
 
@@ -157,18 +167,13 @@ Massive shout-out to some incredible tools that made this project come to life:
 
 Thanks to these projects and their contributors for the hard work that went into developing these invaluable tools!
 
-### Issues and contributions 🆘
-
-> See [CONTRIBUTING.md](CONTRIBUTING.md).
+### Contributions 🆘
 
 Feel free to fork this repository and make your enhancements or improvements. ALL contributions are welcome !
 
-If you encounter any issues or have questions, feel free to open an [issue](https://github.com/mohamed-chs/chatgpt-history-export-to-md/issues) / [discussion](https://github.com/mohamed-chs/chatgpt-history-export-to-md/discussions).
-See also : [HN post](https://news.ycombinator.com/item?id=37636701).
+> See [CONTRIBUTING.md](CONTRIBUTING.md)
 
-### Enjoy Your ChatGPT Data ! 🎈
-
-Hopefully, you find value in this tool. If you do, giving it a star ⭐ on the repository would mean a lot. Thank you!
+> See also : [my HackerNews post](https://news.ycombinator.com/item?id=37636701)
 
 ### Prerequisites
 
