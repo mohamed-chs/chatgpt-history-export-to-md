@@ -1,6 +1,6 @@
-# Your entire ChatGPT data in beautiful Markdown <img src="assets/images/markdown.png" alt="Markdown Logo" width="50"/>
+# Your entire ChatGPT data in beautiful Markdown 📜
 
-## You can now also try out Word Clouds 🔡☁️ on your data, see graphs 📈 of your prompt history, and get all your custom instructions 🤖 in one place !
+### Bonus features : Word Clouds 🔡☁️ on your data, Graphs 📈 of your prompt history, and all your Custom Instructions 🤖 in one place !
 
 ![GitHub last commit](https://img.shields.io/github/last-commit/mohamed-chs/chatgpt-history-export-to-md)
 ![GitHub issues](https://img.shields.io/github/issues/mohamed-chs/chatgpt-history-export-to-md)
@@ -13,76 +13,31 @@ It adds **YAML** headers (_optional, included by default_), and also includes **
 
 <img src="assets/images/chatgpt-logo.svg" alt="ChatGPT Logo" width="70"/>
 
-#### See Examples : [Screenshot](assets/demo/Fibonacci.png), [Markdown](assets/demo/Fibonacci.md), Word clouds : [sample 1](assets/demo/wordcloud_sample.png) , [sample 2](assets/demo/wordcloud_sample2.png).
+> **Example Results**: [Chat screenshot](assets/demo/Fibonacci.png) | [Markdown](assets/demo/Fibonacci.md) | Word clouds : [sample 1](assets/demo/wordcloud_sample.png) , [sample 2](assets/demo/wordcloud_sample2.png).
 
-## Quick setup
+## Quick Start (No Tech Knowledge Required!)
 
-> See [Prerequisites](#prerequisites). (Just Python and Git, and you're good to go.)
+### Before You Begin:
 
-### Step 1: Clone the Repository 📥
+<img src="assets/images/python-logo.png" alt="Python Logo" width="50" style="margin-right: 20px;"/> <img src="assets/images/git-logo.png" alt="Git Logo" width="50"/>
 
-Open a terminal or command prompt and run the following command:
+Make sure you have **Python** and **Git** on your computer. If not, download them from:
 
-```bash
-git clone https://github.com/mohamed-chs/chatgpt-history-export-to-md.git
-```
+- [Python Download](https://www.python.org/downloads/)
+- [Git Download](https://git-scm.com/downloads)
 
-Next, navigate to the project directory by using the following command:
+### Step 1: Download Your Conversations data 🗂
 
-```bash
-cd chatgpt-history-export-to-md
-```
+1. Go to [chat.openai.com](https://chat.openai.com) and sign in.
 
-### Step 2: Set Up the Environment 🛠️
+2. Click your profile name at the bottom left -> **Settings** -> **Data controls**.
 
-Before running the script, you need to set up a virtual environment and install the required dependencies.
+3. Click **Export** -> **Confirm export**.
 
-First, create a virtual environment:
-
-```bash
-python -m venv .venv
-```
-
-Activate the virtual environment:
-
-#### On Windows:
-
-Using Command Prompt (`cmd.exe`):
-
-```bash
-.venv\Scripts\activate.bat
-```
-
-Or, if you're using PowerShell:
-
-```powershell
-.venv\Scripts\Activate.ps1
-```
-
-If you encounter an error about script execution in PowerShell, try running:
-
-```powershell
-powershell -ExecutionPolicy ByPass -File .venv\Scripts\Activate.ps1
-```
-
-#### On Linux or MacOS:
-
-```bash
-source .venv/bin/activate
-```
-
-After activation, install the necessary packages using:
-
-```bash
-pip install -r requirements.txt
-```
-
-### Step 3: Download Your Conversations data 🗂
-
-Before you run the script, make sure your ChatGPT conversations are in a ZIP file format.
+4. Wait for an email from OpenAI and download the `.zip` file it contains.
 
 <details id="download-instructions">
-  <summary>How to download : (click to expand/collapse)</summary>
+  <summary>Screenshots : (click to expand/collapse)</summary>
 
 <hr>
   
@@ -118,7 +73,61 @@ Before you run the script, make sure your ChatGPT conversations are in a ZIP fil
 
 <hr>
 
-The script will automatically find the most recent ZIP file in your 'Downloads' directory (in `~/Downloads/`), but you can specify a different file or location if necessary.
+### Step 2. Copy the Tool to Your Computer 📥
+
+1. Open a program called "terminal" or "command prompt".
+
+2. Type (and hit enter after each line):
+
+```bash
+git clone https://github.com/mohamed-chs/chatgpt-history-export-to-md.git
+```
+
+```bash
+cd chatgpt-history-export-to-md
+```
+
+This will copy this GitHub repository on your computer, and navigate to the root directory.
+
+### Step 3: Set Up the Environment 🛠️
+
+**Quick setup :**
+
+Type (and hit enter):
+
+```bash
+python setup.py
+```
+
+This will create a Python virtual environment and install the necessary python libraries.
+
+**Activate the virtual environment :**
+
+#### On Windows:
+
+Using Command Prompt (`cmd.exe`):
+
+```bash
+.venv\Scripts\activate.bat
+```
+
+Or, if you're using PowerShell:
+
+```powershell
+.venv\Scripts\Activate.ps1
+```
+
+If you encounter an error about script execution in PowerShell, try running:
+
+```powershell
+powershell -ExecutionPolicy ByPass -File .venv\Scripts\Activate.ps1
+```
+
+#### On Linux or MacOS:
+
+```bash
+source .venv/bin/activate
+```
 
 ### Step 4: Running the Script 🏃‍♂️
 
@@ -140,7 +149,7 @@ _tweet your data findings_
 
 ### Share Your Feedback! 💌
 
-I hope you find this tool useful. I'm continuously looking to improve on this, but, I need your help for that.
+I hope you find this tool useful. I'm continuously looking to improve on this, but I need your help for that.
 
 Whether you're a tech wizard or you're new to all this (especially if you're new to all this), I'd love to hear about your journey with the tool. Found a quirk? Have a suggestion? Or just want to send some good vibes? I'm all ears!
 
@@ -173,17 +182,7 @@ Feel free to fork this repository and make your enhancements or improvements. AL
 
 > See [CONTRIBUTING.md](CONTRIBUTING.md)
 
-> See also : [my HackerNews post](https://news.ycombinator.com/item?id=37636701)
-
-### Prerequisites
-
-<img src="assets/images/python-logo.png" alt="Python Logo" width="70" style="margin-right: 20px;"/> <img src="assets/images/git-logo.png" alt="Git Logo" width="70"/>
-
-Make sure you have **Python**, and **Git** installed.
-You can download them from :
-
-- [Official Python website](https://www.python.org/downloads/)
-- [Official Git website](https://git-scm.com/downloads)
+> See also : [HackerNews post](https://news.ycombinator.com/item?id=37636701)
 
 ### Notes
 
