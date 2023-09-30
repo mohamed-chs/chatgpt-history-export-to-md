@@ -14,6 +14,7 @@ from typing import Any, Dict, List
 import matplotlib.dates as mdates
 import matplotlib.pyplot as plt
 import nltk  # type: ignore
+import seaborn as sns  # type: ignore
 import pandas as pd
 from nltk.corpus import stopwords  # type: ignore
 from wordcloud import WordCloud  # type: ignore
@@ -206,8 +207,6 @@ def create_graph(
         ]
 
         all_timestamps.extend(conv_timestamps)  # type: ignore
-
-    plt.style.use("seaborn-darkgrid")
 
     timestamps = pd.DataFrame(all_timestamps, columns=["timestamp"])  # type: ignore
     timestamps["datetime"] = pd.to_datetime(timestamps["timestamp"], unit="s")  # type: ignore
