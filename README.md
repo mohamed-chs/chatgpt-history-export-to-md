@@ -179,7 +179,7 @@ Feel free to fork this repository and make your enhancements or improvements. AL
 
 <img src="assets/images/python-logo.png" alt="Python Logo" width="70" style="margin-right: 20px;"/> <img src="assets/images/git-logo.png" alt="Git Logo" width="70"/>
 
-Make sure you have **Python** (version >= 3.10), and **Git** installed.
+Make sure you have **Python**, and **Git** installed.
 You can download them from :
 
 - [Official Python website](https://www.python.org/downloads/)

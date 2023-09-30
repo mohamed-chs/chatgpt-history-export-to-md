@@ -7,15 +7,9 @@ Todo:
 import datetime
 import os
 import re
-import sys
 import zipfile
 from glob import glob
 from pathlib import Path
-
-# Checking Python version to ensure compatibility
-# specifically for the new type hints syntax
-if sys.version_info < (3, 10):
-    raise RuntimeError("Python 3.10 or a more recent version is required.")
 
 # Pre-compiled pattern for disallowed characters in file names
 PATTERN = re.compile(r'[<>:"/\\|?*\n\r\t\f\v]')
