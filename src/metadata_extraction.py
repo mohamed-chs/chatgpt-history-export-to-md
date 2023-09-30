@@ -7,7 +7,7 @@ Todo:
 
 import json
 import os
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Union
 
 from .utils import replace_delimiters
 from .utils import timestamp_to_str as tts
@@ -19,7 +19,7 @@ with open("config.json", encoding="utf-8") as file:
 
 def extract_metadata_values(
     messages_mapping: Dict[str, Dict[str, Any]], key_path: str
-) -> str | Any:
+) -> Union[str, Any]:
     """Extract metadata values from a mapping using the specified key path.
 
     Args:
@@ -103,7 +103,7 @@ def extract_metadata(conversation: Dict[str, Any]) -> Dict[str, Any]:
     }
 
 
-def sanitize_yaml_value(value: Any) -> str | int:
+def sanitize_yaml_value(value: Any) -> Union[str, int]:
     """Escape problematic characters and wrap the value in quotes.
 
     Args:

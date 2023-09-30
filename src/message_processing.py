@@ -4,7 +4,7 @@ Todo:
     - [x] Format more content data, for example : plugin use
 """
 
-from typing import Any, Dict, Optional
+from typing import Any, Dict, Optional, Union
 
 
 def extract_content_from_message(message: Dict[str, Any]) -> Optional[str]:
@@ -19,7 +19,7 @@ def extract_content_from_message(message: Dict[str, Any]) -> Optional[str]:
 
     content_data = message["content"]
 
-    content: str | None = content_data.get("parts", [None])[0]
+    content: Union[str, None] = content_data.get("parts", [None])[0]
     if content is None:
         text = content_data.get("text")
         content = f"```python\n{text}\n```"
@@ -57,7 +57,7 @@ def format_message_as_md(message: Dict[str, Any], roles: Dict[str, str]) -> str:
         else "(message author unknown)"
     )
 
-    content: str | None = extract_content_from_message(message)
+    content: Union[str, None] = extract_content_from_message(message)
 
     if "text" in message.get("content", {}):
         heading += "\n### Code Environment :"
