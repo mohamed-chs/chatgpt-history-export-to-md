@@ -9,13 +9,12 @@ import calendar
 import datetime
 import json
 import os
-from typing import Any
+from typing import Any, Dict, List
 
 import matplotlib.dates as mdates
 import matplotlib.pyplot as plt
 import nltk  # type: ignore
 import pandas as pd
-import seaborn as sns  # type: ignore
 from nltk.corpus import stopwords  # type: ignore
 from wordcloud import WordCloud  # type: ignore
 
@@ -34,8 +33,8 @@ def ensure_stopwords_downloaded():
 ensure_stopwords_downloaded()
 
 
-def simplify(conversation: dict[str, Any]) -> dict[str, Any]:
-    simple_convo: dict[str, Any] = {}
+def simplify(conversation: Dict[str, Any]) -> Dict[str, Any]:
+    simple_convo: Dict[str, Any] = {}
     simple_convo["title"] = conversation.get("title", "Untitled")
     simple_convo["create_time"] = conversation["create_time"]
     simple_convo["update_time"] = conversation["update_time"]
@@ -195,7 +194,7 @@ def create_graph(
     with open(json_filepath, "r", encoding="utf-8") as file:
         conversations = json.load(file)
 
-    all_timestamps: list[float] = []
+    all_timestamps: List[float] = []
 
     for conversation in conversations:
         simple_convo = simplify(conversation)
@@ -248,7 +247,7 @@ def create_graph(
 
     plt.savefig(graph_path)  # type: ignore
 
-    print(f"Graph 📈 Done !\n")
+    print("Graph 📈 Done !\n")
 
 
 # writing heatmap function ...

@@ -13,15 +13,15 @@ import os
 import pathlib
 import re
 from collections import defaultdict
-from typing import Any
+from typing import Any, Dict, List, Tuple
 
 import questionary
 
+from src.custom_json_files import create_custom_instructions_json
+from src.data_visualization import create_graph, create_wordcloud
 from src.message_processing import format_message_as_md
 from src.metadata_extraction import extract_metadata, save_conversation_to_md
 from src.utils import extract_zip, format_title, get_most_recent_zip
-from src.data_visualization import create_wordcloud, create_graph
-from src.custom_json_files import create_custom_instructions_json
 
 # Load the configuration JSON file
 with open("config.json", encoding="utf-8") as c_file:
@@ -64,7 +64,7 @@ def get_absolute_path(path: str) -> str:
     return os.path.abspath(path)
 
 
-def get_sanitized_and_sorted_messages(conversation: dict[str, Any]) -> tuple[str, str]:
+def get_sanitized_and_sorted_messages(conversation: Dict[str, Any]) -> Tuple[str, str]:
     """Sanitize and sort messages from the conversation.
 
     Args:
@@ -75,7 +75,7 @@ def get_sanitized_and_sorted_messages(conversation: dict[str, Any]) -> tuple[str
     """
 
     title: str = PATTERN.sub("-", conversation.get("title", "Untitled").strip())
-    sorted_messages: list[Any] = sorted(
+    sorted_messages: List[Any] = sorted(
         conversation["mapping"].items(),
         key=lambda x: 0
         if not x[1]["message"] or x[1]["message"].get("create_time") is None
@@ -91,7 +91,7 @@ def get_sanitized_and_sorted_messages(conversation: dict[str, Any]) -> tuple[str
 
 
 def process_conversation(
-    conversation: dict[str, Any], title_occurrences: defaultdict[str, int], path: str
+    conversation: Dict[str, Any], title_occurrences: defaultdict[str, int], path: str
 ) -> None:
     """Process a single conversation and save it to a Markdown file.
 
@@ -102,7 +102,7 @@ def process_conversation(
     """
 
     title, conversation_text = get_sanitized_and_sorted_messages(conversation)
-    metadata: dict[str, Any] = extract_metadata(conversation)
+    metadata: Dict[str, Any] = extract_metadata(conversation)
     delimiters = config["delimiters_default"]
     yaml_config = config["yaml_headers"]
     save_conversation_to_md(

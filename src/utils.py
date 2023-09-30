@@ -59,7 +59,7 @@ def get_most_recent_zip() -> str:
                 f"'Downloads' directory not found: '{downloads_path}'"
             )
 
-        zip_files: list[str] = glob(os.path.join(downloads_path, "*.zip"))
+        zip_files = glob(os.path.join(downloads_path, "*.zip"))
 
         if not zip_files:
             raise FileNotFoundError("No ZIP files found in the 'Downloads' directory.")

@@ -7,7 +7,7 @@ Todo:
 
 import json
 import os
-from typing import Any
+from typing import Any, Dict, List
 
 from .utils import replace_delimiters
 from .utils import timestamp_to_str as tts
@@ -18,7 +18,7 @@ with open("config.json", encoding="utf-8") as file:
 
 
 def extract_metadata_values(
-    messages_mapping: dict[str, dict[str, Any]], key_path: str
+    messages_mapping: Dict[str, Dict[str, Any]], key_path: str
 ) -> str | Any:
     """Extract metadata values from a mapping using the specified key path.
 
@@ -30,8 +30,8 @@ def extract_metadata_values(
         str | Any: The extracted metadata value, or "-" if no data is found
     """
 
-    keys: list[str] = key_path.split(".")
-    data: list[Any] = [
+    keys: List[str] = key_path.split(".")
+    data: List[Any] = [
         value["message"]
         for _, value in messages_mapping.items()
         if value.get("message")
@@ -41,7 +41,7 @@ def extract_metadata_values(
     return data[0] if data else "-"
 
 
-def extract_metadata(conversation: dict[str, Any]) -> dict[str, Any]:
+def extract_metadata(conversation: Dict[str, Any]) -> Dict[str, Any]:
     """Extract metadata from a conversation dictionary.
 
     Args:
@@ -53,7 +53,7 @@ def extract_metadata(conversation: dict[str, Any]) -> dict[str, Any]:
 
     messages_mapping = conversation.get("mapping", {})
 
-    def get_text_content_messages(messages_mapping: dict[str, dict[str, Any]]) -> int:
+    def get_text_content_messages(messages_mapping: Dict[str, Dict[str, Any]]) -> int:
         """Helper function to get text content messages count."""
         return sum(
             1
@@ -122,7 +122,7 @@ def sanitize_yaml_value(value: Any) -> str | int:
     return sanitized
 
 
-def build_metadata_block(metadata: dict[str, Any], yaml_config: dict[str, bool]) -> str:
+def build_metadata_block(metadata: Dict[str, Any], yaml_config: Dict[str, bool]) -> str:
     """Build a markdown block containing metadata information.
 
     Args:
@@ -134,7 +134,7 @@ def build_metadata_block(metadata: dict[str, Any], yaml_config: dict[str, bool])
 
     syv = sanitize_yaml_value
 
-    block_parts: list[str] = ["---"]
+    block_parts: List[str] = ["---"]
 
     # longer custom instructions break the obsidian frontmatter.
     custom_instructions = json.dumps(
@@ -142,7 +142,7 @@ def build_metadata_block(metadata: dict[str, Any], yaml_config: dict[str, bool])
         about_model_message: {syv(metadata.get('about_model_message'))}"""
     )
 
-    metadata_mapping: dict[str, str] = {
+    metadata_mapping: Dict[str, str] = {
         "chat_link": f'chat_link: "https://chat.openai.com/c/{metadata["id"]}"',
         "title": f"title: {syv(metadata['title'])}",
         "time_created": f"time_created: {syv(tts(metadata['create_time']))}",
@@ -167,11 +167,11 @@ def build_metadata_block(metadata: dict[str, Any], yaml_config: dict[str, bool])
 def save_conversation_to_md(
     title: str,
     conversation_text: str,
-    title_occurrences: dict[str, int],
+    title_occurrences: Dict[str, int],
     path: str,
-    metadata: dict[str, Any],
+    metadata: Dict[str, Any],
     delimiters: bool,
-    yaml_config: dict[str, bool],
+    yaml_config: Dict[str, bool],
 ) -> None:
     """Save a conversation along with its metadata to a markdown file.
 

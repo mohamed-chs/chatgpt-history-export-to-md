@@ -4,10 +4,10 @@ Todo:
     - [x] Format more content data, for example : plugin use
 """
 
-from typing import Any, Optional
+from typing import Any, Dict, Optional
 
 
-def extract_content_from_message(message: dict[str, Any]) -> Optional[str]:
+def extract_content_from_message(message: Dict[str, Any]) -> Optional[str]:
     """Extract content from a message.
 
     Args:
@@ -27,7 +27,7 @@ def extract_content_from_message(message: dict[str, Any]) -> Optional[str]:
     return content
 
 
-def format_message_as_md(message: dict[str, Any], roles: dict[str, str]) -> str:
+def format_message_as_md(message: Dict[str, Any], roles: Dict[str, str]) -> str:
     """Format a message as markdown.
 
     Args:
@@ -44,7 +44,7 @@ def format_message_as_md(message: dict[str, Any], roles: dict[str, str]) -> str:
     if author_role == "system":
         return ""
 
-    role_mapping: dict[str, Any] = {
+    role_mapping: Dict[str, Any] = {
         "system": roles["system_title"],
         "user": roles["user_title"],
         "assistant": roles["assistant_title"],
