@@ -21,7 +21,7 @@ default_zip_filepath: Path = max(
     DOWNLOADS.glob("*.zip"), key=lambda x: x.stat().st_ctime
 )
 
-default_output_folder: Path = HOME / "Documents" / "TEST"
+default_output_folder: Path = HOME / "Documents" / "My ChatGPT Data"
 
 
 # utility function

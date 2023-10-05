@@ -14,3 +14,4 @@ stopwords/
 # old stuff
 src/
 config (old).json
+main (old).py
