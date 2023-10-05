@@ -11,9 +11,6 @@ import zipfile
 from glob import glob
 from pathlib import Path
 
-# Pre-compiled pattern for disallowed characters in file names
-PATTERN = re.compile(r'[<>:"/\\|?*\n\r\t\f\v]')
-
 
 def extract_zip(zip_filepath: str) -> None:
     """Extract the contents of the specified ZIP file.

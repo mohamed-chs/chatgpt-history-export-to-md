@@ -163,16 +163,20 @@ And if you've had a great experience, consider giving the project a star ⭐. It
 
 Thank you for being awesome! 🌟
 
-## Acknowledgments 🙌
+### Acknowledgments 🙌
 
 Massive shout-out to some incredible tools that made this project come to life:
 
-- **matplotlib** ([repo](https://github.com/matplotlib/matplotlib)) for those crisp visuals.
-- **nltk** ([repo](https://github.com/nltk/nltk)) for the NLP magic.
-- **pandas** ([repo](https://github.com/pandas-dev/pandas)) – because who can handle data without it?
-- **questionary** ([repo](https://github.com/tmbo/questionary)) for those sleek command line interactions.
-- **seaborn** ([repo](https://github.com/mwaskom/seaborn)) for taking my plots up a notch.
-- **wordcloud** ([repo](https://github.com/amueller/word_cloud)) for those awesome cloud visualizations.
+- **matplotlib**: For all the delightful visualizations. Dive into their repo [here](https://github.com/matplotlib/matplotlib).
+- **nltk**: Text processing? You bet. They're the legends behind it. Check them out [here](https://github.com/nltk/nltk).
+
+- **pandas**: Handling data like a ninja. Massive props! Here's their [repo](https://github.com/pandas-dev/pandas).
+- **questionary**: Making user inputs smooth and snazzy. Hats off! Visit them [here](https://github.com/tmbo/questionary).
+- **seaborn**: For leveling up my plots. Beauty in every graph! Drop by [here](https://github.com/mwaskom/seaborn).
+
+- **tqdm**: That sleek progress bar? Yep, it's their magic. Show them some love [here](https://github.com/tqdm/tqdm).
+
+- **wordcloud**: Words have never looked so good. Pure genius! Their amazing work is [here](https://github.com/amueller/word_cloud).
 
 Thanks to these projects and their contributors for the hard work that went into developing these invaluable tools!
 
@@ -183,6 +187,12 @@ Feel free to fork this repository and make your enhancements or improvements. AL
 > See [CONTRIBUTING.md](CONTRIBUTING.md)
 
 > See also : [HackerNews post](https://news.ycombinator.com/item?id=37636701)
+
+### Changelog
+
+    **01/10/2023**
+
+    Rewrote the whole thing using classes
 
 ### Notes
 

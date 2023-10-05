@@ -1,354 +1,227 @@
-"""main module
+"""Main file for testing the program."""
 
-Todo:
-    - Better command line output formatting
-    - Configs from the command line
-    - Link to submit issues or feedback
-"""
-
-import calendar
-import datetime
 import json
-import os
-import pathlib
-import re
-from collections import defaultdict
-from typing import Any, Dict, List, Tuple
+from datetime import datetime, timedelta
+from pathlib import Path
+from typing import List
+from zipfile import ZipFile
 
-import questionary
+from tqdm import tqdm
 
-from src.custom_json_files import create_custom_instructions_json
-from src.data_visualization import create_graph, create_wordcloud
-from src.message_processing import format_message_as_md
-from src.metadata_extraction import extract_metadata, save_conversation_to_md
-from src.utils import extract_zip, format_title, get_most_recent_zip
+from models.conversation import Conversation, group_by_month, group_by_week
+from views.data_visualizations import create_save_wordcloud, create_save_graph
+from views.questions import ask_questions
 
-# Load the configuration JSON file
-with open("config.json", encoding="utf-8") as c_file:
-    config = json.load(c_file)
+HOME: Path = Path.home()
+DOWNLOADS: Path = HOME / "Downloads"
 
-# Pre-compiled pattern for disallowed characters in file names
-PATTERN = re.compile(r'[<>:"/\\|?*\n\r\t\f\v]')
+# most recent zip file in downloads folder
+default_zip_filepath: Path = max(
+    DOWNLOADS.glob("*.zip"), key=lambda x: x.stat().st_ctime
+)
 
-# default values
-HOME: str = os.path.expanduser("~")
-
-default_out_folder: str = os.path.join(HOME, "Documents", "My ChatGPT Data")
-default_zip_file: str = get_most_recent_zip()
-
-# Get the current date
-now = datetime.datetime.now()
-
-# Extract the month and year
-current_month_name = calendar.month_name[now.month]
-current_year = now.year
+default_output_folder: Path = HOME / "Documents" / "TEST"
 
 
-def get_absolute_path(path: str) -> str:
-    """Convert a potentially relative path to an absolute path, relative to the home directory.
+# utility function
+def all_mondays(year: int) -> List[datetime]:
+    # Start from the first day of the year
+    d = datetime(year, 1, 1)
 
-    Args:
-        path (str): The input path (either relative or absolute).
+    # Move to the first Monday of the year
+    while d.weekday() != 0:
+        d += timedelta(days=1)
 
-    Returns:
-        str: The absolute path.
-    """
+    # Collect all Mondays
+    mondays: List[datetime] = []
+    while d.year == year:
+        mondays.append(d)
+        d += timedelta(days=7)  # jump to next Monday
 
-    if path.startswith(("~", HOME)):
-        path = os.path.expanduser(path)
-    elif path.startswith(("/", "\\")):
-        path = path[1:]
-
-    if not os.path.isabs(path):
-        path = os.path.join(HOME, path)
-    return os.path.abspath(path)
-
-
-def get_sanitized_and_sorted_messages(conversation: Dict[str, Any]) -> Tuple[str, str]:
-    """Sanitize and sort messages from the conversation.
-
-    Args:
-        conversation (dict): The conversation data.
-
-    Returns:
-        tuple[str, str]: The sanitized title and the formatted conversation text.
-    """
-
-    title: str = PATTERN.sub("-", conversation.get("title", "Untitled").strip())
-    sorted_messages: List[Any] = sorted(
-        conversation["mapping"].items(),
-        key=lambda x: 0
-        if not x[1]["message"] or x[1]["message"].get("create_time") is None
-        else x[1]["message"]["create_time"],
-    )
-    conversation_text: str = "".join(
-        [
-            format_message_as_md(value.get("message", {}), config["roles"])
-            for _, value in sorted_messages
-        ]
-    )
-    return title, conversation_text
-
-
-def process_conversation(
-    conversation: Dict[str, Any], title_occurrences: defaultdict[str, int], path: str
-) -> None:
-    """Process a single conversation and save it to a Markdown file.
-
-    Args:
-        conversation (dict): The conversation data.
-        title_occurrences (defaultdict[str, int]): Tracks the occurrences of each title.
-        path (str): The output path.
-    """
-
-    title, conversation_text = get_sanitized_and_sorted_messages(conversation)
-    metadata: Dict[str, Any] = extract_metadata(conversation)
-    delimiters = config["delimiters_default"]
-    yaml_config = config["yaml_headers"]
-    save_conversation_to_md(
-        title,
-        conversation_text,
-        title_occurrences,
-        path,
-        metadata,
-        delimiters,
-        yaml_config,
-    )
+    return mondays
 
 
 def main():
-    """Main processing function.
+    """Main function."""
 
-    Args:
-        out_folder (str): The output folder path.
-        zip_file (str): The ZIP file path.
-    """
+    print("Welcome to ChatGPT Data Visualizer ✨📊!\n")
+    print("Follow the instructions in the command line.\n")
+    print("Press 'ENTER' to select the default options.\n\n")
 
-    out_folder: str = questionary.text(
-        "Enter the path to the output folder :", default=default_out_folder
-    ).ask()
+    # -------------- getting configs --------------
 
-    out_folder = get_absolute_path(out_folder)
+    with open("config.json", "r", encoding="utf-8") as file:
+        configs = json.load(file)
 
-    os.makedirs(out_folder, exist_ok=True)
+    if not configs["zip_file"]:
+        configs["zip_file"] = str(default_zip_filepath)
 
-    zip_file: str = questionary.text(
-        "Enter the path to the exported ZIP file :", default_zip_file
-    ).ask()
+    if not configs["output_folder"]:
+        configs["output_folder"] = str(default_output_folder)
 
-    zip_file = get_absolute_path(zip_file)
+    ask_questions(configs)
 
-    extract_zip(zip_file)
+    print("\n\nAnd we're off! 🚀🚀🚀\n")
 
-    if not os.path.isfile(zip_file):
-        print(f"ZIP file not found: '{zip_file}'. Ensure the file exists.")
-        return
+    # -------------- loading data --------------
 
-    json_filepath: str = os.path.join(
-        os.path.splitext(zip_file)[0], "conversations.json"
-    )
-    if not os.path.isfile(json_filepath):
-        print(
-            f"Expected JSON file not found: '{json_filepath}'. Check the contents of the ZIP file."
+    zip_filepath = Path(configs["zip_file"])
+    with ZipFile(zip_filepath, "r") as zip_ref:
+        zip_ref.extractall(zip_filepath.with_suffix(""))
+
+    with open(
+        zip_filepath.with_suffix("") / Path("conversations.json"), "r", encoding="utf-8"
+    ) as file_ref:
+        conversations = json.load(file_ref)
+
+    # -------------- creating output folder --------------
+
+    output_folder = Path(configs["output_folder"])
+    output_folder.mkdir(parents=True, exist_ok=True)
+
+    # ------------ grouping conversations by week and month -----------
+
+    all_conversations: List[Conversation] = []
+
+    for convo in conversations:
+        conversation = Conversation(**convo)
+        conversation.configuration = configs["conversation"]
+        all_conversations.append(conversation)
+
+    weeks_dict = group_by_week(all_conversations)
+
+    months_dict = group_by_month(all_conversations)
+
+    # --------- writing markdown files ---------
+
+    markdown_folder = output_folder / "Markdown"
+    markdown_folder.mkdir(parents=True, exist_ok=True)
+
+    for conversation in tqdm(conversations, desc="Writing Markdown 📄 files"):
+        conversation = Conversation(**conversation)
+        conversation.configuration = configs["conversation"]
+        conversation.save_to_dir(markdown_folder)
+
+    print(f"\nDone 🎉 ! Check the output 📄 here : {markdown_folder.as_uri()} 🔗\n")
+
+    # ----------- creating graphs -------------
+
+    graph_folder = output_folder / "Graphs"
+    graph_folder.mkdir(parents=True, exist_ok=True)
+
+    # for week in tqdm(weeks_dict.keys(), desc="Creating weekly graphs 📈 ..."):
+    #     all_week_timestamps = [
+    #         node.message.create_time
+    #         for convo in weeks_dict[week]
+    #         for node in convo.user_nodes + convo.assistant_nodes
+    #         if node.message and node.message.create_time
+    #     ]
+
+    #     create_save_graph(
+    #         all_week_timestamps, graph_folder / f"{week.strftime('week %d %m %Y')}.png"
+    #     )
+
+    # for month in tqdm(months_dict.keys(), desc="Creating monthly graphs 📈 ..."):
+    #     all_month_timestamps = [
+    #         node.message.create_time
+    #         for convo in months_dict[month]
+    #         for node in convo.user_nodes + convo.assistant_nodes
+    #         if node.message and node.message.create_time
+    #     ]
+
+    #     create_save_graph(
+    #         all_month_timestamps, graph_folder / f"{month.strftime('%B')}.png"
+    #     )
+
+    print("Creating graph 📈 of prompts per day ...\n")
+
+    # creating the graph of ALL messages
+    all_timestamps = [
+        node.message.create_time
+        for convo in all_conversations
+        for node in convo.user_nodes + convo.assistant_nodes
+        if node.message and node.message.create_time
+    ]
+
+    create_save_graph(all_timestamps, graph_folder / "all conversations.png")
+
+    print(f"\nDone 🎉 ! Check the output 📈 here : {graph_folder.as_uri()} 🔗\n")
+    print("(more graphs 📈 will be added in the future)\n")
+
+    # ----------- creating bar charts -------------
+
+    # print("Creating bar charts 📊 ...\n")
+
+    # bar_chart_folder = output_folder / "Bar Charts"
+    # bar_chart_folder.mkdir(parents=True, exist_ok=True)
+
+    # # bar chart logic here ...
+
+    # print(f"\nDone 🎉 ! Check the output 📊 here : {bar_chart_folder.as_uri()} 🔗\n")
+
+    # ----------- creating wordclouds -------------
+
+    # print("Creating wordclouds 🔡☁️ ...\n")
+
+    wordcloud_folder = output_folder / "Word Clouds"
+    wordcloud_folder.mkdir(parents=True, exist_ok=True)
+
+    font_path = Path("assets/fonts") / f"{configs['wordcloud']['font']}.ttf"
+
+    colormap = configs["wordcloud"]["colormap"]
+
+    for week in tqdm(weeks_dict.keys(), desc="Creating weekly wordclouds 🔡☁️ "):
+        entire_week_text = "\n".join(
+            convo.entire_user_text + "\n" + convo.entire_assistant_text
+            for convo in weeks_dict[week]
         )
-        return
 
-    # generating custom instructions.json file
-
-    print("Writing 'custom_instructions.json' file...\n")
-
-    deduplication_mode = config["deduplication_mode"] = questionary.select(
-        "Select which custom instructions to keep in this JSON file (in case of duplicates) :",
-        choices=["all", "latest", "earliest"],
-        default=config["deduplication_mode"],
-    ).ask()
-
-    create_custom_instructions_json(json_filepath, out_folder, deduplication_mode)
-
-    # generating markdown files
-
-    want_markdown = config["want_markdown"] = questionary.confirm(
-        "Do you want to generate markdown files ?", default=config["want_markdown"]
-    ).ask()
-
-    if want_markdown:
-        # Roles Configuration
-        print("Configuring message headers:")
-
-        config["roles"]["system_title"] = questionary.text(
-            "System message header:", default=config["roles"]["system_title"]
-        ).ask()
-
-        config["roles"]["user_title"] = questionary.text(
-            "User message header:", default=config["roles"]["user_title"]
-        ).ask()
-
-        config["roles"]["assistant_title"] = questionary.text(
-            "Assistant message header:", default=config["roles"]["assistant_title"]
-        ).ask()
-
-        config["roles"]["tool_title"] = questionary.text(
-            "Tool message header:", default=config["roles"]["tool_title"]
-        ).ask()
-
-        # Delimiters Configuration
-        config["delimiters_default"] = questionary.confirm(
-            "Use default LaTeX delimiters?", default=config["delimiters_default"]
-        ).ask()
-
-        # YAML Headers Configuration
-        print("Configuring YAML headers:")
-
-        # Create choices with pre-selected items based on the config
-        choices = [
-            questionary.Choice(header, checked=value)
-            for header, value in config["yaml_headers"].items()
-        ]
-
-        selected_headers = questionary.checkbox(
-            "Select the headers you want to include:",
-            choices=choices,
-        ).ask()
-
-        # Process the selected headers to update the config
-        for header in config["yaml_headers"].keys():
-            config["yaml_headers"][header] = header in selected_headers
-
-        try:
-            with open(json_filepath, "r", encoding="utf-8") as file:
-                conversations = json.load(file)
-        except json.JSONDecodeError:
-            print(f"Error decoding JSON from '{json_filepath}'.")
-            return
-        except IOError as error:
-            print(f"I/O error reading '{json_filepath}': {error}")
-            return
-
-        title_occurrences: defaultdict[str, int] = defaultdict(int)
-        total_conversations: int = len(conversations)
-
-        markdown_path = os.path.join(out_folder, "Markdown")
-        os.makedirs(markdown_path, exist_ok=True)
-
-        print(f"Writing MD files in :\n'{markdown_path}' ...\n")
-
-        for i, conversation in enumerate(conversations):
-            title: str = get_sanitized_and_sorted_messages(conversation)[0]
-            title = format_title(title)
-            process_conversation(conversation, title_occurrences, markdown_path)
-
-            print(f"\n\x1b[KProcessing chat: '{title}'", end="", flush=True)
-            print(
-                f"\x1b[A\rProcessed {i+1}/{total_conversations} conversations",
-                end="",
-                flush=True,
-            )
-
-        print(
-            "\r\n\r\nProcessing completed 🎉.",
-            end="\n\n",
-            flush=True,
+        create_save_wordcloud(
+            entire_week_text,
+            wordcloud_folder / f"{week.strftime('Week %Y %m %d')}.png",
+            font_path=str(font_path),
+            colormap=colormap,
         )
 
-    # creating prompts per day graph
+    for month in tqdm(months_dict.keys(), desc="Creating monthly wordclouds 🔡☁️ "):
+        entire_month_text = "\n".join(
+            convo.entire_user_text + "\n" + convo.entire_assistant_text
+            for convo in months_dict[month]
+        )
 
-    create_graph(json_filepath, out_folder)
+        create_save_wordcloud(
+            entire_month_text,
+            wordcloud_folder / f"{month.strftime('%B')}.png",
+            font_path=str(font_path),
+            colormap=colormap,
+        )
 
-    # create wordcloud
+    print(f"\nDone 🎉 ! Check the output 🔡☁️ here : {wordcloud_folder.as_uri()} 🔗\n")
 
-    want_wordclouds = config["want_wordclouds"] = questionary.confirm(
-        "Do you want a word cloud ?", default=config["want_wordclouds"]
-    ).ask()
+    # ----------- creating heatmaps -------------
 
-    def get_font_path(font_name: str):
-        return f"assets/fonts/{font_name}.ttf"
+    # print("Creating heatmaps 🗺️ ...\n")
 
-    fonts = os.listdir("assets/fonts")
-    fonts = [os.path.splitext(font)[0] for font in fonts]
+    # heatmap_folder = output_folder / "Heatmaps"
+    # heatmap_folder.mkdir(parents=True, exist_ok=True)
 
-    with open("assets/colormaps.txt", "r", encoding="utf-8") as file:
-        colormaps = file.read().splitlines()
+    # # heatmap logic here ...
 
-    if want_wordclouds:
-        font = config["data_viz"]["wordclouds"]["font"] = questionary.select(
-            "Select a font for the word cloud :",
-            choices=fonts,
-            default=config["data_viz"]["wordclouds"]["font"],
-        ).ask()
+    # print(f"\nDone 🎉 ! Check the output 🗺️ here : {heatmap_folder.as_uri()} 🔗\n")
 
-        font_path = get_font_path(font)
+    # ------------ Done ! saving configs ... -------------
 
-        colormap = config["data_viz"]["wordclouds"]["colormap"] = questionary.select(
-            "Select a color theme for the word cloud :",
-            choices=colormaps,
-            default=config["data_viz"]["wordclouds"]["colormap"],
-        ).ask()
+    print("(Settings ⚙️ have been updated and saved to 'config.json')\n")
 
-        month_names = list(calendar.month_name)[1:]
+    print("ALL DONE 🎉🎉🎉 !\n")
+    print(f"Explore the full gallery 🖼️ at: {output_folder.as_uri()} 🔗\n")
+    print("I hope you enjoy the outcome 🤞.\n")
+    print("If you appreciate it, kindly give the project a star 🌟 on GitHub :\n")
+    print("➡️ https://github.com/mohamed-chs/chatgpt-history-export-to-md 🔗\n")
 
-        all_months = config["data_viz"]["wordclouds"][
-            "all_months"
-        ] = questionary.confirm(
-            "One word cloud for each month ? (This may take a while. Otherwise, specify the start and end months.))",
-            default=config["data_viz"]["wordclouds"]["all_months"],
-        ).ask()
-
-        if all_months:
-            for i in range(len(month_names) - 1):
-                create_wordcloud(
-                    json_filepath,
-                    out_folder,
-                    "user",
-                    font_path,
-                    colormap,
-                    month_names[i],
-                    month_names[i + 1],
-                )
-                if month_names[i] == current_month_name:
-                    break
-
-        else:
-            start_month = config["data_viz"]["wordclouds"][
-                "start_month"
-            ] = questionary.select(
-                "Select a start month for the word cloud :",
-                choices=month_names,
-                default=config["data_viz"]["wordclouds"]["start_month"],
-            ).ask()
-
-            end_month = config["data_viz"]["wordclouds"][
-                "end_month"
-            ] = questionary.select(
-                "Select an end month for the word cloud :",
-                choices=month_names,
-                default=config["data_viz"]["wordclouds"]["end_month"],
-            ).ask()
-
-            create_wordcloud(
-                json_filepath,
-                out_folder,
-                "user",
-                font_path,
-                colormap,
-                start_month,
-                end_month,
-            )
-
-    # Save updated configuration
-    with open("config.json", "w", encoding="utf-8") as a_file:
-        json.dump(config, a_file, indent=2)
-
-    print("Configuration has been updated and saved to 'config.json'.\n")
-
-    path = pathlib.Path(out_folder).resolve()
-
-    uri = path.as_uri()
-
-    print(f"Check the output here : {uri}.\n")
+    with open("config.json", "w", encoding="utf-8") as file:
+        json.dump(configs, file, indent=2)
 
 
 if __name__ == "__main__":
-    print(
-        "Welcome to ChatGPT Data Visualizer ✨📊!\nFollow the instructions in the command line.\nPress 'ENTER' to select the default options.\n\n"
-    )
     main()

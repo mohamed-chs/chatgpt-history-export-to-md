@@ -6,8 +6,10 @@ node_modules/
 dev/
 dev.ipynb
 dev.py
+*test*
 
-# trying out the MVC architecture
-models/
-views/
-controllers/
+# until I figure out how to use it
+stopwords/
+
+# old stuff
+src/

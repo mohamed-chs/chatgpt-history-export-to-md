@@ -3,4 +3,5 @@ nltk
 pandas
 questionary
 seaborn
+tqdm
 wordcloud
