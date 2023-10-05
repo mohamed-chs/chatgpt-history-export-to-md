@@ -4,7 +4,6 @@
 .gitignore
 [.mypy_cache] (...)
 [.pytest_cache] (...)
-[.venv] (...)
 [.vscode] (...)
 [assets]
     ├── colormaps.txt
@@ -14,31 +13,22 @@
         ├── wordcloud_sample.png
         └── wordcloud_sample2.png
     ├── [fonts]
-        ├── AmaticSC-Bold.ttf
         ├── AmaticSC-Regular.ttf
         ├── ArchitectsDaughter-Regular.ttf
         ├── BebasNeue-Regular.ttf
         ├── Borel-Regular.ttf
         ├── Courgette-Regular.ttf
         ├── CroissantOne-Regular.ttf
-        ├── Handjet-Bold.ttf
         ├── Handjet-Regular.ttf
         ├── IndieFlower-Regular.ttf
-        ├── Kalam-Light.ttf
         ├── Kalam-Regular.ttf
         ├── Lobster-Regular.ttf
         ├── MartianMono-Regular.ttf
         ├── MartianMono-Thin.ttf
-        ├── Montserrat-Italic.ttf
-        ├── Montserrat-Light.ttf
-        ├── Montserrat-Medium.ttf
         ├── Montserrat-Regular.ttf
         ├── Mooli-Regular.ttf
         ├── Pacifico-Regular.ttf
         ├── PlayfairDisplay-Regular.ttf
-        ├── Raleway-Italic.ttf
-        ├── Raleway-Light.ttf
-        ├── Raleway-Medium.ttf
         ├── Raleway-Regular.ttf
         ├── RobotoMono-Regular.ttf
         ├── RobotoMono-Thin.ttf
@@ -50,7 +40,6 @@
         ├── ShadowsIntoLight-Regular.ttf
         ├── TitilliumWeb-Regular.ttf
         ├── Yellowtail-Regular.ttf
-        ├── YsabeauOffice-Italic.ttf
         ├── YsabeauOffice-Regular.ttf
         ├── YsabeauSC-Regular.ttf
         ├── YsabeauSC-Thin.ttf
@@ -69,8 +58,11 @@
         └── zip-file-content.png
     └── [stopwords]
         └── programming-languages-keywords.txt
+config (old).json
 config.json
 CONTRIBUTING.md
+conversation_test.ipynb
+data_viz_test.ipynb
 [dev] (...)
 dev.ipynb
 dev.py
@@ -79,10 +71,19 @@ dev.py
     ├── cdnjs.cloudflare.com_ajax_libs_jszip_3.10.1_jszip.min.js
     └── how_to_use.md
 LICENSE
+main (old).py
 main.py
+[models]
+    ├── conversation.py
+    ├── message.py
+    ├── node.py
+    ├── __init__.py
+    └── [__pycache__] (...)
+node_test.ipynb
 project_layout.txt
 README.md
 requirements.txt
+setup.py
 [src]
     ├── custom_json_files.py
     ├── data_visualization.py
@@ -92,4 +93,9 @@ requirements.txt
     ├── __init__.py
     └── [__pycache__] (...)
 TODO.md
+[views]
+    ├── data_visualizations.py
+    ├── questions.py
+    ├── __init__.py
+    └── [__pycache__] (...)
 [__pycache__] (...)

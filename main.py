@@ -1,15 +1,16 @@
 """Main file for testing the program."""
 
 import json
+import time
 from datetime import datetime, timedelta
 from pathlib import Path
-from typing import List
+from typing import Any, Dict, List
 from zipfile import ZipFile
 
 from tqdm import tqdm
 
 from models.conversation import Conversation, group_by_month, group_by_week
-from views.data_visualizations import create_save_wordcloud, create_save_graph
+from views.data_visualizations import create_save_graph, create_save_wordcloud
 from views.questions import ask_questions
 
 HOME: Path = Path.home()
@@ -208,6 +209,32 @@ def main():
     # # heatmap logic here ...
 
     # print(f"\nDone 🎉 ! Check the output 🗺️ here : {heatmap_folder.as_uri()} 🔗\n")
+
+    # ------------- writing custom instructions --------------
+
+    print("Writing custom instructions 📝 ...\n")
+
+    ci_json_filepath = output_folder / "custom_instructions.json"
+
+    custom_instructions: List[Dict[str, Any]] = []
+
+    for convo in all_conversations:
+        if not convo.custom_instructions:
+            continue
+
+        custom_instruction = {
+            "chat_title": convo.title,
+            "chat_link": convo.chat_link,
+            "time": time.ctime(convo.create_time),
+            "custom_instructions": convo.custom_instructions,
+        }
+
+        custom_instructions.append(custom_instruction)
+
+    with open(ci_json_filepath, "w", encoding="utf-8") as file:
+        json.dump(custom_instructions, file, indent=2)
+
+    print(f"\nDone 🎉 ! Check the output 📝 here : {ci_json_filepath.as_uri()} 🔗\n")
 
     # ------------ Done ! saving configs ... -------------
 
