@@ -47,7 +47,11 @@ def main():
 
     print("Welcome to ChatGPT Data Visualizer ✨📊!\n")
     print("Follow the instructions in the command line.\n")
-    print("Press 'ENTER' to select the default options.\n\n")
+    print("Press 'ENTER' to select the default options.\n")
+    print("If you encounter any issues, please report them here:\n")
+    print(
+        "➡️ https://github.com/mohamed-chs/chatgpt-history-export-to-md/issues/new/choose 🔗\n\n"
+    )
 
     # -------------- getting configs --------------
 
