@@ -236,8 +236,10 @@ class Conversation:
         if len(self.system_nodes) < 2:
             return None
         context_message = self.system_nodes[1].message
-        if context_message and context_message.metadata["is_user_system_message"]:
-            return context_message.metadata["user_context_message_data"]
+        if context_message and context_message.metadata.get(
+            "is_user_system_message", None
+        ):
+            return context_message.metadata.get("user_context_message_data", None)
 
     @property
     def yaml_header(self) -> str:
