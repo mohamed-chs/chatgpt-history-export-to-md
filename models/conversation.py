@@ -237,6 +237,7 @@ class Conversation:
             "is_user_system_message", None
         ):
             return context_message.metadata.get("user_context_message_data", None)
+        return None
 
     @property
     def yaml_header(self) -> str:
