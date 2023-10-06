@@ -15,8 +15,6 @@ from typing import Any, Dict, List, Optional, Set
 
 from .node import Node
 
-# from .node import Node
-
 used_file_names: Set[str] = set()
 
 
@@ -82,8 +80,7 @@ class Conversation:
         self.conversation_id = conversation_id
         self.conversation_template_id = conversation_template_id
         self.id = id
-        if configuration is None:
-            self.configuration: Dict[str, Any] = {}
+        self.configuration = configuration if configuration else {}
 
     @property
     def chat_link(self) -> str:

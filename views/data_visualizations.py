@@ -11,18 +11,11 @@ from nltk.corpus import stopwords  # type: ignore
 from wordcloud import WordCloud  # type: ignore
 
 
-# This function will check if the stopwords are available. If not, it will download them.
-def ensure_stopwords_downloaded():
-    try:
-        # Try to access the stopwords. If this throws an error, it means they aren't downloaded.
-        nltk.data.find("corpora/stopwords")  # type: ignore
-    except LookupError:
-        # If the stopwords aren't found, download them.
-        nltk.download("stopwords")  # type: ignore
-
-
-# Run the function
-ensure_stopwords_downloaded()
+# Ensure that the stopwords are downloaded
+try:
+    nltk.data.find("corpora/stopwords")  # type: ignore
+except LookupError:
+    nltk.download("stopwords")  # type: ignore
 
 languages = [
     "arabic",
@@ -50,10 +43,10 @@ def create_save_wordcloud(
 def create_save_graph(all_timestamps: List[float], file_path: Path) -> None:
     """Creates and saves a graph from the given timestamps."""
 
-    timestamps = pd.DataFrame(all_timestamps, columns=["timestamp"])  # type: ignore
-    timestamps["datetime"] = pd.to_datetime(timestamps["timestamp"], unit="s")  # type: ignore
+    df = pd.DataFrame(all_timestamps, columns=["timestamp"])  # type: ignore
+    df["datetime"] = pd.to_datetime(df["timestamp"], unit="s")  # type: ignore
 
-    daily_counts = timestamps.groupby(timestamps["datetime"].dt.date).size()  # type: ignore
+    daily_counts = df.groupby(df["datetime"].dt.date).size()  # type: ignore
 
     plt.figure(figsize=(15, 7))  # type: ignore
 

@@ -34,8 +34,7 @@ class Message:
         self.weight = weight
         self.metadata = metadata
         self.recipient = recipient
-        if configuration is None:
-            self.configuration: Dict[str, Any] = {}
+        self.configuration = configuration if configuration else {}
 
     @property
     def author_role(self) -> str:

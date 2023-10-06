@@ -26,18 +26,20 @@ default_output_folder: Path = HOME / "Documents" / "My ChatGPT Data"
 
 # utility function
 def all_mondays(year: int) -> List[datetime]:
+    """Return a list of all Mondays in a given year."""
+
     # Start from the first day of the year
-    d = datetime(year, 1, 1)
+    date = datetime(year, 1, 1)
 
     # Move to the first Monday of the year
-    while d.weekday() != 0:
-        d += timedelta(days=1)
+    while date.weekday() != 0:
+        date += timedelta(days=1)
 
     # Collect all Mondays
     mondays: List[datetime] = []
-    while d.year == year:
-        mondays.append(d)
-        d += timedelta(days=7)  # jump to next Monday
+    while date.year == year:
+        mondays.append(date)
+        date += timedelta(days=7)  # jump to next Monday
 
     return mondays
 
