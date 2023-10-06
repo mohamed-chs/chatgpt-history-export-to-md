@@ -3,15 +3,9 @@ node_modules/
 .venv/
 
 # testing models and visualizations on my personal data
-dev/
-dev.ipynb
-dev.py
+*dev*
 *test*
+*.ipynb
 
-# until I figure out how to use it
-stopwords/
-
-# old stuff
-src/
-config (old).json
-main (old).py
+# until I implement a better way to handle this
+assets/stopwords/
