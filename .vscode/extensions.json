@@ -5,6 +5,7 @@
         "njqdev.vscode-python-typehint",
         "ms-python.python",
         "ms-python.pylint",
-        "matangover.mypy"
+        "matangover.mypy",
+        "ms-toolsai.jupyter"
     ]
 }

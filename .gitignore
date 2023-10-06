@@ -2,10 +2,11 @@ __pycache__/
 node_modules/
 .venv/
 
-# testing models and visualizations on my personal data
+# testing models and visualizations on personal data
 *dev*
 *test*
-*.ipynb
+data/
+output/
 
 # until I implement a better way to handle this
 assets/stopwords/
