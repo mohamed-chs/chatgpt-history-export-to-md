@@ -1,8 +1,9 @@
 """Main file for testing the program."""
 
 import json
-import time
+import shutil
 from pathlib import Path
+from time import ctime
 from typing import Any, Dict, List
 from zipfile import ZipFile
 
@@ -16,11 +17,9 @@ HOME: Path = Path.home()
 DOWNLOADS: Path = HOME / "Downloads"
 
 # most recent zip file in downloads folder
-default_zip_filepath: Path = max(
-    DOWNLOADS.glob("*.zip"), key=lambda x: x.stat().st_ctime
-)
+DEFAULT_ZIP_FILE: Path = max(DOWNLOADS.glob("*.zip"), key=lambda x: x.stat().st_ctime)
 
-default_output_folder: Path = HOME / "Documents" / "My ChatGPT Data"
+DEFAULT_OUTPUT_FOLDER: Path = HOME / "Documents" / "My ChatGPT Data"
 
 
 def main():
@@ -40,10 +39,10 @@ def main():
         configs = json.load(file)
 
     if not configs["zip_file"]:
-        configs["zip_file"] = str(default_zip_filepath)
+        configs["zip_file"] = str(DEFAULT_ZIP_FILE)
 
     if not configs["output_folder"]:
-        configs["output_folder"] = str(default_output_folder)
+        configs["output_folder"] = str(DEFAULT_OUTPUT_FOLDER)
 
     ask_questions(configs)
 
@@ -63,6 +62,10 @@ def main():
     # -------------- creating output folder --------------
 
     output_folder = Path(configs["output_folder"])
+
+    if output_folder.exists() and output_folder.is_dir():
+        shutil.rmtree(output_folder)
+
     output_folder.mkdir(parents=True, exist_ok=True)
 
     # ------------ grouping conversations by week and month -----------
@@ -165,7 +168,7 @@ def main():
 
         create_save_wordcloud(
             entire_week_text,
-            wordcloud_folder / f"{week.strftime('Week %Y %m %d')}.png",
+            wordcloud_folder / f"{week.strftime('Week %W')}.png",
             font_path=str(font_path),
             colormap=colormap,
         )
@@ -211,7 +214,7 @@ def main():
         custom_instruction = {
             "chat_title": convo.title,
             "chat_link": convo.chat_link,
-            "time": time.ctime(convo.create_time),
+            "time": ctime(convo.create_time),
             "custom_instructions": convo.custom_instructions,
         }
 
