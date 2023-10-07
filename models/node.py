@@ -19,9 +19,9 @@ class Node:
     def __init__(
         self,
         id: str,
-        message: Optional[Message] = None,
-        parent: Optional["Node"] = None,
-        children: Optional[List["Node"]] = None,
+        message: Optional[Message],
+        parent: Optional["Node"],
+        children: Optional[List["Node"]],
     ):
         self.id = id
         self.message = message
@@ -34,15 +34,15 @@ class Node:
         self.children.append(node)
         node.parent = self
 
-    @classmethod
-    def tree_from_mapping(cls, mapping: Dict[str, Any]) -> Dict[str, "Node"]:
+    @staticmethod
+    def nodes_from_mapping(mapping: Dict[str, Any]) -> Dict[str, "Node"]:
         """Returns a dictionary of connected Node objects, based on the mapping."""
         nodes: Dict[str, Node] = {}
 
         # First pass: Create nodes
         for key, value in mapping.items():
             message = Message(**value["message"]) if value["message"] else None
-            nodes[key] = Node(id=key, message=message)
+            nodes[key] = Node(id=key, message=message, parent=None, children=None)
 
         # Second pass: Connect nodes
         for key, value in mapping.items():
@@ -72,16 +72,13 @@ class Node:
 
         if len(self.children) == 0:
             return ""
-        elif len(self.children) == 1:
+        if len(self.children) == 1:
             return f"\n[child ⬇️](#{self.children[0].id})\n"
-        else:
-            footer = "\n" + " | ".join(
-                [
-                    f"[child {i+1} ⬇️](#{child.id})"
-                    for i, child in enumerate(self.children)
-                ]
-            )
-            return footer + "\n"
+
+        footer = "\n" + " | ".join(
+            [f"[child {i+1} ⬇️](#{child.id})" for i, child in enumerate(self.children)]
+        )
+        return footer + "\n"
 
     # just for testing, and fun. It's not really ideal for the real thing
     def show(self, level: int = 0) -> str:

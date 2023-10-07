@@ -7,49 +7,17 @@ object path : conversations.json -> conversation (one of the list items)
 
 import os
 import re
-import time
 from collections import defaultdict
 from datetime import datetime, timedelta
 from pathlib import Path
+from time import ctime
 from typing import Any, Dict, List, Optional, Set
+
+from utils.utils import ensure_closed_code_blocks, replace_latex_delimiters
 
 from .node import Node
 
 used_file_names: Set[str] = set()
-
-
-def ensure_closed_code_blocks(string: str) -> str:
-    """Ensure that all code blocks are closed."""
-    # A code block can be opened with triple backticks, possibly followed by a language name.
-    # It can only be closed however with triple backticks, with nothing else on the line.
-
-    open_code_block = False
-
-    lines = string.split("\n")
-
-    for line in lines:
-        if line.startswith("```") and not open_code_block:
-            open_code_block = True
-            continue
-
-        if line == "```" and open_code_block:
-            open_code_block = False
-
-    if open_code_block:
-        string += "\n```"
-
-    return string
-
-
-def replace_latex_delimiters(string: str) -> str:
-    """Replace all the LaTeX bracket delimiters in the string with dollar sign ones."""
-
-    string = re.sub(r"\\\[", "$$", string)
-    string = re.sub(r"\\\]", "$$", string)
-    string = re.sub(r"\\\(", "$", string)
-    string = re.sub(r"\\\)", "$", string)
-
-    return string
 
 
 class Conversation:
@@ -67,12 +35,11 @@ class Conversation:
         conversation_id: str,
         conversation_template_id: Optional[str],
         id: str,
-        configuration: Optional[Dict[str, Any]] = None,
     ):
         self.title = title
         self.create_time = create_time
         self.update_time = update_time
-        nodes: Dict[str, Node] = Node.tree_from_mapping(mapping)
+        nodes: Dict[str, Node] = Node.nodes_from_mapping(mapping)
         self.mapping = nodes
         self.moderation_results = moderation_results
         self.current_node = nodes[current_node]
@@ -80,7 +47,7 @@ class Conversation:
         self.conversation_id = conversation_id
         self.conversation_template_id = conversation_template_id
         self.id = id
-        self.configuration = configuration if configuration else {}
+        self.configuration: Dict[str, Any] = {}
 
     @property
     def chat_link(self) -> str:
@@ -110,7 +77,7 @@ class Conversation:
         return nodes
 
     @property
-    def all_nodes(self) -> List[Node]:
+    def all_message_nodes(self) -> List[Node]:
         """List of all nodes that have a message in the conversation, including all branches."""
 
         nodes: List[Node] = []
@@ -125,12 +92,12 @@ class Conversation:
     @property
     def has_multiple_branches(self) -> bool:
         """Check if the conversation has multiple branches."""
-        return len(self.all_nodes) > len(self.main_branch_nodes)
+        return len(self.all_message_nodes) > len(self.main_branch_nodes)
 
     @property
     def leaf_count(self) -> int:
         """Number of leaves in the conversation."""
-        return sum(1 for node in self.all_nodes if not node.children)
+        return sum(1 for node in self.all_message_nodes if not node.children)
 
     @property
     def content_types(self) -> List[str]:
@@ -138,7 +105,11 @@ class Conversation:
 
         (e.g. text, code, execution_output, etc.)"""
         return list(
-            set(node.message.content_type for node in self.all_nodes if node.message)
+            set(
+                node.message.content_type
+                for node in self.all_message_nodes
+                if node.message
+            )
         )
 
     @property
@@ -146,7 +117,7 @@ class Conversation:
         """Number of 'user' and 'assistant' messages in the conversation. (all branches)"""
         return sum(
             1
-            for node in self.all_nodes
+            for node in self.all_message_nodes
             if node.message and node.message.author_role in ("user", "assistant")
         )
 
@@ -155,7 +126,7 @@ class Conversation:
         """List of all 'system' nodes in the conversation. (all branches)"""
         return [
             node
-            for node in self.all_nodes
+            for node in self.all_message_nodes
             if node.message and node.message.author_role == "system"
         ]
 
@@ -164,7 +135,7 @@ class Conversation:
         """List of all 'user' nodes in the conversation. (all branches)"""
         return [
             node
-            for node in self.all_nodes
+            for node in self.all_message_nodes
             if node.message and node.message.author_role == "user"
         ]
 
@@ -173,7 +144,7 @@ class Conversation:
         """List of all 'assistant' nodes in the conversation. (all branches)"""
         return [
             node
-            for node in self.all_nodes
+            for node in self.all_message_nodes
             if node.message and node.message.author_role == "assistant"
         ]
 
@@ -182,7 +153,7 @@ class Conversation:
         """List of all 'tool' nodes in the conversation. (all branches)"""
         return [
             node
-            for node in self.all_nodes
+            for node in self.all_message_nodes
             if node.message and node.message.author_role == "tool"
         ]
 
@@ -224,8 +195,7 @@ class Conversation:
 
         if len(plugins) > 0:
             return list(plugins)
-        else:
-            return None
+        return None
 
     @property
     def custom_instructions(self) -> Optional[Dict[str, str]]:
@@ -247,8 +217,8 @@ class Conversation:
         yaml_map = {
             "title": self.title,
             "chat_link": self.chat_link,
-            "create_time": time.ctime(self.create_time),
-            "update_time": time.ctime(self.update_time),
+            "create_time": ctime(self.create_time),
+            "update_time": ctime(self.update_time),
             "model": self.model_slug,
             "used_plugins": self.used_plugins,
             "message_count": self.message_count,
@@ -270,8 +240,7 @@ class Conversation:
         """Get the branch indicator for the given node."""
         if node in self.main_branch_nodes:
             return "(main branch ⎇)"
-        else:
-            return "(other branch ⎇)"
+        return "(other branch ⎇)"
 
         # placeholder for now, to be implemented later
 
@@ -285,18 +254,17 @@ class Conversation:
 
         markdown = self.yaml_header
 
-        for node in self.all_nodes:
+        for node in self.all_message_nodes:
             if node.message:
                 content = ensure_closed_code_blocks(node.message.content_text)
                 # prevent empty messages from taking up white space
                 content = f"\n{content}\n" if content else ""
                 if latex_delimiters == "dollar sign":
                     content = replace_latex_delimiters(content)
-                markdown += f"""
-{self.branch_indicator(node)}
-{node.header}{content}{node.footer}
----
-"""
+                markdown += (
+                    f"\n{self.branch_indicator(node)}\n"
+                    f"{node.header}{content}{node.footer}\n---\n"
+                )
         return markdown
 
     @property
@@ -307,8 +275,8 @@ class Conversation:
     @property
     def sanitized_title(self) -> str:
         """Sanitized title of the conversation, compatible with file names."""
-        filename_pattern = re.compile(r'[<>:"/\\|?*\n\r\t\f\v]')
-        return filename_pattern.sub("_", self.title) if self.title else "untitled"
+        file_anti_pattern = re.compile(r'[<>:"/\\|?*\n\r\t\f\v]')
+        return file_anti_pattern.sub("_", self.title) if self.title else "untitled"
 
     def save_to_dir(self, folder_path: Path) -> None:
         """Save the conversation to the given folder path."""

@@ -10,7 +10,6 @@ import pandas as pd
 from nltk.corpus import stopwords  # type: ignore
 from wordcloud import WordCloud  # type: ignore
 
-
 # Ensure that the stopwords are downloaded
 try:
     nltk.data.find("corpora/stopwords")  # type: ignore

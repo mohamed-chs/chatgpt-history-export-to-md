@@ -2,7 +2,6 @@
 
 import json
 import time
-from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Any, Dict, List
 from zipfile import ZipFile
@@ -24,34 +23,14 @@ default_zip_filepath: Path = max(
 default_output_folder: Path = HOME / "Documents" / "My ChatGPT Data"
 
 
-# utility function
-def all_mondays(year: int) -> List[datetime]:
-    """Return a list of all Mondays in a given year."""
-
-    # Start from the first day of the year
-    date = datetime(year, 1, 1)
-
-    # Move to the first Monday of the year
-    while date.weekday() != 0:
-        date += timedelta(days=1)
-
-    # Collect all Mondays
-    mondays: List[datetime] = []
-    while date.year == year:
-        mondays.append(date)
-        date += timedelta(days=7)  # jump to next Monday
-
-    return mondays
-
-
 def main():
     """Main function."""
 
-    print("Welcome to ChatGPT Data Visualizer ✨📊!\n")
-    print("Follow the instructions in the command line.\n")
-    print("Press 'ENTER' to select the default options.\n")
-    print("If you encounter any issues, please report them here:\n")
     print(
+        "Welcome to ChatGPT Data Visualizer ✨📊!\n\n"
+        "Follow the instructions in the command line.\n\n"
+        "Press 'ENTER' to select the default options.\n\n"
+        "If you encounter any issues, please report them here:\n\n"
         "➡️ https://github.com/mohamed-chs/chatgpt-history-export-to-md/issues/new/choose 🔗\n\n"
     )
 
@@ -244,16 +223,17 @@ def main():
 
     # ------------ Done ! saving configs ... -------------
 
-    print("(Settings ⚙️ have been updated and saved to 'config.json')\n")
-
-    print("ALL DONE 🎉🎉🎉 !\n")
-    print(f"Explore the full gallery 🖼️ at: {output_folder.as_uri()} 🔗\n")
-    print("I hope you enjoy the outcome 🤞.\n")
-    print("If you appreciate it, kindly give the project a star 🌟 on GitHub :\n")
-    print("➡️ https://github.com/mohamed-chs/chatgpt-history-export-to-md 🔗\n")
-
     with open("config.json", "w", encoding="utf-8") as file:
         json.dump(configs, file, indent=2)
+
+    print(
+        "(Settings ⚙️ have been updated and saved to 'config.json')\n\n"
+        "ALL DONE 🎉🎉🎉 !\n\n"
+        f"Explore the full gallery 🖼️ at: {output_folder.as_uri()} 🔗\n\n"
+        "I hope you enjoy the outcome 🤞.\n\n"
+        "If you appreciate it, kindly give the project a star 🌟 on GitHub :\n\n"
+        "➡️ https://github.com/mohamed-chs/chatgpt-history-export-to-md 🔗\n\n"
+    )
 
 
 if __name__ == "__main__":

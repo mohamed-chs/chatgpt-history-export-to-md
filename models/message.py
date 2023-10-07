@@ -22,7 +22,6 @@ class Message:
         weight: float,
         metadata: Dict[str, Any],
         recipient: str,
-        configuration: Optional[Dict[str, Any]] = None,
     ):
         self.id = id
         self.author = author
@@ -34,7 +33,7 @@ class Message:
         self.weight = weight
         self.metadata = metadata
         self.recipient = recipient
-        self.configuration = configuration if configuration else {}
+        self.configuration: Dict[str, Any] = {}
 
     @property
     def author_role(self) -> str:
@@ -56,10 +55,9 @@ class Message:
         """get the text content of the message."""
         if "parts" in self.content:
             return self.content["parts"][0]
-        elif "text" in self.content:
+        if "text" in self.content:
             return f"```python\n{self.content['text']}\n```"
-        else:
-            return ""
+        return ""
 
     @property
     def content_type(self) -> str:
