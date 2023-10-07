@@ -79,7 +79,7 @@ styles = {
 
 
 def ask_questions(configs: Dict[str, Any]):
-    """Prompts the user for input and saves the choices to the 'config' dictionary."""
+    """Prompts the user for input and saves the choices to the 'configs' dictionary."""
 
     # style = questionary.select(
     #     "Select the color theme of this interface :",

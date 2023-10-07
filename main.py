@@ -86,7 +86,8 @@ def main():
     for conversation in tqdm(conversations, desc="Writing Markdown 📄 files"):
         conversation = Conversation(**conversation)
         conversation.configuration = configs["conversation"]
-        conversation.save_to_dir(markdown_folder)
+        file_path = markdown_folder / f"{conversation.sanitized_title}.md"
+        conversation.save_to_file(file_path)
 
     print(f"\nDone 🎉 ! Check the output 📄 here : {markdown_folder.as_uri()} 🔗\n")
 

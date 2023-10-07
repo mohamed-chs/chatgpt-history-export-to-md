@@ -11,13 +11,11 @@ from collections import defaultdict
 from datetime import datetime, timedelta
 from pathlib import Path
 from time import ctime
-from typing import Any, Dict, List, Optional, Set
+from typing import Any, Dict, List, Optional
 
 from utils.utils import ensure_closed_code_blocks, replace_latex_delimiters
 
 from .node import Node
-
-used_file_names: Set[str] = set()
 
 
 class Conversation:
@@ -278,20 +276,16 @@ class Conversation:
         file_anti_pattern = re.compile(r'[<>:"/\\|?*\n\r\t\f\v]')
         return file_anti_pattern.sub("_", self.title) if self.title else "untitled"
 
-    def save_to_dir(self, folder_path: Path) -> None:
-        """Save the conversation to the given folder path."""
+    def save_to_file(self, file_path: Path) -> None:
+        """Save the conversation to the given file path."""
+        base_file_name = file_path.stem
 
-        base_file_name = f"{self.sanitized_title}.md"
-        file_path = folder_path / base_file_name
-
-        # Check if the file already exists in the memory set
-        counter = 1
-        while str(file_path) in used_file_names:
-            new_file_name = f"{self.sanitized_title} ({counter}).md"
-            file_path = folder_path / new_file_name
+        counter = 0
+        while file_path.exists():
             counter += 1
-
-        used_file_names.add(str(file_path))
+            file_path = file_path.with_name(
+                f"{base_file_name} ({counter}){file_path.suffix}"
+            )
 
         with open(file_path, "w", encoding="utf-8") as file:
             file.write(self.markdown)
