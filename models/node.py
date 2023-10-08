@@ -16,6 +16,8 @@ from .message import Message
 class Node:
     """Node class for representing a node in a conversation tree."""
 
+    configuration: Dict[str, Any] = {}
+
     def __init__(
         self,
         id: str,
@@ -51,7 +53,6 @@ class Node:
 
         return nodes
 
-    @property
     def header(self) -> Optional[str]:
         """Get the header of the node message, containing a link to its parent."""
         if self.message is None:
@@ -62,9 +63,8 @@ class Node:
             if self.parent and self.parent.message
             else ""
         )
-        return f"###### {self.id}\n{parent_link}{self.message.author_header}\n"
+        return f"###### {self.id}\n{parent_link}{self.message.author_header()}\n"
 
-    @property
     def footer(self) -> Optional[str]:
         """Get the footer of the node message, containing links to its children."""
         if self.message is None:
@@ -87,8 +87,10 @@ class Node:
         lines = [
             (
                 f"{'--'*level}lvl{level} : {self.id[:10]}... ,\n"
-                f"{'--'*level} : {self.message.author_header if self.message else None} ,\n"
-                f"{'--'*level} : {self.message.content_text[:50] if self.message else None}... \n\n"
+                f"{'--'*level} : "
+                f"{self.message.author_header() if self.message else None} ,\n"
+                f"{'--'*level} : "
+                f"{self.message.content_text()[:50] if self.message else None}... \n\n"
             )
         ]
         for child in self.children:

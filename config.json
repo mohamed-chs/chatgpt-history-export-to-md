@@ -1,14 +1,17 @@
 {
   "zip_file": null,
   "output_folder": null,
+  "message": {
+    "author_headers": {
+      "system": "### System",
+      "user": "# Me",
+      "assistant": "# ChatGPT",
+      "tool": "# Tool"
+    }
+  },
   "conversation": {
-    "message": {
-      "author_headers": {
-        "system": "### System",
-        "user": "# Me",
-        "assistant": "# ChatGPT",
-        "tool": "# Tool"
-      }
+    "markdown": {
+      "latex_delimiters": "default"
     },
     "yaml": {
       "title": true,
@@ -21,14 +24,12 @@
       "message_count": true,
       "content_types": true,
       "custom_instructions": true
-    },
-    "markdown": {
-      "latex_delimiters": "default"
     }
   },
   "wordcloud": {
     "font": "ArchitectsDaughter-Regular",
-    "colormap": "prism",
-    "custom_stopwords": []
-  }
+    "colormap": "prism"
+  },
+  "node": {},
+  "conversation_list": {}
 }
