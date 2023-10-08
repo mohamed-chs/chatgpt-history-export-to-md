@@ -39,7 +39,7 @@ def main() -> None:
 
     print("Loading data 📂 ...\n")
 
-    zip_filepath = Path(configs["zip_filepath"])
+    zip_filepath = Path(configs["zip_file"])
 
     all_conversations_list = load_conversations_from_zip(zip_filepath)
 
