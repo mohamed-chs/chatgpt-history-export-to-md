@@ -1,4 +1,6 @@
-"""Module for all the data visualizations."""
+"""Module for all the data visualizations.
+
+Should ideally only return matplotlib objects, and not deal with the filesystem."""
 
 from pathlib import Path
 from typing import Any, List
@@ -9,6 +11,8 @@ import nltk  # type: ignore
 import pandas as pd
 from nltk.corpus import stopwords  # type: ignore
 from wordcloud import WordCloud  # type: ignore
+
+from models.conversation_list import ConversationList
 
 # Ensure that the stopwords are downloaded
 try:
@@ -25,18 +29,59 @@ languages = [
     "portuguese",
 ]  # add more languages here ...
 
-stop_words = set(word for lang in languages for word in stopwords.words(lang))  # type: ignore
+DEFAULT_STOP_WORDS = set(
+    word for lang in languages for word in stopwords.words(lang)  # type: ignore
+)
 
 
-def create_save_wordcloud(
+def wordcloud_from_text(
     text: str,
-    file_path: Path,
     **kwargs: Any,
-) -> None:
-    """Creates and saves a wordcloud from the given text."""
-    wordcloud = WordCloud(stopwords=stop_words, width=1000, height=1000, background_color=None, mode="RGBA", **kwargs).generate(text)  # type: ignore
+) -> WordCloud:
+    """Creates a wordcloud from the given text. Returns a WordCloud object."""
 
-    wordcloud.to_file(file_path)  # type: ignore
+    font_path = kwargs.get("font_path", "assets/fonts/ArchitectsDaughter-Regular.ttf")
+    colormap = kwargs.get("colormap", "prism")
+    width = kwargs.get("width", 1000)
+    height = kwargs.get("height", 1000)
+
+    background_color = kwargs.get("background_color", None)
+    if background_color is None:
+        mode = kwargs.get("mode", "RGBA")
+    else:
+        mode = kwargs.get("mode", "RGB")
+
+    custom_stopwords: List[str] = kwargs.get("stopwords", [])
+    stop_words = DEFAULT_STOP_WORDS.union(set(custom_stopwords))
+
+    # TODO: add more arguments here ...
+
+    wordcloud = WordCloud(
+        font_path=font_path,
+        colormap=colormap,
+        stopwords=stop_words,
+        width=width,
+        height=height,
+        background_color=background_color,
+        mode=mode,
+    ).generate(  # type: ignore
+        text
+    )
+
+    return wordcloud
+
+
+def wordcloud_from_conversation_list(
+    conversation_list: ConversationList, **kwargs: Any
+) -> WordCloud:
+    """Creates a wordcloud from the given conversation list. Returns a WordCloud object."""
+    text = (
+        conversation_list.all_user_text()
+        + "\n"
+        + conversation_list.all_assistant_text()
+    )
+
+    return wordcloud_from_text(text, **kwargs)
 
 
 def create_save_graph(all_timestamps: List[float], file_path: Path) -> None:

@@ -5,10 +5,8 @@ a bunch of classes and functions to handle conversations, messages, stats, etc.
 object path : conversations.json -> conversation (one of the list items)
 """
 
-import os
 import re
 from datetime import datetime, timedelta
-from pathlib import Path
 from time import ctime
 from typing import Any, Dict, List, Optional
 
@@ -239,7 +237,7 @@ class Conversation:
 
         # placeholder for now, to be implemented later
 
-    def markdown(self) -> str:
+    def file_text_content(self) -> str:
         """Markdown formatted text of the conversation. (all branches)
 
         Included authors : user, assistant, tool"""
@@ -265,25 +263,10 @@ class Conversation:
         """Get diverse insightful stats on the conversation."""
         return {}
 
-    def sanitized_title(self) -> str:
+    def file_name(self) -> str:
         """Sanitized title of the conversation, compatible with file names."""
         file_anti_pattern = re.compile(r'[<>:"/\\|?*\n\r\t\f\v]')
         return file_anti_pattern.sub("_", self.title) if self.title else "untitled"
-
-    def save_to_file(self, file_path: Path) -> None:
-        """Save the conversation to the given file path."""
-        base_file_name = file_path.stem
-
-        counter = 0
-        while file_path.exists():
-            counter += 1
-            file_path = file_path.with_name(
-                f"{base_file_name} ({counter}){file_path.suffix}"
-            )
-
-        with open(file_path, "w", encoding="utf-8") as file:
-            file.write(self.markdown())
-        os.utime(file_path, (self.update_time, self.update_time))
 
     def start_of_year(self) -> datetime:
         """Start of year as a datetime object."""

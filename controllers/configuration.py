@@ -35,9 +35,6 @@ def get_user_configs() -> Dict[str, Any]:
     if not default_configs["output_folder"]:
         default_configs["output_folder"] = str(DEFAULT_OUTPUT_FOLDER)
 
-    # DEBUG
-    print("DEBUG: loaded default configs")
-
     return prompt_user(default_configs)
 
 

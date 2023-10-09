@@ -1,41 +1,28 @@
 """Module for the questionary user interface."""
 
-from pathlib import Path
 from typing import Any, Dict
-from zipfile import ZipFile
 
 import questionary
 
+from utils.utils import get_colormap_names, get_font_names, validate_zip_file
+
 CUSTOM_STYLE = questionary.Style(
     [
-        ("qmark", "fg:#1565C0"),  # Bright blue question mark
-        ("question", "bold fg:#1E88E5"),  # Bold, even brighter blue question text
-        ("answer", "fg:#BBDEFB"),  # Soft blue answer
-        ("pointer", "fg:#0D47A1 bold"),  # Deep blue bold pointer for select
-        (
-            "selected",
-            "bg:#0D47A1 fg:white",
-        ),  # Deep blue background with white text for selected items
+        ("qmark", "fg:#34eb9b bold"),
+        ("question", "bold fg:#e0e0e0"),
+        ("answer", "fg:#34ebeb bold"),
+        ("pointer", "fg:#e834eb bold"),
+        ("highlighted", "fg:#349ceb bold"),
+        ("selected", "fg:#34ebeb"),
+        ("separator", "fg:#eb3434"),
+        ("instruction", "fg:#eb9434"),
+        ("text", "fg:#b2eb34"),
+        ("disabled", "fg:#858585 italic"),
     ]
 )
 
+
 # --------------------- validators ---------------------
-
-
-def validate_zip_file(path: str) -> bool:
-    """Returns True if the given path is a zip file with a 'conversations.json' file."""
-
-    if not Path(path).is_file() or Path(path).suffix != ".zip":
-        return False
-    with ZipFile(path) as zip_ref:
-        if "conversations.json" not in zip_ref.namelist():
-            return False
-    return True
-
-
-def validate_text(text: str) -> bool:
-    """Returns True if the given text is not empty."""
-    return len(text) > 0
 
 
 def validate_header(text: str) -> bool:
@@ -116,23 +103,18 @@ def prompt_user(default_configs: Dict[str, Any]) -> Dict[str, Any]:
 
     user_configs["wordcloud"] = {}
 
-    fonts_path = Path("assets/fonts")
-
-    fonts_list = [font.stem for font in fonts_path.iterdir() if font.is_file()]
+    font_names = get_font_names()
 
     user_configs["wordcloud"]["font"] = questionary.select(
         "Select the font you want to use for the word clouds :",
-        choices=fonts_list,
+        choices=font_names,
         default=default_configs["wordcloud"]["font"]
         if default_configs["wordcloud"]["font"]
         else None,
         style=CUSTOM_STYLE,
     ).ask()
 
-    colormaps_path = Path("assets/colormaps.txt")
-
-    with open(colormaps_path, "r", encoding="utf-8") as file2:
-        colormaps_list = file2.read().splitlines()
+    colormaps_list = get_colormap_names()
 
     user_configs["wordcloud"]["colormap"] = questionary.select(
         "Select the color theme you want to use for the word clouds :",
