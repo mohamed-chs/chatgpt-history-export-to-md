@@ -235,7 +235,7 @@ class Conversation:
             return "(main branch ⎇)"
         return "(other branch ⎇)"
 
-        # placeholder for now, to be implemented later
+        # TODO: placeholder for now, to be implemented later
 
     def file_text_content(self) -> str:
         """Markdown formatted text of the conversation. (all branches)

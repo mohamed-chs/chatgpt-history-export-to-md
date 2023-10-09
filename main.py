@@ -1,5 +1,6 @@
 """Main file for testing the program."""
 
+import os
 import shutil
 from pathlib import Path
 
@@ -12,9 +13,13 @@ from controllers.data_analysis import create_save_graph
 from controllers.file_system import (
     create_n_save_wordclouds,
     load_conversations_from_zip,
-    save_custom_instructions_to_file,
     save_conversation_list_to_dir,
+    save_custom_instructions_to_file,
 )
+
+# DEBUG / PROFILING
+pid = os.getpid()
+print("PID:", pid)
 
 
 def main() -> None:
