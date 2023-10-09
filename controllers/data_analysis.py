@@ -3,7 +3,7 @@
 Should ideally only return matplotlib objects, and not deal with the filesystem."""
 
 from pathlib import Path
-from typing import Any, List
+from typing import Any, List, Set
 
 import matplotlib.dates as mdates
 import matplotlib.pyplot as plt
@@ -14,24 +14,30 @@ from wordcloud import WordCloud  # type: ignore
 
 from models.conversation_list import ConversationList
 
+
 # Ensure that the stopwords are downloaded
-try:
-    nltk.data.find("corpora/stopwords")  # type: ignore
-except LookupError:
-    nltk.download("stopwords")  # type: ignore
+def load_nltk_stopwords() -> Set[str]:
+    """Loads the nltk stopwords. Returns a set of stopwords."""
 
-languages = [
-    "arabic",
-    "english",
-    "french",
-    "german",
-    "spanish",
-    "portuguese",
-]  # add more languages here ...
+    try:
+        nltk.data.find("corpora/stopwords")  # type: ignore
+    except LookupError:
+        nltk.download("stopwords")  # type: ignore
 
-DEFAULT_STOP_WORDS = set(
-    word for lang in languages for word in stopwords.words(lang)  # type: ignore
-)
+    languages = [
+        "arabic",
+        "english",
+        "french",
+        "german",
+        "spanish",
+        "portuguese",
+    ]  # add more languages here ...
+
+    stop_words = set(
+        word for lang in languages for word in stopwords.words(lang)  # type: ignore
+    )
+
+    return stop_words
 
 
 def wordcloud_from_text(
@@ -52,7 +58,10 @@ def wordcloud_from_text(
         mode = kwargs.get("mode", "RGB")
 
     custom_stopwords: List[str] = kwargs.get("stopwords", [])
-    stop_words = DEFAULT_STOP_WORDS.union(set(custom_stopwords))
+
+    default_stopwords = load_nltk_stopwords()
+
+    stop_words = default_stopwords.union(set(custom_stopwords))
 
     # TODO: add more arguments here ...
 
