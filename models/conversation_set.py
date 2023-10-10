@@ -1,6 +1,6 @@
-"""ConversationList class to model a list of conversations.
+"""ConversationSet class to model a set of conversations.
 
-Can be the list of all conversations, or a list of conversations in a week, month, or year.
+Can be the set of all conversations, or a set of conversations in a week, month, or year.
 
 gonna be useful for updating the data in the future"""
 
@@ -11,16 +11,16 @@ from typing import Any, Dict, List
 from .conversation import Conversation
 
 
-class ConversationList:
+class ConversationSet:
     """Stores a list of conversations."""
 
     configuration: Dict[str, Any] = {}
 
     def __init__(self, conversations: List[Dict[str, Any]]):
-        conversation_list: List[Conversation] = [
+        conversation_set: List[Conversation] = [
             Conversation(**conversation) for conversation in conversations
         ]
-        self.conversations = conversation_list
+        self.conversations = conversation_set
 
     def add_conversation(self, conversation: Conversation) -> None:
         """Add a conversation to the list."""
@@ -30,33 +30,33 @@ class ConversationList:
         """Returns the timestamp of the last updated conversation in the list."""
         return max(conversation.update_time for conversation in self.conversations)
 
-    def grouped_by_week(self) -> Dict[datetime, "ConversationList"]:
+    def grouped_by_week(self) -> Dict[datetime, "ConversationSet"]:
         """Get a dictionary of conversations in the list grouped by the start of the week."""
-        grouped: Dict[datetime, "ConversationList"] = {}
+        grouped: Dict[datetime, "ConversationSet"] = {}
         for conversation in self.conversations:
             week_start = conversation.start_of_week()
             if week_start not in grouped:
-                grouped[week_start] = ConversationList([])
+                grouped[week_start] = ConversationSet([])
             grouped[week_start].add_conversation(conversation)
         return grouped
 
-    def grouped_by_month(self) -> Dict[datetime, "ConversationList"]:
+    def grouped_by_month(self) -> Dict[datetime, "ConversationSet"]:
         """Get a dictionary of conversations in the list grouped by the start of the month."""
-        grouped: Dict[datetime, "ConversationList"] = {}
+        grouped: Dict[datetime, "ConversationSet"] = {}
         for conversation in self.conversations:
             month_start = conversation.start_of_month()
             if month_start not in grouped:
-                grouped[month_start] = ConversationList([])
+                grouped[month_start] = ConversationSet([])
             grouped[month_start].add_conversation(conversation)
         return grouped
 
-    def grouped_by_year(self) -> Dict[datetime, "ConversationList"]:
+    def grouped_by_year(self) -> Dict[datetime, "ConversationSet"]:
         """Get a dictionary of conversations in the list grouped by the start of the year."""
-        grouped: Dict[datetime, "ConversationList"] = {}
+        grouped: Dict[datetime, "ConversationSet"] = {}
         for conversation in self.conversations:
             year_start = conversation.start_of_year()
             if year_start not in grouped:
-                grouped[year_start] = ConversationList([])
+                grouped[year_start] = ConversationSet([])
             grouped[year_start].add_conversation(conversation)
         return grouped
 

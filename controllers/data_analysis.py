@@ -12,7 +12,7 @@ import pandas as pd
 from nltk.corpus import stopwords  # type: ignore
 from wordcloud import WordCloud  # type: ignore
 
-from models.conversation_list import ConversationList
+from models.conversation_set import ConversationSet
 
 
 # Ensure that the stopwords are downloaded
@@ -80,14 +80,14 @@ def wordcloud_from_text(
     return wordcloud
 
 
-def wordcloud_from_conversation_list(
-    conversation_list: ConversationList, **kwargs: Any
+def wordcloud_from_conversation_set(
+    conversation_set: ConversationSet, **kwargs: Any
 ) -> WordCloud:
-    """Creates a wordcloud from the given conversation list. Returns a WordCloud object."""
+    """Creates a wordcloud from the given conversation set. Returns a WordCloud object."""
     text = (
-        conversation_list.all_user_text()
+        conversation_set.all_user_text()
         + "\n"
-        + conversation_list.all_assistant_text()
+        + conversation_set.all_assistant_text()
     )
 
     return wordcloud_from_text(text, **kwargs)

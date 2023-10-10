@@ -126,9 +126,9 @@ def prompt_user(default_configs: Dict[str, Any]) -> Dict[str, Any]:
 
     user_configs["node"] = {}
 
-    # -------------------- conversation list --------------------
+    # -------------------- conversation set --------------------
 
-    user_configs["conversation_list"] = {}
+    user_configs["conversation_set"] = {}
 
     # ------------- return -----------------
 

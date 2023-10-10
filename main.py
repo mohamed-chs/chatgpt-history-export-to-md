@@ -13,7 +13,7 @@ from controllers.data_analysis import create_save_graph
 from controllers.file_system import (
     create_n_save_wordclouds,
     load_conversations_from_zip,
-    save_conversation_list_to_dir,
+    save_conversation_set_to_dir,
     save_custom_instructions_to_file,
 )
 
@@ -30,7 +30,7 @@ def main() -> None:
         "Follow the instructions in the command line.\n\n"
         "Press 'ENTER' to select the default options.\n\n"
         "If you encounter any issues 🐛, please report 🚨 them here:\n\n"
-        " ➡️ https://github.com/mohamed-chs/chatgpt-history-export-to-md/issues/new/choose 🔗\n\n"
+        "➡️ https://github.com/mohamed-chs/chatgpt-history-export-to-md/issues/new/choose 🔗\n\n"
     )
 
     configs_dict = get_user_configs()
@@ -56,9 +56,9 @@ def main() -> None:
     markdown_folder = output_folder / "Markdown"
     markdown_folder.mkdir(parents=True, exist_ok=True)
 
-    save_conversation_list_to_dir(all_conversations_list, markdown_folder)
+    save_conversation_set_to_dir(all_conversations_list, markdown_folder)
 
-    print(f"\nDone 🎉 ! Check the output 📄 here : {markdown_folder.as_uri()} 🔗\n")
+    print(f"\nDone ✅ ! Check the output 📄 here : {markdown_folder.as_uri()} 🔗\n")
 
     graph_folder = output_folder / "Graphs"
     graph_folder.mkdir(parents=True, exist_ok=True)
@@ -69,7 +69,7 @@ def main() -> None:
 
     create_save_graph(all_conversations_list.all_message_timestamps(), graph_path)
 
-    print(f"\nDone 🎉 ! Check the output 📈 here : {graph_folder.as_uri()} 🔗\n")
+    print(f"\nDone ✅ ! Check the output 📈 here : {graph_folder.as_uri()} 🔗\n")
     print("(more graphs 📈 will be added in the future ...)\n")
 
     wordcloud_folder = output_folder / "Word Clouds"
@@ -82,7 +82,7 @@ def main() -> None:
         all_conversations_list, wordcloud_folder, font_path=font_path, colormap=colormap
     )
 
-    print(f"\nDone 🎉 ! Check the output 🔡☁️ here : {wordcloud_folder.as_uri()} 🔗\n")
+    print(f"\nDone ✅ ! Check the output 🔡☁️ here : {wordcloud_folder.as_uri()} 🔗\n")
 
     print("Writing custom instructions 📝 ...\n")
 
@@ -93,7 +93,7 @@ def main() -> None:
     )
 
     print(
-        f"\nDone 🎉 ! Check the output 📝 here : {custom_instructions_filepath.as_uri()} 🔗\n"
+        f"\nDone ✅ ! Check the output 📝 here : {custom_instructions_filepath.as_uri()} 🔗\n"
     )
 
     update_config_file(configs_dict)

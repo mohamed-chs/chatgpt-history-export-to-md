@@ -5,7 +5,7 @@ from pathlib import Path
 from typing import Any, Dict
 
 from models.conversation import Conversation
-from models.conversation_list import ConversationList
+from models.conversation_set import ConversationSet
 from models.message import Message
 from models.node import Node
 from views.prompt_user import prompt_user
@@ -46,6 +46,6 @@ def update_config_file(user_configs: Dict[str, Any]) -> None:
 def set_model_configs(configs: Dict[str, Any]) -> None:
     """Set the configuration for all models."""
     Conversation.configuration = configs.get("conversation", {})
-    ConversationList.configuration = configs.get("conversation_list", {})
+    ConversationSet.configuration = configs.get("conversation_set", {})
     Message.configuration = configs.get("message", {})
     Node.configuration = configs.get("node", {})
