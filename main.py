@@ -43,7 +43,7 @@ def main() -> None:
 
     zip_filepath = Path(configs_dict["zip_file"])
 
-    all_conversations_list = load_conversations_from_zip(zip_filepath)
+    all_conversations_set = load_conversations_from_zip(zip_filepath)
 
     output_folder = Path(configs_dict["output_folder"])
 
@@ -56,7 +56,7 @@ def main() -> None:
     markdown_folder = output_folder / "Markdown"
     markdown_folder.mkdir(parents=True, exist_ok=True)
 
-    save_conversation_set_to_dir(all_conversations_list, markdown_folder)
+    save_conversation_set_to_dir(all_conversations_set, markdown_folder)
 
     print(f"\nDone ✅ ! Check the output 📄 here : {markdown_folder.as_uri()} 🔗\n")
 
@@ -67,7 +67,7 @@ def main() -> None:
 
     graph_path = graph_folder / "all messages.png"
 
-    create_save_graph(all_conversations_list.all_message_timestamps(), graph_path)
+    create_save_graph(all_conversations_set.all_message_timestamps(), graph_path)
 
     print(f"\nDone ✅ ! Check the output 📈 here : {graph_folder.as_uri()} 🔗\n")
     print("(more graphs 📈 will be added in the future ...)\n")
@@ -79,7 +79,7 @@ def main() -> None:
     colormap = configs_dict["wordcloud"]["colormap"]
 
     create_n_save_wordclouds(
-        all_conversations_list, wordcloud_folder, font_path=font_path, colormap=colormap
+        all_conversations_set, wordcloud_folder, font_path=font_path, colormap=colormap
     )
 
     print(f"\nDone ✅ ! Check the output 🔡☁️ here : {wordcloud_folder.as_uri()} 🔗\n")
@@ -89,7 +89,7 @@ def main() -> None:
     custom_instructions_filepath = output_folder / "custom_instructions.json"
 
     save_custom_instructions_to_file(
-        all_conversations_list, custom_instructions_filepath
+        all_conversations_set, custom_instructions_filepath
     )
 
     print(
