@@ -12,9 +12,8 @@ from views.prompt_user import prompt_user
 
 
 def get_user_configs() -> Dict[str, Any]:
-    """Prompt the user for configuration options, with defaults from the config file.
-
-    Returns the user configuration as a dictionary."""
+    """Loads the default configs and calls the prompt_user function with those defaults.
+    Returns the new configuration."""
 
     with open("config.json", "r", encoding="utf-8") as file:
         default_configs = json.load(file)
@@ -29,7 +28,7 @@ def get_user_configs() -> Dict[str, Any]:
 
 
 def update_config_file(user_configs: Dict[str, Any]) -> None:
-    """Update the config file with the user's configuration options."""
+    """Update the config file with the new configuration options."""
     with open("config.json", "w", encoding="utf-8") as file:
         json.dump(user_configs, file, indent=2)
 

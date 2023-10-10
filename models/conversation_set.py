@@ -14,7 +14,7 @@ from .conversation import Conversation
 
 
 class ConversationSet:
-    """Stores a list of conversations."""
+    """Stores a set of conversations."""
 
     configuration: Dict[str, Any] = {}
 
@@ -75,7 +75,7 @@ class ConversationSet:
         return grouped
 
     def all_custom_instructions(self) -> List[Dict[str, Any]]:
-        """Get a list of all custom instructions, in all conversations in the list."""
+        """Get a list of all custom instructions, in all conversations in the set."""
         custom_instructions: List[Dict[str, Any]] = []
 
         for conversation in self.conversation_list:

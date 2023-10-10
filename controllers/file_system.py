@@ -1,6 +1,7 @@
 """Module for various processes that are used in the controllers.
 
-Should ideally be the only module that deals with the filesystem."""
+Should ideally be the only module that deals with the filesystem.
+(besides utils.py, but that doesn't save anything to disk)"""
 
 
 import json

@@ -42,7 +42,9 @@ class Conversation:
         return f"https://chat.openai.com/c/{self.conversation_id}"
 
     def _main_branch_nodes(self) -> List[Node]:
-        """List of all nodes that have a message in the current 'main' branch."""
+        """List of all nodes that have a message in the current 'main' branch.
+
+        the 'current_node' represents the last node in the main branch."""
 
         nodes: List[Node] = []
         curr_node = self.current_node
@@ -98,7 +100,7 @@ class Conversation:
 
     def message_timestamps(self) -> List[float]:
         """List of all 'user' and 'assistant' message timestamps in the conversation.
-        (all branches)"""
+        (all branches) Useful for generating time series plots."""
         return [
             node.message.create_time
             for node in self._all_message_nodes()
@@ -169,17 +171,15 @@ class Conversation:
 
         return message.model_slug()
 
-    def used_plugins(self) -> Optional[List[str]]:
-        """List of all plugins used in the conversation."""
-        plugins: set[str] = set(
-            node.message.metadata["invoked_plugin"]["namespace"]
-            for node in self._assistant_nodes()
-            if node.message and node.message.metadata.get("invoked_plugin")
+    def used_plugins(self) -> List[str]:
+        """List of all ChatGPT plugins used in the conversation."""
+        return list(
+            set(
+                node.message.metadata["invoked_plugin"]["namespace"]
+                for node in self._tool_nodes()
+                if node.message and node.message.metadata.get("invoked_plugin")
+            )
         )
-
-        if len(plugins) > 0:
-            return list(plugins)
-        return None
 
     def custom_instructions(self) -> Optional[Dict[str, str]]:
         """Custom instructions used for the conversation."""
@@ -227,9 +227,7 @@ class Conversation:
         # TODO: placeholder for now, to be implemented later
 
     def file_text_content(self) -> str:
-        """Markdown formatted text of the conversation. (all branches)
-
-        Included authors : user, assistant, tool"""
+        """Returns the full markdown text content of the conversation."""
         markdown_config = self.configuration.get("markdown", {})
         latex_delimiters = markdown_config.get("latex_delimiters", "default")
 
@@ -252,17 +250,21 @@ class Conversation:
         """Get diverse insightful stats on the conversation."""
         return {}
 
+        # TODO: add stats
+
     def file_name(self) -> str:
         """Sanitized title of the conversation, compatible with file names."""
         file_anti_pattern = re.compile(r'[<>:"/\\|?*\n\r\t\f\v]')
         return file_anti_pattern.sub("_", self.title) if self.title else "untitled"
 
     def start_of_year(self) -> datetime:
-        """Start of year as a datetime object."""
+        """Returns the first of January of the year the conversation was created in,
+        as a datetime object."""
         return datetime(datetime.fromtimestamp(self.create_time).year, 1, 1)
 
     def start_of_month(self) -> datetime:
-        """Start of month as a datetime object."""
+        """Returns the first of the month the conversation was created in,
+        as a datetime object."""
         return datetime(
             datetime.fromtimestamp(self.create_time).year,
             datetime.fromtimestamp(self.create_time).month,
@@ -270,7 +272,8 @@ class Conversation:
         )
 
     def start_of_week(self) -> datetime:
-        """Start of week as a datetime object."""
+        """Returns the monday of the week the conversation was created in,
+        as a datetime object."""
         start_of_week = datetime.fromtimestamp(self.create_time) - timedelta(
             days=datetime.fromtimestamp(self.create_time).weekday()
         )
