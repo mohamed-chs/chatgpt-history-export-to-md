@@ -2,7 +2,9 @@
 
 Can be the set of all conversations, or a set of conversations in a week, month, or year.
 
-gonna be useful for updating the data in the future"""
+gonna be useful for updating the data in the future
+
+TODO: turn the conversations list into a dict, with the id as the key"""
 
 from datetime import datetime
 from time import ctime
