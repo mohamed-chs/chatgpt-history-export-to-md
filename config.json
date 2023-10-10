@@ -27,7 +27,7 @@
     }
   },
   "wordcloud": {
-    "font": "ArchitectsDaughter-Regular",
+    "font": "RobotoSlab-Thin",
     "colormap": "prism"
   },
   "node": {},
