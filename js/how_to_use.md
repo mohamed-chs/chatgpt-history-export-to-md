@@ -9,6 +9,8 @@ Now your conversations should be in a JSON file named something like "chatgpt_bo
 
 Alternatively, you can create a bookmarklet with the code in [this file](bookmarklet.js) and click it when you're on the ChatGPT website. It will do the same thing as the above steps.
 
+(You should refresh the page after the download finishes, to clear the UI widget and the console logs.)
+
 Now, if you run the `main.py` script, it should recognize the new downloaded json zip file and add the conversations to the ones from the OpenAI export, that way ALL the conversations are converted to markdown files, as well as the other data visualizations stuff.
 
 This is a very rudimentary js script, and it needs more error handling. I've tried it on Chrome, and it works so far.
