@@ -2,7 +2,7 @@
 
 import re
 from pathlib import Path
-from typing import List
+from typing import List, Optional
 from zipfile import ZipFile
 
 
@@ -68,3 +68,50 @@ def validate_zip_file(path_str: str) -> bool:
         if "conversations.json" not in zip_ref.namelist():
             return False
     return True
+
+
+def default_output_folder() -> str:
+    """Returns the default output folder path.
+
+    (put the function in a separate file to isolate file system operations)"""
+
+    return str(Path.home() / "Documents" / "ChatGPT Data")
+
+
+def get_openai_zip_filepath() -> str:
+    """Returns the path to the most recent zip file in the Downloads folder,
+    excluding those containing 'bookmarklet'."""
+
+    downloads_folder = Path.home() / "Downloads"
+
+    # Filter out zip files with names that contain "bookmarklet"
+    zip_files = (
+        x for x in downloads_folder.glob("*.zip") if "bookmarklet" not in x.name
+    )
+
+    # Most recent zip file in downloads folder, excluding those containing "bookmarklet"
+    default_zip_filepath: Path = max(zip_files, key=lambda x: x.stat().st_ctime)
+
+    return str(default_zip_filepath)
+
+
+def get_bookmarklet_json_filepath() -> Optional[Path]:
+    """Returns the path to the most recent json file in the Downloads folder,
+    containing 'bookmarklet'."""
+
+    downloads_folder = Path.home() / "Downloads"
+
+    # Filter out json files with names that do not contain "bookmarklet"
+    bookmarklet_json_files = [
+        x for x in downloads_folder.glob("*.json") if "bookmarklet" in x.name
+    ]
+
+    if not bookmarklet_json_files:
+        return None
+
+    # Most recent json file in downloads folder, containing "bookmarklet"
+    bookmarklet_json_filepath: Path = max(
+        bookmarklet_json_files, key=lambda x: x.stat().st_ctime
+    )
+
+    return bookmarklet_json_filepath

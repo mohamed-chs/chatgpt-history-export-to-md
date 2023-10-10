@@ -1,13 +1,13 @@
 """Module for handling user configuration and updating the models."""
 
 import json
-from pathlib import Path
 from typing import Any, Dict
 
 from models.conversation import Conversation
 from models.conversation_set import ConversationSet
 from models.message import Message
 from models.node import Node
+from utils.utils import default_output_folder, get_openai_zip_filepath
 from views.prompt_user import prompt_user
 
 
@@ -16,23 +16,14 @@ def get_user_configs() -> Dict[str, Any]:
 
     Returns the user configuration as a dictionary."""
 
-    downloads_folder: Path = Path.home() / "Downloads"
-
-    # most recent zip file in downloads folder
-    default_zip_filepath: Path = max(
-        downloads_folder.glob("*.zip"), key=lambda x: x.stat().st_ctime
-    )
-
-    default_output_folder: Path = Path.home() / "Documents" / "ChatGPT Data"
-
     with open("config.json", "r", encoding="utf-8") as file:
         default_configs = json.load(file)
 
     if not default_configs["zip_file"]:
-        default_configs["zip_file"] = str(default_zip_filepath)
+        default_configs["zip_file"] = get_openai_zip_filepath()
 
     if not default_configs["output_folder"]:
-        default_configs["output_folder"] = str(default_output_folder)
+        default_configs["output_folder"] = default_output_folder()
 
     return prompt_user(default_configs)
 

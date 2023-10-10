@@ -163,6 +163,10 @@ And if you've had a great experience, consider giving the project a star ⭐. It
 
 Thank you for being awesome! 🌟
 
+#### How to add new conversations
+
+> See [How to use the JS script](js/how_to_use.md) for instructions on how to download new conversations.
+
 ### Acknowledgments 🙌
 
 Massive shout-out to some incredible tools that made this project come to life:

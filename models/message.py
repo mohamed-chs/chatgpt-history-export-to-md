@@ -12,29 +12,17 @@ class Message:
 
     configuration: Dict[str, Any] = {}
 
-    def __init__(
-        self,
-        id: str,
-        author: Dict[str, Any],
-        create_time: Optional[float],
-        update_time: Optional[float],
-        content: Dict[str, Any],
-        status: str,
-        end_turn: Optional[bool],
-        weight: float,
-        metadata: Dict[str, Any],
-        recipient: str,
-    ):
-        self.id = id
-        self.author = author
-        self.create_time = create_time
-        self.update_time = update_time
-        self.content = content
-        self.status = status
-        self.end_turn = end_turn
-        self.weight = weight
-        self.metadata = metadata
-        self.recipient = recipient
+    def __init__(self, message: Dict[str, Any]):
+        self.id = message.get("id", None)
+        self.author = message.get("author", None)
+        self.create_time = message.get("create_time", None)
+        self.update_time = message.get("update_time", None)
+        self.content = message.get("content", None)
+        self.status = message.get("status", None)
+        self.end_turn = message.get("end_turn", None)
+        self.weight = message.get("weight", None)
+        self.metadata = message.get("metadata", None)
+        self.recipient = message.get("recipient", None)
 
     def author_role(self) -> str:
         """The role of the author of the message.

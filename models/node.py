@@ -43,7 +43,7 @@ class Node:
 
         # First pass: Create nodes
         for key, value in mapping.items():
-            message = Message(**value["message"]) if value["message"] else None
+            message = Message(value["message"]) if value.get("message") else None
             nodes[key] = Node(id=key, message=message, parent=None, children=None)
 
         # Second pass: Connect nodes

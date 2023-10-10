@@ -12,10 +12,12 @@ from controllers.configuration import (
 from controllers.data_analysis import create_save_graph
 from controllers.file_system import (
     create_n_save_wordclouds,
-    load_conversations_from_zip,
+    load_conversations_from_bookmarklet_json,
+    load_conversations_from_openai_zip,
     save_conversation_set_to_dir,
     save_custom_instructions_to_file,
 )
+from utils.utils import get_bookmarklet_json_filepath
 
 # DEBUG / PROFILING
 pid = os.getpid()
@@ -43,7 +45,15 @@ def main() -> None:
 
     zip_filepath = Path(configs_dict["zip_file"])
 
-    all_conversations_set = load_conversations_from_zip(zip_filepath)
+    all_conversations_set = load_conversations_from_openai_zip(zip_filepath)
+
+    bookmarklet_json_filepath = get_bookmarklet_json_filepath()
+    if bookmarklet_json_filepath:
+        print("Found bookmarklet download, loading 📂 ...\n")
+        bookmarklet_conversations_set = load_conversations_from_bookmarklet_json(
+            bookmarklet_json_filepath
+        )
+        all_conversations_set.update(bookmarklet_conversations_set)
 
     output_folder = Path(configs_dict["output_folder"])
 

@@ -17,8 +17,8 @@ from models.conversation_set import ConversationSet
 from .data_analysis import wordcloud_from_conversation_set
 
 
-def load_conversations_from_zip(zip_filepath: Path) -> ConversationSet:
-    """Load the conversations from the zip file."""
+def load_conversations_from_openai_zip(zip_filepath: Path) -> ConversationSet:
+    """Load the conversations from the OpenAI zip export file."""
 
     with ZipFile(zip_filepath, "r") as file:
         file.extractall(zip_filepath.with_suffix(""))
@@ -26,6 +26,15 @@ def load_conversations_from_zip(zip_filepath: Path) -> ConversationSet:
     conversations_path = zip_filepath.with_suffix("") / "conversations.json"
 
     with open(conversations_path, "r", encoding="utf-8") as file:
+        conversations = json.load(file)
+
+    return ConversationSet(conversations)
+
+
+def load_conversations_from_bookmarklet_json(json_filepath: Path) -> ConversationSet:
+    """Load the conversations from the bookmarklet json export file."""
+
+    with open(json_filepath, "r", encoding="utf-8") as file:
         conversations = json.load(file)
 
     return ConversationSet(conversations)
@@ -52,7 +61,7 @@ def save_conversation_set_to_dir(
 ) -> None:
     """Save a conversation set to a directory."""
     for conversation in tqdm(
-        conversation_set.conversations, desc="Writing Markdown 📄 files"
+        conversation_set.conversation_list, desc="Writing Markdown 📄 files"
     ):
         file_path = dir_path / f"{conversation.file_name()}.md"
         save_conversation_to_file(conversation, file_path)

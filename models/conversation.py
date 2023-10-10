@@ -20,37 +20,26 @@ class Conversation:
 
     configuration: Dict[str, Any] = {}
 
-    def __init__(
-        self,
-        title: str,
-        create_time: float,
-        update_time: float,
-        mapping: Dict[str, Any],
-        moderation_results: List[Any],
-        current_node: str,
-        plugin_ids: Optional[List[str]],
-        conversation_id: str,
-        conversation_template_id: Optional[str],
-        id: str,
-    ):
-        self.title = title
-        self.create_time = create_time
-        self.update_time = update_time
-        nodes: Dict[str, Node] = Node.nodes_from_mapping(mapping)
-        self.mapping = nodes
-        self.moderation_results = moderation_results
-        self.current_node = nodes[current_node]
-        self.plugin_ids = plugin_ids
-        self.conversation_id = conversation_id
-        self.conversation_template_id = conversation_template_id
-        self.id = id
+    def __init__(self, conversation: Dict[str, Any]):
+        self.title = conversation.get("title", None)
+        self.create_time = conversation.get("create_time", None)
+        self.update_time = conversation.get("update_time", None)
+        self.mapping = Node.nodes_from_mapping(conversation.get("mapping", None))
+        self.moderation_results = conversation.get("moderation_results", None)
+        self.current_node = self.mapping[conversation.get("current_node", None)]
+        self.plugin_ids = conversation.get("plugin_ids", None)
+        self.conversation_id = conversation.get("conversation_id", None)
+        self.conversation_template_id = conversation.get(
+            "conversation_template_id", None
+        )
+        self.id = conversation.get("id", None)
 
     def chat_link(self) -> str:
         """Chat URL.
 
         Links to the original chat, not a 'shared' one. Needs user's login to chat.openai.com.
         """
-        return f"https://chat.openai.com/c/{self.id}"
+        return f"https://chat.openai.com/c/{self.conversation_id}"
 
     def _main_branch_nodes(self) -> List[Node]:
         """List of all nodes that have a message in the current 'main' branch."""
