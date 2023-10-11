@@ -98,15 +98,16 @@ class Conversation:
             if node.message and node.message.author_role() in ("user", "assistant")
         )
 
-    def message_timestamps(self) -> List[float]:
-        """List of all 'user' and 'assistant' message timestamps in the conversation.
+    def user_message_timestamps(self) -> List[float]:
+        """List of all 'user' message timestamps in the conversation.
+        (all branches) Useful for generating time series plots."""
+        return [node.message.create_time for node in self._user_nodes() if node.message]
+
+    def assistant_message_timestamps(self) -> List[float]:
+        """List of all 'assistant' message timestamps in the conversation.
         (all branches) Useful for generating time series plots."""
         return [
-            node.message.create_time
-            for node in self._all_message_nodes()
-            if node.message
-            and node.message.create_time
-            and node.message.author_role() in ("user", "assistant")
+            node.message.create_time for node in self._assistant_nodes() if node.message
         ]
 
     def _system_nodes(self) -> List[Node]:
@@ -191,6 +192,8 @@ class Conversation:
         ):
             return context_message.metadata.get("user_context_message_data", None)
         return None
+
+        # TODO: check if this is the same for conversations from the bookmarklet download
 
     def yaml_header(self) -> str:
         """YAML metadata header for the conversation."""

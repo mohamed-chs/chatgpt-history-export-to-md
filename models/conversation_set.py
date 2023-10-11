@@ -93,12 +93,21 @@ class ConversationSet:
 
         return custom_instructions
 
-    def all_message_timestamps(self) -> List[float]:
+    def all_user_message_timestamps(self) -> List[float]:
         """Get a list of all message timestamps, in all conversations in the list."""
         timestamps: List[float] = []
 
         for conversation in self.conversation_list:
-            timestamps.extend(conversation.message_timestamps())
+            timestamps.extend(conversation.user_message_timestamps())
+
+        return timestamps
+
+    def all_assistant_message_timestamps(self) -> List[float]:
+        """Get a list of all message timestamps, in all conversations in the list."""
+        timestamps: List[float] = []
+
+        for conversation in self.conversation_list:
+            timestamps.extend(conversation.assistant_message_timestamps())
 
         return timestamps
 

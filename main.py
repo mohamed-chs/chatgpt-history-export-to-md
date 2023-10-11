@@ -77,7 +77,7 @@ def main() -> None:
 
     graph_path = graph_folder / "all messages.png"
 
-    create_save_graph(all_conversations_set.all_message_timestamps(), graph_path)
+    create_save_graph(all_conversations_set.all_user_message_timestamps(), graph_path)
 
     print(f"\nDone ✅ ! Check the output 📈 here : {graph_folder.as_uri()} 🔗\n")
     print("(more graphs 📈 will be added in the future ...)\n")

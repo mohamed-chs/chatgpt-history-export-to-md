@@ -57,6 +57,8 @@ def wordcloud_from_text(
     else:
         mode = kwargs.get("mode", "RGB")
 
+    include_numbers = kwargs.get("include_numbers", False)
+
     custom_stopwords: List[str] = kwargs.get("stopwords", [])
 
     default_stopwords = load_nltk_stopwords()
@@ -73,6 +75,7 @@ def wordcloud_from_text(
         height=height,
         background_color=background_color,
         mode=mode,
+        include_numbers=include_numbers,
     ).generate(  # type: ignore
         text
     )
@@ -85,9 +88,7 @@ def wordcloud_from_conversation_set(
 ) -> WordCloud:
     """Creates a wordcloud from the given conversation set. Returns a WordCloud object."""
     text = (
-        conversation_set.all_user_text()
-        + "\n"
-        + conversation_set.all_assistant_text()
+        conversation_set.all_user_text() + "\n" + conversation_set.all_assistant_text()
     )
 
     return wordcloud_from_text(text, **kwargs)
