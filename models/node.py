@@ -8,7 +8,7 @@ get the branch of a given node,
 and some other version control stuff
 """
 
-from typing import Any
+from typing import Any, Optional
 
 from .message import Message
 
@@ -22,8 +22,8 @@ class Node:
         self,
         node_id: str,
         message: Message | None,
-        parent: "Node" | None,
-        children: list["Node"] | None,
+        parent: Optional["Node"],
+        children: Optional[list["Node"]],
     ):
         self.id = node_id
         self.message = message
