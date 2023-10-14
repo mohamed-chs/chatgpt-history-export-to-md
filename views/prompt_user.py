@@ -1,6 +1,6 @@
 """Module for the questionary user interface."""
 
-from typing import Any, Dict
+from typing import Any
 
 import questionary
 
@@ -12,7 +12,7 @@ def validate_header(text: str) -> bool:
     return text.startswith("#")
 
 
-def prompt_user(default_configs: Dict[str, Any]) -> Dict[str, Any]:
+def prompt_user(default_configs: dict[str, Any]) -> dict[str, Any]:
     """Prompts the user for input and returns the choices as a dictionary."""
 
     custom_style = questionary.Style(
@@ -30,7 +30,7 @@ def prompt_user(default_configs: Dict[str, Any]) -> Dict[str, Any]:
         ]
     )
 
-    user_configs: Dict[str, Any] = {}
+    user_configs: dict[str, Any] = {}
 
     # ------------------------ zip file and output folder ------------------------
 

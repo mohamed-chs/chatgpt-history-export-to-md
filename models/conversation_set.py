@@ -8,7 +8,7 @@ TODO: turn the conversations list into a dict, with the id as the key"""
 
 from datetime import datetime
 from time import ctime
-from typing import Any, Dict, List
+from typing import Any
 
 from .conversation import Conversation
 
@@ -16,10 +16,10 @@ from .conversation import Conversation
 class ConversationSet:
     """Stores a set of conversations."""
 
-    configuration: Dict[str, Any] = {}
+    configuration: dict[str, Any] = {}
 
-    def __init__(self, conversations: List[Dict[str, Any]]):
-        conversation_dict: Dict[str, Conversation] = {
+    def __init__(self, conversations: list[dict[str, Any]]):
+        conversation_dict: dict[str, Conversation] = {
             conversation["conversation_id"]: Conversation(conversation)
             for conversation in conversations
         }
@@ -44,9 +44,9 @@ class ConversationSet:
         self.conversation_dict.update(conversation_set.conversation_dict)
         self.conversation_list = list(self.conversation_dict.values())
 
-    def grouped_by_week(self) -> Dict[datetime, "ConversationSet"]:
+    def grouped_by_week(self) -> dict[datetime, "ConversationSet"]:
         """Get a dictionary of conversations in the list grouped by the start of the week."""
-        grouped: Dict[datetime, "ConversationSet"] = {}
+        grouped: dict[datetime, "ConversationSet"] = {}
         for conversation in self.conversation_list:
             week_start = conversation.start_of_week()
             if week_start not in grouped:
@@ -54,9 +54,9 @@ class ConversationSet:
             grouped[week_start].add_conversation(conversation)
         return grouped
 
-    def grouped_by_month(self) -> Dict[datetime, "ConversationSet"]:
+    def grouped_by_month(self) -> dict[datetime, "ConversationSet"]:
         """Get a dictionary of conversations in the list grouped by the start of the month."""
-        grouped: Dict[datetime, "ConversationSet"] = {}
+        grouped: dict[datetime, "ConversationSet"] = {}
         for conversation in self.conversation_list:
             month_start = conversation.start_of_month()
             if month_start not in grouped:
@@ -64,9 +64,9 @@ class ConversationSet:
             grouped[month_start].add_conversation(conversation)
         return grouped
 
-    def grouped_by_year(self) -> Dict[datetime, "ConversationSet"]:
+    def grouped_by_year(self) -> dict[datetime, "ConversationSet"]:
         """Get a dictionary of conversations in the list grouped by the start of the year."""
-        grouped: Dict[datetime, "ConversationSet"] = {}
+        grouped: dict[datetime, "ConversationSet"] = {}
         for conversation in self.conversation_list:
             year_start = conversation.start_of_year()
             if year_start not in grouped:
@@ -74,9 +74,9 @@ class ConversationSet:
             grouped[year_start].add_conversation(conversation)
         return grouped
 
-    def all_custom_instructions(self) -> List[Dict[str, Any]]:
+    def all_custom_instructions(self) -> list[dict[str, Any]]:
         """Get a list of all custom instructions, in all conversations in the set."""
-        custom_instructions: List[Dict[str, Any]] = []
+        custom_instructions: list[dict[str, Any]] = []
 
         for conversation in self.conversation_list:
             if not conversation.custom_instructions():
@@ -93,18 +93,18 @@ class ConversationSet:
 
         return custom_instructions
 
-    def all_user_message_timestamps(self) -> List[float]:
+    def all_user_message_timestamps(self) -> list[float]:
         """Get a list of all message timestamps, in all conversations in the list."""
-        timestamps: List[float] = []
+        timestamps: list[float] = []
 
         for conversation in self.conversation_list:
             timestamps.extend(conversation.user_message_timestamps())
 
         return timestamps
 
-    def all_assistant_message_timestamps(self) -> List[float]:
+    def all_assistant_message_timestamps(self) -> list[float]:
         """Get a list of all message timestamps, in all conversations in the list."""
-        timestamps: List[float] = []
+        timestamps: list[float] = []
 
         for conversation in self.conversation_list:
             timestamps.extend(conversation.assistant_message_timestamps())

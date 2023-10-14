@@ -1,6 +1,6 @@
 __pycache__/
 node_modules/
-.venv/
+.venv*/
 
 # testing models and visualizations on personal data
 data/

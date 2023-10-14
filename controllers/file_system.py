@@ -53,25 +53,25 @@ def save_conversation_to_file(conversation: Conversation, file_path: Path) -> No
         )
 
     with open(file_path, "w", encoding="utf-8") as file:
-        file.write(conversation.file_text_content())
+        file.write(conversation.to_markdown())
     os.utime(file_path, (conversation.update_time, conversation.update_time))
 
 
 def save_conversation_set_to_dir(
     conversation_set: ConversationSet, dir_path: Path
 ) -> None:
-    """Save a conversation set to a directory."""
+    """Save a conversation set to a directory, one markdown file per conversation."""
     for conversation in tqdm(
         conversation_set.conversation_list, desc="Writing Markdown 📄 files"
     ):
-        file_path = dir_path / f"{conversation.file_name()}.md"
+        file_path = dir_path / f"{conversation.sanitized_title()}.md"
         save_conversation_to_file(conversation, file_path)
 
 
 def create_n_save_wordclouds(
     conversation_set: ConversationSet, folder_path: Path, **kwargs: Any
 ) -> None:
-    """Create the wordclouds for the conversations in the conversation set."""
+    """Create the wordclouds and save them to the folder."""
 
     weeks_dict = conversation_set.grouped_by_week()
     months_dict = conversation_set.grouped_by_month()

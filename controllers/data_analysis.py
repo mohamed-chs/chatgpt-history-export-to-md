@@ -3,7 +3,7 @@
 Should ideally only return matplotlib objects, and not deal with the filesystem."""
 
 from pathlib import Path
-from typing import Any, List, Set
+from typing import Any
 
 import matplotlib.dates as mdates
 import matplotlib.pyplot as plt
@@ -16,7 +16,7 @@ from models.conversation_set import ConversationSet
 
 
 # Ensure that the stopwords are downloaded
-def load_nltk_stopwords() -> Set[str]:
+def load_nltk_stopwords() -> set[str]:
     """Loads the nltk stopwords. Returns a set of stopwords."""
 
     try:
@@ -46,36 +46,28 @@ def wordcloud_from_text(
 ) -> WordCloud:
     """Creates a wordcloud from the given text. Returns a WordCloud object."""
 
-    font_path = kwargs.get("font_path", "assets/fonts/ArchitectsDaughter-Regular.ttf")
-    colormap = kwargs.get("colormap", "prism")
-    width = kwargs.get("width", 1000)
-    height = kwargs.get("height", 1000)
-
+    custom_stopwords: list[str] = kwargs.get("stopwords", [])
+    default_stopwords = load_nltk_stopwords()
+    stop_words = default_stopwords.union(set(custom_stopwords))
     background_color = kwargs.get("background_color", None)
     if background_color is None:
         mode = kwargs.get("mode", "RGBA")
     else:
         mode = kwargs.get("mode", "RGB")
 
-    include_numbers = kwargs.get("include_numbers", False)
-
-    custom_stopwords: List[str] = kwargs.get("stopwords", [])
-
-    default_stopwords = load_nltk_stopwords()
-
-    stop_words = default_stopwords.union(set(custom_stopwords))
-
     # TODO: add more arguments here ...
 
     wordcloud = WordCloud(
-        font_path=font_path,
-        colormap=colormap,
+        font_path=kwargs.get(
+            "font_path", "assets/fonts/ArchitectsDaughter-Regular.ttf"
+        ),
+        width=kwargs.get("width", 1000),
+        height=kwargs.get("height", 1000),
         stopwords=stop_words,
-        width=width,
-        height=height,
         background_color=background_color,
         mode=mode,
-        include_numbers=include_numbers,
+        colormap=kwargs.get("colormap", "prism"),
+        include_numbers=kwargs.get("include_numbers", False),
     ).generate(  # type: ignore
         text
     )
@@ -94,7 +86,7 @@ def wordcloud_from_conversation_set(
     return wordcloud_from_text(text, **kwargs)
 
 
-def create_save_graph(all_timestamps: List[float], file_path: Path) -> None:
+def create_save_graph(all_timestamps: list[float], file_path: Path) -> None:
     """Creates and saves a graph from the given timestamps."""
 
     df = pd.DataFrame(all_timestamps, columns=["timestamp"])  # type: ignore

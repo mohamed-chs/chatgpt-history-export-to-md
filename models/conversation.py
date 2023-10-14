@@ -8,7 +8,7 @@ object path : conversations.json -> conversation (one of the list items)
 import re
 from datetime import datetime, timedelta
 from time import ctime
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 from utils.utils import ensure_closed_code_blocks, replace_latex_delimiters
 
@@ -18,9 +18,9 @@ from .node import Node
 class Conversation:
     """Stores the conversation object from the conversations.json file."""
 
-    configuration: Dict[str, Any] = {}
+    configuration: dict[str, Any] = {}
 
-    def __init__(self, conversation: Dict[str, Any]):
+    def __init__(self, conversation: dict[str, Any]):
         self.title = conversation.get("title", None)
         self.create_time = conversation.get("create_time", None)
         self.update_time = conversation.get("update_time", None)
@@ -41,12 +41,12 @@ class Conversation:
         """
         return f"https://chat.openai.com/c/{self.conversation_id}"
 
-    def _main_branch_nodes(self) -> List[Node]:
+    def _main_branch_nodes(self) -> list[Node]:
         """List of all nodes that have a message in the current 'main' branch.
 
         the 'current_node' represents the last node in the main branch."""
 
-        nodes: List[Node] = []
+        nodes: list[Node] = []
         curr_node = self.current_node
         curr_parent = curr_node.parent
 
@@ -60,10 +60,10 @@ class Conversation:
 
         return nodes
 
-    def _all_message_nodes(self) -> List[Node]:
+    def _all_message_nodes(self) -> list[Node]:
         """List of all nodes that have a message in the conversation, including all branches."""
 
-        nodes: List[Node] = []
+        nodes: list[Node] = []
         for _, node in self.mapping.items():
             if node.message:
                 nodes.append(node)
@@ -78,7 +78,7 @@ class Conversation:
         """Number of leaves in the conversation."""
         return sum(1 for node in self._all_message_nodes() if not node.children)
 
-    def content_types(self) -> List[str]:
+    def content_types(self) -> list[str]:
         """List of all content types in the conversation. (all branches)
 
         (e.g. text, code, execution_output, etc.)"""
@@ -98,19 +98,19 @@ class Conversation:
             if node.message and node.message.author_role() in ("user", "assistant")
         )
 
-    def user_message_timestamps(self) -> List[float]:
+    def user_message_timestamps(self) -> list[float]:
         """List of all 'user' message timestamps in the conversation.
         (all branches) Useful for generating time series plots."""
         return [node.message.create_time for node in self._user_nodes() if node.message]
 
-    def assistant_message_timestamps(self) -> List[float]:
+    def assistant_message_timestamps(self) -> list[float]:
         """List of all 'assistant' message timestamps in the conversation.
         (all branches) Useful for generating time series plots."""
         return [
             node.message.create_time for node in self._assistant_nodes() if node.message
         ]
 
-    def _system_nodes(self) -> List[Node]:
+    def _system_nodes(self) -> list[Node]:
         """List of all 'system' nodes in the conversation. (all branches)"""
         return [
             node
@@ -118,7 +118,7 @@ class Conversation:
             if node.message and node.message.author_role() == "system"
         ]
 
-    def _user_nodes(self) -> List[Node]:
+    def _user_nodes(self) -> list[Node]:
         """List of all 'user' nodes in the conversation. (all branches)"""
         return [
             node
@@ -126,7 +126,7 @@ class Conversation:
             if node.message and node.message.author_role() == "user"
         ]
 
-    def _assistant_nodes(self) -> List[Node]:
+    def _assistant_nodes(self) -> list[Node]:
         """List of all 'assistant' nodes in the conversation. (all branches)"""
         return [
             node
@@ -134,7 +134,7 @@ class Conversation:
             if node.message and node.message.author_role() == "assistant"
         ]
 
-    def _tool_nodes(self) -> List[Node]:
+    def _tool_nodes(self) -> list[Node]:
         """List of all 'tool' nodes in the conversation. (all branches)"""
         return [
             node
@@ -160,7 +160,7 @@ class Conversation:
             if node.message
         )
 
-    def model_slug(self) -> Optional[str]:
+    def model_slug(self) -> str | None:
         """ChatGPT model used for the conversation."""
         assistant_nodes = self._assistant_nodes()
         if not assistant_nodes:
@@ -172,7 +172,7 @@ class Conversation:
 
         return message.model_slug()
 
-    def used_plugins(self) -> List[str]:
+    def used_plugins(self) -> list[str]:
         """List of all ChatGPT plugins used in the conversation."""
         return list(
             set(
@@ -182,7 +182,7 @@ class Conversation:
             )
         )
 
-    def custom_instructions(self) -> Optional[Dict[str, str]]:
+    def custom_instructions(self) -> dict[str, str] | None:
         """Custom instructions used for the conversation."""
         if len(self._system_nodes()) < 2:
             return None
@@ -229,7 +229,7 @@ class Conversation:
 
         # TODO: placeholder for now, to be implemented later
 
-    def file_text_content(self) -> str:
+    def to_markdown(self) -> str:
         """Returns the full markdown text content of the conversation."""
         markdown_config = self.configuration.get("markdown", {})
         latex_delimiters = markdown_config.get("latex_delimiters", "default")
@@ -249,13 +249,13 @@ class Conversation:
                 )
         return markdown
 
-    def stats(self) -> Dict[str, Any]:
+    def stats(self) -> dict[str, Any]:
         """Get diverse insightful stats on the conversation."""
         return {}
 
         # TODO: add stats
 
-    def file_name(self) -> str:
+    def sanitized_title(self) -> str:
         """Sanitized title of the conversation, compatible with file names."""
         file_anti_pattern = re.compile(r'[<>:"/\\|?*\n\r\t\f\v]')
         return file_anti_pattern.sub("_", self.title) if self.title else "untitled"

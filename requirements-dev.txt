@@ -1,0 +1,9 @@
+matplotlib
+nltk
+pandas
+questionary
+seaborn
+tqdm
+wordcloud
+pylint
+mypy

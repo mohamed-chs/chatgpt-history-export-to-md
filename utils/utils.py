@@ -2,7 +2,6 @@
 
 import re
 from pathlib import Path
-from typing import List, Optional
 from zipfile import ZipFile
 
 
@@ -40,7 +39,7 @@ def replace_latex_delimiters(string: str) -> str:
     return string
 
 
-def get_font_names() -> List[str]:
+def get_font_names() -> list[str]:
     """Returns a list of all the font names in the assets/fonts folder."""
 
     fonts_path = Path("assets/fonts")
@@ -48,7 +47,7 @@ def get_font_names() -> List[str]:
     return font_names
 
 
-def get_colormap_names() -> List[str]:
+def get_colormap_names() -> list[str]:
     """Returns a list of all the colormap names in the assets/colormaps.txt file."""
 
     colormaps_path = Path("assets/colormaps.txt")
@@ -95,7 +94,7 @@ def get_openai_zip_filepath() -> str:
     return str(default_zip_filepath)
 
 
-def get_bookmarklet_json_filepath() -> Optional[Path]:
+def get_bookmarklet_json_filepath() -> Path | None:
     """Returns the path to the most recent json file in the Downloads folder,
     containing 'bookmarklet'."""
 

@@ -2,6 +2,7 @@
 
 import os
 import shutil
+import sys
 from pathlib import Path
 
 from controllers.configuration import (
@@ -22,6 +23,10 @@ from utils.utils import get_bookmarklet_json_filepath
 # DEBUG / PROFILING
 pid = os.getpid()
 print("PID:", pid)
+
+# python version
+if sys.version_info < (3, 10):
+    raise OSError("Python 3.10 or higher is required. Please upgrade Python.")
 
 
 def main() -> None:

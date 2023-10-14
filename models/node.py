@@ -8,7 +8,7 @@ get the branch of a given node,
 and some other version control stuff
 """
 
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 from .message import Message
 
@@ -16,20 +16,20 @@ from .message import Message
 class Node:
     """Node class for representing a node in a conversation tree."""
 
-    configuration: Dict[str, Any] = {}
+    configuration: dict[str, Any] = {}
 
     def __init__(
         self,
-        id: str,
-        message: Optional[Message],
-        parent: Optional["Node"],
-        children: Optional[List["Node"]],
+        node_id: str,
+        message: Message | None,
+        parent: "Node" | None,
+        children: list["Node"] | None,
     ):
-        self.id = id
+        self.id = node_id
         self.message = message
         self.parent = parent
         if children is None:
-            self.children: List["Node"] = []
+            self.children: list["Node"] = []
 
     def add_child(self, node: "Node"):
         """Add a child to the node."""
@@ -37,14 +37,14 @@ class Node:
         node.parent = self
 
     @staticmethod
-    def nodes_from_mapping(mapping: Dict[str, Any]) -> Dict[str, "Node"]:
+    def nodes_from_mapping(mapping: dict[str, Any]) -> dict[str, "Node"]:
         """Returns a dictionary of connected Node objects, based on the mapping."""
-        nodes: Dict[str, Node] = {}
+        nodes: dict[str, Node] = {}
 
         # First pass: Create nodes
         for key, value in mapping.items():
             message = Message(value["message"]) if value.get("message") else None
-            nodes[key] = Node(id=key, message=message, parent=None, children=None)
+            nodes[key] = Node(node_id=key, message=message, parent=None, children=None)
 
         # Second pass: Connect nodes
         for key, value in mapping.items():
@@ -53,7 +53,7 @@ class Node:
 
         return nodes
 
-    def header(self) -> Optional[str]:
+    def header(self) -> str | None:
         """Get the header of the node message, containing a link to its parent."""
         if self.message is None:
             return None
@@ -65,7 +65,7 @@ class Node:
         )
         return f"###### {self.id}\n{parent_link}{self.message.author_header()}\n"
 
-    def footer(self) -> Optional[str]:
+    def footer(self) -> str | None:
         """Get the footer of the node message, containing links to its children."""
         if self.message is None:
             return None
