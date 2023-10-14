@@ -88,6 +88,9 @@ def get_openai_zip_filepath() -> str:
         x for x in downloads_folder.glob("*.zip") if "bookmarklet" not in x.name
     )
 
+    if not zip_files:
+        return ""
+
     # Most recent zip file in downloads folder, excluding those containing "bookmarklet"
     default_zip_filepath: Path = max(zip_files, key=lambda x: x.stat().st_ctime)
 
