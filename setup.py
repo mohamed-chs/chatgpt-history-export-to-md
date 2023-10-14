@@ -24,6 +24,15 @@ def pip_install_requirements():
 
 
 if __name__ == "__main__":
+    if sys.version_info < (3, 10):
+        print(
+            "Python 3.10 or higher is required to run this program.\n"
+            "Please download the latest version of Python at :\n"
+            "https://www.python.org/downloads/ 🔗, and try again.\n"
+            "Exiting..."
+        )
+        sys.exit(1)
+
     print("Creating virtual environment...\n")
     create_virtual_environment()
     print("Installing requirements... (This may take a minute..)\n")

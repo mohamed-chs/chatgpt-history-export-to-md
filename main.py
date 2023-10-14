@@ -1,6 +1,5 @@
 """Main file for testing the program."""
 
-import os
 import shutil
 import sys
 from pathlib import Path
@@ -20,13 +19,14 @@ from controllers.file_system import (
 )
 from utils.utils import get_bookmarklet_json_filepath
 
-# DEBUG / PROFILING
-pid = os.getpid()
-print("PID:", pid)
-
-# python version
 if sys.version_info < (3, 10):
-    raise OSError("Python 3.10 or higher is required. Please upgrade Python.")
+    print(
+        "Python 3.10 or higher is required to run this program.\n"
+        "Please download the latest version of Python at :\n"
+        "https://www.python.org/downloads/ 🔗, and try again.\n"
+        "Exiting..."
+    )
+    sys.exit(1)
 
 
 def main() -> None:
