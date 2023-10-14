@@ -84,9 +84,9 @@ def get_openai_zip_filepath() -> str:
     downloads_folder = Path.home() / "Downloads"
 
     # Filter out zip files with names that contain "bookmarklet"
-    zip_files = (
+    zip_files = [
         x for x in downloads_folder.glob("*.zip") if "bookmarklet" not in x.name
-    )
+    ]
 
     if not zip_files:
         return ""
