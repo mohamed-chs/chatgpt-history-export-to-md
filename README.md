@@ -120,18 +120,6 @@ And if you've had a great experience, consider giving the project a star ⭐. It
 
 Thank you for being awesome! 🌟
 
-## Acknowledgments 🙌
-
-Massive shout-out to some incredible tools that made this project come to life:
-
-- [matplotlib](https://github.com/matplotlib/matplotlib)
-- [nltk](https://github.com/nltk/nltk)
-- [pandas](https://github.com/pandas-dev/pandas)
-- [questionary](https://github.com/tmbo/questionary)
-- [seaborn](https://github.com/mwaskom/seaborn)
-- [tqdm](https://github.com/tqdm/tqdm)
-- [wordcloud](https://github.com/amueller/word_cloud)
-
 ## Contributions 🆘
 
 Feel free to fork this repository and make your enhancements or improvements. ALL contributions are welcome !
