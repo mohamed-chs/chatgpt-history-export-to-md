@@ -53,10 +53,10 @@ class Node:
 
         return nodes
 
-    def header(self) -> str | None:
+    def header(self) -> str:
         """Get the header of the node message, containing a link to its parent."""
         if self.message is None:
-            return None
+            return ""
 
         parent_link = (
             f"[parent ⬆️](#{self.parent.id})\n"
@@ -65,10 +65,10 @@ class Node:
         )
         return f"###### {self.id}\n{parent_link}{self.message.author_header()}\n"
 
-    def footer(self) -> str | None:
+    def footer(self) -> str:
         """Get the footer of the node message, containing links to its children."""
         if self.message is None:
-            return None
+            return ""
 
         if len(self.children) == 0:
             return ""
@@ -79,21 +79,3 @@ class Node:
             [f"[child {i+1} ⬇️](#{child.id})" for i, child in enumerate(self.children)]
         )
         return footer + "\n"
-
-    # just for testing, and fun. It's not really ideal for the real thing
-    def show(self, level: int = 0) -> str:
-        """Return a tree representation of the node and its descendants."""
-
-        lines = [
-            (
-                f"{'--'*level}lvl{level} : {self.id[:10]}... ,\n"
-                f"{'--'*level} : "
-                f"{self.message.author_header() if self.message else None} ,\n"
-                f"{'--'*level} : "
-                f"{self.message.content_text()[:50] if self.message else None}... \n\n"
-            )
-        ]
-        for child in self.children:
-            lines.append(child.show(level + 1))
-
-        return "".join(lines)

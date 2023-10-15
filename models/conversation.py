@@ -21,25 +21,20 @@ class Conversation:
     configuration: dict[str, Any] = {}
 
     def __init__(self, conversation: dict[str, Any]):
-        self.title = conversation.get("title", None)
-        self.create_time = conversation.get("create_time", None)
-        self.update_time = conversation.get("update_time", None)
+        self.title: str = conversation.get("title", None)
+        self.create_time: float = conversation.get("create_time", None)
+        self.update_time: float = conversation.get("update_time", None)
         self.mapping = Node.nodes_from_mapping(conversation.get("mapping", None))
-        self.moderation_results = conversation.get("moderation_results", None)
+        self.moderation_results: list[Any] = conversation.get(
+            "moderation_results", None
+        )
         self.current_node = self.mapping[conversation.get("current_node", None)]
-        self.plugin_ids = conversation.get("plugin_ids", None)
-        self.conversation_id = conversation.get("conversation_id", None)
-        self.conversation_template_id = conversation.get(
+        self.plugin_ids: list[str] = conversation.get("plugin_ids", None)
+        self.conversation_id: str = conversation.get("conversation_id", None)
+        self.conversation_template_id: str = conversation.get(
             "conversation_template_id", None
         )
-        self.id = conversation.get("id", None)
-
-    def chat_link(self) -> str:
-        """Chat URL.
-
-        Links to the original chat, not a 'shared' one. Needs user's login to chat.openai.com.
-        """
-        return f"https://chat.openai.com/c/{self.conversation_id}"
+        self.id: str = conversation.get("id", None)
 
     def _main_branch_nodes(self) -> list[Node]:
         """List of all nodes that have a message in the current 'main' branch.
@@ -70,6 +65,22 @@ class Conversation:
 
         return nodes
 
+    def _author_nodes(self, author: str) -> list[Node]:
+        """List of all nodes with the given author role in the conversation. (all branches)"""
+        return [
+            node
+            for node in self._all_message_nodes()
+            if node.message and node.message.author_role() == author
+        ]
+
+    def _branch_indicator(self, node: Node) -> str:
+        """Get the branch indicator for the given node."""
+        if node in self._main_branch_nodes():
+            return "(main branch ⎇)"
+        return "(other branch ⎇)"
+
+        # TODO: placeholder for now, to be implemented later
+
     def has_multiple_branches(self) -> bool:
         """Check if the conversation has multiple branches."""
         return len(self._all_message_nodes()) > len(self._main_branch_nodes())
@@ -77,6 +88,13 @@ class Conversation:
     def leaf_count(self) -> int:
         """Number of leaves in the conversation."""
         return sum(1 for node in self._all_message_nodes() if not node.children)
+
+    def chat_link(self) -> str:
+        """Chat URL.
+
+        Links to the original chat, not a 'shared' one. Needs user's login to chat.openai.com.
+        """
+        return f"https://chat.openai.com/c/{self.conversation_id}"
 
     def content_types(self) -> list[str]:
         """List of all content types in the conversation. (all branches)
@@ -98,77 +116,34 @@ class Conversation:
             if node.message and node.message.author_role() in ("user", "assistant")
         )
 
-    def user_message_timestamps(self) -> list[float]:
-        """List of all 'user' message timestamps in the conversation.
-        (all branches) Useful for generating time series plots."""
-        return [node.message.create_time for node in self._user_nodes() if node.message]
-
-    def assistant_message_timestamps(self) -> list[float]:
-        """List of all 'assistant' message timestamps in the conversation.
-        (all branches) Useful for generating time series plots."""
-        return [
-            node.message.create_time for node in self._assistant_nodes() if node.message
-        ]
-
-    def _system_nodes(self) -> list[Node]:
-        """List of all 'system' nodes in the conversation. (all branches)"""
-        return [
-            node
-            for node in self._all_message_nodes()
-            if node.message and node.message.author_role() == "system"
-        ]
-
-    def _user_nodes(self) -> list[Node]:
-        """List of all 'user' nodes in the conversation. (all branches)"""
-        return [
-            node
-            for node in self._all_message_nodes()
-            if node.message and node.message.author_role() == "user"
-        ]
-
-    def _assistant_nodes(self) -> list[Node]:
-        """List of all 'assistant' nodes in the conversation. (all branches)"""
-        return [
-            node
-            for node in self._all_message_nodes()
-            if node.message and node.message.author_role() == "assistant"
-        ]
-
-    def _tool_nodes(self) -> list[Node]:
-        """List of all 'tool' nodes in the conversation. (all branches)"""
-        return [
-            node
-            for node in self._all_message_nodes()
-            if node.message and node.message.author_role() == "tool"
-        ]
-
-    def entire_user_text(self) -> str:
-        """Entire raw 'user' text in the conversation. (all branches)
-
-        Useful for generating word clouds."""
-        return "\n".join(
-            node.message.content_text() for node in self._user_nodes() if node.message
-        )
-
-    def entire_assistant_text(self) -> str:
-        """Entire raw 'assistant' text in the conversation. (all branches)
+    def entire_author_text(self, author: str) -> str:
+        """Entire raw text from the given author role in the conversation. (all branches)
 
         Useful for generating word clouds."""
         return "\n".join(
             node.message.content_text()
-            for node in self._assistant_nodes()
+            for node in self._author_nodes(author)
             if node.message
         )
 
-    def model_slug(self) -> str | None:
+    def author_message_timestamps(self, author: str) -> list[float]:
+        """List of all message timestamps from the given author role in the conversation.
+        (all branches) Useful for generating time series plots."""
+        return [
+            node.message.create_time
+            for node in self._author_nodes(author)
+            if node.message
+        ]
+
+    def model_slug(self) -> str:
         """ChatGPT model used for the conversation."""
-        assistant_nodes = self._assistant_nodes()
+        assistant_nodes = self._author_nodes("assistant")
         if not assistant_nodes:
-            return None
+            return ""
 
         message = assistant_nodes[0].message
         if not message:
-            return None
+            return ""
 
         return message.model_slug()
 
@@ -177,21 +152,22 @@ class Conversation:
         return list(
             set(
                 node.message.metadata["invoked_plugin"]["namespace"]
-                for node in self._tool_nodes()
+                for node in self._author_nodes("tool")
                 if node.message and node.message.metadata.get("invoked_plugin")
             )
         )
 
-    def custom_instructions(self) -> dict[str, str] | None:
+    def custom_instructions(self) -> dict[str, str]:
         """Custom instructions used for the conversation."""
-        if len(self._system_nodes()) < 2:
-            return None
-        context_message = self._system_nodes()[1].message
+        system_nodes = self._author_nodes("system")
+        if len(system_nodes) < 2:
+            return {}
+        context_message = system_nodes[1].message
         if context_message and context_message.metadata.get(
             "is_user_system_message", None
         ):
-            return context_message.metadata.get("user_context_message_data", None)
-        return None
+            return context_message.metadata.get("user_context_message_data", {})
+        return {}
 
         # TODO: check if this is the same for conversations from the bookmarklet download
 
@@ -221,14 +197,6 @@ class Conversation:
 
         return yaml
 
-    def _branch_indicator(self, node: Node) -> str:
-        """Get the branch indicator for the given node."""
-        if node in self._main_branch_nodes():
-            return "(main branch ⎇)"
-        return "(other branch ⎇)"
-
-        # TODO: placeholder for now, to be implemented later
-
     def to_markdown(self) -> str:
         """Returns the full markdown text content of the conversation."""
         markdown_config = self.configuration.get("markdown", {})
@@ -249,16 +217,16 @@ class Conversation:
                 )
         return markdown
 
+    def sanitized_title(self) -> str:
+        """Sanitized title of the conversation, compatible with file names."""
+        file_anti_pattern = re.compile(r'[<>:"/\\|?*\n\r\t\f\v]')
+        return file_anti_pattern.sub("_", self.title) if self.title else "untitled"
+
     def stats(self) -> dict[str, Any]:
         """Get diverse insightful stats on the conversation."""
         return {}
 
         # TODO: add stats
-
-    def sanitized_title(self) -> str:
-        """Sanitized title of the conversation, compatible with file names."""
-        file_anti_pattern = re.compile(r'[<>:"/\\|?*\n\r\t\f\v]')
-        return file_anti_pattern.sub("_", self.title) if self.title else "untitled"
 
     def start_of_year(self) -> datetime:
         """Returns the first of January of the year the conversation was created in,

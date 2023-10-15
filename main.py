@@ -11,7 +11,7 @@ from controllers.configuration import (
 )
 from controllers.data_analysis import create_save_graph
 from controllers.file_system import (
-    create_n_save_wordclouds,
+    generate_all_wordclouds,
     load_conversations_from_bookmarklet_json,
     load_conversations_from_openai_zip,
     save_conversation_set_to_dir,
@@ -82,7 +82,9 @@ def main() -> None:
 
     graph_path = graph_folder / "all messages.png"
 
-    create_save_graph(all_conversations_set.all_user_message_timestamps(), graph_path)
+    create_save_graph(
+        all_conversations_set.all_author_message_timestamps("user"), graph_path
+    )
 
     print(f"\nDone ✅ ! Check the output 📈 here : {graph_folder.as_uri()} 🔗\n")
     print("(more graphs 📈 will be added in the future ...)\n")
@@ -93,7 +95,7 @@ def main() -> None:
     font_path = f"assets/fonts/{configs_dict['wordcloud']['font']}.ttf"
     colormap = configs_dict["wordcloud"]["colormap"]
 
-    create_n_save_wordclouds(
+    generate_all_wordclouds(
         all_conversations_set, wordcloud_folder, font_path=font_path, colormap=colormap
     )
 

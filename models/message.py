@@ -13,16 +13,16 @@ class Message:
     configuration: dict[str, Any] = {}
 
     def __init__(self, message: dict[str, Any]):
-        self.id = message.get("id", None)
-        self.author = message.get("author", None)
-        self.create_time = message.get("create_time", None)
-        self.update_time = message.get("update_time", None)
-        self.content = message.get("content", None)
-        self.status = message.get("status", None)
-        self.end_turn = message.get("end_turn", None)
-        self.weight = message.get("weight", None)
-        self.metadata = message.get("metadata", None)
-        self.recipient = message.get("recipient", None)
+        self.id: str = message.get("id", None)
+        self.author: dict[str, Any] = message.get("author", None)
+        self.create_time: float = message.get("create_time", None)
+        self.update_time: float = message.get("update_time", None)
+        self.content: dict[str, Any] = message.get("content", None)
+        self.status: str = message.get("status", None)
+        self.end_turn: bool = message.get("end_turn", None)
+        self.weight: float = message.get("weight", None)
+        self.metadata: dict[str, Any] = message.get("metadata", None)
+        self.recipient: str = message.get("recipient", None)
 
     def author_role(self) -> str:
         """The role of the author of the message.
@@ -49,6 +49,6 @@ class Message:
         """get the content type of the message."""
         return self.content["content_type"]
 
-    def model_slug(self) -> str | None:
+    def model_slug(self) -> str:
         """get the model used for the message."""
-        return self.metadata.get("model_slug", None)
+        return self.metadata.get("model_slug", "")

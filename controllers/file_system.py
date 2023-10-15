@@ -1,11 +1,15 @@
 """Module for various processes that are used in the controllers.
 
 Should ideally be the only module that deals with the filesystem.
-(besides utils.py, but that doesn't save anything to disk)"""
+
+(besides utils.py, but that doesn't save anything to disk,
+and configuration.py, but that's a placeholder for user input in whatever form,
+may be replaced later, with a GUI or something)"""
 
 
 import json
 import os
+from datetime import datetime
 from pathlib import Path
 from typing import Any
 from zipfile import ZipFile
@@ -15,7 +19,7 @@ from tqdm import tqdm
 from models.conversation import Conversation
 from models.conversation_set import ConversationSet
 
-from .data_analysis import wordcloud_from_conversation_set
+from .data_analysis import wordcloud_from_text
 
 
 def load_conversations_from_openai_zip(zip_filepath: Path) -> ConversationSet:
@@ -68,7 +72,33 @@ def save_conversation_set_to_dir(
         save_conversation_to_file(conversation, file_path)
 
 
-def create_n_save_wordclouds(
+def save_wordcloud_from_conversation_set(
+    conversation_set: ConversationSet,
+    folder_path: Path,
+    time_period: tuple[datetime, str],
+    **kwargs: Any,
+) -> None:
+    """Create the wordclouds and save them to the folder."""
+    match time_period[1]:
+        case "week":
+            file_name = f"{time_period[0].strftime('%Y week %W')}.png"
+        case "month":
+            file_name = f"{time_period[0].strftime('%Y %B')}.png"
+        case "year":
+            file_name = f"{time_period[0].strftime('%Y')}.png"
+        case _:
+            raise ValueError("Invalid time period for wordcloud")
+
+    text = (
+        conversation_set.all_author_text("user")
+        + "\n"
+        + conversation_set.all_author_text("assistant")
+    )
+
+    wordcloud_from_text(text, **kwargs).to_file(folder_path / file_name)  # type: ignore
+
+
+def generate_all_wordclouds(
     conversation_set: ConversationSet, folder_path: Path, **kwargs: Any
 ) -> None:
     """Create the wordclouds and save them to the folder."""
@@ -78,24 +108,18 @@ def create_n_save_wordclouds(
     years_dict = conversation_set.grouped_by_year()
 
     for week in tqdm(weeks_dict.keys(), desc="Creating weekly wordclouds 🔡☁️ "):
-        wordcloud_from_conversation_set(
-            weeks_dict[week], **kwargs
-        ).to_file(  # type: ignore
-            folder_path / f"{week.strftime('%Y week %W')}.png"
+        save_wordcloud_from_conversation_set(
+            weeks_dict[week], folder_path, (week, "week"), **kwargs
         )
 
     for month in tqdm(months_dict.keys(), desc="Creating monthly wordclouds 🔡☁️ "):
-        wordcloud_from_conversation_set(
-            months_dict[month], **kwargs
-        ).to_file(  # type: ignore
-            folder_path / f"{month.strftime('%Y %B')}.png"
+        save_wordcloud_from_conversation_set(
+            months_dict[month], folder_path, (month, "month"), **kwargs
         )
 
     for year in tqdm(years_dict.keys(), desc="Creating yearly wordclouds 🔡☁️ "):
-        wordcloud_from_conversation_set(
-            years_dict[year], **kwargs
-        ).to_file(  # type: ignore
-            folder_path / f"{year.strftime('%Y')}.png"
+        save_wordcloud_from_conversation_set(
+            years_dict[year], folder_path, (year, "year"), **kwargs
         )
 
 

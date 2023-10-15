@@ -93,33 +93,18 @@ class ConversationSet:
 
         return custom_instructions
 
-    def all_user_message_timestamps(self) -> list[float]:
+    def all_author_message_timestamps(self, author: str) -> list[float]:
         """Get a list of all message timestamps, in all conversations in the list."""
         timestamps: list[float] = []
 
         for conversation in self.conversation_list:
-            timestamps.extend(conversation.user_message_timestamps())
+            timestamps.extend(conversation.author_message_timestamps(author))
 
         return timestamps
 
-    def all_assistant_message_timestamps(self) -> list[float]:
-        """Get a list of all message timestamps, in all conversations in the list."""
-        timestamps: list[float] = []
-
-        for conversation in self.conversation_list:
-            timestamps.extend(conversation.assistant_message_timestamps())
-
-        return timestamps
-
-    def all_user_text(self) -> str:
-        """Get a string of all user text, in all conversations in the list."""
+    def all_author_text(self, author: str) -> str:
+        """Get a string of all text, in all conversations in the list."""
         return "\n".join(
-            conversation.entire_user_text() for conversation in self.conversation_list
-        )
-
-    def all_assistant_text(self) -> str:
-        """Get a string of all assistant text, in all conversations in the list."""
-        return "\n".join(
-            conversation.entire_assistant_text()
+            conversation.entire_author_text(author)
             for conversation in self.conversation_list
         )
