@@ -121,9 +121,7 @@ class Conversation:
 
         Useful for generating word clouds."""
         return "\n".join(
-            node.message.content_text()
-            for node in self._author_nodes(author)
-            if node.message
+        str(node.message.content_text()) for node in self._user_nodes() if node.message
         )
 
     def author_message_timestamps(self, author: str) -> list[float]:
