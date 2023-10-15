@@ -19,7 +19,7 @@ from tqdm import tqdm
 from models.conversation import Conversation
 from models.conversation_set import ConversationSet
 
-from .data_analysis import wordcloud_from_text
+from .data_analysis import wordcloud_from_conversation_set
 
 
 def load_conversations_from_openai_zip(zip_filepath: Path) -> ConversationSet:
@@ -89,13 +89,9 @@ def save_wordcloud_from_conversation_set(
         case _:
             raise ValueError("Invalid time period for wordcloud")
 
-    text = (
-        conversation_set.all_author_text("user")
-        + "\n"
-        + conversation_set.all_author_text("assistant")
+    wordcloud_from_conversation_set(conversation_set, **kwargs).to_file(  # type: ignore
+        folder_path / file_name
     )
-
-    wordcloud_from_text(text, **kwargs).to_file(folder_path / file_name)  # type: ignore
 
 
 def generate_all_wordclouds(
@@ -130,3 +126,53 @@ def save_custom_instructions_to_file(
 
     with open(file_path, "w", encoding="utf-8") as file:
         json.dump(conversation_set.all_custom_instructions(), file, indent=2)
+
+
+def default_output_folder() -> str:
+    """Returns the default output folder path.
+
+    (put the function in a separate file to isolate file system operations)"""
+
+    return str(Path.home() / "Documents" / "ChatGPT Data")
+
+
+def get_openai_zip_filepath() -> str:
+    """Returns the path to the most recent zip file in the Downloads folder,
+    excluding those containing 'bookmarklet'."""
+
+    downloads_folder = Path.home() / "Downloads"
+
+    # Filter out zip files with names that contain "bookmarklet"
+    zip_files = [
+        x for x in downloads_folder.glob("*.zip") if "bookmarklet" not in x.name
+    ]
+
+    if not zip_files:
+        return ""
+
+    # Most recent zip file in downloads folder, excluding those containing "bookmarklet"
+    default_zip_filepath: Path = max(zip_files, key=lambda x: x.stat().st_ctime)
+
+    return str(default_zip_filepath)
+
+
+def get_bookmarklet_json_filepath() -> Path | None:
+    """Returns the path to the most recent json file in the Downloads folder,
+    containing 'bookmarklet'."""
+
+    downloads_folder = Path.home() / "Downloads"
+
+    # Filter out json files with names that do not contain "bookmarklet"
+    bookmarklet_json_files = [
+        x for x in downloads_folder.glob("*.json") if "bookmarklet" in x.name
+    ]
+
+    if not bookmarklet_json_files:
+        return None
+
+    # Most recent json file in downloads folder, containing "bookmarklet"
+    bookmarklet_json_filepath: Path = max(
+        bookmarklet_json_files, key=lambda x: x.stat().st_ctime
+    )
+
+    return bookmarklet_json_filepath

@@ -12,12 +12,12 @@ from controllers.configuration import (
 from controllers.data_analysis import create_save_graph
 from controllers.file_system import (
     generate_all_wordclouds,
+    get_bookmarklet_json_filepath,
     load_conversations_from_bookmarklet_json,
     load_conversations_from_openai_zip,
     save_conversation_set_to_dir,
     save_custom_instructions_to_file,
 )
-from utils.utils import get_bookmarklet_json_filepath
 
 if sys.version_info < (3, 10):
     print(

@@ -7,8 +7,9 @@ from models.conversation import Conversation
 from models.conversation_set import ConversationSet
 from models.message import Message
 from models.node import Node
-from utils.utils import default_output_folder, get_openai_zip_filepath
 from views.prompt_user import prompt_user
+
+from .file_system import default_output_folder, get_openai_zip_filepath
 
 
 def get_user_configs() -> dict[str, Any]:

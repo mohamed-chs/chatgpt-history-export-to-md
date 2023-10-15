@@ -11,6 +11,7 @@ import nltk  # type: ignore
 import pandas as pd
 from nltk.corpus import stopwords  # type: ignore
 from wordcloud import WordCloud  # type: ignore
+from models.conversation_set import ConversationSet
 
 
 # Ensure that the stopwords are downloaded
@@ -71,6 +72,20 @@ def wordcloud_from_text(
     )
 
     return wordcloud
+
+
+def wordcloud_from_conversation_set(
+    conversation_set: ConversationSet, **kwargs: Any
+) -> WordCloud:
+    """Creates a wordcloud from the given conversation set. Returns a WordCloud object."""
+
+    text = (
+        conversation_set.all_author_text("user")
+        + "\n"
+        + conversation_set.all_author_text("assistant")
+    )
+
+    return wordcloud_from_text(text, **kwargs)
 
 
 def create_save_graph(all_timestamps: list[float], file_path: Path) -> None:
