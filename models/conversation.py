@@ -211,10 +211,7 @@ class Conversation:
                 content = f"\n{content}\n" if content else ""
                 if latex_delimiters == "dollar sign":
                     content = replace_latex_delimiters(content)
-                markdown += (
-                    f"\n{self._branch_indicator(node)}\n"
-                    f"{node.header()}{content}{node.footer()}\n---\n"
-                )
+                markdown += f"\n{node.header()}{content}{node.footer()}\n---\n"
         return markdown
 
     def sanitized_title(self) -> str:

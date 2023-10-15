@@ -6,11 +6,10 @@ update_time: Sun Sep 17 04:13:34 2023
 model: gpt-4-code-interpreter
 used_plugins: []
 message_count: 4
-content_types: ['code', 'execution_output', 'text']
+content_types: ['text', 'code', 'execution_output']
 custom_instructions: {'about_user_message': "I'm a math and CS student, and I like simple and clever solutions.", 'about_model_message': "You're a proficient and helpful AI programming and research assistant."}
 ---
 
-(main branch ⎇)
 ###### ffae223b-5aa7-4600-a02f-39899749df8c
 ### System
 
@@ -18,7 +17,6 @@ custom_instructions: {'about_user_message': "I'm a math and CS student, and I li
 
 ---
 
-(main branch ⎇)
 ###### 16322b04-e350-41fd-8f9f-6d4ef757fa7c
 [parent ⬆️](#ffae223b-5aa7-4600-a02f-39899749df8c)
 ### System
@@ -27,7 +25,6 @@ custom_instructions: {'about_user_message': "I'm a math and CS student, and I li
 
 ---
 
-(main branch ⎇)
 ###### aaa21886-05e4-4f31-9d8c-9bd901197c99
 [parent ⬆️](#16322b04-e350-41fd-8f9f-6d4ef757fa7c)
 # Me
@@ -40,7 +37,6 @@ Write the math in beautiful latex. Be quick with it, I want it to fit in a scree
 
 ---
 
-(main branch ⎇)
 ###### 8ca84c64-f6b2-4604-84a6-52abe4a33101
 [parent ⬆️](#aaa21886-05e4-4f31-9d8c-9bd901197c99)
 # ChatGPT
@@ -77,7 +73,6 @@ Now, let's proceed to compute \(F(n)\) for a given \(n\) using Python and the nu
 
 ---
 
-(main branch ⎇)
 ###### 99e1efbe-6c7b-487f-8227-27cae1702925
 [parent ⬆️](#8ca84c64-f6b2-4604-84a6-52abe4a33101)
 # ChatGPT
@@ -108,7 +103,6 @@ fib_matrix(n)
 
 ---
 
-(main branch ⎇)
 ###### d432834e-63c7-4efe-b66e-26faba815f64
 [parent ⬆️](#99e1efbe-6c7b-487f-8227-27cae1702925)
 # Tool
@@ -121,7 +115,6 @@ fib_matrix(n)
 
 ---
 
-(main branch ⎇)
 ###### 09faa857-7541-4e22-a987-cf90a5a80e74
 [parent ⬆️](#d432834e-63c7-4efe-b66e-26faba815f64)
 # ChatGPT
