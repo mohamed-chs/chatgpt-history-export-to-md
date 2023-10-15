@@ -8,7 +8,7 @@ If this is your first time, welcome! The codebase is documented to help you get 
 
 ## Test Environment
 
-Ensure you run tests in the provided [notebook](./playground.ipynb) to validate your changes without causing regressions.
+Ensure you run tests in the provided [notebook](../blob/main/playground.ipynb) to validate your changes without causing regressions.
 
 ## Contribution Workflow
 
@@ -46,7 +46,7 @@ Ensure you run tests in the provided [notebook](./playground.ipynb) to validate 
 
 Check the `Issues` tab for bugs, enhancements, or first-timer tasks. If you have a new idea or improvement, feel free to open an issue.
 
-The [Project Todo](./TODO.md) and [JavaScript Todo](./js/how_to_use.md#still-working-on) also offer areas needing attention.
+The [Project Todo](../blob/main/TODO.md) and [JavaScript Todo](../blob/main/js/how_to_use.md#still-working-on) also offer areas needing attention.
 
 ## Documentation
 

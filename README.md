@@ -13,7 +13,7 @@ Convert your ChatGPT history into well-formatted Markdown files. Additionally, v
 - **Data Visualizations**: Word clouds, graphs, and more.
 - **Custom Instructions**: All your custom instructions in one JSON file.
 
-> see examples [here](./assets/demo/).
+> see examples [here](../blob/main/assets/demo/)
 
 ## Getting Started
 
@@ -102,7 +102,7 @@ And that's it! After running the script, head over to the output folder to see y
 
 ### How to add new conversations ➕
 
-> See [How to use the JS script](./js/how_to_use.md) for instructions on how to download new conversations.
+> See [How to use the JS script](../blob/main/js/how_to_use.md) for instructions on how to download new conversations.
 
 ## Share Your Feedback! 💌
 
@@ -136,7 +136,7 @@ Massive shout-out to some incredible tools that made this project come to life:
 
 Feel free to fork this repository and make your enhancements or improvements. ALL contributions are welcome !
 
-> [CONTRIBUTING.md](./CONTRIBUTING.md)
+> [CONTRIBUTING.md](../blob/main/CONTRIBUTING.md)
 
 > [Related post](https://news.ycombinator.com/item?id=37636701)
 
@@ -148,6 +148,6 @@ I wasn't a fan of the clunky, and sometimes paid, browser extensions.
 
 I'm working on automating it to add new conversations and updating old ones. Had some luck with a JavaScript bookmarklet, still ironing it out tho. Shouldn't take long.
 
-> See [TODO](./TODO.md).
+> See [TODO](../blob/main/TODO.md).
 
 > for an older version with no external dependencies (no virtual environment needed), see https://github.com/mohamed-chs/chatgpt-history-export-to-md/tree/fe13a701fe8653c9f946b1e12979ce3bfe7104b8.
