@@ -11,7 +11,7 @@ Feel free to add or check items.
 - [ ] Standalone executable, for an even smoother setup
 - [ ] Obsidian plugin ?
 - [x] keep external dependencies to a minimum (looking at you js)
-- [x] Javascript to download more conversations, see [Javascript](../blob/main/js/)
+- [x] Javascript to download more conversations, see [Javascript](js)
 - [ ] Add new downloaded conversations to the MD folder
 - [ ] Update past conversations if changed
 - [ ] Data visualizations : chat times, frequency, models, word clouds, etc...
@@ -45,4 +45,4 @@ Feel free to add or check items.
 - [ ] output folder (currently set by default or via command line arguments)
 - [ ] add more configs ...
 
-> See also : [JavaScript Todo](../blob/main/js/how_to_use.md#still-working-on)
+See also : [JavaScript Todo](js/how_to_use.md#still-working-on)
