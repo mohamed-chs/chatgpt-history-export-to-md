@@ -6,7 +6,7 @@ update_time: Sun Sep 17 04:13:34 2023
 model: gpt-4-code-interpreter
 used_plugins: []
 message_count: 4
-content_types: ['text', 'code', 'execution_output']
+content_types: ['code', 'execution_output', 'text']
 custom_instructions: {'about_user_message': "I'm a math and CS student, and I like simple and clever solutions.", 'about_model_message': "You're a proficient and helpful AI programming and research assistant."}
 ---
 
@@ -105,7 +105,7 @@ fib_matrix(n)
 
 ###### d432834e-63c7-4efe-b66e-26faba815f64
 [parent ⬆️](#99e1efbe-6c7b-487f-8227-27cae1702925)
-# Tool
+### Tool output
 
 ```python
 55

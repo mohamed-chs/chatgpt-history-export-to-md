@@ -6,7 +6,7 @@
       "system": "### System",
       "user": "# Me",
       "assistant": "# ChatGPT",
-      "tool": "# Tool"
+      "tool": "### Tool output"
     }
   },
   "conversation": {
