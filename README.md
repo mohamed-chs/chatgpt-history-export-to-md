@@ -13,7 +13,7 @@ Convert your ChatGPT history into well-formatted Markdown files. Additionally, v
 - **Data Visualizations**: Word clouds, graphs, and more.
 - **Custom Instructions**: All your custom instructions in one JSON file.
 
-**Samples**: [Chat](assets/demo/Fibonacci.png) | [Markdown](assets/demo/Fibonacci.md) | [Word cloud 1](assets/demo/wordcloud_sample.png) | [Word cloud 2](assets/demo/wordcloud_sample2.png).
+> Samples at [Demo](assets/demo).
 
 ## Getting Started
 
