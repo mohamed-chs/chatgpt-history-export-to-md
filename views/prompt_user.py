@@ -2,21 +2,21 @@
 
 from typing import Any
 
-import questionary
+from questionary import Choice, Style, checkbox, path, select, text
 
 from utils.utils import get_colormap_names, get_font_names, validate_zip_file
 
 
-def validate_header(text: str) -> bool:
+def validate_header(string: str) -> bool:
     """Returns True if the given text is a valid markdown header."""
-    return text.startswith("#")
+    return string.startswith("#")
 
 
 def prompt_user(default_configs: dict[str, Any]) -> dict[str, Any]:
     """Prompts the user for input and returns the choices as a dictionary."""
 
-    custom_style = questionary.Style(
-        [
+    custom_style = Style(
+        style_rules=[
             ("qmark", "fg:#34eb9b bold"),
             ("question", "bold fg:#e0e0e0"),
             ("answer", "fg:#34ebeb bold"),
@@ -34,15 +34,15 @@ def prompt_user(default_configs: dict[str, Any]) -> dict[str, Any]:
 
     # ------------------------ zip file and output folder ------------------------
 
-    user_configs["zip_file"] = questionary.path(
-        "Enter the path to the zip file :",
+    user_configs["zip_file"] = path(
+        message="Enter the path to the zip file :",
         default=default_configs["zip_file"],
         validate=validate_zip_file,
         style=custom_style,
     ).ask()
 
-    user_configs["output_folder"] = questionary.path(
-        "Enter the path to the output folder :",
+    user_configs["output_folder"] = path(
+        message="Enter the path to the output folder :",
         default=default_configs["output_folder"],
         style=custom_style,
     ).ask()
@@ -56,8 +56,8 @@ def prompt_user(default_configs: dict[str, Any]) -> dict[str, Any]:
     user_configs["message"]["author_headers"] = {}
 
     for author_role in default_configs["message"]["author_headers"].keys():
-        user_configs["message"]["author_headers"][author_role] = questionary.text(
-            f"Enter the message header (#) for messages from '{author_role}' :",
+        user_configs["message"]["author_headers"][author_role] = text(
+            message=f"Enter the message header (#) for messages from '{author_role}' :",
             default=default_configs["message"]["author_headers"][author_role],
             validate=validate_header,
             style=custom_style,
@@ -71,8 +71,8 @@ def prompt_user(default_configs: dict[str, Any]) -> dict[str, Any]:
 
     user_configs["conversation"]["markdown"] = {}
 
-    user_configs["conversation"]["markdown"]["latex_delimiters"] = questionary.select(
-        "Select the LaTeX math delimiters you want to use :",
+    user_configs["conversation"]["markdown"]["latex_delimiters"] = select(
+        message="Select the LaTeX math delimiters you want to use :",
         choices=["default", "dollar sign"],
         default=default_configs["conversation"]["markdown"]["latex_delimiters"],
         style=custom_style,
@@ -82,13 +82,13 @@ def prompt_user(default_configs: dict[str, Any]) -> dict[str, Any]:
 
     user_configs["conversation"]["yaml"] = {}
 
-    yaml_choices = [
-        questionary.Choice(header, checked=value)
+    yaml_choices: list[Choice] = [
+        Choice(title=header, checked=value)
         for header, value in default_configs["conversation"]["yaml"].items()
     ]
 
-    selected_headers = questionary.checkbox(
-        "Select the YAML metadata headers you want to include :",
+    selected_headers = checkbox(
+        message="Select the YAML metadata headers you want to include :",
         choices=yaml_choices,
         style=custom_style,
     ).ask()
@@ -100,10 +100,10 @@ def prompt_user(default_configs: dict[str, Any]) -> dict[str, Any]:
 
     user_configs["wordcloud"] = {}
 
-    font_names = get_font_names()
+    font_names: list[str] = get_font_names()
 
-    user_configs["wordcloud"]["font"] = questionary.select(
-        "Select the font you want to use for the word clouds :",
+    user_configs["wordcloud"]["font"] = select(
+        message="Select the font you want to use for the word clouds :",
         choices=font_names,
         default=default_configs["wordcloud"]["font"]
         if default_configs["wordcloud"]["font"]
@@ -111,10 +111,10 @@ def prompt_user(default_configs: dict[str, Any]) -> dict[str, Any]:
         style=custom_style,
     ).ask()
 
-    colormaps_list = get_colormap_names()
+    colormaps_list: list[str] = get_colormap_names()
 
-    user_configs["wordcloud"]["colormap"] = questionary.select(
-        "Select the color theme you want to use for the word clouds :",
+    user_configs["wordcloud"]["colormap"] = select(
+        message="Select the color theme you want to use for the word clouds :",
         choices=colormaps_list,
         default=default_configs["wordcloud"]["colormap"]
         if default_configs["wordcloud"]["colormap"]

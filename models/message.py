@@ -12,7 +12,7 @@ class Message:
 
     configuration: dict[str, Any] = {}
 
-    def __init__(self, message: dict[str, Any]):
+    def __init__(self, message: dict[str, Any]) -> None:
         self.id: str = message.get("id", None)
         self.author: dict[str, Any] = message.get("author", None)
         self.create_time: float = message.get("create_time", None)
@@ -33,9 +33,17 @@ class Message:
     def author_header(self) -> str:
         """Get the title header of the message based on the configs."""
         author_config: dict[str, Any] = self.configuration.get("author_headers", {})
-        if self.author_role() == "system":
-            return author_config.get("system", "### System")
-        return author_config.get(self.author_role(), f"# {self.author_role().title()}")
+        match self.author_role():
+            case "user":
+                return author_config.get("user", "# User")
+            case "assistant":
+                return author_config.get("assistant", "# Assistant")
+            case "system":
+                return author_config.get("system", "### System")
+            case "tool":
+                return author_config.get("tool", "### Tool output")
+            case _:
+                return ""
 
     def content_text(self) -> str:
         """get the text content of the message."""

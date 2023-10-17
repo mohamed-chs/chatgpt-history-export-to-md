@@ -45,4 +45,4 @@ Feel free to add or check items.
 - [ ] output folder (currently set by default or via command line arguments)
 - [ ] add more configs ...
 
-> See also : [JavaScript Todo](js/how_to_use.md#still-working-on)
+See also : [JavaScript Todo](js/how_to_use.md#still-working-on)

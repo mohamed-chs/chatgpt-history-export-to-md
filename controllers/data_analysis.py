@@ -10,7 +10,9 @@ import matplotlib.pyplot as plt
 import nltk  # type: ignore
 import pandas as pd
 from nltk.corpus import stopwords  # type: ignore
+from pandas.core.series import Series
 from wordcloud import WordCloud  # type: ignore
+
 from models.conversation_set import ConversationSet
 
 
@@ -19,11 +21,11 @@ def load_nltk_stopwords() -> set[str]:
     """Loads the nltk stopwords. Returns a set of stopwords."""
 
     try:
-        nltk.data.find("corpora/stopwords")  # type: ignore
+        nltk.data.find(resource_name="corpora/stopwords")  # type: ignore
     except LookupError:
-        nltk.download("stopwords")  # type: ignore
+        nltk.download(info_or_id="stopwords")  # type: ignore
 
-    languages = [
+    languages: list[str] = [
         "arabic",
         "english",
         "french",
@@ -33,7 +35,7 @@ def load_nltk_stopwords() -> set[str]:
     ]  # add more languages here ...
 
     stop_words = set(
-        word for lang in languages for word in stopwords.words(lang)  # type: ignore
+        word for lang in languages for word in stopwords.words(fileids=lang)  # type: ignore
     )
 
     return stop_words
@@ -46,8 +48,8 @@ def wordcloud_from_text(
     """Creates a wordcloud from the given text. Returns a WordCloud object."""
 
     custom_stopwords: list[str] = kwargs.get("stopwords", [])
-    default_stopwords = load_nltk_stopwords()
-    stop_words = default_stopwords.union(set(custom_stopwords))
+    default_stopwords: set[str] = load_nltk_stopwords()
+    stop_words: set[str] = default_stopwords.union(set(custom_stopwords))
     background_color = kwargs.get("background_color", None)
     if background_color is None:
         mode = kwargs.get("mode", "RGBA")
@@ -56,7 +58,7 @@ def wordcloud_from_text(
 
     # TODO: add more arguments here ...
 
-    wordcloud = WordCloud(
+    wordcloud: WordCloud = WordCloud(
         font_path=kwargs.get(
             "font_path", "assets/fonts/ArchitectsDaughter-Regular.ttf"
         ),
@@ -68,7 +70,7 @@ def wordcloud_from_text(
         colormap=kwargs.get("colormap", "prism"),
         include_numbers=kwargs.get("include_numbers", False),
     ).generate(  # type: ignore
-        text
+        text=text
     )
 
     return wordcloud
@@ -79,22 +81,22 @@ def wordcloud_from_conversation_set(
 ) -> WordCloud:
     """Creates a wordcloud from the given conversation set. Returns a WordCloud object."""
 
-    text = (
-        conversation_set.all_author_text("user")
+    text: str = (
+        conversation_set.all_author_text(author="user")
         + "\n"
-        + conversation_set.all_author_text("assistant")
+        + conversation_set.all_author_text(author="assistant")
     )
 
-    return wordcloud_from_text(text, **kwargs)
+    return wordcloud_from_text(text=text, **kwargs)
 
 
 def create_save_graph(all_timestamps: list[float], file_path: Path) -> None:
     """Creates and saves a graph from the given timestamps."""
 
-    df = pd.DataFrame(all_timestamps, columns=["timestamp"])  # type: ignore
-    df["datetime"] = pd.to_datetime(df["timestamp"], unit="s")  # type: ignore
+    df = pd.DataFrame(data=all_timestamps, columns=["timestamp"])  # type: ignore
+    df["datetime"] = pd.to_datetime(arg=df["timestamp"], unit="s")  # type: ignore
 
-    daily_counts = df.groupby(df["datetime"].dt.date).size()  # type: ignore
+    daily_counts: Series = df.groupby(by=df["datetime"].dt.date).size()  # type: ignore
 
     plt.figure(figsize=(15, 7))  # type: ignore
 
@@ -109,19 +111,19 @@ def create_save_graph(all_timestamps: list[float], file_path: Path) -> None:
         markeredgewidth=0.5,
     )
 
-    plt.title("ChatGPT Prompts per Day", fontsize=20, fontweight="bold", pad=20)  # type: ignore
-    plt.xlabel("Month", fontsize=16, labelpad=15)  # type: ignore
-    plt.ylabel("Number of Prompts", fontsize=16, labelpad=15)  # type: ignore
+    plt.title(label="ChatGPT Prompts per Day", fontsize=20, fontweight="bold", pad=20)  # type: ignore
+    plt.xlabel(xlabel="Month", fontsize=16, labelpad=15)  # type: ignore
+    plt.ylabel(ylabel="Number of Prompts", fontsize=16, labelpad=15)  # type: ignore
     plt.xticks(fontsize=14)  # type: ignore
     plt.yticks(fontsize=14)  # type: ignore
 
     ax = plt.gca()  # type: ignore
-    ax.xaxis.set_major_locator(mdates.MonthLocator())  # type: ignore
-    ax.xaxis.set_major_formatter(mdates.DateFormatter("%B"))  # type: ignore
+    ax.xaxis.set_major_locator(locator=mdates.MonthLocator())  # type: ignore
+    ax.xaxis.set_major_formatter(formatter=mdates.DateFormatter(fmt="%B"))  # type: ignore
 
     plt.xticks(rotation=45)  # type: ignore
 
-    plt.grid(True, linestyle="--", linewidth=0.5, alpha=0.7)  # type: ignore
+    plt.grid(visible=True, linestyle="--", linewidth=0.5, alpha=0.7)  # type: ignore
 
     plt.tight_layout()  # type: ignore
 

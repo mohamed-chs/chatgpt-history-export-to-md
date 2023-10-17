@@ -12,6 +12,7 @@ from typing import Any
 
 from utils.utils import ensure_closed_code_blocks, replace_latex_delimiters
 
+from .message import Message
 from .node import Node
 
 
@@ -20,15 +21,17 @@ class Conversation:
 
     configuration: dict[str, Any] = {}
 
-    def __init__(self, conversation: dict[str, Any]):
+    def __init__(self, conversation: dict[str, Any]) -> None:
         self.title: str = conversation.get("title", None)
         self.create_time: float = conversation.get("create_time", None)
         self.update_time: float = conversation.get("update_time", None)
-        self.mapping = Node.nodes_from_mapping(conversation.get("mapping", None))
+        self.mapping: dict[str, Node] = Node.nodes_from_mapping(
+            mapping=conversation.get("mapping", None)
+        )
         self.moderation_results: list[Any] = conversation.get(
             "moderation_results", None
         )
-        self.current_node = self.mapping[conversation.get("current_node", None)]
+        self.current_node: Node = self.mapping[conversation.get("current_node", None)]
         self.plugin_ids: list[str] = conversation.get("plugin_ids", None)
         self.conversation_id: str = conversation.get("conversation_id", None)
         self.conversation_template_id: str = conversation.get(
@@ -42,8 +45,8 @@ class Conversation:
         the 'current_node' represents the last node in the main branch."""
 
         nodes: list[Node] = []
-        curr_node = self.current_node
-        curr_parent = curr_node.parent
+        curr_node: Node = self.current_node
+        curr_parent: Node | None = curr_node.parent
 
         while curr_parent:
             if curr_node.message:
@@ -121,7 +124,9 @@ class Conversation:
 
         Useful for generating word clouds."""
         return "\n".join(
-        str(node.message.content_text()) for node in self._user_nodes() if node.message
+            node.message.content_text()
+            for node in self._author_nodes(author=author)
+            if node.message
         )
 
     def author_message_timestamps(self, author: str) -> list[float]:
@@ -129,17 +134,17 @@ class Conversation:
         (all branches) Useful for generating time series plots."""
         return [
             node.message.create_time
-            for node in self._author_nodes(author)
+            for node in self._author_nodes(author=author)
             if node.message
         ]
 
     def model_slug(self) -> str:
         """ChatGPT model used for the conversation."""
-        assistant_nodes = self._author_nodes("assistant")
+        assistant_nodes: list[Node] = self._author_nodes(author="assistant")
         if not assistant_nodes:
             return ""
 
-        message = assistant_nodes[0].message
+        message: Message | None = assistant_nodes[0].message
         if not message:
             return ""
 
@@ -150,17 +155,17 @@ class Conversation:
         return list(
             set(
                 node.message.metadata["invoked_plugin"]["namespace"]
-                for node in self._author_nodes("tool")
+                for node in self._author_nodes(author="tool")
                 if node.message and node.message.metadata.get("invoked_plugin")
             )
         )
 
     def custom_instructions(self) -> dict[str, str]:
         """Custom instructions used for the conversation."""
-        system_nodes = self._author_nodes("system")
+        system_nodes: list[Node] = self._author_nodes(author="system")
         if len(system_nodes) < 2:
             return {}
-        context_message = system_nodes[1].message
+        context_message: Message | None = system_nodes[1].message
         if context_message and context_message.metadata.get(
             "is_user_system_message", None
         ):
@@ -173,7 +178,7 @@ class Conversation:
         """YAML metadata header for the conversation."""
         yaml_config = self.configuration.get("yaml", {})
 
-        yaml_map = {
+        yaml_map: dict[str, str | list[str] | int | dict[str, str]] = {
             "title": self.title,
             "chat_link": self.chat_link(),
             "create_time": ctime(self.create_time),
@@ -200,25 +205,30 @@ class Conversation:
         markdown_config = self.configuration.get("markdown", {})
         latex_delimiters = markdown_config.get("latex_delimiters", "default")
 
-        markdown = self.yaml_header()
+        markdown: str = self.yaml_header()
 
         for node in self._all_message_nodes():
             if node.message:
-                content = ensure_closed_code_blocks(node.message.content_text())
+                content: str = ensure_closed_code_blocks(
+                    string=node.message.content_text()
+                )
                 # prevent empty messages from taking up white space
                 content = f"\n{content}\n" if content else ""
                 if latex_delimiters == "dollar sign":
-                    content = replace_latex_delimiters(content)
-                markdown += (
-                    f"\n{self._branch_indicator(node)}\n"
-                    f"{node.header()}{content}{node.footer()}\n---\n"
-                )
+                    content = replace_latex_delimiters(string=content)
+                markdown += f"\n{node.header()}{content}{node.footer()}\n---\n"
         return markdown
 
     def sanitized_title(self) -> str:
         """Sanitized title of the conversation, compatible with file names."""
-        file_anti_pattern = re.compile(r'[<>:"/\\|?*\n\r\t\f\v]')
-        return file_anti_pattern.sub("_", self.title) if self.title else "untitled"
+        file_anti_pattern: re.Pattern[str] = re.compile(
+            pattern=r'[<>:"/\\|?*\n\r\t\f\v]'
+        )
+        return (
+            file_anti_pattern.sub(repl="_", string=self.title)
+            if self.title
+            else "untitled"
+        )
 
     def stats(self) -> dict[str, Any]:
         """Get diverse insightful stats on the conversation."""
@@ -229,21 +239,23 @@ class Conversation:
     def start_of_year(self) -> datetime:
         """Returns the first of January of the year the conversation was created in,
         as a datetime object."""
-        return datetime(datetime.fromtimestamp(self.create_time).year, 1, 1)
+        return datetime(
+            year=datetime.fromtimestamp(self.create_time).year, month=1, day=1
+        )
 
     def start_of_month(self) -> datetime:
         """Returns the first of the month the conversation was created in,
         as a datetime object."""
         return datetime(
-            datetime.fromtimestamp(self.create_time).year,
-            datetime.fromtimestamp(self.create_time).month,
-            1,
+            year=datetime.fromtimestamp(self.create_time).year,
+            month=datetime.fromtimestamp(self.create_time).month,
+            day=1,
         )
 
     def start_of_week(self) -> datetime:
         """Returns the monday of the week the conversation was created in,
         as a datetime object."""
-        start_of_week = datetime.fromtimestamp(self.create_time) - timedelta(
+        start_of_week: datetime = datetime.fromtimestamp(self.create_time) - timedelta(
             days=datetime.fromtimestamp(self.create_time).weekday()
         )
         return start_of_week.replace(hour=0, minute=0, second=0, microsecond=0)
