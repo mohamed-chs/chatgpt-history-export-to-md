@@ -9,8 +9,6 @@ def ensure_closed_code_blocks(string: str) -> str:
     """Ensure that all code blocks are closed."""
     # A code block can be opened with triple backticks, possibly followed by a language name.
     # It can only be closed however with triple backticks, with nothing else on the line.
-    if not isinstance(string, str):
-        string = str(string)  # Convert to string representation
 
     open_code_block = False
 
