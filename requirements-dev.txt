@@ -1,10 +1,6 @@
-matplotlib
-nltk
-pandas
-questionary
-seaborn
-tqdm
-wordcloud
-pylint
-mypy
+-r requirements.txt
 pytest
+mypy
+ruff
+black
+isort

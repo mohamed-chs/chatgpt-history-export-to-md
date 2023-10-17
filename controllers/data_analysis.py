@@ -9,6 +9,7 @@ import matplotlib.dates as mdates
 import matplotlib.pyplot as plt
 import nltk  # type: ignore
 import pandas as pd
+from matplotlib.axes import Axes
 from nltk.corpus import stopwords  # type: ignore
 from pandas.core.series import Series
 from wordcloud import WordCloud  # type: ignore
@@ -77,23 +78,23 @@ def wordcloud_from_text(
 
 
 def wordcloud_from_conversation_set(
-    conversation_set: ConversationSet, **kwargs: Any
+    conv_set: ConversationSet, **kwargs: Any
 ) -> WordCloud:
     """Creates a wordcloud from the given conversation set. Returns a WordCloud object."""
 
     text: str = (
-        conversation_set.all_author_text(author="user")
+        conv_set.all_author_text(author="user")
         + "\n"
-        + conversation_set.all_author_text(author="assistant")
+        + conv_set.all_author_text(author="assistant")
     )
 
     return wordcloud_from_text(text=text, **kwargs)
 
 
-def create_save_graph(all_timestamps: list[float], file_path: Path) -> None:
+def create_save_graph(timestamps: list[float], file_path: Path) -> None:
     """Creates and saves a graph from the given timestamps."""
 
-    df = pd.DataFrame(data=all_timestamps, columns=["timestamp"])  # type: ignore
+    df = pd.DataFrame(data=timestamps, columns=["timestamp"])  # type: ignore
     df["datetime"] = pd.to_datetime(arg=df["timestamp"], unit="s")  # type: ignore
 
     daily_counts: Series = df.groupby(by=df["datetime"].dt.date).size()  # type: ignore
@@ -111,13 +112,15 @@ def create_save_graph(all_timestamps: list[float], file_path: Path) -> None:
         markeredgewidth=0.5,
     )
 
-    plt.title(label="ChatGPT Prompts per Day", fontsize=20, fontweight="bold", pad=20)  # type: ignore
+    plt.title(  # type: ignore
+        label="ChatGPT Prompts per Day", fontsize=20, fontweight="bold", pad=20
+    )
     plt.xlabel(xlabel="Month", fontsize=16, labelpad=15)  # type: ignore
     plt.ylabel(ylabel="Number of Prompts", fontsize=16, labelpad=15)  # type: ignore
     plt.xticks(fontsize=14)  # type: ignore
     plt.yticks(fontsize=14)  # type: ignore
 
-    ax = plt.gca()  # type: ignore
+    ax: Axes = plt.gca()
     ax.xaxis.set_major_locator(locator=mdates.MonthLocator())  # type: ignore
     ax.xaxis.set_major_formatter(formatter=mdates.DateFormatter(fmt="%B"))  # type: ignore
 

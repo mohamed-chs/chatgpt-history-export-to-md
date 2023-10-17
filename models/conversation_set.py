@@ -28,20 +28,20 @@ class ConversationSet:
 
         self.conversation_list = list(self.conversation_dict.values())
 
-    def add_conversation(self, conversation: Conversation) -> None:
+    def add_conversation(self, conv: Conversation) -> None:
         """Add a conversation to the dictionary and list."""
-        self.conversation_dict[conversation.conversation_id] = conversation
-        self.conversation_list.append(conversation)
+        self.conversation_dict[conv.conversation_id] = conv
+        self.conversation_list.append(conv)
 
     def last_updated(self) -> float:
         """Returns the timestamp of the last updated conversation in the list."""
         return max(conversation.update_time for conversation in self.conversation_list)
 
-    def update(self, conversation_set: "ConversationSet") -> None:
+    def update(self, conv_set: "ConversationSet") -> None:
         """Update the conversation set with the new one."""
-        if conversation_set.last_updated() <= self.last_updated():
+        if conv_set.last_updated() <= self.last_updated():
             return
-        self.conversation_dict.update(conversation_set.conversation_dict)
+        self.conversation_dict.update(conv_set.conversation_dict)
         self.conversation_list = list(self.conversation_dict.values())
 
     def grouped_by_week(self) -> dict[datetime, "ConversationSet"]:
@@ -51,7 +51,7 @@ class ConversationSet:
             week_start: datetime = conversation.start_of_week()
             if week_start not in grouped:
                 grouped[week_start] = ConversationSet(conversations=[])
-            grouped[week_start].add_conversation(conversation=conversation)
+            grouped[week_start].add_conversation(conv=conversation)
         return grouped
 
     def grouped_by_month(self) -> dict[datetime, "ConversationSet"]:
@@ -61,7 +61,7 @@ class ConversationSet:
             month_start: datetime = conversation.start_of_month()
             if month_start not in grouped:
                 grouped[month_start] = ConversationSet(conversations=[])
-            grouped[month_start].add_conversation(conversation=conversation)
+            grouped[month_start].add_conversation(conv=conversation)
         return grouped
 
     def grouped_by_year(self) -> dict[datetime, "ConversationSet"]:
@@ -71,7 +71,7 @@ class ConversationSet:
             year_start: datetime = conversation.start_of_year()
             if year_start not in grouped:
                 grouped[year_start] = ConversationSet(conversations=[])
-            grouped[year_start].add_conversation(conversation=conversation)
+            grouped[year_start].add_conversation(conv=conversation)
         return grouped
 
     def all_custom_instructions(self) -> list[dict[str, Any]]:

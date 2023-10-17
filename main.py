@@ -64,7 +64,7 @@ def main() -> None:
                 json_filepath=bookmarklet_json_filepath
             )
         )
-        all_conversations_set.update(conversation_set=bookmarklet_conversations_set)
+        all_conversations_set.update(conv_set=bookmarklet_conversations_set)
 
     output_folder = Path(configs_dict["output_folder"])
 
@@ -78,7 +78,7 @@ def main() -> None:
     markdown_folder.mkdir(parents=True, exist_ok=True)
 
     save_conversation_set_to_dir(
-        conversation_set=all_conversations_set, dir_path=markdown_folder
+        conv_set=all_conversations_set, dir_path=markdown_folder
     )
 
     print(f"\nDone ✅ ! Check the output 📄 here : {markdown_folder.as_uri()} 🔗\n")
@@ -91,9 +91,7 @@ def main() -> None:
     graph_path: Path = graph_folder / "all messages.png"
 
     create_save_graph(
-        all_timestamps=all_conversations_set.all_author_message_timestamps(
-            author="user"
-        ),
+        timestamps=all_conversations_set.all_author_message_timestamps(author="user"),
         file_path=graph_path,
     )
 
@@ -107,8 +105,8 @@ def main() -> None:
     colormap = configs_dict["wordcloud"]["colormap"]
 
     generate_all_wordclouds(
-        conversation_set=all_conversations_set,
-        folder_path=wordcloud_folder,
+        conv_set=all_conversations_set,
+        dir_path=wordcloud_folder,
         font_path=font_path,
         colormap=colormap,
     )
@@ -120,7 +118,7 @@ def main() -> None:
     custom_instructions_filepath: Path = output_folder / "custom_instructions.json"
 
     save_custom_instructions_to_file(
-        conversation_set=all_conversations_set, file_path=custom_instructions_filepath
+        conv_set=all_conversations_set, filepath=custom_instructions_filepath
     )
 
     print(

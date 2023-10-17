@@ -48,9 +48,7 @@ class Message:
     def content_text(self) -> str:
         """get the text content of the message."""
         if "parts" in self.content:
-            return str(
-                object=self.content["parts"][0]
-            )  # suggested by @turnboughsg, pr #24
+            return str(object=self.content["parts"][0])
         if "text" in self.content:
             return f"```python\n{self.content['text']}\n```"
         return ""

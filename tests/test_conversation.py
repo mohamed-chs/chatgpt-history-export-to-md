@@ -11,8 +11,8 @@ def sample_conversation_data() -> dict[str, Any]:
 
     return {
         "title": "Sample Conversation",
-        "create_time": 1642540800.0,  # Jan 19, 2022, 12:00:00 PM
-        "update_time": 1642540900.0,  # Jan 19, 2022, 12:01:40 PM
+        "create_time": 1642540800.0,  # Jan 18, 2022, 12:00:00 PM
+        "update_time": 1642540900.0,  # Jan 18, 2022, 12:01:40 PM
         "mapping": {
             "node1": {
                 "message": {

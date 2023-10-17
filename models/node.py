@@ -20,13 +20,13 @@ class Node:
 
     def __init__(
         self,
-        node_id: str,
-        message: Message | None,
+        n_id: str,
+        msg: Message | None,
         parent: Optional["Node"],
         children: Optional[list["Node"]],
     ) -> None:
-        self.id: str = node_id
-        self.message: Message | None = message
+        self.id: str = n_id
+        self.message: Message | None = msg
         self.parent: Node | None = parent
         self.children: list[Node] = children if children else []
 
@@ -45,7 +45,7 @@ class Node:
             message: Message | None = (
                 Message(message=value["message"]) if value.get("message") else None
             )
-            nodes[key] = Node(node_id=key, message=message, parent=None, children=None)
+            nodes[key] = Node(n_id=key, msg=message, parent=None, children=None)
 
         # Second pass: Connect nodes
         for key, value in mapping.items():

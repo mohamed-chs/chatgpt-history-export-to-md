@@ -11,7 +11,7 @@ def test_node_initialization() -> None:
 
     node_id = "node_id_123"
     msg = Message(message={"id": "msg_id_123", "author": {"role": "user"}})
-    node = Node(node_id=node_id, message=msg, parent=None, children=None)
+    node = Node(n_id=node_id, msg=msg, parent=None, children=None)
 
     assert node.id == node_id
     assert node.message == msg
@@ -22,10 +22,8 @@ def test_node_initialization() -> None:
 def test_add_child() -> None:
     """Test add_child method."""
 
-    parent_node = Node(
-        node_id="parent_node_id", message=None, parent=None, children=None
-    )
-    child_node = Node(node_id="child_node_id", message=None, parent=None, children=None)
+    parent_node = Node(n_id="parent_node_id", msg=None, parent=None, children=None)
+    child_node = Node(n_id="child_node_id", msg=None, parent=None, children=None)
 
     parent_node.add_child(node=child_node)
 
@@ -63,15 +61,11 @@ def test_nodes_from_mapping() -> None:
 def test_header_with_root_sys_and_user() -> None:
     """Test header method with root, system and user nodes."""
 
-    root = Node(node_id="root_id", message=None, parent=None, children=None)
+    root = Node(n_id="root_id", msg=None, parent=None, children=None)
     system_msg = Message(message={"id": "sys_msg_id", "author": {"role": "system"}})
-    sys_node = Node(
-        node_id="sys_node_id", message=system_msg, parent=root, children=None
-    )
+    sys_node = Node(n_id="sys_node_id", msg=system_msg, parent=root, children=None)
     user_msg = Message(message={"id": "user_msg_id", "author": {"role": "user"}})
-    user_node = Node(
-        node_id="user_node_id", message=user_msg, parent=sys_node, children=None
-    )
+    user_node = Node(n_id="user_node_id", msg=user_msg, parent=sys_node, children=None)
     header: str = user_node.header()
 
     assert "node_id" in header
@@ -82,9 +76,9 @@ def test_header_with_root_sys_and_user() -> None:
 def test_footer_with_multiple_children() -> None:
     """Test footer method with multiple children."""
 
-    node = Node(node_id="node_id", message=None, parent=None, children=None)
-    child1 = Node(node_id="child1_id", message=None, parent=None, children=None)
-    child2 = Node(node_id="child2_id", message=None, parent=None, children=None)
+    node = Node(n_id="node_id", msg=None, parent=None, children=None)
+    child1 = Node(n_id="child1_id", msg=None, parent=None, children=None)
+    child2 = Node(n_id="child2_id", msg=None, parent=None, children=None)
 
     node.add_child(node=child1)
     node.add_child(node=child2)

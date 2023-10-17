@@ -4,8 +4,8 @@
         "usernamehw.errorlens",
         "njqdev.vscode-python-typehint",
         "ms-python.python",
-        "ms-python.pylint",
         "matangover.mypy",
-        "ms-toolsai.jupyter"
+        "ms-toolsai.jupyter",
+        "charliermarsh.ruff"
     ]
 }

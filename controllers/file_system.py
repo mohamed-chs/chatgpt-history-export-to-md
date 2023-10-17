@@ -6,7 +6,6 @@ Should ideally be the only module that deals with the filesystem.
 and configuration.py, but that's a placeholder for user input in whatever form,
 may be replaced later, with a GUI or something)"""
 
-
 from datetime import datetime
 from json import dump, load
 from os import utime
@@ -42,41 +41,39 @@ def load_conversations_from_bookmarklet_json(json_filepath: Path) -> Conversatio
     """Load the conversations from the bookmarklet json export file."""
 
     with open(file=json_filepath, mode="r", encoding="utf-8") as file:
-        conversations = load(file)
+        conversations = load(fp=file)
 
     return ConversationSet(conversations=conversations)
 
 
-def save_conversation_to_file(conversation: Conversation, file_path: Path) -> None:
+def save_conversation_to_file(conversation: Conversation, filepath: Path) -> None:
     """Save a conversation to a file, with added modification time."""
-    base_file_name: str = file_path.stem
+    base_file_name: str = filepath.stem
 
     counter = 0
-    while file_path.exists():
+    while filepath.exists():
         counter += 1
-        file_path = file_path.with_name(
-            name=f"{base_file_name} ({counter}){file_path.suffix}"
+        filepath = filepath.with_name(
+            name=f"{base_file_name} ({counter}){filepath.suffix}"
         )
 
-    with open(file=file_path, mode="w", encoding="utf-8") as file:
+    with open(file=filepath, mode="w", encoding="utf-8") as file:
         file.write(conversation.to_markdown())
-    utime(path=file_path, times=(conversation.update_time, conversation.update_time))
+    utime(path=filepath, times=(conversation.update_time, conversation.update_time))
 
 
-def save_conversation_set_to_dir(
-    conversation_set: ConversationSet, dir_path: Path
-) -> None:
+def save_conversation_set_to_dir(conv_set: ConversationSet, dir_path: Path) -> None:
     """Save a conversation set to a directory, one markdown file per conversation."""
     for conversation in tqdm(
-        iterable=conversation_set.conversation_list, desc="Writing Markdown 📄 files"
+        iterable=conv_set.conversation_list, desc="Writing Markdown 📄 files"
     ):
         file_path: Path = dir_path / f"{conversation.sanitized_title()}.md"
-        save_conversation_to_file(conversation=conversation, file_path=file_path)
+        save_conversation_to_file(conversation=conversation, filepath=file_path)
 
 
 def save_wordcloud_from_conversation_set(
-    conversation_set: ConversationSet,
-    folder_path: Path,
+    conv_set: ConversationSet,
+    dir_path: Path,
     time_period: tuple[datetime, str],
     **kwargs: Any,
 ) -> None:
@@ -91,26 +88,26 @@ def save_wordcloud_from_conversation_set(
         case _:
             raise ValueError("Invalid time period for wordcloud")
 
-    wordcloud_from_conversation_set(conversation_set=conversation_set, **kwargs).to_file(  # type: ignore
-        filename=folder_path / file_name
+    wordcloud_from_conversation_set(conv_set=conv_set, **kwargs).to_file(  # type: ignore
+        filename=dir_path / file_name
     )
 
 
 def generate_all_wordclouds(
-    conversation_set: ConversationSet, folder_path: Path, **kwargs: Any
+    conv_set: ConversationSet, dir_path: Path, **kwargs: Any
 ) -> None:
     """Create the wordclouds and save them to the folder."""
 
-    weeks_dict: dict[datetime, ConversationSet] = conversation_set.grouped_by_week()
-    months_dict: dict[datetime, ConversationSet] = conversation_set.grouped_by_month()
-    years_dict: dict[datetime, ConversationSet] = conversation_set.grouped_by_year()
+    weeks_dict: dict[datetime, ConversationSet] = conv_set.grouped_by_week()
+    months_dict: dict[datetime, ConversationSet] = conv_set.grouped_by_month()
+    years_dict: dict[datetime, ConversationSet] = conv_set.grouped_by_year()
 
     for week in tqdm(
         iterable=weeks_dict.keys(), desc="Creating weekly wordclouds 🔡☁️ "
     ):
         save_wordcloud_from_conversation_set(
-            conversation_set=weeks_dict[week],
-            folder_path=folder_path,
+            conv_set=weeks_dict[week],
+            dir_path=dir_path,
             time_period=(week, "week"),
             **kwargs,
         )
@@ -119,8 +116,8 @@ def generate_all_wordclouds(
         iterable=months_dict.keys(), desc="Creating monthly wordclouds 🔡☁️ "
     ):
         save_wordcloud_from_conversation_set(
-            conversation_set=months_dict[month],
-            folder_path=folder_path,
+            conv_set=months_dict[month],
+            dir_path=dir_path,
             time_period=(month, "month"),
             **kwargs,
         )
@@ -129,20 +126,18 @@ def generate_all_wordclouds(
         iterable=years_dict.keys(), desc="Creating yearly wordclouds 🔡☁️ "
     ):
         save_wordcloud_from_conversation_set(
-            conversation_set=years_dict[year],
-            folder_path=folder_path,
+            conv_set=years_dict[year],
+            dir_path=dir_path,
             time_period=(year, "year"),
             **kwargs,
         )
 
 
-def save_custom_instructions_to_file(
-    conversation_set: ConversationSet, file_path: Path
-) -> None:
+def save_custom_instructions_to_file(conv_set: ConversationSet, filepath: Path) -> None:
     """Create JSON file for custom instructions in the conversation set."""
 
-    with open(file=file_path, mode="w", encoding="utf-8") as file:
-        dump(obj=conversation_set.all_custom_instructions(), fp=file, indent=2)
+    with open(file=filepath, mode="w", encoding="utf-8") as file:
+        dump(obj=conv_set.all_custom_instructions(), fp=file, indent=2)
 
 
 def default_output_folder() -> str:
