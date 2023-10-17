@@ -28,8 +28,7 @@ class Node:
         self.id: str = node_id
         self.message: Message | None = message
         self.parent: Node | None = parent
-        if children is None:
-            self.children: list["Node"] = []
+        self.children: list[Node] = children if children else []
 
     def add_child(self, node: "Node") -> None:
         """Add a child to the node."""
@@ -69,8 +68,6 @@ class Node:
 
     def footer(self) -> str:
         """Get the footer of the node message, containing links to its children."""
-        if self.message is None:
-            return ""
 
         if len(self.children) == 0:
             return ""

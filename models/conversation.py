@@ -84,13 +84,13 @@ class Conversation:
 
         # TODO: placeholder for now, to be implemented later
 
-    def has_multiple_branches(self) -> bool:
-        """Check if the conversation has multiple branches."""
-        return len(self._all_message_nodes()) > len(self._main_branch_nodes())
-
     def leaf_count(self) -> int:
         """Number of leaves in the conversation."""
         return sum(1 for node in self._all_message_nodes() if not node.children)
+
+    def has_multiple_branches(self) -> bool:
+        """Check if the conversation has multiple branches."""
+        return self.leaf_count() > 1
 
     def chat_link(self) -> str:
         """Chat URL.
@@ -178,7 +178,7 @@ class Conversation:
         """YAML metadata header for the conversation."""
         yaml_config = self.configuration.get("yaml", {})
 
-        yaml_map: dict[str, str | list[str] | int | dict[str, str]] = {
+        yaml_map: dict[str, Any] = {
             "title": self.title,
             "chat_link": self.chat_link(),
             "create_time": ctime(self.create_time),
