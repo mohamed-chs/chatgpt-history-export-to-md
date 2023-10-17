@@ -24,14 +24,14 @@ class Node:
         message: Message | None,
         parent: Optional["Node"],
         children: Optional[list["Node"]],
-    ):
-        self.id = node_id
-        self.message = message
-        self.parent = parent
+    ) -> None:
+        self.id: str = node_id
+        self.message: Message | None = message
+        self.parent: Node | None = parent
         if children is None:
             self.children: list["Node"] = []
 
-    def add_child(self, node: "Node"):
+    def add_child(self, node: "Node") -> None:
         """Add a child to the node."""
         self.children.append(node)
         node.parent = self
@@ -43,13 +43,15 @@ class Node:
 
         # First pass: Create nodes
         for key, value in mapping.items():
-            message = Message(value["message"]) if value.get("message") else None
+            message: Message | None = (
+                Message(message=value["message"]) if value.get("message") else None
+            )
             nodes[key] = Node(node_id=key, message=message, parent=None, children=None)
 
         # Second pass: Connect nodes
         for key, value in mapping.items():
             for child_id in value["children"]:
-                nodes[key].add_child(nodes[child_id])
+                nodes[key].add_child(node=nodes[child_id])
 
         return nodes
 
@@ -58,7 +60,7 @@ class Node:
         if self.message is None:
             return ""
 
-        parent_link = (
+        parent_link: str = (
             f"[parent ⬆️](#{self.parent.id})\n"
             if self.parent and self.parent.message
             else ""
@@ -75,7 +77,10 @@ class Node:
         if len(self.children) == 1:
             return f"\n[child ⬇️](#{self.children[0].id})\n"
 
-        footer = "\n" + " | ".join(
-            [f"[child {i+1} ⬇️](#{child.id})" for i, child in enumerate(self.children)]
+        footer: str = "\n" + " | ".join(
+            [
+                f"[child {i+1} ⬇️](#{child.id})"
+                for i, child in enumerate(iterable=self.children)
+            ]
         )
         return footer + "\n"

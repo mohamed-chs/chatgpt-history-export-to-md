@@ -12,7 +12,7 @@ class Message:
 
     configuration: dict[str, Any] = {}
 
-    def __init__(self, message: dict[str, Any]):
+    def __init__(self, message: dict[str, Any]) -> None:
         self.id: str = message.get("id", None)
         self.author: dict[str, Any] = message.get("author", None)
         self.create_time: float = message.get("create_time", None)

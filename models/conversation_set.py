@@ -18,13 +18,13 @@ class ConversationSet:
 
     configuration: dict[str, Any] = {}
 
-    def __init__(self, conversations: list[dict[str, Any]]):
+    def __init__(self, conversations: list[dict[str, Any]]) -> None:
         conversation_dict: dict[str, Conversation] = {
-            conversation["conversation_id"]: Conversation(conversation)
+            conversation["conversation_id"]: Conversation(conversation=conversation)
             for conversation in conversations
         }
 
-        self.conversation_dict = conversation_dict
+        self.conversation_dict: dict[str, Conversation] = conversation_dict
 
         self.conversation_list = list(self.conversation_dict.values())
 
@@ -48,30 +48,30 @@ class ConversationSet:
         """Get a dictionary of conversations in the list grouped by the start of the week."""
         grouped: dict[datetime, "ConversationSet"] = {}
         for conversation in self.conversation_list:
-            week_start = conversation.start_of_week()
+            week_start: datetime = conversation.start_of_week()
             if week_start not in grouped:
-                grouped[week_start] = ConversationSet([])
-            grouped[week_start].add_conversation(conversation)
+                grouped[week_start] = ConversationSet(conversations=[])
+            grouped[week_start].add_conversation(conversation=conversation)
         return grouped
 
     def grouped_by_month(self) -> dict[datetime, "ConversationSet"]:
         """Get a dictionary of conversations in the list grouped by the start of the month."""
         grouped: dict[datetime, "ConversationSet"] = {}
         for conversation in self.conversation_list:
-            month_start = conversation.start_of_month()
+            month_start: datetime = conversation.start_of_month()
             if month_start not in grouped:
-                grouped[month_start] = ConversationSet([])
-            grouped[month_start].add_conversation(conversation)
+                grouped[month_start] = ConversationSet(conversations=[])
+            grouped[month_start].add_conversation(conversation=conversation)
         return grouped
 
     def grouped_by_year(self) -> dict[datetime, "ConversationSet"]:
         """Get a dictionary of conversations in the list grouped by the start of the year."""
         grouped: dict[datetime, "ConversationSet"] = {}
         for conversation in self.conversation_list:
-            year_start = conversation.start_of_year()
+            year_start: datetime = conversation.start_of_year()
             if year_start not in grouped:
-                grouped[year_start] = ConversationSet([])
-            grouped[year_start].add_conversation(conversation)
+                grouped[year_start] = ConversationSet(conversations=[])
+            grouped[year_start].add_conversation(conversation=conversation)
         return grouped
 
     def all_custom_instructions(self) -> list[dict[str, Any]]:
@@ -82,7 +82,7 @@ class ConversationSet:
             if not conversation.custom_instructions():
                 continue
 
-            instructions_info = {
+            instructions_info: dict[str, str | dict[str, str]] = {
                 "chat_title": conversation.title,
                 "chat_link": conversation.chat_link(),
                 "time": ctime(conversation.create_time),
@@ -98,13 +98,13 @@ class ConversationSet:
         timestamps: list[float] = []
 
         for conversation in self.conversation_list:
-            timestamps.extend(conversation.author_message_timestamps(author))
+            timestamps.extend(conversation.author_message_timestamps(author=author))
 
         return timestamps
 
     def all_author_text(self, author: str) -> str:
         """Get a string of all text, in all conversations in the list."""
         return "\n".join(
-            conversation.entire_author_text(author)
+            conversation.entire_author_text(author=author)
             for conversation in self.conversation_list
         )

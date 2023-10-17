@@ -12,7 +12,7 @@ def ensure_closed_code_blocks(string: str) -> str:
 
     open_code_block = False
 
-    lines = string.split("\n")
+    lines: list[str] = string.split(sep="\n")
 
     for line in lines:
         if line.startswith("```") and not open_code_block:
@@ -31,10 +31,10 @@ def ensure_closed_code_blocks(string: str) -> str:
 def replace_latex_delimiters(string: str) -> str:
     """Replace all the LaTeX bracket delimiters in the string with dollar sign ones."""
 
-    string = re.sub(r"\\\[", "$$", string)
-    string = re.sub(r"\\\]", "$$", string)
-    string = re.sub(r"\\\(", "$", string)
-    string = re.sub(r"\\\)", "$", string)
+    string = re.sub(pattern=r"\\\[", repl="$$", string=string)
+    string = re.sub(pattern=r"\\\]", repl="$$", string=string)
+    string = re.sub(pattern=r"\\\(", repl="$", string=string)
+    string = re.sub(pattern=r"\\\)", repl="$", string=string)
 
     return string
 
@@ -43,7 +43,9 @@ def get_font_names() -> list[str]:
     """Returns a list of all the font names in the assets/fonts folder."""
 
     fonts_path = Path("assets/fonts")
-    font_names = [font.stem for font in fonts_path.iterdir() if font.is_file()]
+    font_names: list[str] = [
+        font.stem for font in fonts_path.iterdir() if font.is_file()
+    ]
     return font_names
 
 
@@ -52,8 +54,8 @@ def get_colormap_names() -> list[str]:
 
     colormaps_path = Path("assets/colormaps.txt")
 
-    with open(colormaps_path, "r", encoding="utf-8") as file:
-        colormaps_list = file.read().splitlines()
+    with open(file=colormaps_path, mode="r", encoding="utf-8") as file:
+        colormaps_list: list[str] = file.read().splitlines()
 
     return colormaps_list
 
@@ -63,7 +65,7 @@ def validate_zip_file(path_str: str) -> bool:
 
     if not Path(path_str).is_file() or Path(path_str).suffix != ".zip":
         return False
-    with ZipFile(path_str) as zip_ref:
+    with ZipFile(file=path_str) as zip_ref:
         if "conversations.json" not in zip_ref.namelist():
             return False
     return True
