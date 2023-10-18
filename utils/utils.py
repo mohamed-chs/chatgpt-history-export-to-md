@@ -1,7 +1,7 @@
 """Utility functions for the project."""
 
 from pathlib import Path
-from re import sub as re_sub
+from re import sub
 from zipfile import ZipFile
 
 
@@ -30,10 +30,10 @@ def ensure_closed_code_blocks(string: str) -> str:
 
 def replace_latex_delimiters(string: str) -> str:
     """Replace all the LaTeX bracket delimiters in the string with dollar sign ones."""
-    string = re_sub(pattern=r"\\\[", repl="$$", string=string)
-    string = re_sub(pattern=r"\\\]", repl="$$", string=string)
-    string = re_sub(pattern=r"\\\(", repl="$", string=string)
-    string = re_sub(pattern=r"\\\)", repl="$", string=string)
+    string = sub(pattern=r"\\\[", repl="$$", string=string)
+    string = sub(pattern=r"\\\]", repl="$$", string=string)
+    string = sub(pattern=r"\\\(", repl="$", string=string)
+    string = sub(pattern=r"\\\)", repl="$", string=string)
 
     return string
 

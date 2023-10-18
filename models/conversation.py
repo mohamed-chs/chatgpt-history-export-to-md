@@ -5,7 +5,7 @@ object path : conversations.json -> conversation (one of the list items)
 """
 
 from datetime import datetime, timedelta
-from re import Pattern as RegexPattern
+from re import Pattern
 from re import compile as re_compile
 from time import ctime
 from typing import Any
@@ -226,7 +226,7 @@ class Conversation:
 
     def sanitized_title(self) -> str:
         """Sanitized title of the conversation, compatible with file names."""
-        file_anti_pattern: RegexPattern[str] = re_compile(
+        file_anti_pattern: Pattern[str] = re_compile(
             pattern=r'[<>:"/\\|?*\n\r\t\f\v]',
         )
         return (
