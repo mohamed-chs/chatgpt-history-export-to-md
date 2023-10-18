@@ -28,7 +28,8 @@
   },
   "wordcloud": {
     "font": "RobotoSlab-Thin",
-    "colormap": "prism"
+    "colormap": "prism",
+    "custom_stopwords": "file, use"
   },
   "node": {},
   "conversation_set": {}

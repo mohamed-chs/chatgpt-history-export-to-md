@@ -10,7 +10,7 @@ from utils.utils import get_colormap_names, get_font_names, validate_zip_file
 def validate_header(string: str) -> bool:
     """Returns True if the given text is a valid markdown header."""
     return (
-        1 <= string.count(x="#") <= 6
+        1 <= string.count("#") <= 6
         and string.startswith("#")
         and string[len(string.split()[0])] == " "
     )
@@ -122,6 +122,12 @@ def prompt_user(default_configs: dict[str, Any]) -> dict[str, Any]:
         default=default_configs["wordcloud"]["colormap"]
         if default_configs["wordcloud"]["colormap"]
         else None,
+        style=custom_style,
+    ).ask()
+
+    user_configs["wordcloud"]["custom_stopwords"] = text(
+        message="Enter custom stopwords (separated by commas) :",
+        default=default_configs["wordcloud"]["custom_stopwords"],
         style=custom_style,
     ).ask()
 

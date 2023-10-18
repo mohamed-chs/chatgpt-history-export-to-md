@@ -102,13 +102,15 @@ def main() -> None:
     wordcloud_folder.mkdir(parents=True, exist_ok=True)
 
     font_path: str = f"assets/fonts/{configs_dict['wordcloud']['font']}.ttf"
-    colormap = configs_dict["wordcloud"]["colormap"]
+    colormap: str = configs_dict["wordcloud"]["colormap"]
+    custom_stopwords: str = configs_dict["wordcloud"]["custom_stopwords"]
 
     generate_all_wordclouds(
         conv_set=all_conversations_set,
         dir_path=wordcloud_folder,
         font_path=font_path,
         colormap=colormap,
+        custom_stopwords=custom_stopwords,
     )
 
     print(f"\nDone ✅ ! Check the output 🔡☁️ here : {wordcloud_folder.as_uri()} 🔗\n")

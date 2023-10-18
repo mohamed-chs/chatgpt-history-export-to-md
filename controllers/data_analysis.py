@@ -49,9 +49,18 @@ def wordcloud_from_text(
     **kwargs: Any,
 ) -> WordCloud:
     """Creates a wordcloud from the given text. Returns a WordCloud object."""
-    custom_stopwords: list[str] = kwargs.get("stopwords", [])
     default_stopwords: set[str] = load_nltk_stopwords()
-    stop_words: set[str] = default_stopwords.union(set(custom_stopwords))
+
+    custom_stopwords: str = kwargs.get("custom_stopwords", "")
+    custom_stopwords_list: list[str] = (
+        custom_stopwords.split(sep=",") if custom_stopwords else []
+    )
+    custom_stopwords_list = [
+        word.strip().lower() for word in custom_stopwords_list if word.strip()
+    ]
+
+    stop_words: set[str] = default_stopwords.union(set(custom_stopwords_list))
+
     background_color = kwargs.get("background_color", None)
     if background_color is None:
         mode = kwargs.get("mode", "RGBA")
