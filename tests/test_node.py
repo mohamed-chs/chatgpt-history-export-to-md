@@ -8,7 +8,6 @@ from models.node import Node
 
 def test_node_initialization() -> None:
     """Test initialization of Node object."""
-
     node_id = "node_id_123"
     msg = Message(message={"id": "msg_id_123", "author": {"role": "user"}})
     node = Node(n_id=node_id, msg=msg, parent=None, children=None)
@@ -21,7 +20,6 @@ def test_node_initialization() -> None:
 
 def test_add_child() -> None:
     """Test add_child method."""
-
     parent_node = Node(n_id="parent_node_id", msg=None, parent=None, children=None)
     child_node = Node(n_id="child_node_id", msg=None, parent=None, children=None)
 
@@ -34,7 +32,6 @@ def test_add_child() -> None:
 
 def test_nodes_from_mapping() -> None:
     """Test nodes_from_mapping method."""
-
     mapping: dict[str, Any] = {
         "node1": {
             "message": {
@@ -60,7 +57,6 @@ def test_nodes_from_mapping() -> None:
 
 def test_header_with_root_sys_and_user() -> None:
     """Test header method with root, system and user nodes."""
-
     root = Node(n_id="root_id", msg=None, parent=None, children=None)
     system_msg = Message(message={"id": "sys_msg_id", "author": {"role": "system"}})
     sys_node = Node(n_id="sys_node_id", msg=system_msg, parent=root, children=None)
@@ -75,7 +71,6 @@ def test_header_with_root_sys_and_user() -> None:
 
 def test_footer_with_multiple_children() -> None:
     """Test footer method with multiple children."""
-
     node = Node(n_id="node_id", msg=None, parent=None, children=None)
     child1 = Node(n_id="child1_id", msg=None, parent=None, children=None)
     child2 = Node(n_id="child2_id", msg=None, parent=None, children=None)

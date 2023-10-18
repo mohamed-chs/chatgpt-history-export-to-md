@@ -27,7 +27,8 @@ class Message:
     def author_role(self) -> str:
         """The role of the author of the message.
 
-        'user', 'assistant', 'system' or 'tool'."""
+        'user', 'assistant', 'system' or 'tool'.
+        """
         return self.author["role"]
 
     def author_header(self) -> str:
@@ -46,7 +47,7 @@ class Message:
                 return ""
 
     def content_text(self) -> str:
-        """get the text content of the message."""
+        """Get the text content of the message."""
         if "parts" in self.content:
             return str(object=self.content["parts"][0])
         if "text" in self.content:
@@ -54,9 +55,9 @@ class Message:
         return ""
 
     def content_type(self) -> str:
-        """get the content type of the message."""
+        """Get the content type of the message."""
         return self.content["content_type"]
 
     def model_slug(self) -> str:
-        """get the model used for the message."""
+        """Get the model used for the message."""
         return self.metadata.get("model_slug", "")

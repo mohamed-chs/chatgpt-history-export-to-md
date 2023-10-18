@@ -9,7 +9,6 @@ from models.message import Message
 
 def test_message_initialization() -> None:
     """Test initialization of Message object."""
-
     # Sample message dictionary
     message_dict: dict[str, Any] = {
         "id": "sample_id",
@@ -42,7 +41,6 @@ def test_message_initialization() -> None:
 
 def test_author_role() -> None:
     """Test author_role method."""
-
     message = Message(message={"author": {"role": "user"}})
     assert message.author_role() == "user"
 
@@ -62,7 +60,6 @@ def test_author_header(
     header: Literal["# User", "# Assistant", "### System", "### Tool output", ""],
 ) -> None:
     """Test author_header method."""
-
     Message.configuration = {"author_headers": {}}
     message = Message(message={"author": {"role": role}})
     assert message.author_header() == header
@@ -70,7 +67,6 @@ def test_author_header(
 
 def test_content_text() -> None:
     """Test content_text method."""
-
     message = Message(message={"content": {"parts": ["Hello World"]}})
     assert message.content_text() == "Hello World"
 
@@ -80,13 +76,11 @@ def test_content_text() -> None:
 
 def test_content_type() -> None:
     """Test content_type method."""
-
     message = Message(message={"content": {"content_type": "text"}})
     assert message.content_type() == "text"
 
 
 def test_model_slug() -> None:
     """Test model_slug method."""
-
     message = Message(message={"metadata": {"model_slug": "gpt-4"}})
     assert message.model_slug() == "gpt-4"

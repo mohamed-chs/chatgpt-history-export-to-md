@@ -14,9 +14,9 @@ from .file_system import default_output_folder, get_openai_zip_filepath
 
 def get_user_configs() -> dict[str, Any]:
     """Loads the default configs and calls the prompt_user function with those defaults.
-    Returns the new configuration."""
-
-    with open(file="config.json", mode="r", encoding="utf-8") as file:
+    Returns the new configuration.
+    """
+    with open(file="config.json", encoding="utf-8") as file:
         default_configs = load(fp=file)
 
     if not default_configs["zip_file"]:

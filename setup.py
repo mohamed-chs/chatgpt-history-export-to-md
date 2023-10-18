@@ -29,7 +29,7 @@ if __name__ == "__main__":
             "Python 3.10 or higher is required to run this program.\n"
             "Please download the latest version of Python at :\n"
             "https://www.python.org/downloads/ 🔗, and try again.\n"
-            "Exiting..."
+            "Exiting...",
         )
         sys.exit(1)
 
@@ -41,7 +41,7 @@ if __name__ == "__main__":
     # Post-setup instructions
     print("\nSetup completed successfully!")
     print(
-        "\nTo activate the virtual environment, use the following command based on your platform:"
+        "\nTo activate the virtual environment, use the following command based on your platform:",
     )
     if sys.platform == "win32":
         print("\nFor Command Prompt:\n.venv\\Scripts\\activate.bat")

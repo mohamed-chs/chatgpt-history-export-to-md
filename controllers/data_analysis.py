@@ -1,6 +1,7 @@
 """Module for all the data visualizations.
 
-Should ideally only return matplotlib objects, and not deal with the filesystem."""
+Should ideally only return matplotlib objects, and not deal with the filesystem.
+"""
 
 from pathlib import Path
 from typing import Any
@@ -20,7 +21,6 @@ from models.conversation_set import ConversationSet
 # Ensure that the stopwords are downloaded
 def load_nltk_stopwords() -> set[str]:
     """Loads the nltk stopwords. Returns a set of stopwords."""
-
     try:
         nltk.data.find(resource_name="corpora/stopwords")  # type: ignore
     except LookupError:
@@ -36,7 +36,9 @@ def load_nltk_stopwords() -> set[str]:
     ]  # add more languages here ...
 
     stop_words = set(
-        word for lang in languages for word in stopwords.words(fileids=lang)  # type: ignore
+        word
+        for lang in languages
+        for word in stopwords.words(fileids=lang)  # type: ignore
     )
 
     return stop_words
@@ -47,7 +49,6 @@ def wordcloud_from_text(
     **kwargs: Any,
 ) -> WordCloud:
     """Creates a wordcloud from the given text. Returns a WordCloud object."""
-
     custom_stopwords: list[str] = kwargs.get("stopwords", [])
     default_stopwords: set[str] = load_nltk_stopwords()
     stop_words: set[str] = default_stopwords.union(set(custom_stopwords))
@@ -61,7 +62,8 @@ def wordcloud_from_text(
 
     wordcloud: WordCloud = WordCloud(
         font_path=kwargs.get(
-            "font_path", "assets/fonts/ArchitectsDaughter-Regular.ttf"
+            "font_path",
+            "assets/fonts/ArchitectsDaughter-Regular.ttf",
         ),
         width=kwargs.get("width", 1000),
         height=kwargs.get("height", 1000),
@@ -71,17 +73,17 @@ def wordcloud_from_text(
         colormap=kwargs.get("colormap", "prism"),
         include_numbers=kwargs.get("include_numbers", False),
     ).generate(  # type: ignore
-        text=text
+        text=text,
     )
 
     return wordcloud
 
 
 def wordcloud_from_conversation_set(
-    conv_set: ConversationSet, **kwargs: Any
+    conv_set: ConversationSet,
+    **kwargs: Any,
 ) -> WordCloud:
     """Creates a wordcloud from the given conversation set. Returns a WordCloud object."""
-
     text: str = (
         conv_set.all_author_text(author="user")
         + "\n"
@@ -93,7 +95,6 @@ def wordcloud_from_conversation_set(
 
 def create_save_graph(timestamps: list[float], file_path: Path) -> None:
     """Creates and saves a graph from the given timestamps."""
-
     df = pd.DataFrame(data=timestamps, columns=["timestamp"])  # type: ignore
     df["datetime"] = pd.to_datetime(arg=df["timestamp"], unit="s")  # type: ignore
 
@@ -113,7 +114,10 @@ def create_save_graph(timestamps: list[float], file_path: Path) -> None:
     )
 
     plt.title(  # type: ignore
-        label="ChatGPT Prompts per Day", fontsize=20, fontweight="bold", pad=20
+        label="ChatGPT Prompts per Day",
+        fontsize=20,
+        fontweight="bold",
+        pad=20,
     )
     plt.xlabel(xlabel="Month", fontsize=16, labelpad=15)  # type: ignore
     plt.ylabel(ylabel="Number of Prompts", fontsize=16, labelpad=15)  # type: ignore

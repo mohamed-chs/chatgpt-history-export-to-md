@@ -26,20 +26,19 @@ if sys.version_info < (3, 10):
         "Python 3.10 or higher is required to run this program.\n"
         "Please download the latest version of Python at :\n"
         "https://www.python.org/downloads/ 🔗, and try again.\n"
-        "Exiting..."
+        "Exiting...",
     )
     sys.exit(1)
 
 
 def main() -> None:
     """Main function."""
-
     print(
         "Welcome to ChatGPT Data Visualizer ✨📊!\n\n"
         "Follow the instructions in the command line.\n\n"
         "Press 'ENTER' to select the default options.\n\n"
         "If you encounter any issues 🐛, please report 🚨 them here:\n\n"
-        "➡️ https://github.com/mohamed-chs/chatgpt-history-export-to-md/issues/new/choose 🔗\n\n"
+        "➡️ https://github.com/mohamed-chs/chatgpt-history-export-to-md/issues/new/choose 🔗\n\n",
     )
 
     configs_dict: dict[str, Any] = get_user_configs()
@@ -53,16 +52,16 @@ def main() -> None:
     zip_filepath = Path(configs_dict["zip_file"])
 
     all_conversations_set: ConversationSet = load_conversations_from_openai_zip(
-        zip_filepath=zip_filepath
+        zip_filepath=zip_filepath,
     )
 
     bookmarklet_json_filepath: Path | None = get_bookmarklet_json_filepath()
     if bookmarklet_json_filepath:
         print("Found bookmarklet download, loading 📂 ...\n")
-        bookmarklet_conversations_set: ConversationSet = (
-            load_conversations_from_bookmarklet_json(
-                json_filepath=bookmarklet_json_filepath
-            )
+        bookmarklet_conversations_set: (
+            ConversationSet
+        ) = load_conversations_from_bookmarklet_json(
+            json_filepath=bookmarklet_json_filepath,
         )
         all_conversations_set.update(conv_set=bookmarklet_conversations_set)
 
@@ -78,7 +77,8 @@ def main() -> None:
     markdown_folder.mkdir(parents=True, exist_ok=True)
 
     save_conversation_set_to_dir(
-        conv_set=all_conversations_set, dir_path=markdown_folder
+        conv_set=all_conversations_set,
+        dir_path=markdown_folder,
     )
 
     print(f"\nDone ✅ ! Check the output 📄 here : {markdown_folder.as_uri()} 🔗\n")
@@ -118,11 +118,12 @@ def main() -> None:
     custom_instructions_filepath: Path = output_folder / "custom_instructions.json"
 
     save_custom_instructions_to_file(
-        conv_set=all_conversations_set, filepath=custom_instructions_filepath
+        conv_set=all_conversations_set,
+        filepath=custom_instructions_filepath,
     )
 
     print(
-        f"\nDone ✅ ! Check the output 📝 here : {custom_instructions_filepath.as_uri()} 🔗\n"
+        f"\nDone ✅ ! Check the output 📝 here : {custom_instructions_filepath.as_uri()} 🔗\n",
     )
 
     update_config_file(user_configs=configs_dict)
@@ -133,7 +134,7 @@ def main() -> None:
         f"Explore the full gallery 🖼️ at: {output_folder.as_uri()} 🔗\n\n"
         "I hope you enjoy the outcome 🤞.\n\n"
         "If you appreciate it, kindly give the project a star 🌟 on GitHub :\n\n"
-        "➡️ https://github.com/mohamed-chs/chatgpt-history-export-to-md 🔗\n\n"
+        "➡️ https://github.com/mohamed-chs/chatgpt-history-export-to-md 🔗\n\n",
     )
 
 

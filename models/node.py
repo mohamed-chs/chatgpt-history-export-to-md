@@ -1,5 +1,4 @@
-"""
-Node class and methods for the node object in a conversation
+"""Node class and methods for the node object in a conversation
 object path : conversations.json -> conversation -> mapping -> mapping node
 
 will implement methods to handle conversation branches, like
@@ -68,7 +67,6 @@ class Node:
 
     def footer(self) -> str:
         """Get the footer of the node message, containing links to its children."""
-
         if len(self.children) == 0:
             return ""
         if len(self.children) == 1:
@@ -78,6 +76,6 @@ class Node:
             [
                 f"[child {i+1} ⬇️](#{child.id})"
                 for i, child in enumerate(iterable=self.children)
-            ]
+            ],
         )
         return footer + "\n"

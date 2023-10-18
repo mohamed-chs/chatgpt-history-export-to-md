@@ -8,7 +8,6 @@ from models.node import Node
 
 def sample_conversation_data() -> dict[str, Any]:
     """Return sample conversation data."""
-
     return {
         "title": "Sample Conversation",
         "create_time": 1642540800.0,  # Jan 18, 2022, 12:00:00 PM
@@ -47,7 +46,6 @@ def sample_conversation_data() -> dict[str, Any]:
 
 def test_conversation_initialization() -> None:
     """Test initialization of Conversation object."""
-
     data: dict[str, Any] = sample_conversation_data()
     conversation = Conversation(conversation=data)
 
@@ -60,7 +58,6 @@ def test_conversation_initialization() -> None:
 
 def test_leaf_count() -> None:
     """Test leaf_count method."""
-
     data: dict[str, Any] = sample_conversation_data()
     conversation = Conversation(conversation=data)
 
@@ -69,7 +66,6 @@ def test_leaf_count() -> None:
 
 def test_has_multiple_branches() -> None:
     """Test has_multiple_branches method."""
-
     data: dict[str, Any] = sample_conversation_data()
     conversation = Conversation(conversation=data)
 
@@ -78,7 +74,6 @@ def test_has_multiple_branches() -> None:
 
 def test_chat_link() -> None:
     """Test chat_link method."""
-
     data: dict[str, Any] = sample_conversation_data()
     conversation = Conversation(conversation=data)
 
@@ -87,7 +82,6 @@ def test_chat_link() -> None:
 
 def test_content_types() -> None:
     """Test content_types method."""
-
     data: dict[str, Any] = sample_conversation_data()
     conversation = Conversation(conversation=data)
 
@@ -96,7 +90,6 @@ def test_content_types() -> None:
 
 def test_message_count() -> None:
     """Test message_count method."""
-
     data: dict[str, Any] = sample_conversation_data()
     conversation = Conversation(conversation=data)
 
@@ -105,7 +98,6 @@ def test_message_count() -> None:
 
 def test_entire_author_text() -> None:
     """Test entire_author_text method."""
-
     data: dict[str, Any] = sample_conversation_data()
     conversation = Conversation(conversation=data)
 
@@ -115,7 +107,6 @@ def test_entire_author_text() -> None:
 
 def test_author_message_timestamps() -> None:
     """Test author_message_timestamps method."""
-
     data: dict[str, Any] = sample_conversation_data()
     conversation = Conversation(conversation=data)
 
@@ -124,7 +115,6 @@ def test_author_message_timestamps() -> None:
 
 def test_model_slug() -> None:
     """Test model_slug method."""
-
     data: dict[str, Any] = sample_conversation_data()
     conversation = Conversation(conversation=data)
 
@@ -133,7 +123,6 @@ def test_model_slug() -> None:
 
 def test_used_plugins() -> None:
     """Test used_plugins method."""
-
     data: dict[str, Any] = sample_conversation_data()
     conversation = Conversation(conversation=data)
 
@@ -142,7 +131,6 @@ def test_used_plugins() -> None:
 
 def test_sanitized_title() -> None:
     """Test sanitized_title method."""
-
     data: dict[str, Any] = sample_conversation_data()
     conversation = Conversation(conversation=data)
 
@@ -151,7 +139,6 @@ def test_sanitized_title() -> None:
 
 def test_yaml_header() -> None:
     """Test yaml_header method."""
-
     data: dict[str, Any] = sample_conversation_data()
     conversation = Conversation(conversation=data)
 
@@ -162,7 +149,6 @@ def test_yaml_header() -> None:
 
 def test_to_markdown() -> None:
     """Test to_markdown method."""
-
     data: dict[str, Any] = sample_conversation_data()
     conversation = Conversation(conversation=data)
 
@@ -176,7 +162,6 @@ def test_to_markdown() -> None:
 
 def test_start_of_year() -> None:
     """Test start_of_year method."""
-
     data: dict[str, Any] = sample_conversation_data()
     conversation = Conversation(conversation=data)
 
@@ -187,7 +172,6 @@ def test_start_of_year() -> None:
 
 def test_start_of_month() -> None:
     """Test start_of_month method."""
-
     data: dict[str, Any] = sample_conversation_data()
     conversation = Conversation(conversation=data)
 
@@ -198,7 +182,6 @@ def test_start_of_month() -> None:
 
 def test_start_of_week() -> None:
     """Test start_of_week method."""
-
     data: dict[str, Any] = sample_conversation_data()
     conversation = Conversation(conversation=data)
 

@@ -1,12 +1,12 @@
-"""
-Just a placeholder for now.
+"""Just a placeholder for now.
 a bunch of classes and functions to handle conversations, messages, stats, etc.
 
 object path : conversations.json -> conversation (one of the list items)
 """
 
-import re
 from datetime import datetime, timedelta
+from re import Pattern as RegexPattern
+from re import compile as re_compile
 from time import ctime
 from typing import Any
 
@@ -26,24 +26,26 @@ class Conversation:
         self.create_time: float = conversation.get("create_time", None)
         self.update_time: float = conversation.get("update_time", None)
         self.mapping: dict[str, Node] = Node.nodes_from_mapping(
-            mapping=conversation.get("mapping", None)
+            mapping=conversation.get("mapping", None),
         )
         self.moderation_results: list[Any] = conversation.get(
-            "moderation_results", None
+            "moderation_results",
+            None,
         )
         self.current_node: Node = self.mapping[conversation.get("current_node", None)]
         self.plugin_ids: list[str] = conversation.get("plugin_ids", None)
         self.conversation_id: str = conversation.get("conversation_id", None)
         self.conversation_template_id: str = conversation.get(
-            "conversation_template_id", None
+            "conversation_template_id",
+            None,
         )
         self.id: str = conversation.get("id", None)
 
     def _main_branch_nodes(self) -> list[Node]:
         """List of all nodes that have a message in the current 'main' branch.
 
-        the 'current_node' represents the last node in the main branch."""
-
+        the 'current_node' represents the last node in the main branch.
+        """
         nodes: list[Node] = []
         curr_node: Node = self.current_node
         curr_parent: Node | None = curr_node.parent
@@ -60,7 +62,6 @@ class Conversation:
 
     def _all_message_nodes(self) -> list[Node]:
         """List of all nodes that have a message in the conversation, including all branches."""
-
         nodes: list[Node] = []
         for _, node in self.mapping.items():
             if node.message:
@@ -102,13 +103,14 @@ class Conversation:
     def content_types(self) -> list[str]:
         """List of all content types in the conversation. (all branches)
 
-        (e.g. text, code, execution_output, etc.)"""
+        (e.g. text, code, execution_output, etc.)
+        """
         return list(
             set(
                 node.message.content_type()
                 for node in self._all_message_nodes()
                 if node.message
-            )
+            ),
         )
 
     def message_count(self) -> int:
@@ -122,7 +124,8 @@ class Conversation:
     def entire_author_text(self, author: str) -> str:
         """Entire raw text from the given author role in the conversation. (all branches)
 
-        Useful for generating word clouds."""
+        Useful for generating word clouds.
+        """
         return "\n".join(
             node.message.content_text()
             for node in self._author_nodes(author=author)
@@ -131,7 +134,8 @@ class Conversation:
 
     def author_message_timestamps(self, author: str) -> list[float]:
         """List of all message timestamps from the given author role in the conversation.
-        (all branches) Useful for generating time series plots."""
+        (all branches) Useful for generating time series plots.
+        """
         return [
             node.message.create_time
             for node in self._author_nodes(author=author)
@@ -157,7 +161,7 @@ class Conversation:
                 node.message.metadata["invoked_plugin"]["namespace"]
                 for node in self._author_nodes(author="tool")
                 if node.message and node.message.metadata.get("invoked_plugin")
-            )
+            ),
         )
 
     def custom_instructions(self) -> dict[str, str]:
@@ -167,7 +171,8 @@ class Conversation:
             return {}
         context_message: Message | None = system_nodes[1].message
         if context_message and context_message.metadata.get(
-            "is_user_system_message", None
+            "is_user_system_message",
+            None,
         ):
             return context_message.metadata.get("user_context_message_data", {})
         return {}
@@ -210,7 +215,7 @@ class Conversation:
         for node in self._all_message_nodes():
             if node.message:
                 content: str = ensure_closed_code_blocks(
-                    string=node.message.content_text()
+                    string=node.message.content_text(),
                 )
                 # prevent empty messages from taking up white space
                 content = f"\n{content}\n" if content else ""
@@ -221,8 +226,8 @@ class Conversation:
 
     def sanitized_title(self) -> str:
         """Sanitized title of the conversation, compatible with file names."""
-        file_anti_pattern: re.Pattern[str] = re.compile(
-            pattern=r'[<>:"/\\|?*\n\r\t\f\v]'
+        file_anti_pattern: RegexPattern[str] = re_compile(
+            pattern=r'[<>:"/\\|?*\n\r\t\f\v]',
         )
         return (
             file_anti_pattern.sub(repl="_", string=self.title)
@@ -238,14 +243,18 @@ class Conversation:
 
     def start_of_year(self) -> datetime:
         """Returns the first of January of the year the conversation was created in,
-        as a datetime object."""
+        as a datetime object.
+        """
         return datetime(
-            year=datetime.fromtimestamp(self.create_time).year, month=1, day=1
+            year=datetime.fromtimestamp(self.create_time).year,
+            month=1,
+            day=1,
         )
 
     def start_of_month(self) -> datetime:
         """Returns the first of the month the conversation was created in,
-        as a datetime object."""
+        as a datetime object.
+        """
         return datetime(
             year=datetime.fromtimestamp(self.create_time).year,
             month=datetime.fromtimestamp(self.create_time).month,
@@ -254,8 +263,9 @@ class Conversation:
 
     def start_of_week(self) -> datetime:
         """Returns the monday of the week the conversation was created in,
-        as a datetime object."""
+        as a datetime object.
+        """
         start_of_week: datetime = datetime.fromtimestamp(self.create_time) - timedelta(
-            days=datetime.fromtimestamp(self.create_time).weekday()
+            days=datetime.fromtimestamp(self.create_time).weekday(),
         )
         return start_of_week.replace(hour=0, minute=0, second=0, microsecond=0)

@@ -4,7 +4,8 @@ Can be the set of all conversations, or a set of conversations in a week, month,
 
 gonna be useful for updating the data in the future
 
-TODO: turn the conversations list into a dict, with the id as the key"""
+TODO: turn the conversations list into a dict, with the id as the key
+"""
 
 from datetime import datetime
 from time import ctime
