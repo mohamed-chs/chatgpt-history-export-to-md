@@ -8,7 +8,8 @@ may be replaced later, with a GUI or something)
 """
 
 from datetime import datetime
-from json import dump, load
+from json import dump as json_dump
+from json import load as json_load
 from os import utime
 from pathlib import Path
 from typing import Any
@@ -32,7 +33,7 @@ def load_conversations_from_openai_zip(zip_filepath: Path) -> ConversationSet:
     )
 
     with open(file=conversations_path, encoding="utf-8") as file:
-        conversations = load(fp=file)
+        conversations = json_load(fp=file)
 
     return ConversationSet(conversations=conversations)
 
@@ -40,7 +41,7 @@ def load_conversations_from_openai_zip(zip_filepath: Path) -> ConversationSet:
 def load_conversations_from_bookmarklet_json(json_filepath: Path) -> ConversationSet:
     """Load the conversations from the bookmarklet json export file."""
     with open(file=json_filepath, encoding="utf-8") as file:
-        conversations = load(fp=file)
+        conversations = json_load(fp=file)
 
     return ConversationSet(conversations=conversations)
 
@@ -140,7 +141,7 @@ def generate_all_wordclouds(
 def save_custom_instructions_to_file(conv_set: ConversationSet, filepath: Path) -> None:
     """Create JSON file for custom instructions in the conversation set."""
     with open(file=filepath, mode="w", encoding="utf-8") as file:
-        dump(obj=conv_set.all_custom_instructions(), fp=file, indent=2)
+        json_dump(obj=conv_set.all_custom_instructions(), fp=file, indent=2)
 
 
 def default_output_folder() -> str:

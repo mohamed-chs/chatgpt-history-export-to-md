@@ -6,6 +6,7 @@ Feel free to add or check items.
 
 **general**
 
+- [ ] Improve CONTRIBUTING.md
 - [ ] More robust testing setup
 - [ ] GUI
 - [ ] Standalone executable, for an even smoother setup

@@ -48,6 +48,8 @@ Check the `Issues` tab for bugs, enhancements, or first-timer tasks. If you have
 
 The [Project Todo](TODO.md) and [JavaScript Todo](js/how_to_use.md#still-working-on) also offer areas needing attention.
 
+See also a rough internal dependency graph of the project [here](assets/deps_graph.png) (the graph is not complete, but it gives a general idea of the project's structure). Generated using [pydeps](https://github.com/thebjorn/pydeps).
+
 ## Documentation
 
 Refer to the in-code comments and docstrings for understanding and clarity.

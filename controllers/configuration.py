@@ -1,6 +1,7 @@
 """Module for handling user configuration and updating the models."""
 
-from json import dump, load
+from json import dump as json_dump
+from json import load as json_load
 from typing import Any
 
 from models.conversation import Conversation
@@ -17,7 +18,7 @@ def get_user_configs() -> dict[str, Any]:
     Returns the new configuration.
     """
     with open(file="config.json", encoding="utf-8") as file:
-        default_configs = load(fp=file)
+        default_configs = json_load(fp=file)
 
     if not default_configs["zip_file"]:
         default_configs["zip_file"] = get_openai_zip_filepath()
@@ -31,7 +32,7 @@ def get_user_configs() -> dict[str, Any]:
 def update_config_file(user_configs: dict[str, Any]) -> None:
     """Update the config file with the new configuration options."""
     with open(file="config.json", mode="w", encoding="utf-8") as file:
-        dump(obj=user_configs, fp=file, indent=2)
+        json_dump(obj=user_configs, fp=file, indent=2)
 
 
 def set_model_configs(configs: dict[str, Any]) -> None:
