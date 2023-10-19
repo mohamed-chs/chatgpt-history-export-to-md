@@ -29,7 +29,7 @@ from .data_analysis import (
 )
 
 
-def load_conversations_from_openai_zip(zip_filepath: Path) -> ConversationSet:
+def conversation_set_from_zip(zip_filepath: Path) -> ConversationSet:
     """Load the conversations from the OpenAI zip export file."""
     with ZipFile(file=zip_filepath, mode="r") as file:
         file.extractall(path=zip_filepath.with_suffix(suffix=""))
@@ -44,7 +44,7 @@ def load_conversations_from_openai_zip(zip_filepath: Path) -> ConversationSet:
     return ConversationSet(conversations=conversations)
 
 
-def load_conversations_from_bookmarklet_json(json_filepath: Path) -> ConversationSet:
+def conversation_set_from_json(json_filepath: Path) -> ConversationSet:
     """Load the conversations from the bookmarklet json export file."""
     with open(file=json_filepath, encoding="utf-8") as file:
         conversations = json_load(fp=file)
@@ -52,7 +52,7 @@ def load_conversations_from_bookmarklet_json(json_filepath: Path) -> Conversatio
     return ConversationSet(conversations=conversations)
 
 
-def save_conversation_to_file(conversation: Conversation, filepath: Path) -> None:
+def save_conversation(conversation: Conversation, filepath: Path) -> None:
     """Save a conversation to a file, with added modification time."""
     base_file_name: str = filepath.stem
 
@@ -68,14 +68,14 @@ def save_conversation_to_file(conversation: Conversation, filepath: Path) -> Non
     utime(path=filepath, times=(conversation.update_time, conversation.update_time))
 
 
-def save_conversation_set_to_dir(conv_set: ConversationSet, dir_path: Path) -> None:
+def save_conversation_set(conv_set: ConversationSet, dir_path: Path) -> None:
     """Save a conversation set to a directory, one markdown file per conversation."""
     for conversation in tqdm(
         iterable=conv_set.conversation_list,
         desc="Writing Markdown 📄 files",
     ):
         file_path: Path = dir_path / f"{conversation.sanitized_title()}.md"
-        save_conversation_to_file(conversation=conversation, filepath=file_path)
+        save_conversation(conversation=conversation, filepath=file_path)
 
 
 def save_weekwise_graph_from_conversation_set(
@@ -103,8 +103,6 @@ def save_weekwise_graph_from_conversation_set(
             fname=dir_path / file_name,
             dpi=300,
         )
-    else:
-        raise ValueError("Invalid time period for weekwise graph")
 
 
 def create_n_save_all_weekwise_graphs(
@@ -212,37 +210,27 @@ def save_custom_instructions_to_file(conv_set: ConversationSet, filepath: Path) 
 
 
 def default_output_folder() -> str:
-    """Returns the default output folder path.
-
-    (put the function in a separate file to isolate file system operations)
-    """
+    """Returns the default output folder path : ~/Documents/ChatGPT Data"""
+    # put the function here to isolate file system operations
     return str(object=Path.home() / "Documents" / "ChatGPT Data")
 
 
-def get_openai_zip_filepath() -> str:
-    """Returns the path to the most recent zip file in the Downloads folder,
-    excluding those containing 'bookmarklet'.
-    """
+def most_recently_downloaded_zip() -> str:
+    """Path to the most recently created zip file in the Downloads folder."""
     downloads_folder: Path = Path.home() / "Downloads"
 
-    # Filter out zip files with names that contain "bookmarklet"
-    zip_files: list[Path] = [
-        x for x in downloads_folder.glob(pattern="*.zip") if "bookmarklet" not in x.name
-    ]
+    zip_files: list[Path] = [x for x in downloads_folder.glob(pattern="*.zip")]
 
     if not zip_files:
         return ""
 
-    # Most recent zip file in downloads folder, excluding those containing "bookmarklet"
     default_zip_filepath: Path = max(zip_files, key=lambda x: x.stat().st_ctime)
 
     return str(object=default_zip_filepath)
 
 
 def get_bookmarklet_json_filepath() -> Path | None:
-    """Returns the path to the most recent json file in the Downloads folder,
-    containing 'bookmarklet'.
-    """
+    """Path to the most recently downloaded JSON file, with "bookmarklet" in the name."""
     downloads_folder: Path = Path.home() / "Downloads"
 
     # Filter out json files with names that do not contain "bookmarklet"

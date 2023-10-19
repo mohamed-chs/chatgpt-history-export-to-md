@@ -11,7 +11,7 @@ Alternatively, you can create a bookmarklet with the code in [this file](bookmar
 
 (You should refresh the page after the download finishes, to clear the UI widget and the console logs.)
 
-Now, if you run the `main.py` script, it should recognize the new downloaded json file and add the conversations to the ones from the OpenAI export, that way ALL the conversations are converted to markdown files, as well as the other data visualizations stuff.
+Now, if you run the `cli.py` script, it should recognize the new downloaded json file and add the conversations to the ones from the OpenAI export, that way ALL the conversations are converted to markdown files, as well as the other data visualizations stuff.
 
 This is a very rudimentary js script, and it needs more error handling. I've tried it on Chrome, and it works so far.
 Could break at anytime if OpenAI changes their data permissions or the `/backend-api/` API.

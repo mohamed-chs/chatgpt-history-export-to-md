@@ -10,7 +10,7 @@ from models.message import Message
 from models.node import Node
 from views.prompt_user import prompt_user
 
-from .file_system import default_output_folder, get_openai_zip_filepath
+from .file_system import default_output_folder, most_recently_downloaded_zip
 
 
 def get_user_configs() -> dict[str, Any]:
@@ -21,7 +21,7 @@ def get_user_configs() -> dict[str, Any]:
         default_configs = json_load(fp=file)
 
     if not default_configs["zip_file"]:
-        default_configs["zip_file"] = get_openai_zip_filepath()
+        default_configs["zip_file"] = most_recently_downloaded_zip()
 
     if not default_configs["output_folder"]:
         default_configs["output_folder"] = default_output_folder()

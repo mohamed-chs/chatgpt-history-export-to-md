@@ -51,7 +51,7 @@ The [Project Todo](TODO.md) and [JavaScript Todo](js/how_to_use.md#still-working
 See also a rough internal dependency graph of the project [here](assets/deps_graph.png) (the graph is not complete, but it gives a general idea of the project's structure). Generated using :
 
 ```bash
-pydeps main.py -o assets/deps_graph.png -T png --noshow --reverse --rankdir BT --exclude-exact models views controllers
+pydeps cli.py -o assets/deps_graph.png -T png --noshow --reverse --rankdir BT --exclude-exact models views controllers
 ```
 
 ## Documentation

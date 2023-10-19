@@ -1,4 +1,4 @@
-"""Main file for testing the program."""
+"""Main file for running the program from the command line."""
 
 import sys
 from pathlib import Path
@@ -11,12 +11,12 @@ from controllers.configuration import (
     update_config_file,
 )
 from controllers.file_system import (
+    conversation_set_from_json,
+    conversation_set_from_zip,
     create_n_save_all_weekwise_graphs,
     generate_n_save_all_wordclouds,
     get_bookmarklet_json_filepath,
-    load_conversations_from_bookmarklet_json,
-    load_conversations_from_openai_zip,
-    save_conversation_set_to_dir,
+    save_conversation_set,
     save_custom_instructions_to_file,
 )
 from models.conversation_set import ConversationSet
@@ -51,16 +51,14 @@ def main() -> None:
 
     zip_filepath = Path(configs_dict["zip_file"])
 
-    all_conversations_set: ConversationSet = load_conversations_from_openai_zip(
+    all_conversations_set: ConversationSet = conversation_set_from_zip(
         zip_filepath=zip_filepath,
     )
 
     bookmarklet_json_filepath: Path | None = get_bookmarklet_json_filepath()
     if bookmarklet_json_filepath:
         print("Found bookmarklet download, loading 📂 ...\n")
-        bookmarklet_conversations_set: (
-            ConversationSet
-        ) = load_conversations_from_bookmarklet_json(
+        bookmarklet_conversations_set: ConversationSet = conversation_set_from_json(
             json_filepath=bookmarklet_json_filepath,
         )
         all_conversations_set.update(conv_set=bookmarklet_conversations_set)
@@ -76,7 +74,7 @@ def main() -> None:
     markdown_folder: Path = output_folder / "Markdown"
     markdown_folder.mkdir(parents=True, exist_ok=True)
 
-    save_conversation_set_to_dir(
+    save_conversation_set(
         conv_set=all_conversations_set,
         dir_path=markdown_folder,
     )

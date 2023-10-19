@@ -87,7 +87,7 @@ powershell -ExecutionPolicy ByPass -File .venv\Scripts\Activate.ps1
 With the environment set up, you can now run the script. In the terminal or command prompt, execute:
 
 ```bash
-python main.py
+python cli.py
 ```
 
 Now, follow the instructions on screen and choose your desired options, the script will handle the rest.
