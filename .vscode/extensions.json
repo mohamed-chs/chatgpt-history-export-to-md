@@ -3,8 +3,8 @@
         "usernamehw.errorlens",
         "njqdev.vscode-python-typehint",
         "ms-python.python",
-        "matangover.mypy",
         "ms-toolsai.jupyter",
-        "charliermarsh.ruff"
+        "charliermarsh.ruff",
+        "matangover.mypy"
     ]
 }

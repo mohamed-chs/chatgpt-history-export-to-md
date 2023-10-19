@@ -8,7 +8,7 @@ from datetime import datetime, timedelta
 from re import Pattern
 from re import compile as re_compile
 from time import ctime
-from typing import Any
+from typing import Any, Literal
 
 from utils.utils import ensure_closed_code_blocks, replace_latex_delimiters
 
@@ -69,7 +69,9 @@ class Conversation:
 
         return nodes
 
-    def _author_nodes(self, author: str) -> list[Node]:
+    def _author_nodes(
+        self, author: Literal["user", "assistant", "system", "tool"]
+    ) -> list[Node]:
         """List of all nodes with the given author role in the conversation. (all branches)"""
         return [
             node
@@ -121,7 +123,9 @@ class Conversation:
             if node.message and node.message.author_role() in ("user", "assistant")
         )
 
-    def entire_author_text(self, author: str) -> str:
+    def entire_author_text(
+        self, author: Literal["user", "assistant", "system", "tool"]
+    ) -> str:
         """Entire raw text from the given author role in the conversation. (all branches)
 
         Useful for generating word clouds.
@@ -132,7 +136,9 @@ class Conversation:
             if node.message
         )
 
-    def author_message_timestamps(self, author: str) -> list[float]:
+    def author_message_timestamps(
+        self, author: Literal["user", "assistant", "system", "tool"]
+    ) -> list[float]:
         """List of all message timestamps from the given author role in the conversation.
         (all branches) Useful for generating time series plots.
         """

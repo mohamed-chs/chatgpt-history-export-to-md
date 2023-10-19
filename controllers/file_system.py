@@ -7,15 +7,13 @@ and configuration.py, but that's a placeholder for user input in whatever form,
 may be replaced later, with a GUI or something)
 """
 
-# pyright: reportUnknownMemberType=false
-
 
 from datetime import datetime
 from json import dump as json_dump
 from json import load as json_load
 from os import utime
 from pathlib import Path
-from typing import Any
+from typing import Any, Literal
 from zipfile import ZipFile
 
 from tqdm import tqdm
@@ -30,7 +28,7 @@ from .data_analysis import (
 
 
 def conversation_set_from_zip(zip_filepath: Path) -> ConversationSet:
-    """Load the conversations from the OpenAI zip export file."""
+    """Load the conversations from a zip file, containing a 'conversations.json' file."""
     with ZipFile(file=zip_filepath, mode="r") as file:
         file.extractall(path=zip_filepath.with_suffix(suffix=""))
 
@@ -45,7 +43,7 @@ def conversation_set_from_zip(zip_filepath: Path) -> ConversationSet:
 
 
 def conversation_set_from_json(json_filepath: Path) -> ConversationSet:
-    """Load the conversations from the bookmarklet json export file."""
+    """Load the conversations from a JSON file, containing an array of conversations."""
     with open(file=json_filepath, encoding="utf-8") as file:
         conversations = json_load(fp=file)
 
@@ -81,7 +79,7 @@ def save_conversation_set(conv_set: ConversationSet, dir_path: Path) -> None:
 def save_weekwise_graph_from_conversation_set(
     conv_set: ConversationSet,
     dir_path: Path,
-    time_period: tuple[datetime, str],
+    time_period: tuple[datetime, Literal["month", "year"]],
     **kwargs: Any,
 ) -> None:
     """Create a weekwise graph and saves it to the folder."""
@@ -140,7 +138,7 @@ def create_n_save_all_weekwise_graphs(
 def save_wordcloud_from_conversation_set(
     conv_set: ConversationSet,
     dir_path: Path,
-    time_period: tuple[datetime, str],
+    time_period: tuple[datetime, Literal["week", "month", "year"]],
     **kwargs: Any,
 ) -> None:
     """Create a wordcloud and saves it to the folder."""
@@ -151,10 +149,8 @@ def save_wordcloud_from_conversation_set(
             file_name = f"{time_period[0].strftime('%Y %B')}.png"
         case "year":
             file_name = f"{time_period[0].strftime('%Y')}.png"
-        case _:
-            raise ValueError("Invalid time period for wordcloud")
 
-    wordcloud_from_conversation_set(conv_set=conv_set, **kwargs).to_file(  # type: ignore
+    wordcloud_from_conversation_set(conv_set=conv_set, **kwargs).to_file(
         filename=dir_path / file_name,
     )
 
@@ -203,7 +199,7 @@ def generate_n_save_all_wordclouds(
         )
 
 
-def save_custom_instructions_to_file(conv_set: ConversationSet, filepath: Path) -> None:
+def save_custom_instructions(conv_set: ConversationSet, filepath: Path) -> None:
     """Create JSON file for custom instructions in the conversation set."""
     with open(file=filepath, mode="w", encoding="utf-8") as file:
         json_dump(obj=conv_set.all_custom_instructions(), fp=file, indent=2)
@@ -215,7 +211,7 @@ def default_output_folder() -> str:
     return str(object=Path.home() / "Documents" / "ChatGPT Data")
 
 
-def most_recently_downloaded_zip() -> str:
+def get_most_recently_downloaded_zip() -> str:
     """Path to the most recently created zip file in the Downloads folder."""
     downloads_folder: Path = Path.home() / "Downloads"
 
@@ -233,7 +229,6 @@ def get_bookmarklet_json_filepath() -> Path | None:
     """Path to the most recently downloaded JSON file, with "bookmarklet" in the name."""
     downloads_folder: Path = Path.home() / "Downloads"
 
-    # Filter out json files with names that do not contain "bookmarklet"
     bookmarklet_json_files: list[Path] = [
         x for x in downloads_folder.glob(pattern="*.json") if "bookmarklet" in x.name
     ]
@@ -241,7 +236,6 @@ def get_bookmarklet_json_filepath() -> Path | None:
     if not bookmarklet_json_files:
         return None
 
-    # Most recent json file in downloads folder, containing "bookmarklet"
     bookmarklet_json_filepath: Path = max(
         bookmarklet_json_files,
         key=lambda x: x.stat().st_ctime,

@@ -103,22 +103,18 @@ def prompt_user(default_configs: dict[str, Any]) -> dict[str, Any]:
 
     user_configs["wordcloud"] = {}
 
-    font_names: list[str] = get_font_names()
-
     user_configs["wordcloud"]["font"] = select(
         message="Select the font you want to use for the word clouds :",
-        choices=font_names,
+        choices=get_font_names(),
         default=default_configs["wordcloud"]["font"]
         if default_configs["wordcloud"]["font"]
         else None,
         style=custom_style,
     ).ask()
 
-    colormaps_list: list[str] = get_colormap_names()
-
     user_configs["wordcloud"]["colormap"] = select(
         message="Select the color theme you want to use for the word clouds :",
-        choices=colormaps_list,
+        choices=get_colormap_names(),
         default=default_configs["wordcloud"]["colormap"]
         if default_configs["wordcloud"]["colormap"]
         else None,

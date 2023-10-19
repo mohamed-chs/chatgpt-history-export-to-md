@@ -5,11 +5,7 @@ from pathlib import Path
 from shutil import rmtree
 from typing import Any
 
-from controllers.configuration import (
-    get_user_configs,
-    set_model_configs,
-    update_config_file,
-)
+from controllers.configuration import get_user_configs, save_configs, set_model_configs
 from controllers.file_system import (
     conversation_set_from_json,
     conversation_set_from_zip,
@@ -17,7 +13,7 @@ from controllers.file_system import (
     generate_n_save_all_wordclouds,
     get_bookmarklet_json_filepath,
     save_conversation_set,
-    save_custom_instructions_to_file,
+    save_custom_instructions,
 )
 from models.conversation_set import ConversationSet
 
@@ -113,7 +109,7 @@ def main() -> None:
 
     custom_instructions_filepath: Path = output_folder / "custom_instructions.json"
 
-    save_custom_instructions_to_file(
+    save_custom_instructions(
         conv_set=all_conversations_set,
         filepath=custom_instructions_filepath,
     )
@@ -122,7 +118,7 @@ def main() -> None:
         f"\nDone ✅ ! Check the output 📝 here : {custom_instructions_filepath.as_uri()} 🔗\n",
     )
 
-    update_config_file(user_configs=configs_dict)
+    save_configs(user_configs=configs_dict)
     print("(Settings ⚙️ have been updated and saved to 'config.json')\n")
 
     print(

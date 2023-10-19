@@ -3,7 +3,6 @@
 Should ideally only return matplotlib objects, and not deal with the filesystem.
 """
 
-# pyright: reportUnknownMemberType=false
 
 from collections import defaultdict
 from datetime import datetime
@@ -52,7 +51,7 @@ def weekwise_graph_from_timestamps(
     if month_name:
         ax.set_title(label=f"Prompt Count for {month_name}")
 
-    year: str | int = kwargs.get("year", "")
+    year: str = kwargs.get("year", "")
     if year:
         ax.set_title(label=f"Prompt Count for {year}")
 

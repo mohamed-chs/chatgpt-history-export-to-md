@@ -9,7 +9,7 @@ TODO: turn the conversations list into a dict, with the id as the key
 
 from datetime import datetime
 from time import ctime
-from typing import Any
+from typing import Any, Literal
 
 from .conversation import Conversation
 
@@ -94,7 +94,9 @@ class ConversationSet:
 
         return custom_instructions
 
-    def all_author_message_timestamps(self, author: str) -> list[float]:
+    def all_author_message_timestamps(
+        self, author: Literal["user", "assistant", "system", "tool"]
+    ) -> list[float]:
         """Get a list of all message timestamps, in all conversations in the list."""
         timestamps: list[float] = []
 
@@ -103,7 +105,9 @@ class ConversationSet:
 
         return timestamps
 
-    def all_author_text(self, author: str) -> str:
+    def all_author_text(
+        self, author: Literal["user", "assistant", "system", "tool"]
+    ) -> str:
         """Get a string of all text, in all conversations in the list."""
         return "\n".join(
             conversation.entire_author_text(author=author)
