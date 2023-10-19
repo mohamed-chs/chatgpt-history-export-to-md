@@ -205,7 +205,7 @@ class Conversation:
 
         return yaml
 
-    def to_markdown(self) -> str:
+    def markdown_text(self) -> str:
         """Returns the full markdown text content of the conversation."""
         markdown_config = self.configuration.get("markdown", {})
         latex_delimiters = markdown_config.get("latex_delimiters", "default")

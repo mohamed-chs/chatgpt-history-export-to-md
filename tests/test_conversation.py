@@ -152,7 +152,7 @@ def test_to_markdown() -> None:
     data: dict[str, Any] = sample_conversation_data()
     conversation = Conversation(conversation=data)
 
-    markdown: str = conversation.to_markdown()
+    markdown: str = conversation.markdown_text()
     assert "---" in markdown
     assert "# User" in markdown
     assert "Hello!" in markdown

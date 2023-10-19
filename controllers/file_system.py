@@ -64,7 +64,7 @@ def save_conversation_to_file(conversation: Conversation, filepath: Path) -> Non
         )
 
     with open(file=filepath, mode="w", encoding="utf-8") as file:
-        file.write(conversation.to_markdown())
+        file.write(conversation.markdown_text())
     utime(path=filepath, times=(conversation.update_time, conversation.update_time))
 
 
