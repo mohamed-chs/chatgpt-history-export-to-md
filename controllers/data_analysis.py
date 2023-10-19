@@ -3,28 +3,82 @@
 Should ideally only return matplotlib objects, and not deal with the filesystem.
 """
 
-from pathlib import Path
+# pyright: reportUnknownMemberType=false
+
+from collections import defaultdict
+from datetime import datetime
 from typing import Any
 
-import matplotlib.dates as mdates
-import matplotlib.pyplot as plt
 import nltk  # type: ignore
-import pandas as pd
 from matplotlib.axes import Axes
+from matplotlib.figure import Figure
 from nltk.corpus import stopwords  # type: ignore
-from pandas.core.series import Series
 from wordcloud import WordCloud  # type: ignore
 
 from models.conversation_set import ConversationSet
+
+
+def weekwise_graph_from_timestamps(
+    timestamps: list[float], **kwargs: Any
+) -> tuple[Figure, Axes]:
+    """Creates a timeseries graph from the given timestamps, collapsed on a weekly basis."""
+    dates: list[datetime] = [datetime.fromtimestamp(ts) for ts in timestamps]
+
+    weekday_counts: defaultdict[str, int] = defaultdict(int)
+    days: list[str] = [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday",
+        "Saturday",
+        "Sunday",
+    ]
+
+    for date in dates:
+        weekday_counts[days[date.weekday()]] += 1
+
+    x: list[str] = days
+    y: list[int] = [weekday_counts[day] for day in days]
+
+    fig: Figure = Figure()
+    ax: Axes = fig.add_subplot()
+
+    ax.bar(x=x, height=y)
+    ax.set_xlabel(xlabel="Weekday")
+    ax.set_ylabel(ylabel="Prompt Count")
+
+    month_name: str = kwargs.get("month_name", "")
+    if month_name:
+        ax.set_title(label=f"Prompt Count for {month_name}")
+
+    year: str | int = kwargs.get("year", "")
+    if year:
+        ax.set_title(label=f"Prompt Count for {year}")
+
+    ax.set_xticks(ticks=x)
+    ax.set_xticklabels(labels=x, rotation=45)
+    fig.tight_layout()
+
+    return fig, ax
+
+
+def weekwise_graph_from_conversation_set(
+    conv_set: ConversationSet,
+    **kwargs: Any,
+) -> tuple[Figure, Axes]:
+    """Creates a timeseries graph from the given conversation set."""
+    timestamps: list[float] = conv_set.all_author_message_timestamps(author="user")
+    return weekwise_graph_from_timestamps(timestamps=timestamps, **kwargs)
 
 
 # Ensure that the stopwords are downloaded
 def load_nltk_stopwords() -> set[str]:
     """Loads the nltk stopwords. Returns a set of stopwords."""
     try:
-        nltk.data.find(resource_name="corpora/stopwords")  # type: ignore
+        nltk.data.find(resource_name="corpora/stopwords")
     except LookupError:
-        nltk.download(info_or_id="stopwords")  # type: ignore
+        nltk.download(info_or_id="stopwords")
 
     languages: list[str] = [
         "arabic",
@@ -36,9 +90,7 @@ def load_nltk_stopwords() -> set[str]:
     ]  # add more languages here ...
 
     stop_words = set(
-        word
-        for lang in languages
-        for word in stopwords.words(fileids=lang)  # type: ignore
+        word for lang in languages for word in stopwords.words(fileids=lang)
     )
 
     return stop_words
@@ -48,7 +100,7 @@ def wordcloud_from_text(
     text: str,
     **kwargs: Any,
 ) -> WordCloud:
-    """Creates a wordcloud from the given text. Returns a WordCloud object."""
+    """Creates a wordcloud from the given text."""
     default_stopwords: set[str] = load_nltk_stopwords()
 
     custom_stopwords: str = kwargs.get("custom_stopwords", "")
@@ -81,7 +133,7 @@ def wordcloud_from_text(
         mode=mode,
         colormap=kwargs.get("colormap", "prism"),
         include_numbers=kwargs.get("include_numbers", False),
-    ).generate(  # type: ignore
+    ).generate(
         text=text,
     )
 
@@ -92,7 +144,7 @@ def wordcloud_from_conversation_set(
     conv_set: ConversationSet,
     **kwargs: Any,
 ) -> WordCloud:
-    """Creates a wordcloud from the given conversation set. Returns a WordCloud object."""
+    """Creates a wordcloud from the given conversation set."""
     text: str = (
         conv_set.all_author_text(author="user")
         + "\n"
@@ -100,50 +152,3 @@ def wordcloud_from_conversation_set(
     )
 
     return wordcloud_from_text(text=text, **kwargs)
-
-
-def create_save_graph(timestamps: list[float], file_path: Path) -> None:
-    """Creates and saves a graph from the given timestamps."""
-    df = pd.DataFrame(data=timestamps, columns=["timestamp"])  # type: ignore
-    df["datetime"] = pd.to_datetime(arg=df["timestamp"], unit="s")  # type: ignore
-
-    daily_counts: Series = df.groupby(by=df["datetime"].dt.date).size()  # type: ignore
-
-    plt.figure(figsize=(15, 7))  # type: ignore
-
-    daily_counts.plot(
-        kind="line",
-        marker="o",
-        linestyle="-",
-        linewidth=2,
-        markersize=8,
-        color="royalblue",
-        markeredgecolor="white",
-        markeredgewidth=0.5,
-    )
-
-    plt.title(  # type: ignore
-        label="ChatGPT Prompts per Day",
-        fontsize=20,
-        fontweight="bold",
-        pad=20,
-    )
-    plt.xlabel(xlabel="Month", fontsize=16, labelpad=15)  # type: ignore
-    plt.ylabel(ylabel="Number of Prompts", fontsize=16, labelpad=15)  # type: ignore
-    plt.xticks(fontsize=14)  # type: ignore
-    plt.yticks(fontsize=14)  # type: ignore
-
-    ax: Axes = plt.gca()
-    ax.xaxis.set_major_locator(locator=mdates.MonthLocator())  # type: ignore
-    ax.xaxis.set_major_formatter(formatter=mdates.DateFormatter(fmt="%B"))  # type: ignore
-
-    plt.xticks(rotation=45)  # type: ignore
-
-    plt.grid(visible=True, linestyle="--", linewidth=0.5, alpha=0.7)  # type: ignore
-
-    plt.tight_layout()  # type: ignore
-
-    plt.savefig(file_path)  # type: ignore
-
-    # close the plot
-    plt.close()  # type: ignore

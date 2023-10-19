@@ -10,9 +10,9 @@ from controllers.configuration import (
     set_model_configs,
     update_config_file,
 )
-from controllers.data_analysis import create_save_graph
 from controllers.file_system import (
-    generate_all_wordclouds,
+    create_n_save_all_weekwise_graphs,
+    generate_n_save_all_wordclouds,
     get_bookmarklet_json_filepath,
     load_conversations_from_bookmarklet_json,
     load_conversations_from_openai_zip,
@@ -86,13 +86,9 @@ def main() -> None:
     graph_folder: Path = output_folder / "Graphs"
     graph_folder.mkdir(parents=True, exist_ok=True)
 
-    print("Creating graph 📈 of prompts per day ...\n")
-
-    graph_path: Path = graph_folder / "all messages.png"
-
-    create_save_graph(
-        timestamps=all_conversations_set.all_author_message_timestamps(author="user"),
-        file_path=graph_path,
+    create_n_save_all_weekwise_graphs(
+        conv_set=all_conversations_set,
+        dir_path=graph_folder,
     )
 
     print(f"\nDone ✅ ! Check the output 📈 here : {graph_folder.as_uri()} 🔗\n")
@@ -105,7 +101,7 @@ def main() -> None:
     colormap: str = configs_dict["wordcloud"]["colormap"]
     custom_stopwords: str = configs_dict["wordcloud"]["custom_stopwords"]
 
-    generate_all_wordclouds(
+    generate_n_save_all_wordclouds(
         conv_set=all_conversations_set,
         dir_path=wordcloud_folder,
         font_path=font_path,

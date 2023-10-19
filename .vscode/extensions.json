@@ -1,6 +1,5 @@
 {
     "recommendations": [
-        "ms-python.black-formatter",
         "usernamehw.errorlens",
         "njqdev.vscode-python-typehint",
         "ms-python.python",

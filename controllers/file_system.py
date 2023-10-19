@@ -7,6 +7,9 @@ and configuration.py, but that's a placeholder for user input in whatever form,
 may be replaced later, with a GUI or something)
 """
 
+# pyright: reportUnknownMemberType=false
+
+
 from datetime import datetime
 from json import dump as json_dump
 from json import load as json_load
@@ -20,7 +23,10 @@ from tqdm import tqdm
 from models.conversation import Conversation
 from models.conversation_set import ConversationSet
 
-from .data_analysis import wordcloud_from_conversation_set
+from .data_analysis import (
+    weekwise_graph_from_conversation_set,
+    wordcloud_from_conversation_set,
+)
 
 
 def load_conversations_from_openai_zip(zip_filepath: Path) -> ConversationSet:
@@ -72,13 +78,74 @@ def save_conversation_set_to_dir(conv_set: ConversationSet, dir_path: Path) -> N
         save_conversation_to_file(conversation=conversation, filepath=file_path)
 
 
+def save_weekwise_graph_from_conversation_set(
+    conv_set: ConversationSet,
+    dir_path: Path,
+    time_period: tuple[datetime, str],
+    **kwargs: Any,
+) -> None:
+    """Create a weekwise graph and saves it to the folder."""
+    if time_period[1] == "month":
+        file_name: str = f"{time_period[0].strftime('%Y %B')}.png"
+        weekwise_graph_from_conversation_set(
+            conv_set=conv_set,
+            month_name=time_period[0].strftime("%B '%y"),
+            **kwargs,
+        )[0].savefig(
+            fname=dir_path / file_name,
+            dpi=300,
+        )
+    elif time_period[1] == "year":
+        file_name = f"{time_period[0].strftime('%Y')}.png"
+        weekwise_graph_from_conversation_set(
+            conv_set=conv_set, year=time_period[0].strftime("%Y"), **kwargs
+        )[0].savefig(
+            fname=dir_path / file_name,
+            dpi=300,
+        )
+    else:
+        raise ValueError("Invalid time period for weekwise graph")
+
+
+def create_n_save_all_weekwise_graphs(
+    conv_set: ConversationSet,
+    dir_path: Path,
+    **kwargs: Any,
+) -> None:
+    """Create the weekwise graphs and save them to the folder."""
+    months_dict: dict[datetime, ConversationSet] = conv_set.grouped_by_month()
+    years_dict: dict[datetime, ConversationSet] = conv_set.grouped_by_year()
+
+    for month in tqdm(
+        iterable=months_dict.keys(),
+        desc="Creating monthly weekwise graphs 📈 ",
+    ):
+        save_weekwise_graph_from_conversation_set(
+            conv_set=months_dict[month],
+            dir_path=dir_path,
+            time_period=(month, "month"),
+            **kwargs,
+        )
+
+    for year in tqdm(
+        iterable=years_dict.keys(),
+        desc="Creating yearly weekwise graphs 📈 ",
+    ):
+        save_weekwise_graph_from_conversation_set(
+            conv_set=years_dict[year],
+            dir_path=dir_path,
+            time_period=(year, "year"),
+            **kwargs,
+        )
+
+
 def save_wordcloud_from_conversation_set(
     conv_set: ConversationSet,
     dir_path: Path,
     time_period: tuple[datetime, str],
     **kwargs: Any,
 ) -> None:
-    """Create the wordclouds and save them to the folder."""
+    """Create a wordcloud and saves it to the folder."""
     match time_period[1]:
         case "week":
             file_name: str = f"{time_period[0].strftime('%Y week %W')}.png"
@@ -94,7 +161,7 @@ def save_wordcloud_from_conversation_set(
     )
 
 
-def generate_all_wordclouds(
+def generate_n_save_all_wordclouds(
     conv_set: ConversationSet,
     dir_path: Path,
     **kwargs: Any,
