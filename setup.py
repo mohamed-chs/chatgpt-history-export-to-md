@@ -6,7 +6,7 @@ import venv
 from pathlib import Path
 
 BASE_DIR: Path = Path(__file__).parent.resolve()
-VENV_DIR = BASE_DIR / ".venv"
+VENV_DIR: Path = BASE_DIR / ".venv"
 
 
 def create_virtual_environment() -> None:
