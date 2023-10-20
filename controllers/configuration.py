@@ -15,7 +15,7 @@ from views.prompt_user import prompt_user
 
 from .file_system import get_most_recently_downloaded_zip
 
-CONFIG_PATH = Path("config.json")
+CONFIG_PATH = Path("user_config.json")
 DEFAULT_OUTPUT_FOLDER: Path = Path.home() / "Documents" / "ChatGPT Data"
 
 

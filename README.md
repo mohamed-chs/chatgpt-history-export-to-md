@@ -130,6 +130,8 @@ See [contributing guide](CONTRIBUTING.md)
 
 ## Notes
 
+This project requires Python 3.8.7 or higher if on Windows. See [known issue](https://github.com/prompt-toolkit/python-prompt-toolkit/issues/1023#issue-534396318)
+
 This is just a small thing I coded to help me see my convos in beautiful markdown, in [Obsidian](https://obsidian.md/) (my go-to note-taking app).
 
 I wasn't a fan of the clunky, and sometimes paid, browser extensions.

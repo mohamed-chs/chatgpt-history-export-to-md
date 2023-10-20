@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import sys
 from pathlib import Path
 from shutil import rmtree
 from typing import TYPE_CHECKING, Any
@@ -20,15 +19,6 @@ from controllers.file_system import (
 
 if TYPE_CHECKING:
     from models.conversation_set import ConversationSet
-
-if sys.version_info < (3, 10):
-    print(
-        "Python 3.10 or higher is required to run this program.\n"
-        "Please download the latest version of Python at :\n"
-        "https://www.python.org/downloads/ 🔗, and try again.\n"
-        "Exiting...",
-    )
-    sys.exit(1)
 
 
 def main() -> None:
@@ -125,7 +115,7 @@ def main() -> None:
     )
 
     save_configs(user_configs=configs_dict)
-    print("(Settings ⚙️ have been updated and saved to 'config.json')\n")
+    print("(Settings ⚙️ have been updated and saved to 'user_config.json')\n")
 
     print(
         "ALL DONE 🎉🎉🎉 !\n\n"

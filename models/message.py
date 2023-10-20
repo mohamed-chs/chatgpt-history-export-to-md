@@ -33,17 +33,17 @@ class Message:
     def author_header(self) -> str:
         """Get the title header of the message based on the configs."""
         author_config: dict[str, Any] = self.configuration.get("author_headers", {})
-        match self.author_role():
-            case "user":
-                return author_config.get("user", "# User")
-            case "assistant":
-                return author_config.get("assistant", "# Assistant")
-            case "system":
-                return author_config.get("system", "### System")
-            case "tool":
-                return author_config.get("tool", "### Tool output")
-            case _:
-                return "### unknown-message-author"
+
+        if self.author_role() == "user":
+            return author_config.get("user", "# User")
+        if self.author_role() == "assistant":
+            return author_config.get("assistant", "# Assistant")
+        if self.author_role() == "system":
+            return author_config.get("system", "### System")
+        if self.author_role() == "tool":
+            return author_config.get("tool", "### Tool output")
+
+        return "### unknown-message-author"
 
     def content_text(self) -> str:
         """Get the text content of the message."""

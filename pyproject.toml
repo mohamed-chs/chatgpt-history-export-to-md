@@ -1,9 +1,13 @@
 [tool.ruff]
 select = ["ALL"]
 
-ignore = ["ANN101"] # missing-type-self
+ignore = [
+    "ANN101", # missing-type-self
+    "TD002",  # missing-todo-author
+    "TD003",  # missing-todo-link
+]
 
 [tool.ruff.per-file-ignores]
-"cli.py" = ["T201"]   # print statement
-"setup.py" = ["T201"] # print statement
+"cli.py" = ["T201"]   # print
+"setup.py" = ["T201"] # print
 "tests/*" = ["S101"]  # assert

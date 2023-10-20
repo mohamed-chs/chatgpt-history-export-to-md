@@ -28,15 +28,6 @@ def pip_install_requirements() -> None:
 
 
 if __name__ == "__main__":
-    if sys.version_info < (3, 10):
-        print(
-            "Python 3.10 or higher is required to run this program.\n"
-            "Please download the latest version of Python at :\n"
-            "https://www.python.org/downloads/ 🔗, and try again.\n"
-            "Exiting...",
-        )
-        sys.exit(1)
-
     print("Creating virtual environment...\n")
     create_virtual_environment()
     print("Installing requirements... (This may take a minute..)\n")
@@ -45,12 +36,12 @@ if __name__ == "__main__":
     print(
         "\nSetup completed successfully!\n"
         "\nTo activate the virtual environment, "
-        "use the following command based on your platform:",
+        "use the following command based on your platform:\n",
     )
     if sys.platform == "win32":
         print(
-            "\nFor Command Prompt:\n.venv\\Scripts\\activate.bat\n"
-            "\nFor PowerShell:\n.venv\\Scripts\\Activate.ps1\n",
+            "\nFor Command Prompt:\n\t.venv\\Scripts\\activate.bat\n"
+            "\nFor PowerShell:\n\t.venv\\Scripts\\Activate.ps1\n",
         )
     else:
-        print("\nsource .venv/bin/activate\n")
+        print("\n\tsource .venv/bin/activate\n")

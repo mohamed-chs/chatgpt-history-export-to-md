@@ -148,13 +148,12 @@ def save_wordcloud_from_conversation_set(
     **kwargs: Any,
 ) -> None:
     """Create a wordcloud and saves it to the folder."""
-    match time_period[1]:
-        case "week":
-            file_name: str = f"{time_period[0].strftime('%Y week %W')}.png"
-        case "month":
-            file_name = f"{time_period[0].strftime('%Y %B')}.png"
-        case "year":
-            file_name = f"{time_period[0].strftime('%Y')}.png"
+    if time_period[1] == "week":
+        file_name: str = f"{time_period[0].strftime('%Y week %W')}.png"
+    elif time_period[1] == "month":
+        file_name = f"{time_period[0].strftime('%Y %B')}.png"
+    elif time_period[1] == "year":
+        file_name = f"{time_period[0].strftime('%Y')}.png"
 
     wordcloud_from_conversation_set(conv_set=conv_set, **kwargs).to_file(
         filename=dir_path / file_name,

@@ -1,69 +1,120 @@
-# Contribution Guide
+# Contributing Guide
 
-Thanks for considering a contribution to this project. Whether you're fixing bugs, adding features, or updating documentation, your effort is appreciated.
+Hello and welcome! 🚀
 
-## For New Contributors
+Thank you for considering a contribution to this project. Your effort, whether it's fixing bugs, adding features, or improving documentation, is deeply valued.
 
-If this is your first time, welcome! The codebase is documented to help you get started.
+## First Time Contributing?
 
-## Test Environment
-
-Ensure you run tests in the provided [notebook](playground.ipynb) to validate your changes without causing regressions.
+If you're new here, fret not. The codebase is well-documented, guiding you step-by-step.
 
 ## Contribution Workflow
 
 1. **Fork the Repository**
 
-   Click the fork button to create your personal copy.
+   Start by forking the repository to your account.
 
-2. **Clone the Repository**
+2. **Clone Your Fork**
 
-   `git clone https://github.com/mohamed-chs/chatgpt-history-export-to-md.git`
+   ```bash
+   git clone https://github.com/YOUR_USERNAME/chatgpt-history-export-to-md.git
+   ```
 
 3. **Create a New Branch**
 
-   Navigate to your directory and create a branch:
+   Navigate to the cloned directory and initiate a new branch:
 
-   `git checkout -b branch-name`
+   ```bash
+   cd chatgpt-history-export-to-md
+   git checkout -b your-branch-name
+   ```
 
-4. **Make Your Changes**
+## Setting Up Your Development Environment
 
-   Update the code or documentation as needed.
+1. **Set Up a Virtual Environment with `venv`**
 
-5. **Commit Your Changes**
+   It's advisable to use a virtual environment for an isolated setup:
 
-   `git commit -m "Brief description of changes"`
+   ```bash
+   python -m venv .venv
+   source .venv/bin/activate  # On Windows, use `.venv\Scripts\activate`
+   ```
 
-6. **Push to Your Fork**
+2. **Install Development Dependencies**
 
-   `git push origin branch-name`
+   With your virtual environment activated:
 
-7. **Create a Pull Request**
+   ```bash
+   pip install -r requirements-dev.txt
+   ```
 
-   Navigate to the repository and submit a PR. Attach any relevant images or demos to facilitate the review process.
+3. **Development Workflow**
 
-## Suggestions
+   - **Format the code**:
 
-Check the `Issues` tab for bugs, enhancements, or first-timer tasks. If you have a new idea or improvement, feel free to open an issue.
+     ```bash
+     ruff format .
+     ```
 
-The [Project Todo](TODO.md) and [JavaScript Todo](js/how_to_use.md#still-working-on) also offer areas needing attention.
+   - **Lint the code**:
 
-See also a rough internal dependency graph of the project [here](assets/deps_graph.png) (the graph is not complete, but it gives a general idea of the project's structure). Generated using :
+     ```bash
+     ruff check .
+     ```
 
-```bash
-pydeps cli.py -o assets/deps_graph.png -T png --noshow --reverse --rankdir BT --exclude-exact models views controllers
-```
+   - **Type checks**:
 
-## Documentation
+     ```bash
+     mypy --install-types
+     mypy .
+     ```
 
-Refer to the in-code comments and docstrings for understanding and clarity.
+   - **Run tests**:
 
-## Code of Conduct
+     ```bash
+     python -m pytest
+     ```
 
-Maintain a respectful and professional demeanor. Constructive collaboration is key.
+4. **Additional testing**
 
-## Final Note
+   You can also check [notebook](playground.ipynb) to see how the output looks.
 
-Each contribution, irrespective of its scale, is valuable. Dive in and make a difference!
+## Committing and Pushing Changes
 
-Looking forward to your pull request.
+1. **Commit Your Changes**
+
+   ```bash
+   git commit -m "Descriptive message about your changes"
+   ```
+
+2. **Push Your Branch**
+
+   ```bash
+   git push origin your-branch-name
+   ```
+
+3. **Open a Pull Request (PR)**
+
+   Navigate to the main repository and initiate a PR. Including demos or screenshots will enrich the review process.
+
+**Note**: Before pushing your changes, ensure that you reset the `user_config.json` file to its original state. (unless you want to add or change the default values)
+
+## Seeking Contribution Ideas?
+
+- Peruse the `Issues` tab for open bugs or feature suggestions.
+- Explore the [Project Todo](TODO.md) and [JavaScript Todo](js/how_to_use.md#still-working-on).
+- Get a project overview from [here](assets/deps_graph.png). Generated using :
+
+  ```bash
+  pydeps cli.py -o assets/deps_graph.png -T png --noshow --reverse --rankdir BT --exclude-exact models views controllers utils
+  ```
+
+## Documentation Insights
+
+Engage with the codebase; in-code comments and docstrings offer ample context.
+
+## In Closing
+
+Every contribution, big or small, enriches the project. We eagerly await your additions!
+
+Catch you in the PRs! 🚀
