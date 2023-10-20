@@ -1,0 +1,7 @@
+[tool.ruff]
+select = ["ALL"]
+
+ignore = ["ANN101"]
+
+[tool.ruff.per-file-ignores]
+"{cli.py, setup.py}" = ["T201"]

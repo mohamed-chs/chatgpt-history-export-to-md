@@ -1,18 +1,20 @@
 """Represents a single message in a conversation. It's contained in a Node object.
-(it could be written in node.py, but I think it's better to separate them)
 
 object path : conversations.json -> conversation -> mapping -> mapping node -> message
 """
 
-from typing import Any
+from __future__ import annotations
+
+from typing import Any, ClassVar, Literal
 
 
 class Message:
     """A single message in a conversation."""
 
-    configuration: dict[str, Any] = {}
+    configuration: ClassVar[dict[str, Any]] = {}
 
     def __init__(self, message: dict[str, Any]) -> None:
+        """Initialize Message object."""
         self.id: str = message.get("id", None)
         self.author: dict[str, Any] = message.get("author", None)
         self.create_time: float = message.get("create_time", None)
@@ -24,11 +26,8 @@ class Message:
         self.metadata: dict[str, Any] = message.get("metadata", None)
         self.recipient: str = message.get("recipient", None)
 
-    def author_role(self) -> str:
-        """The role of the author of the message.
-
-        'user', 'assistant', 'system' or 'tool'.
-        """
+    def author_role(self) -> Literal["user", "assistant", "system", "tool"]:
+        """Return the role of the author of the message."""
         return self.author["role"]
 
     def author_header(self) -> str:
@@ -44,7 +43,7 @@ class Message:
             case "tool":
                 return author_config.get("tool", "### Tool output")
             case _:
-                return ""
+                return "### unknown-message-author"
 
     def content_text(self) -> str:
         """Get the text content of the message."""

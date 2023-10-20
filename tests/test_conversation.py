@@ -1,5 +1,7 @@
 """Tests for the Conversation class."""
 
+from __future__ import annotations
+
 from typing import Any
 
 from models.conversation import Conversation

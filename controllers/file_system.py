@@ -7,18 +7,17 @@ and configuration.py, but that's a placeholder for user input in whatever form,
 may be replaced later, with a GUI or something)
 """
 
+from __future__ import annotations
 
-from datetime import datetime
 from json import dump as json_dump
 from json import load as json_load
 from os import utime
 from pathlib import Path
-from typing import Any, Literal
+from typing import TYPE_CHECKING, Any, Literal
 from zipfile import ZipFile
 
 from tqdm import tqdm
 
-from models.conversation import Conversation
 from models.conversation_set import ConversationSet
 
 from .data_analysis import (
@@ -26,9 +25,14 @@ from .data_analysis import (
     wordcloud_from_conversation_set,
 )
 
+if TYPE_CHECKING:
+    from datetime import datetime
+
+    from models.conversation import Conversation
+
 
 def conversation_set_from_zip(zip_filepath: Path) -> ConversationSet:
-    """Load the conversations from a zip file, containing a 'conversations.json' file."""
+    """Load conversations from a zip file, containing a 'conversations.json' file."""
     with ZipFile(file=zip_filepath, mode="r") as file:
         file.extractall(path=zip_filepath.with_suffix(suffix=""))
 
@@ -36,7 +40,7 @@ def conversation_set_from_zip(zip_filepath: Path) -> ConversationSet:
         zip_filepath.with_suffix(suffix="") / "conversations.json"
     )
 
-    with open(file=conversations_path, encoding="utf-8") as file:
+    with conversations_path.open(encoding="utf-8") as file:
         conversations = json_load(fp=file)
 
     return ConversationSet(conversations=conversations)
@@ -44,7 +48,7 @@ def conversation_set_from_zip(zip_filepath: Path) -> ConversationSet:
 
 def conversation_set_from_json(json_filepath: Path) -> ConversationSet:
     """Load the conversations from a JSON file, containing an array of conversations."""
-    with open(file=json_filepath, encoding="utf-8") as file:
+    with json_filepath.open(encoding="utf-8") as file:
         conversations = json_load(fp=file)
 
     return ConversationSet(conversations=conversations)
@@ -61,7 +65,7 @@ def save_conversation(conversation: Conversation, filepath: Path) -> None:
             name=f"{base_file_name} ({counter}){filepath.suffix}",
         )
 
-    with open(file=filepath, mode="w", encoding="utf-8") as file:
+    with filepath.open(mode="w", encoding="utf-8") as file:
         file.write(conversation.markdown_text())
     utime(path=filepath, times=(conversation.update_time, conversation.update_time))
 
@@ -96,7 +100,9 @@ def save_weekwise_graph_from_conversation_set(
     elif time_period[1] == "year":
         file_name = f"{time_period[0].strftime('%Y')}.png"
         weekwise_graph_from_conversation_set(
-            conv_set=conv_set, year=time_period[0].strftime("%Y"), **kwargs
+            conv_set=conv_set,
+            year=time_period[0].strftime("%Y"),
+            **kwargs,
         )[0].savefig(
             fname=dir_path / file_name,
             dpi=300,
@@ -201,21 +207,15 @@ def generate_n_save_all_wordclouds(
 
 def save_custom_instructions(conv_set: ConversationSet, filepath: Path) -> None:
     """Create JSON file for custom instructions in the conversation set."""
-    with open(file=filepath, mode="w", encoding="utf-8") as file:
+    with filepath.open(mode="w", encoding="utf-8") as file:
         json_dump(obj=conv_set.all_custom_instructions(), fp=file, indent=2)
-
-
-def default_output_folder() -> str:
-    """Returns the default output folder path : ~/Documents/ChatGPT Data"""
-    # put the function here to isolate file system operations
-    return str(object=Path.home() / "Documents" / "ChatGPT Data")
 
 
 def get_most_recently_downloaded_zip() -> str:
     """Path to the most recently created zip file in the Downloads folder."""
     downloads_folder: Path = Path.home() / "Downloads"
 
-    zip_files: list[Path] = [x for x in downloads_folder.glob(pattern="*.zip")]
+    zip_files: list[Path] = list(downloads_folder.glob(pattern="*.zip"))
 
     if not zip_files:
         return ""
@@ -226,7 +226,7 @@ def get_most_recently_downloaded_zip() -> str:
 
 
 def get_bookmarklet_json_filepath() -> Path | None:
-    """Path to the most recently downloaded JSON file, with "bookmarklet" in the name."""
+    """Path to the most recent JSON file in Downloads with 'bookmarklet' in the name."""
     downloads_folder: Path = Path.home() / "Downloads"
 
     bookmarklet_json_files: list[Path] = [

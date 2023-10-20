@@ -1,5 +1,7 @@
 """Utility functions for the project."""
 
+from __future__ import annotations
+
 from pathlib import Path
 from re import sub
 from zipfile import ZipFile
@@ -7,8 +9,8 @@ from zipfile import ZipFile
 
 def ensure_closed_code_blocks(string: str) -> str:
     """Ensure that all code blocks are closed."""
-    # A code block can be opened with triple backticks, possibly followed by a language name.
-    # It can only be closed however with triple backticks, with nothing else on the line.
+    # A code block can be opened with triple backticks, possibly followed by a lang name
+    # It can only be closed however with triple backticks, with nothing else on the line
 
     open_code_block = False
 
@@ -33,13 +35,12 @@ def replace_latex_delimiters(string: str) -> str:
     string = sub(pattern=r"\\\[", repl="$$", string=string)
     string = sub(pattern=r"\\\]", repl="$$", string=string)
     string = sub(pattern=r"\\\(", repl="$", string=string)
-    string = sub(pattern=r"\\\)", repl="$", string=string)
 
-    return string
+    return sub(pattern=r"\\\)", repl="$", string=string)
 
 
 def get_font_names() -> list[str]:
-    """Returns a list of all the font names in the assets/fonts folder."""
+    """Return a list of all the font names in the assets/fonts folder."""
     fonts_path = Path("assets/fonts")
     font_names: list[str] = [
         font.stem for font in fonts_path.iterdir() if font.is_file()
@@ -48,17 +49,17 @@ def get_font_names() -> list[str]:
 
 
 def get_colormap_names() -> list[str]:
-    """Returns a list of all the colormap names in the assets/colormaps.txt file."""
+    """Return a list of all the colormap names in the assets/colormaps.txt file."""
     colormaps_path = Path("assets/colormaps.txt")
 
-    with open(file=colormaps_path, encoding="utf-8") as file:
+    with colormaps_path.open(encoding="utf-8") as file:
         colormaps_list: list[str] = file.read().splitlines()
 
     return colormaps_list
 
 
 def validate_zip_file(path_str: str) -> bool:
-    """Returns True if the given path is a zip file with a 'conversations.json' file."""
+    """Return True if the given path is a zip file with a 'conversations.json' file."""
     if not Path(path_str).is_file() or Path(path_str).suffix != ".zip":
         return False
     with ZipFile(file=path_str) as zip_ref:

@@ -1,9 +1,11 @@
 """Main file for running the program from the command line."""
 
+from __future__ import annotations
+
 import sys
 from pathlib import Path
 from shutil import rmtree
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from controllers.configuration import get_user_configs, save_configs, set_model_configs
 from controllers.file_system import (
@@ -15,7 +17,9 @@ from controllers.file_system import (
     save_conversation_set,
     save_custom_instructions,
 )
-from models.conversation_set import ConversationSet
+
+if TYPE_CHECKING:
+    from models.conversation_set import ConversationSet
 
 if sys.version_info < (3, 10):
     print(
@@ -28,13 +32,14 @@ if sys.version_info < (3, 10):
 
 
 def main() -> None:
-    """Main function."""
+    """Run the program."""
     print(
         "Welcome to ChatGPT Data Visualizer ✨📊!\n\n"
         "Follow the instructions in the command line.\n\n"
         "Press 'ENTER' to select the default options.\n\n"
         "If you encounter any issues 🐛, please report 🚨 them here:\n\n"
-        "➡️ https://github.com/mohamed-chs/chatgpt-history-export-to-md/issues/new/choose 🔗\n\n",
+        "➡️ https://github.com/mohamed-chs/chatgpt-history-export-to-md/issues/new/choose"
+        " 🔗\n\n",
     )
 
     configs_dict: dict[str, Any] = get_user_configs()
@@ -115,7 +120,8 @@ def main() -> None:
     )
 
     print(
-        f"\nDone ✅ ! Check the output 📝 here : {custom_instructions_filepath.as_uri()} 🔗\n",
+        "\nDone ✅ ! Check the output 📝 here :"
+        f" {custom_instructions_filepath.as_uri()} 🔗\n",
     )
 
     save_configs(user_configs=configs_dict)

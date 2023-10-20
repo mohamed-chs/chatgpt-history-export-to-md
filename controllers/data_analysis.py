@@ -3,25 +3,31 @@
 Should ideally only return matplotlib objects, and not deal with the filesystem.
 """
 
+from __future__ import annotations
 
 from collections import defaultdict
-from datetime import datetime
-from typing import Any
+from datetime import datetime, timezone
+from typing import TYPE_CHECKING, Any
 
-import nltk  # type: ignore
-from matplotlib.axes import Axes
+import nltk  # type: ignore[import-untyped]
 from matplotlib.figure import Figure
-from nltk.corpus import stopwords  # type: ignore
-from wordcloud import WordCloud  # type: ignore
+from nltk.corpus import stopwords  # type: ignore[import-untyped]
+from wordcloud import WordCloud  # type: ignore[import-untyped]
 
-from models.conversation_set import ConversationSet
+if TYPE_CHECKING:
+    from matplotlib.axes import Axes
+
+    from models.conversation_set import ConversationSet
 
 
 def weekwise_graph_from_timestamps(
-    timestamps: list[float], **kwargs: Any
+    timestamps: list[float],
+    **kwargs: str,
 ) -> tuple[Figure, Axes]:
-    """Creates a timeseries graph from the given timestamps, collapsed on a weekly basis."""
-    dates: list[datetime] = [datetime.fromtimestamp(ts) for ts in timestamps]
+    """Create a bar graph from the given timestamps, collapsed on one week."""
+    dates: list[datetime] = [
+        datetime.fromtimestamp(ts, tz=timezone.utc) for ts in timestamps
+    ]
 
     weekday_counts: defaultdict[str, int] = defaultdict(int)
     days: list[str] = [
@@ -64,16 +70,16 @@ def weekwise_graph_from_timestamps(
 
 def weekwise_graph_from_conversation_set(
     conv_set: ConversationSet,
-    **kwargs: Any,
+    **kwargs: str,
 ) -> tuple[Figure, Axes]:
-    """Creates a timeseries graph from the given conversation set."""
+    """Create a bar graph from the given conversation set."""
     timestamps: list[float] = conv_set.all_author_message_timestamps(author="user")
     return weekwise_graph_from_timestamps(timestamps=timestamps, **kwargs)
 
 
 # Ensure that the stopwords are downloaded
 def load_nltk_stopwords() -> set[str]:
-    """Loads the nltk stopwords. Returns a set of stopwords."""
+    """Load nltk stopwords."""
     try:
         nltk.data.find(resource_name="corpora/stopwords")
     except LookupError:
@@ -88,9 +94,9 @@ def load_nltk_stopwords() -> set[str]:
         "portuguese",
     ]  # add more languages here ...
 
-    stop_words = set(
+    stop_words: set[str] = {
         word for lang in languages for word in stopwords.words(fileids=lang)
-    )
+    }
 
     return stop_words
 
@@ -99,7 +105,7 @@ def wordcloud_from_text(
     text: str,
     **kwargs: Any,
 ) -> WordCloud:
-    """Creates a wordcloud from the given text."""
+    """Create a wordcloud from the given text."""
     default_stopwords: set[str] = load_nltk_stopwords()
 
     custom_stopwords: str = kwargs.get("custom_stopwords", "")
@@ -112,13 +118,11 @@ def wordcloud_from_text(
 
     stop_words: set[str] = default_stopwords.union(set(custom_stopwords_list))
 
-    background_color = kwargs.get("background_color", None)
+    background_color: str | None = kwargs.get("background_color", None)
     if background_color is None:
-        mode = kwargs.get("mode", "RGBA")
+        mode: str = kwargs.get("mode", "RGBA")
     else:
         mode = kwargs.get("mode", "RGB")
-
-    # TODO: add more arguments here ...
 
     wordcloud: WordCloud = WordCloud(
         font_path=kwargs.get(
@@ -143,7 +147,7 @@ def wordcloud_from_conversation_set(
     conv_set: ConversationSet,
     **kwargs: Any,
 ) -> WordCloud:
-    """Creates a wordcloud from the given conversation set."""
+    """Create a wordcloud from the given conversation set."""
     text: str = (
         conv_set.all_author_text(author="user")
         + "\n"

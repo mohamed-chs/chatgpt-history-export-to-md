@@ -1,5 +1,7 @@
 """Tests for the Node class."""
 
+from __future__ import annotations
+
 from typing import Any
 
 from models.message import Message

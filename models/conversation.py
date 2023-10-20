@@ -1,27 +1,31 @@
-"""Just a placeholder for now.
-a bunch of classes and functions to handle conversations, messages, stats, etc.
+"""Conversation model. Represents a single ChatGPT chat.
 
 object path : conversations.json -> conversation (one of the list items)
 """
 
-from datetime import datetime, timedelta
+from __future__ import annotations
+
+from datetime import datetime, timedelta, timezone
 from re import Pattern
 from re import compile as re_compile
 from time import ctime
-from typing import Any, Literal
+from typing import TYPE_CHECKING, Any, ClassVar, Literal
 
 from utils.utils import ensure_closed_code_blocks, replace_latex_delimiters
 
-from .message import Message
 from .node import Node
+
+if TYPE_CHECKING:
+    from .message import Message
 
 
 class Conversation:
     """Stores the conversation object from the conversations.json file."""
 
-    configuration: dict[str, Any] = {}
+    configuration: ClassVar[dict[str, Any]] = {}
 
     def __init__(self, conversation: dict[str, Any]) -> None:
+        """Initialize Conversation object."""
         self.title: str = conversation.get("title", None)
         self.create_time: float = conversation.get("create_time", None)
         self.update_time: float = conversation.get("update_time", None)
@@ -61,18 +65,14 @@ class Conversation:
         return nodes
 
     def _all_message_nodes(self) -> list[Node]:
-        """List of all nodes that have a message in the conversation, including all branches."""
-        nodes: list[Node] = []
-        for _, node in self.mapping.items():
-            if node.message:
-                nodes.append(node)
-
-        return nodes
+        """List of all nodes that have a message, including all branches."""
+        return [node for node in self.mapping.values() if node.message]
 
     def _author_nodes(
-        self, author: Literal["user", "assistant", "system", "tool"]
+        self,
+        author: Literal["user", "assistant", "system", "tool"],
     ) -> list[Node]:
-        """List of all nodes with the given author role in the conversation. (all branches)"""
+        """List of all nodes with the given author role (all branches)."""
         return [
             node
             for node in self._all_message_nodes()
@@ -80,15 +80,16 @@ class Conversation:
         ]
 
     def _branch_indicator(self, node: Node) -> str:
-        """Get the branch indicator for the given node."""
+        """Get the branch indicator for the given node.
+
+        (yet to be implemented ...)
+        """
         if node in self._main_branch_nodes():
             return "(main branch ⎇)"
         return "(other branch ⎇)"
 
-        # TODO: placeholder for now, to be implemented later
-
     def leaf_count(self) -> int:
-        """Number of leaves in the conversation."""
+        """Return the number of leaves in the conversation."""
         return sum(1 for node in self._all_message_nodes() if not node.children)
 
     def has_multiple_branches(self) -> bool:
@@ -96,27 +97,21 @@ class Conversation:
         return self.leaf_count() > 1
 
     def chat_link(self) -> str:
-        """Chat URL.
-
-        Links to the original chat, not a 'shared' one. Needs user's login to chat.openai.com.
-        """
+        """Chat URL."""
         return f"https://chat.openai.com/c/{self.conversation_id}"
 
     def content_types(self) -> list[str]:
-        """List of all content types in the conversation. (all branches)
-
-        (e.g. text, code, execution_output, etc.)
-        """
+        """List of all content types in the conversation (all branches)."""
         return list(
-            set(
+            {
                 node.message.content_type()
                 for node in self._all_message_nodes()
                 if node.message
-            ),
+            },
         )
 
     def message_count(self) -> int:
-        """Number of 'user' and 'assistant' messages in the conversation. (all branches)"""
+        """Return the number of 'user' and 'assistant' messages (all branches)."""
         return sum(
             1
             for node in self._all_message_nodes()
@@ -124,9 +119,10 @@ class Conversation:
         )
 
     def entire_author_text(
-        self, author: Literal["user", "assistant", "system", "tool"]
+        self,
+        author: Literal["user", "assistant", "system", "tool"],
     ) -> str:
-        """Entire raw text from the given author role in the conversation. (all branches)
+        """Entire raw text from the given author role (all branches).
 
         Useful for generating word clouds.
         """
@@ -137,10 +133,12 @@ class Conversation:
         )
 
     def author_message_timestamps(
-        self, author: Literal["user", "assistant", "system", "tool"]
+        self,
+        author: Literal["user", "assistant", "system", "tool"],
     ) -> list[float]:
-        """List of all message timestamps from the given author role in the conversation.
-        (all branches) Useful for generating time series plots.
+        """List of all message timestamps from the given author role (all branches).
+
+        Useful for generating time graphs.
         """
         return [
             node.message.create_time
@@ -163,15 +161,15 @@ class Conversation:
     def used_plugins(self) -> list[str]:
         """List of all ChatGPT plugins used in the conversation."""
         return list(
-            set(
+            {
                 node.message.metadata["invoked_plugin"]["namespace"]
                 for node in self._author_nodes(author="tool")
                 if node.message and node.message.metadata.get("invoked_plugin")
-            ),
+            },
         )
 
     def custom_instructions(self) -> dict[str, str]:
-        """Custom instructions used for the conversation."""
+        """Return custom instructions used for the conversation."""
         system_nodes: list[Node] = self._author_nodes(author="system")
         if len(system_nodes) < 2:
             return {}
@@ -183,7 +181,7 @@ class Conversation:
             return context_message.metadata.get("user_context_message_data", {})
         return {}
 
-        # TODO: check if this is the same for conversations from the bookmarklet download
+        # TODO: check if this is the same for conversations from the bookmarklet
 
     def yaml_header(self) -> str:
         """YAML metadata header for the conversation."""
@@ -212,7 +210,7 @@ class Conversation:
         return yaml
 
     def markdown_text(self) -> str:
-        """Returns the full markdown text content of the conversation."""
+        """Return the full markdown text content of the conversation."""
         markdown_config = self.configuration.get("markdown", {})
         latex_delimiters = markdown_config.get("latex_delimiters", "default")
 
@@ -245,33 +243,30 @@ class Conversation:
         """Get diverse insightful stats on the conversation."""
         return {}
 
-        # TODO: add stats
-
     def start_of_year(self) -> datetime:
-        """Returns the first of January of the year the conversation was created in,
-        as a datetime object.
-        """
+        """Return the first of January of the year the conversation was created in."""
         return datetime(
-            year=datetime.fromtimestamp(self.create_time).year,
+            year=datetime.fromtimestamp(self.create_time, tz=timezone.utc).year,
             month=1,
             day=1,
+            tzinfo=timezone.utc,
         )
 
     def start_of_month(self) -> datetime:
-        """Returns the first of the month the conversation was created in,
-        as a datetime object.
-        """
+        """Return the first of the month the conversation was created in."""
         return datetime(
-            year=datetime.fromtimestamp(self.create_time).year,
-            month=datetime.fromtimestamp(self.create_time).month,
+            year=datetime.fromtimestamp(self.create_time, tz=timezone.utc).year,
+            month=datetime.fromtimestamp(self.create_time, tz=timezone.utc).month,
             day=1,
+            tzinfo=timezone.utc,
         )
 
     def start_of_week(self) -> datetime:
-        """Returns the monday of the week the conversation was created in,
-        as a datetime object.
-        """
-        start_of_week: datetime = datetime.fromtimestamp(self.create_time) - timedelta(
-            days=datetime.fromtimestamp(self.create_time).weekday(),
+        """Return the monday of the week the conversation was created in."""
+        start_of_week: datetime = datetime.fromtimestamp(
+            self.create_time,
+            tz=timezone.utc,
+        ) - timedelta(
+            days=datetime.fromtimestamp(self.create_time, tz=timezone.utc).weekday(),
         )
         return start_of_week.replace(hour=0, minute=0, second=0, microsecond=0)

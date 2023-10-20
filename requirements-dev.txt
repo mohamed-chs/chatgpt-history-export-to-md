@@ -2,4 +2,3 @@
 pytest
 mypy
 ruff
-isort

@@ -1,5 +1,7 @@
 """Module for the questionary user interface."""
 
+from __future__ import annotations
+
 from typing import Any
 
 from questionary import Choice, Style, checkbox, path, select, text
@@ -8,7 +10,7 @@ from utils.utils import get_colormap_names, get_font_names, validate_zip_file
 
 
 def validate_header(string: str) -> bool:
-    """Returns True if the given text is a valid markdown header."""
+    """Return True if the given text is a valid markdown header."""
     return (
         1 <= string.count("#") <= 6
         and string.startswith("#")
@@ -58,7 +60,7 @@ def prompt_user(default_configs: dict[str, Any]) -> dict[str, Any]:
 
     user_configs["message"]["author_headers"] = {}
 
-    for author_role in default_configs["message"]["author_headers"].keys():
+    for author_role in default_configs["message"]["author_headers"]:
         user_configs["message"]["author_headers"][author_role] = text(
             message=f"Enter the message header (#) for messages from '{author_role}' :",
             default=default_configs["message"]["author_headers"][author_role],
@@ -96,7 +98,7 @@ def prompt_user(default_configs: dict[str, Any]) -> dict[str, Any]:
         style=custom_style,
     ).ask()
 
-    for header in default_configs["conversation"]["yaml"].keys():
+    for header in default_configs["conversation"]["yaml"]:
         user_configs["conversation"]["yaml"][header] = header in selected_headers
 
     # ------------------------ word clouds ------------------------

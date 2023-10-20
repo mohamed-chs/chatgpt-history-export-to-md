@@ -1,5 +1,7 @@
 """Tests for the Message class."""
 
+from __future__ import annotations
+
 from typing import Any, Literal
 
 import pytest
@@ -46,18 +48,24 @@ def test_author_role() -> None:
 
 
 @pytest.mark.parametrize(
-    "role, header",
+    ("role", "header"),
     [
         ("user", "# User"),
         ("assistant", "# Assistant"),
         ("system", "### System"),
         ("tool", "### Tool output"),
-        ("unknown", ""),
+        ("unknown", "### unknown-message-author"),
     ],
 )
 def test_author_header(
     role: Literal["user", "assistant", "system", "tool", "unknown"],
-    header: Literal["# User", "# Assistant", "### System", "### Tool output", ""],
+    header: Literal[
+        "# User",
+        "# Assistant",
+        "### System",
+        "### Tool output",
+        "### unknown-message-author",
+    ],
 ) -> None:
     """Test author_header method."""
     Message.configuration = {"author_headers": {}}

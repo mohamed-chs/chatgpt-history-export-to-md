@@ -1,4 +1,5 @@
-"""Node class and methods for the node object in a conversation
+"""Node class and methods for the node object in a conversation.
+
 object path : conversations.json -> conversation -> mapping -> mapping node
 
 will implement methods to handle conversation branches, like
@@ -7,7 +8,9 @@ get the branch of a given node,
 and some other version control stuff
 """
 
-from typing import Any, Optional
+from __future__ import annotations
+
+from typing import Any, ClassVar
 
 from .message import Message
 
@@ -15,28 +18,29 @@ from .message import Message
 class Node:
     """Node class for representing a node in a conversation tree."""
 
-    configuration: dict[str, Any] = {}
+    configuration: ClassVar[dict[str, Any]] = {}
 
     def __init__(
         self,
         n_id: str,
         msg: Message | None,
-        parent: Optional["Node"],
-        children: Optional[list["Node"]],
+        parent: Node | None,
+        children: list[Node] | None,
     ) -> None:
+        """Initialize Node object."""
         self.id: str = n_id
         self.message: Message | None = msg
         self.parent: Node | None = parent
         self.children: list[Node] = children if children else []
 
-    def add_child(self, node: "Node") -> None:
+    def add_child(self, node: Node) -> None:
         """Add a child to the node."""
         self.children.append(node)
         node.parent = self
 
     @staticmethod
-    def nodes_from_mapping(mapping: dict[str, Any]) -> dict[str, "Node"]:
-        """Returns a dictionary of connected Node objects, based on the mapping."""
+    def nodes_from_mapping(mapping: dict[str, Any]) -> dict[str, Node]:
+        """Return a dictionary of connected Node objects, based on the mapping."""
         nodes: dict[str, Node] = {}
 
         # First pass: Create nodes
