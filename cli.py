@@ -10,8 +10,8 @@ from controllers.configuration import get_user_configs, save_configs, set_model_
 from controllers.file_system import (
     conversation_set_from_json,
     conversation_set_from_zip,
-    create_n_save_all_weekwise_graphs,
-    generate_n_save_all_wordclouds,
+    create_all_weekwise_graphs,
+    create_all_wordclouds,
     get_bookmarklet_json_filepath,
     save_conversation_set,
     save_custom_instructions,
@@ -75,7 +75,7 @@ def main() -> None:
     graph_folder: Path = output_folder / "Graphs"
     graph_folder.mkdir(parents=True, exist_ok=True)
 
-    create_n_save_all_weekwise_graphs(
+    create_all_weekwise_graphs(
         conv_set=all_conversations_set,
         dir_path=graph_folder,
     )
@@ -90,7 +90,7 @@ def main() -> None:
     colormap: str = configs_dict["wordcloud"]["colormap"]
     custom_stopwords: str = configs_dict["wordcloud"]["custom_stopwords"]
 
-    generate_n_save_all_wordclouds(
+    create_all_wordclouds(
         conv_set=all_conversations_set,
         dir_path=wordcloud_folder,
         font_path=font_path,

@@ -4,7 +4,18 @@ from __future__ import annotations
 
 from typing import Any
 
-from questionary import Choice, Style, checkbox, path, select, text
+from questionary import (
+    Choice,
+    Style,
+    checkbox,
+    select,
+)
+from questionary import (
+    path as qst_path,
+)
+from questionary import (
+    text as qst_text,
+)
 
 from utils.utils import get_colormap_names, get_font_names, validate_zip_file
 
@@ -39,14 +50,14 @@ def prompt_user(default_configs: dict[str, Any]) -> dict[str, Any]:
 
     # ------------------------ zip file and output folder ------------------------
 
-    user_configs["zip_file"] = path(
+    user_configs["zip_file"] = qst_path(
         message="Enter the path to the zip file :",
         default=default_configs["zip_file"],
         validate=validate_zip_file,
         style=custom_style,
     ).ask()
 
-    user_configs["output_folder"] = path(
+    user_configs["output_folder"] = qst_path(
         message="Enter the path to the output folder :",
         default=default_configs["output_folder"],
         style=custom_style,
@@ -61,7 +72,7 @@ def prompt_user(default_configs: dict[str, Any]) -> dict[str, Any]:
     user_configs["message"]["author_headers"] = {}
 
     for author_role in default_configs["message"]["author_headers"]:
-        user_configs["message"]["author_headers"][author_role] = text(
+        user_configs["message"]["author_headers"][author_role] = qst_text(
             message=f"Enter the message header (#) for messages from '{author_role}' :",
             default=default_configs["message"]["author_headers"][author_role],
             validate=validate_header,
@@ -123,7 +134,7 @@ def prompt_user(default_configs: dict[str, Any]) -> dict[str, Any]:
         style=custom_style,
     ).ask()
 
-    user_configs["wordcloud"]["custom_stopwords"] = text(
+    user_configs["wordcloud"]["custom_stopwords"] = qst_text(
         message="Enter custom stopwords (separated by commas) :",
         default=default_configs["wordcloud"]["custom_stopwords"],
         style=custom_style,

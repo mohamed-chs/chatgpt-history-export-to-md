@@ -9,9 +9,10 @@ from collections import defaultdict
 from datetime import datetime, timezone
 from typing import TYPE_CHECKING, Any
 
-import nltk  # type: ignore[import-untyped]
 from matplotlib.figure import Figure
-from nltk.corpus import stopwords  # type: ignore[import-untyped]
+from nltk import data as nltk_data  # type: ignore[import-untyped]
+from nltk import download as nltk_download  # type: ignore[import-untyped]
+from nltk.corpus import stopwords as nltk_stopwords  # type: ignore[import-untyped]
 from wordcloud import WordCloud  # type: ignore[import-untyped]
 
 if TYPE_CHECKING:
@@ -23,7 +24,7 @@ if TYPE_CHECKING:
 def weekwise_graph_from_timestamps(
     timestamps: list[float],
     **kwargs: str,
-) -> tuple[Figure, Axes]:
+) -> Figure:
     """Create a bar graph from the given timestamps, collapsed on one week."""
     dates: list[datetime] = [
         datetime.fromtimestamp(ts, tz=timezone.utc) for ts in timestamps
@@ -65,13 +66,13 @@ def weekwise_graph_from_timestamps(
     ax.set_xticklabels(labels=x, rotation=45)
     fig.tight_layout()
 
-    return fig, ax
+    return fig
 
 
 def weekwise_graph_from_conversation_set(
     conv_set: ConversationSet,
     **kwargs: str,
-) -> tuple[Figure, Axes]:
+) -> Figure:
     """Create a bar graph from the given conversation set."""
     timestamps: list[float] = conv_set.all_author_message_timestamps(author="user")
     return weekwise_graph_from_timestamps(timestamps=timestamps, **kwargs)
@@ -81,9 +82,9 @@ def weekwise_graph_from_conversation_set(
 def load_nltk_stopwords() -> set[str]:
     """Load nltk stopwords."""
     try:
-        nltk.data.find(resource_name="corpora/stopwords")
+        nltk_data.find(resource_name="corpora/stopwords")
     except LookupError:
-        nltk.download(info_or_id="stopwords")
+        nltk_download(info_or_id="stopwords")
 
     languages: list[str] = [
         "arabic",
@@ -94,11 +95,7 @@ def load_nltk_stopwords() -> set[str]:
         "portuguese",
     ]  # add more languages here ...
 
-    stop_words: set[str] = {
-        word for lang in languages for word in stopwords.words(fileids=lang)
-    }
-
-    return stop_words
+    return {word for lang in languages for word in nltk_stopwords.words(fileids=lang)}
 
 
 def wordcloud_from_text(

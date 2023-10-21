@@ -11,7 +11,7 @@ from __future__ import annotations
 
 from json import dump as json_dump
 from json import load as json_load
-from os import utime
+from os import utime as os_utime
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Literal
 from zipfile import ZipFile
@@ -28,22 +28,13 @@ from .data_analysis import (
 if TYPE_CHECKING:
     from datetime import datetime
 
+    from matplotlib.figure import Figure
+    from wordcloud import WordCloud  # type: ignore[import-untyped]
+
     from models.conversation import Conversation
 
 
-def conversation_set_from_zip(zip_filepath: Path) -> ConversationSet:
-    """Load conversations from a zip file, containing a 'conversations.json' file."""
-    with ZipFile(file=zip_filepath, mode="r") as file:
-        file.extractall(path=zip_filepath.with_suffix(suffix=""))
-
-    conversations_path: Path = (
-        zip_filepath.with_suffix(suffix="") / "conversations.json"
-    )
-
-    with conversations_path.open(encoding="utf-8") as file:
-        conversations = json_load(fp=file)
-
-    return ConversationSet(conversations=conversations)
+DOWNLOADS_PATH: Path = Path.home() / "Downloads"
 
 
 def conversation_set_from_json(json_filepath: Path) -> ConversationSet:
@@ -54,8 +45,23 @@ def conversation_set_from_json(json_filepath: Path) -> ConversationSet:
     return ConversationSet(conversations=conversations)
 
 
+def extract_zip(zip_filepath: Path) -> Path:
+    """Extract the zip file to the same folder."""
+    with ZipFile(file=zip_filepath, mode="r") as file:
+        file.extractall(path=zip_filepath.with_suffix(suffix=""))
+
+    return zip_filepath.with_suffix(suffix="")
+
+
+def conversation_set_from_zip(zip_filepath: Path) -> ConversationSet:
+    """Load conversations from a zip file, containing a 'conversations.json' file."""
+    return conversation_set_from_json(
+        json_filepath=extract_zip(zip_filepath=zip_filepath) / "conversations.json",
+    )
+
+
 def save_conversation(conversation: Conversation, filepath: Path) -> None:
-    """Save a conversation to a file, with added modification time."""
+    """Save the conversation to the file, with added modification time."""
     base_file_name: str = filepath.stem
 
     counter = 0
@@ -67,17 +73,24 @@ def save_conversation(conversation: Conversation, filepath: Path) -> None:
 
     with filepath.open(mode="w", encoding="utf-8") as file:
         file.write(conversation.markdown_text())
-    utime(path=filepath, times=(conversation.update_time, conversation.update_time))
+    os_utime(path=filepath, times=(conversation.update_time, conversation.update_time))
 
 
 def save_conversation_set(conv_set: ConversationSet, dir_path: Path) -> None:
-    """Save a conversation set to a directory, one markdown file per conversation."""
+    """Save the conversation set to the directory."""
     for conversation in tqdm(
         iterable=conv_set.conversation_list,
         desc="Writing Markdown 📄 files",
     ):
-        file_path: Path = dir_path / f"{conversation.sanitized_title()}.md"
-        save_conversation(conversation=conversation, filepath=file_path)
+        save_conversation(
+            conversation=conversation,
+            filepath=dir_path / f"{conversation.sanitized_title()}.md",
+        )
+
+
+def save_figure(figure: Figure, filepath: Path) -> None:
+    """Save the figure to the file."""
+    figure.savefig(fname=filepath, dpi=300)
 
 
 def save_weekwise_graph_from_conversation_set(
@@ -89,27 +102,27 @@ def save_weekwise_graph_from_conversation_set(
     """Create a weekwise graph and saves it to the folder."""
     if time_period[1] == "month":
         file_name: str = f"{time_period[0].strftime('%Y %B')}.png"
-        weekwise_graph_from_conversation_set(
-            conv_set=conv_set,
-            month_name=time_period[0].strftime("%B '%y"),
-            **kwargs,
-        )[0].savefig(
-            fname=dir_path / file_name,
-            dpi=300,
+        save_figure(
+            figure=weekwise_graph_from_conversation_set(
+                conv_set=conv_set,
+                month_name=time_period[0].strftime("%B '%y"),
+                **kwargs,
+            ),
+            filepath=dir_path / file_name,
         )
     elif time_period[1] == "year":
         file_name = f"{time_period[0].strftime('%Y')}.png"
-        weekwise_graph_from_conversation_set(
-            conv_set=conv_set,
-            year=time_period[0].strftime("%Y"),
-            **kwargs,
-        )[0].savefig(
-            fname=dir_path / file_name,
-            dpi=300,
+        save_figure(
+            figure=weekwise_graph_from_conversation_set(
+                conv_set=conv_set,
+                year=time_period[0].strftime("%Y"),
+                **kwargs,
+            ),
+            filepath=dir_path / file_name,
         )
 
 
-def create_n_save_all_weekwise_graphs(
+def create_all_weekwise_graphs(
     conv_set: ConversationSet,
     dir_path: Path,
     **kwargs: Any,
@@ -141,6 +154,11 @@ def create_n_save_all_weekwise_graphs(
         )
 
 
+def save_wordcloud(wordcloud: WordCloud, filepath: Path) -> None:
+    """Save the word cloud to the file."""
+    wordcloud.to_file(filename=filepath)
+
+
 def save_wordcloud_from_conversation_set(
     conv_set: ConversationSet,
     dir_path: Path,
@@ -155,12 +173,13 @@ def save_wordcloud_from_conversation_set(
     elif time_period[1] == "year":
         file_name = f"{time_period[0].strftime('%Y')}.png"
 
-    wordcloud_from_conversation_set(conv_set=conv_set, **kwargs).to_file(
-        filename=dir_path / file_name,
+    save_wordcloud(
+        wordcloud=wordcloud_from_conversation_set(conv_set=conv_set, **kwargs),
+        filepath=dir_path / file_name,
     )
 
 
-def generate_n_save_all_wordclouds(
+def create_all_wordclouds(
     conv_set: ConversationSet,
     dir_path: Path,
     **kwargs: Any,
@@ -210,34 +229,23 @@ def save_custom_instructions(conv_set: ConversationSet, filepath: Path) -> None:
         json_dump(obj=conv_set.all_custom_instructions(), fp=file, indent=2)
 
 
-def get_most_recently_downloaded_zip() -> str:
+def get_most_recently_downloaded_zip() -> Path | str:
     """Path to the most recently created zip file in the Downloads folder."""
-    downloads_folder: Path = Path.home() / "Downloads"
-
-    zip_files: list[Path] = list(downloads_folder.glob(pattern="*.zip"))
+    zip_files: list[Path] = list(DOWNLOADS_PATH.glob(pattern="*.zip"))
 
     if not zip_files:
         return ""
 
-    default_zip_filepath: Path = max(zip_files, key=lambda x: x.stat().st_ctime)
-
-    return str(object=default_zip_filepath)
+    return max(zip_files, key=lambda x: x.stat().st_ctime)
 
 
 def get_bookmarklet_json_filepath() -> Path | None:
     """Path to the most recent JSON file in Downloads with 'bookmarklet' in the name."""
-    downloads_folder: Path = Path.home() / "Downloads"
-
-    bookmarklet_json_files: list[Path] = [
-        x for x in downloads_folder.glob(pattern="*.json") if "bookmarklet" in x.name
+    bkmrklet_files: list[Path] = [
+        x for x in DOWNLOADS_PATH.glob(pattern="*.json") if "bookmarklet" in x.name
     ]
 
-    if not bookmarklet_json_files:
+    if not bkmrklet_files:
         return None
 
-    bookmarklet_json_filepath: Path = max(
-        bookmarklet_json_files,
-        key=lambda x: x.stat().st_ctime,
-    )
-
-    return bookmarklet_json_filepath
+    return max(bkmrklet_files, key=lambda x: x.stat().st_ctime)

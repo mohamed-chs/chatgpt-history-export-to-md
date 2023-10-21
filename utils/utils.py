@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from pathlib import Path
-from re import sub
+from re import sub as re_sub
 from zipfile import ZipFile
 
 
@@ -32,30 +32,22 @@ def ensure_closed_code_blocks(string: str) -> str:
 
 def replace_latex_delimiters(string: str) -> str:
     """Replace all the LaTeX bracket delimiters in the string with dollar sign ones."""
-    string = sub(pattern=r"\\\[", repl="$$", string=string)
-    string = sub(pattern=r"\\\]", repl="$$", string=string)
-    string = sub(pattern=r"\\\(", repl="$", string=string)
+    string = re_sub(pattern=r"\\\[", repl="$$", string=string)
+    string = re_sub(pattern=r"\\\]", repl="$$", string=string)
+    string = re_sub(pattern=r"\\\(", repl="$", string=string)
 
-    return sub(pattern=r"\\\)", repl="$", string=string)
+    return re_sub(pattern=r"\\\)", repl="$", string=string)
 
 
 def get_font_names() -> list[str]:
     """Return a list of all the font names in the assets/fonts folder."""
-    fonts_path = Path("assets/fonts")
-    font_names: list[str] = [
-        font.stem for font in fonts_path.iterdir() if font.is_file()
-    ]
-    return font_names
+    return [font.stem for font in Path("assets/fonts").iterdir()]
 
 
 def get_colormap_names() -> list[str]:
     """Return a list of all the colormap names in the assets/colormaps.txt file."""
-    colormaps_path = Path("assets/colormaps.txt")
-
-    with colormaps_path.open(encoding="utf-8") as file:
-        colormaps_list: list[str] = file.read().splitlines()
-
-    return colormaps_list
+    with Path("assets/colormaps.txt").open(encoding="utf-8") as file:
+        return file.read().splitlines()
 
 
 def validate_zip_file(path_str: str) -> bool:

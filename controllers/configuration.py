@@ -25,7 +25,7 @@ def get_user_configs() -> dict[str, Any]:
         default_configs = json_load(fp=file)
 
     if not default_configs["zip_file"]:
-        default_configs["zip_file"] = get_most_recently_downloaded_zip()
+        default_configs["zip_file"] = str(object=get_most_recently_downloaded_zip())
 
     if not default_configs["output_folder"]:
         default_configs["output_folder"] = str(object=DEFAULT_OUTPUT_FOLDER)
