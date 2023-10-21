@@ -11,3 +11,6 @@ ignore = [
 "cli.py" = ["T201"]   # print
 "setup.py" = ["T201"] # print
 "tests/*" = ["S101"]  # assert
+
+[tool.mypy]
+strict = true

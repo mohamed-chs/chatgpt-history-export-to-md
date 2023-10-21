@@ -17,6 +17,7 @@ from wordcloud import WordCloud  # type: ignore[import-untyped]
 
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
+    from PIL.Image import Image
 
     from models.conversation_set import ConversationSet
 
@@ -101,7 +102,7 @@ def load_nltk_stopwords() -> set[str]:
 def wordcloud_from_text(
     text: str,
     **kwargs: Any,
-) -> WordCloud:
+) -> Image:
     """Create a wordcloud from the given text."""
     default_stopwords: set[str] = load_nltk_stopwords()
 
@@ -137,13 +138,13 @@ def wordcloud_from_text(
         text=text,
     )
 
-    return wordcloud
+    return wordcloud.to_image()
 
 
 def wordcloud_from_conversation_set(
     conv_set: ConversationSet,
     **kwargs: Any,
-) -> WordCloud:
+) -> Image:
     """Create a wordcloud from the given conversation set."""
     text: str = (
         conv_set.all_author_text(author="user")

@@ -5,6 +5,7 @@
         "ms-python.python",
         "ms-toolsai.jupyter",
         "charliermarsh.ruff",
-        "matangover.mypy"
+        "matangover.mypy",
+        "njpwerner.autodocstring"
     ]
 }

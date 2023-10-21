@@ -29,12 +29,34 @@ if TYPE_CHECKING:
     from datetime import datetime
 
     from matplotlib.figure import Figure
-    from wordcloud import WordCloud  # type: ignore[import-untyped]
+    from PIL.Image import Image
 
     from models.conversation import Conversation
 
 
 DOWNLOADS_PATH: Path = Path.home() / "Downloads"
+
+
+def get_most_recently_downloaded_zip() -> Path | str:
+    """Path to the most recently created zip file in the Downloads folder."""
+    zip_files: list[Path] = list(DOWNLOADS_PATH.glob(pattern="*.zip"))
+
+    if not zip_files:
+        return ""
+
+    return max(zip_files, key=lambda x: x.stat().st_ctime)
+
+
+def get_bookmarklet_json_filepath() -> Path | None:
+    """Path to the most recent JSON file in Downloads with 'bookmarklet' in the name."""
+    bkmrklet_files: list[Path] = [
+        x for x in DOWNLOADS_PATH.glob(pattern="*.json") if "bookmarklet" in x.name
+    ]
+
+    if not bkmrklet_files:
+        return None
+
+    return max(bkmrklet_files, key=lambda x: x.stat().st_ctime)
 
 
 def conversation_set_from_json(json_filepath: Path) -> ConversationSet:
@@ -154,9 +176,9 @@ def create_all_weekwise_graphs(
         )
 
 
-def save_wordcloud(wordcloud: WordCloud, filepath: Path) -> None:
+def save_image(image: Image, filepath: Path) -> None:
     """Save the word cloud to the file."""
-    wordcloud.to_file(filename=filepath)
+    image.save(fp=filepath, optimize=True)
 
 
 def save_wordcloud_from_conversation_set(
@@ -173,8 +195,8 @@ def save_wordcloud_from_conversation_set(
     elif time_period[1] == "year":
         file_name = f"{time_period[0].strftime('%Y')}.png"
 
-    save_wordcloud(
-        wordcloud=wordcloud_from_conversation_set(conv_set=conv_set, **kwargs),
+    save_image(
+        image=wordcloud_from_conversation_set(conv_set=conv_set, **kwargs),
         filepath=dir_path / file_name,
     )
 
@@ -227,25 +249,3 @@ def save_custom_instructions(conv_set: ConversationSet, filepath: Path) -> None:
     """Create JSON file for custom instructions in the conversation set."""
     with filepath.open(mode="w", encoding="utf-8") as file:
         json_dump(obj=conv_set.all_custom_instructions(), fp=file, indent=2)
-
-
-def get_most_recently_downloaded_zip() -> Path | str:
-    """Path to the most recently created zip file in the Downloads folder."""
-    zip_files: list[Path] = list(DOWNLOADS_PATH.glob(pattern="*.zip"))
-
-    if not zip_files:
-        return ""
-
-    return max(zip_files, key=lambda x: x.stat().st_ctime)
-
-
-def get_bookmarklet_json_filepath() -> Path | None:
-    """Path to the most recent JSON file in Downloads with 'bookmarklet' in the name."""
-    bkmrklet_files: list[Path] = [
-        x for x in DOWNLOADS_PATH.glob(pattern="*.json") if "bookmarklet" in x.name
-    ]
-
-    if not bkmrklet_files:
-        return None
-
-    return max(bkmrklet_files, key=lambda x: x.stat().st_ctime)

@@ -12,5 +12,8 @@
     ],
     "python.testing.unittestEnabled": false,
     "python.testing.pytestEnabled": true,
-    "mypy.runUsingActiveInterpreter": true
+    "mypy.runUsingActiveInterpreter": true,
+    "black-formatter.importStrategy": "fromEnvironment",
+    "python.createEnvironment.contentButton": "show",
+    "python.createEnvironment.trigger": "prompt"
 }
