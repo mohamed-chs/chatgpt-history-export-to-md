@@ -43,7 +43,7 @@ class Message:
         if self.author_role() == "tool":
             return author_config.get("tool", "### Tool output")
 
-        return "### unknown-message-author"
+        return ""
 
     def content_text(self) -> str:
         """Get the text content of the message."""

@@ -46,13 +46,13 @@ def main() -> None:
         zip_filepath=zip_filepath,
     )
 
-    bookmarklet_json_filepath: Path | None = get_bookmarklet_json_filepath()
-    if bookmarklet_json_filepath:
+    bkmrklet_json_filepath: Path | None = get_bookmarklet_json_filepath()
+    if bkmrklet_json_filepath:
         print("Found bookmarklet download, loading 📂 ...\n")
-        bookmarklet_conversations_set: ConversationSet = conversation_set_from_json(
-            json_filepath=bookmarklet_json_filepath,
+        bkmrklet_conversations_set: ConversationSet = conversation_set_from_json(
+            json_filepath=bkmrklet_json_filepath,
         )
-        all_conversations_set.update(conv_set=bookmarklet_conversations_set)
+        all_conversations_set.update(conv_set=bkmrklet_conversations_set)
 
     output_folder = Path(configs_dict["output_folder"])
 

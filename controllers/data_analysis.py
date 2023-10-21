@@ -10,9 +10,9 @@ from datetime import datetime, timezone
 from typing import TYPE_CHECKING, Any
 
 from matplotlib.figure import Figure
-from nltk import data as nltk_data  # type: ignore[import-untyped]
 from nltk import download as nltk_download  # type: ignore[import-untyped]
 from nltk.corpus import stopwords as nltk_stopwords  # type: ignore[import-untyped]
+from nltk.data import find as nltk_find  # type: ignore[import-untyped]
 from wordcloud import WordCloud  # type: ignore[import-untyped]
 
 if TYPE_CHECKING:
@@ -22,7 +22,7 @@ if TYPE_CHECKING:
     from models.conversation_set import ConversationSet
 
 
-def weekwise_graph_from_timestamps(
+def _weekwise_graph_from_timestamps(
     timestamps: list[float],
     **kwargs: str,
 ) -> Figure:
@@ -48,7 +48,7 @@ def weekwise_graph_from_timestamps(
     x: list[str] = days
     y: list[int] = [weekday_counts[day] for day in days]
 
-    fig: Figure = Figure()
+    fig: Figure = Figure(dpi=300)
     ax: Axes = fig.add_subplot()
 
     ax.bar(x=x, height=y)
@@ -76,14 +76,14 @@ def weekwise_graph_from_conversation_set(
 ) -> Figure:
     """Create a bar graph from the given conversation set."""
     timestamps: list[float] = conv_set.all_author_message_timestamps(author="user")
-    return weekwise_graph_from_timestamps(timestamps=timestamps, **kwargs)
+    return _weekwise_graph_from_timestamps(timestamps=timestamps, **kwargs)
 
 
 # Ensure that the stopwords are downloaded
-def load_nltk_stopwords() -> set[str]:
+def _load_nltk_stopwords() -> set[str]:
     """Load nltk stopwords."""
     try:
-        nltk_data.find(resource_name="corpora/stopwords")
+        nltk_find(resource_name="corpora/stopwords")
     except LookupError:
         nltk_download(info_or_id="stopwords")
 
@@ -99,12 +99,12 @@ def load_nltk_stopwords() -> set[str]:
     return {word for lang in languages for word in nltk_stopwords.words(fileids=lang)}
 
 
-def wordcloud_from_text(
+def _wordcloud_from_text(
     text: str,
     **kwargs: Any,
 ) -> Image:
     """Create a wordcloud from the given text."""
-    default_stopwords: set[str] = load_nltk_stopwords()
+    default_stopwords: set[str] = _load_nltk_stopwords()
 
     custom_stopwords: str = kwargs.get("custom_stopwords", "")
     custom_stopwords_list: list[str] = (
@@ -138,7 +138,8 @@ def wordcloud_from_text(
         text=text,
     )
 
-    return wordcloud.to_image()
+    img: Image = wordcloud.to_image()
+    return img
 
 
 def wordcloud_from_conversation_set(
@@ -152,4 +153,4 @@ def wordcloud_from_conversation_set(
         + conv_set.all_author_text(author="assistant")
     )
 
-    return wordcloud_from_text(text=text, **kwargs)
+    return _wordcloud_from_text(text=text, **kwargs)

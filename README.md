@@ -49,7 +49,7 @@ This will copy this GitHub repository on your computer, and navigate to the root
 Type (and hit enter):
 
 ```bash
-python setup.py
+python setup_env.py
 ```
 
 This will create a virtual environment and install the necessary python libraries.
@@ -137,7 +137,5 @@ This is just a small thing I coded to help me see my convos in beautiful markdow
 I wasn't a fan of the clunky, and sometimes paid, browser extensions.
 
 I'm working on automating it to add new conversations and updating old ones. Had some luck with a JavaScript bookmarklet, still ironing it out tho. Shouldn't take long.
-
-See [TODO](TODO.md) for more info on what I'm working on. Feel free to contribute :)
 
 > for an older version with no external dependencies (no virtual environment needed), see https://github.com/mohamed-chs/chatgpt-history-export-to-md/tree/fe13a701fe8653c9f946b1e12979ce3bfe7104b8.

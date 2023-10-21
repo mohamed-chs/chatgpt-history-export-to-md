@@ -22,8 +22,9 @@ from utils.utils import get_colormap_names, get_font_names, validate_zip_file
 
 def validate_header(string: str) -> bool:
     """Return True if the given text is a valid markdown header."""
+    max_header_level = 6
     return (
-        1 <= string.count("#") <= 6
+        1 <= string.count("#") <= max_header_level
         and string.startswith("#")
         and string[len(string.split()[0])] == " "
     )

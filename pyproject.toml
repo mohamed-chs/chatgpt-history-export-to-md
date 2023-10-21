@@ -8,9 +8,9 @@ ignore = [
 ]
 
 [tool.ruff.per-file-ignores]
-"cli.py" = ["T201"]   # print
-"setup.py" = ["T201"] # print
-"tests/*" = ["S101"]  # assert
+"cli.py" = ["T201"]       # print
+"setup_env.py" = ["T201"] # print
+"tests/*" = ["S101"]      # assert
 
 [tool.mypy]
 strict = true

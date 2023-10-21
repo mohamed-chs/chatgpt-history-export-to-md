@@ -60,24 +60,24 @@ If you're new here, fret not. The codebase is well-documented, guiding you step-
 
      ```bash
      ruff check .
+     ruff check --fix .
      ```
 
    - **Type checks**:
 
      ```bash
-     mypy --install-types
-     mypy .
+     mypy --install-types .
      ```
 
    - **Run tests**:
 
      ```bash
-     python -m pytest
+     pytest tests
      ```
 
-4. **Additional testing**
+4. **Playground**
 
-   You can also check [notebook](playground.ipynb) to see how the output looks.
+   You can also check the [notebook](playground.ipynb) to see how the output looks. Feel free to play around with it.
 
 ## Committing and Pushing Changes
 
@@ -101,13 +101,14 @@ If you're new here, fret not. The codebase is well-documented, guiding you step-
 
 ## Seeking Contribution Ideas?
 
-- Peruse the `Issues` tab for open bugs or feature suggestions.
-- Explore the [Project Todo](TODO.md) and [JavaScript Todo](js/how_to_use.md#still-working-on).
+- Browse the `Issues` tab for open bugs or feature suggestions.
 - Get a project overview from [here](assets/deps_graph.png). Generated using :
 
   ```bash
   pydeps cli.py -o assets/deps_graph.png -T png --noshow --reverse --rankdir BT --exclude-exact models views controllers utils
   ```
+
+  (outside the virtual environment)
 
 ## Documentation Insights
 

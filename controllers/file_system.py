@@ -37,12 +37,12 @@ if TYPE_CHECKING:
 DOWNLOADS_PATH: Path = Path.home() / "Downloads"
 
 
-def get_most_recently_downloaded_zip() -> Path | str:
+def get_most_recently_downloaded_zip() -> Path | None:
     """Path to the most recently created zip file in the Downloads folder."""
     zip_files: list[Path] = list(DOWNLOADS_PATH.glob(pattern="*.zip"))
 
     if not zip_files:
-        return ""
+        return None
 
     return max(zip_files, key=lambda x: x.stat().st_ctime)
 
@@ -110,9 +110,9 @@ def save_conversation_set(conv_set: ConversationSet, dir_path: Path) -> None:
         )
 
 
-def save_figure(figure: Figure, filepath: Path) -> None:
+def _save_figure(figure: Figure, filepath: Path) -> None:
     """Save the figure to the file."""
-    figure.savefig(fname=filepath, dpi=300)
+    figure.savefig(fname=filepath)
 
 
 def save_weekwise_graph_from_conversation_set(
@@ -124,7 +124,7 @@ def save_weekwise_graph_from_conversation_set(
     """Create a weekwise graph and saves it to the folder."""
     if time_period[1] == "month":
         file_name: str = f"{time_period[0].strftime('%Y %B')}.png"
-        save_figure(
+        _save_figure(
             figure=weekwise_graph_from_conversation_set(
                 conv_set=conv_set,
                 month_name=time_period[0].strftime("%B '%y"),
@@ -134,7 +134,7 @@ def save_weekwise_graph_from_conversation_set(
         )
     elif time_period[1] == "year":
         file_name = f"{time_period[0].strftime('%Y')}.png"
-        save_figure(
+        _save_figure(
             figure=weekwise_graph_from_conversation_set(
                 conv_set=conv_set,
                 year=time_period[0].strftime("%Y"),
@@ -176,7 +176,7 @@ def create_all_weekwise_graphs(
         )
 
 
-def save_image(image: Image, filepath: Path) -> None:
+def _save_image(image: Image, filepath: Path) -> None:
     """Save the word cloud to the file."""
     image.save(fp=filepath, optimize=True)
 
@@ -195,7 +195,7 @@ def save_wordcloud_from_conversation_set(
     elif time_period[1] == "year":
         file_name = f"{time_period[0].strftime('%Y')}.png"
 
-    save_image(
+    _save_image(
         image=wordcloud_from_conversation_set(conv_set=conv_set, **kwargs),
         filepath=dir_path / file_name,
     )
