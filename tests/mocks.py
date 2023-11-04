@@ -3,9 +3,12 @@
 from __future__ import annotations
 
 from datetime import datetime, timedelta, timezone
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
-DATETIME_1: datetime = datetime(
+if TYPE_CHECKING:
+    from convoviz.models import ConversationJSON, MessageJSON, NodeJSON
+
+DATETIME_111 = datetime(
     year=2023,
     month=7,
     day=29,
@@ -15,15 +18,44 @@ DATETIME_1: datetime = datetime(
     tzinfo=timezone.utc,
 )
 
-DATETIME_2: datetime = DATETIME_1 + timedelta(minutes=5)
+DATETIME_112: datetime = DATETIME_111 + timedelta(minutes=5)
 
+SYSTEM_MESSAGE_111: MessageJSON = {
+    "id": "system_node_111",
+    "author": {"role": "system", "metadata": {}},
+    "create_time": DATETIME_111.timestamp(),
+    "update_time": DATETIME_111.timestamp(),
+    "content": {"content_type": "text", "parts": ["system message 111"]},
+    "status": "finished_successfully",
+    "end_turn": True,
+    "weight": 1.0,
+    "metadata": {"model_slug": "gpt-4"},
+    "recipient": "all",
+}
 
-MESSAGE_1: dict[str, Any] = {
-    "id": "sample_id",
-    "author": {"role": "user"},
-    "create_time": DATETIME_1.timestamp(),
-    "update_time": DATETIME_1.timestamp(),
-    "content": {"content_type": "text", "parts": ["Hello World"]},
+USER_MESSAGE_TEXT_111 = "user message 111"
+
+USER_MESSAGE_111: MessageJSON = {
+    "id": "user_node_111",
+    "author": {"role": "user", "metadata": {}},
+    "create_time": DATETIME_111.timestamp(),
+    "update_time": DATETIME_111.timestamp(),
+    "content": {"content_type": "text", "parts": [USER_MESSAGE_TEXT_111]},
+    "status": "finished_successfully",
+    "end_turn": True,
+    "weight": 1.0,
+    "metadata": {"model_slug": "gpt-4"},
+    "recipient": "all",
+}
+
+ASSISTANT_MESSAGE_TEXT_111 = "assistant message 111"
+
+ASSISTANT_MESSAGE_111: MessageJSON = {
+    "id": "assistant_node_111",
+    "author": {"role": "assistant", "metadata": {}},
+    "create_time": DATETIME_112.timestamp(),
+    "update_time": DATETIME_112.timestamp(),
+    "content": {"content_type": "text", "parts": [ASSISTANT_MESSAGE_TEXT_111]},
     "status": "finished_successfully",
     "end_turn": True,
     "weight": 1.0,
@@ -32,37 +64,59 @@ MESSAGE_1: dict[str, Any] = {
 }
 
 
-CONVERSATION_1: dict[str, Any] = {
-    "title": "Sample Conversation",
-    "create_time": DATETIME_1.timestamp(),
-    "update_time": DATETIME_2.timestamp(),
-    "mapping": {
-        "node1": {
-            "message": {
-                "id": "msg1",
-                "author": {"role": "user"},
-                "create_time": DATETIME_1.timestamp(),
-                "update_time": DATETIME_1.timestamp(),
-                "content": {"content_type": "text", "parts": ["Hello!"]},
-                "metadata": {"model_slug": "gpt-4"},
-            },
-            "children": ["node2"],
-        },
-        "node2": {
-            "message": {
-                "id": "msg2",
-                "author": {"role": "assistant"},
-                "create_time": DATETIME_2.timestamp(),
-                "update_time": DATETIME_2.timestamp(),
-                "content": {"content_type": "text", "parts": ["Hi there!"]},
-                "metadata": {"model_slug": "gpt-4"},
-            },
-            "children": [],
-        },
-    },
-    "current_node": "node2",
-    "plugin_ids": [],
-    "conversation_id": "conv_id_123",
-    "conversation_template_id": "template_id_123",
-    "id": "id_123",
+ROOT_NODE_111: NodeJSON = {
+    "id": "root_node_111",
+    "message": None,
+    "parent": None,
+    "children": ["system_node_111"],
 }
+
+SYSTEM_NODE_111: NodeJSON = {
+    "id": "system_node_111",
+    "message": SYSTEM_MESSAGE_111,
+    "parent": None,
+    "children": ["user_node_111"],
+}
+
+USER_NODE_111: NodeJSON = {
+    "id": "user_node_111",
+    "message": USER_MESSAGE_111,
+    "parent": None,
+    "children": ["assistant_node_111"],
+}
+
+ASSISTANT_NODE_111: NodeJSON = {
+    "id": "assistant_node_111",
+    "message": ASSISTANT_MESSAGE_111,
+    "parent": None,
+    "children": [],
+}
+
+MAPPING_111: dict[str, NodeJSON] = {
+    "root_node_111": ROOT_NODE_111,
+    "system_node_111": SYSTEM_NODE_111,
+    "user_node_111": USER_NODE_111,
+    "assistant_node_111": ASSISTANT_NODE_111,
+}
+
+TITLE_111 = "conversation 111"
+CONVERSATION_ID_111 = "conversation_111"
+TEMPLATE_ID_111 = "template_111"
+PLUGIN_IDS_111: list[str] = []
+MODERATION_RESULTS_111: list[Any] = []
+
+CONVERSATION_111: ConversationJSON = {
+    "title": TITLE_111,
+    "create_time": DATETIME_111.timestamp(),
+    "update_time": DATETIME_112.timestamp(),
+    "mapping": MAPPING_111,
+    "moderation_results": MODERATION_RESULTS_111,
+    "current_node": ASSISTANT_NODE_111["id"],
+    "plugin_ids": PLUGIN_IDS_111,
+    "conversation_id": CONVERSATION_ID_111,
+    "conversation_template_id": TEMPLATE_ID_111,
+    "id": CONVERSATION_ID_111,
+}
+
+# based on the above
+MESSAGE_COUNT_111 = 2

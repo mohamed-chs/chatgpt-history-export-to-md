@@ -2,77 +2,42 @@
 
 from __future__ import annotations
 
-from typing import Literal
+from convoviz.models import Message
 
-import pytest
-
-from models.message import Message
-
-from .mocks import DATETIME_1, MESSAGE_1
-
-
-def test_message_initialization() -> None:
-    """Test initialization of Message object."""
-    message = Message(message=MESSAGE_1)
-
-    assert message.id == "sample_id"
-    assert message.author == {"role": "user"}
-    assert message.create_time == DATETIME_1.timestamp()
-    assert message.update_time == DATETIME_1.timestamp()
-    assert message.content == {"content_type": "text", "parts": ["Hello World"]}
-    assert message.status == "finished_successfully"
-    assert message.end_turn is True
-    assert message.weight == 1
-    assert message.metadata == {"model_slug": "gpt-4"}
-    assert message.recipient == "all"
+from .mocks import ASSISTANT_MESSAGE_111, USER_MESSAGE_111
 
 
 def test_author_role() -> None:
     """Test author_role method."""
-    message = Message(message=MESSAGE_1)
-    assert message.author_role() == "user"
+    message = Message(USER_MESSAGE_111)
+    assert message.author_role == "user"
 
 
-@pytest.mark.parametrize(
-    ("role", "header"),
-    [
-        ("user", "# User"),
-        ("assistant", "# Assistant"),
-        ("system", "### System"),
-        ("tool", "### Tool output"),
-    ],
-)
-def test_author_header(
-    role: Literal["user", "assistant", "system", "tool"],
-    header: Literal[
-        "# User",
-        "# Assistant",
-        "### System",
-        "### Tool output",
-    ],
-) -> None:
+def test_author_header() -> None:
     """Test author_header method."""
-    Message.configuration = {"author_headers": {}}
-    message = Message(message={"author": {"role": role}})
-    assert message.author_header() == header
+    user_message = Message(USER_MESSAGE_111)
+    assert user_message.author_header == "# Me"
+
+    assistant_message = Message(ASSISTANT_MESSAGE_111)
+    assert assistant_message.author_header == "# ChatGPT"
 
 
 def test_content_text() -> None:
     """Test content_text method."""
-    message = Message(message={"content": {"parts": ["Hello World"]}})
-    assert message.content_text() == "Hello World"
+    user_message = Message(USER_MESSAGE_111)
+    assert user_message.content_text == "user message 111"
 
-    message = Message(message={"content": {"text": "print('Hello World')"}})
-    assert message.content_text() == "```python\nprint('Hello World')\n```"
+    assistant_message = Message(ASSISTANT_MESSAGE_111)
+    assert assistant_message.content_text == "assistant message 111"
 
 
 def test_content_type() -> None:
     """Test content_type method."""
-    message = Message(message=MESSAGE_1)
-    assert message.content_type() == "text"
+    message = Message(USER_MESSAGE_111)
+    assert message.content_type == "text"
 
 
 def test_model_slug() -> None:
     """Test model_slug method."""
-    message = Message(message=MESSAGE_1)
-    assert message.model_slug() == "gpt-4"
+    message = Message(ASSISTANT_MESSAGE_111)
+    assert message.model_slug == "gpt-4"

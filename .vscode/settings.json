@@ -1,19 +1,9 @@
 {
-    "editor.inlayHints.enabled": "onUnlessPressed",
-    "editor.inlayHints.padding": true,
-    "python.analysis.inlayHints.functionReturnTypes": true,
-    "python.analysis.inlayHints.pytestParameters": true,
-    "python.analysis.inlayHints.variableTypes": true,
-    "python.analysis.inlayHints.callArgumentNames": "partial",
-    "editor.bracketPairColorization.independentColorPoolPerBracketType": true,
-    "workbench.startupEditor": "readme",
-    "python.testing.pytestArgs": [
-        "tests"
-    ],
-    "python.testing.unittestEnabled": false,
-    "python.testing.pytestEnabled": true,
-    "mypy.runUsingActiveInterpreter": true,
-    "black-formatter.importStrategy": "fromEnvironment",
-    "python.createEnvironment.contentButton": "show",
-    "python.createEnvironment.trigger": "prompt"
+  "editor.inlayHints.enabled": "onUnlessPressed",
+  "python.analysis.inlayHints.functionReturnTypes": true,
+  "python.analysis.inlayHints.pytestParameters": true,
+  "python.analysis.inlayHints.variableTypes": true,
+  "python.analysis.inlayHints.callArgumentNames": "partial",
+  "python.testing.pytestArgs": ["tests"],
+  "python.testing.pytestEnabled": true
 }

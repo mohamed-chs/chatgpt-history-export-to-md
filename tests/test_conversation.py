@@ -2,157 +2,121 @@
 
 from __future__ import annotations
 
-from typing import Any
+from convoviz.models import Conversation
 
-from models.conversation import Conversation
-from models.node import Node
-
-from .mocks import CONVERSATION_1, DATETIME_1, DATETIME_2
-
-
-def test_conversation_initialization() -> None:
-    """Test initialization of Conversation object."""
-    data: dict[str, Any] = CONVERSATION_1
-    conversation = Conversation(conversation=data)
-
-    assert conversation.title == "Sample Conversation"
-    assert conversation.create_time == DATETIME_1.timestamp()
-    assert conversation.update_time == DATETIME_2.timestamp()
-    assert isinstance(conversation.mapping, dict)
-    assert isinstance(conversation.current_node, Node)
+from .mocks import (
+    ASSISTANT_MESSAGE_TEXT_111,
+    CONVERSATION_111,
+    CONVERSATION_ID_111,
+    DATETIME_111,
+    MESSAGE_COUNT_111,
+    TITLE_111,
+    USER_MESSAGE_TEXT_111,
+)
 
 
 def test_leaf_count() -> None:
     """Test leaf_count method."""
-    data: dict[str, Any] = CONVERSATION_1
-    conversation = Conversation(conversation=data)
+    conversation = Conversation(CONVERSATION_111)
 
-    assert conversation.leaf_count() == 1
-
-
-def test_has_multiple_branches() -> None:
-    """Test has_multiple_branches method."""
-    data: dict[str, Any] = CONVERSATION_1
-    conversation = Conversation(conversation=data)
-
-    assert not conversation.has_multiple_branches()
+    assert conversation.leaf_count == 1
 
 
 def test_chat_link() -> None:
     """Test chat_link method."""
-    data: dict[str, Any] = CONVERSATION_1
-    conversation = Conversation(conversation=data)
+    conversation = Conversation(CONVERSATION_111)
 
-    assert conversation.chat_link() == "https://chat.openai.com/c/conv_id_123"
+    assert conversation.chat_link == f"https://chat.openai.com/c/{CONVERSATION_ID_111}"
 
 
 def test_content_types() -> None:
     """Test content_types method."""
-    data: dict[str, Any] = CONVERSATION_1
-    conversation = Conversation(conversation=data)
+    conversation = Conversation(CONVERSATION_111)
 
-    assert set(conversation.content_types()) == {"text"}
+    assert set(conversation.content_types) == {"text"}
 
 
 def test_message_count() -> None:
     """Test message_count method."""
-    data: dict[str, Any] = CONVERSATION_1
-    conversation = Conversation(conversation=data)
+    conversation = Conversation(CONVERSATION_111)
 
-    assert conversation.message_count() == 2
+    assert conversation.message_count("user", "assistant") == MESSAGE_COUNT_111
 
 
 def test_entire_author_text() -> None:
     """Test entire_author_text method."""
-    data: dict[str, Any] = CONVERSATION_1
-    conversation = Conversation(conversation=data)
+    conversation = Conversation(CONVERSATION_111)
 
-    assert conversation.entire_author_text(author="user") == "Hello!"
-    assert conversation.entire_author_text(author="assistant") == "Hi there!"
+    assert conversation.plaintext("user") == USER_MESSAGE_TEXT_111
+    assert conversation.plaintext("assistant") == ASSISTANT_MESSAGE_TEXT_111
 
 
 def test_author_message_timestamps() -> None:
     """Test author_message_timestamps method."""
-    data: dict[str, Any] = CONVERSATION_1
-    conversation = Conversation(conversation=data)
+    conversation = Conversation(CONVERSATION_111)
 
-    assert conversation.author_message_timestamps(author="user") == [
-        DATETIME_1.timestamp(),
+    assert conversation.timestamps("user") == [
+        DATETIME_111.timestamp(),
     ]
 
 
 def test_model_slug() -> None:
     """Test model_slug method."""
-    data: dict[str, Any] = CONVERSATION_1
-    conversation = Conversation(conversation=data)
+    conversation = Conversation(CONVERSATION_111)
 
-    assert conversation.model_slug() == "gpt-4"
+    assert conversation.model_slug == "gpt-4"
 
 
 def test_used_plugins() -> None:
     """Test used_plugins method."""
-    data: dict[str, Any] = CONVERSATION_1
-    conversation = Conversation(conversation=data)
+    conversation = Conversation(CONVERSATION_111)
 
-    assert len(conversation.used_plugins()) == 0
-
-
-def test_sanitized_title() -> None:
-    """Test sanitized_title method."""
-    data: dict[str, Any] = CONVERSATION_1
-    conversation = Conversation(conversation=data)
-
-    assert conversation.sanitized_title() == "Sample Conversation"
+    assert len(conversation.used_plugins) == 0
 
 
 def test_yaml_header() -> None:
     """Test yaml_header method."""
-    data: dict[str, Any] = CONVERSATION_1
-    conversation = Conversation(conversation=data)
+    conversation = Conversation(CONVERSATION_111)
 
-    yaml_header: str = conversation.yaml_header()
+    yaml_header = conversation.yaml
     assert "---" in yaml_header
-    assert "title: Sample Conversation" in yaml_header
+    assert f"title: {TITLE_111}" in yaml_header
 
 
 def test_to_markdown() -> None:
     """Test to_markdown method."""
-    data: dict[str, Any] = CONVERSATION_1
-    conversation = Conversation(conversation=data)
+    conversation = Conversation(CONVERSATION_111)
 
-    markdown: str = conversation.markdown_text()
+    markdown = conversation.markdown
     assert "---" in markdown
-    assert "# User" in markdown
-    assert "Hello!" in markdown
-    assert "# Assistant" in markdown
-    assert "Hi there!" in markdown
+    assert "# Me" in markdown
+    assert USER_MESSAGE_TEXT_111 in markdown
+    assert "# ChatGPT" in markdown
+    assert ASSISTANT_MESSAGE_TEXT_111 in markdown
 
 
 def test_start_of_year() -> None:
     """Test start_of_year method."""
-    data: dict[str, Any] = CONVERSATION_1
-    conversation = Conversation(conversation=data)
+    conversation = Conversation(CONVERSATION_111)
 
-    assert conversation.start_of_year().year == DATETIME_1.year
-    assert conversation.start_of_year().month == 1
-    assert conversation.start_of_year().day == 1
+    assert conversation.year_start.year == DATETIME_111.year
+    assert conversation.year_start.month == 1
+    assert conversation.year_start.day == 1
 
 
 def test_start_of_month() -> None:
     """Test start_of_month method."""
-    data: dict[str, Any] = CONVERSATION_1
-    conversation = Conversation(conversation=data)
+    conversation = Conversation(CONVERSATION_111)
 
-    assert conversation.start_of_month().year == DATETIME_1.year
-    assert conversation.start_of_month().month == DATETIME_1.month
-    assert conversation.start_of_month().day == 1
+    assert conversation.month_start.year == DATETIME_111.year
+    assert conversation.month_start.month == DATETIME_111.month
+    assert conversation.month_start.day == 1
 
 
 def test_start_of_week() -> None:
     """Test start_of_week method."""
-    data: dict[str, Any] = CONVERSATION_1
-    conversation = Conversation(conversation=data)
+    conversation = Conversation(CONVERSATION_111)
 
-    assert conversation.start_of_week().year == DATETIME_1.year
-    assert conversation.start_of_week().month == DATETIME_1.month
-    assert conversation.start_of_week().day == DATETIME_1.day - DATETIME_1.weekday()
+    assert conversation.week_start.year == DATETIME_111.year
+    assert conversation.week_start.month == DATETIME_111.month
+    assert conversation.week_start.day == DATETIME_111.day - DATETIME_111.weekday()

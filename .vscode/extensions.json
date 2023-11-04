@@ -1,11 +1,7 @@
 {
     "recommendations": [
         "usernamehw.errorlens",
-        "njqdev.vscode-python-typehint",
         "ms-python.python",
-        "ms-toolsai.jupyter",
         "charliermarsh.ruff",
-        "matangover.mypy",
-        "njpwerner.autodocstring"
     ]
 }

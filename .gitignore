@@ -1,6 +1,9 @@
 __pycache__/
 node_modules/
-.venv*/
+.venv/
+dist/
+
+poetry.lock
 
 # testing models and visualizations on personal data
 data/

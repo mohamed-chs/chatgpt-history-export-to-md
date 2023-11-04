@@ -1,1 +1,0 @@
-"""Models for the application."""

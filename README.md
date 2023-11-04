@@ -1,4 +1,4 @@
-# Your entire ChatGPT data in beautiful Markdown 📜
+# Convoviz 📊: Visualize your entire ChatGPT data !
 
 Convert your ChatGPT history into well-formatted Markdown files. Additionally, visualize your data with word clouds 🔡☁️, view your prompt history graphs 📈, and access all your custom instructions 🤖 in a single location.
 
@@ -13,14 +13,9 @@ Convert your ChatGPT history into well-formatted Markdown files. Additionally, v
 - **Data Visualizations**: Word clouds, graphs, and more.
 - **Custom Instructions**: All your custom instructions in one JSON file.
 
-See examples [here](assets/demo).
+See examples [here](demo).
 
-## Getting Started
-
-Ensure you have **Python** and **Git** installed. If not:
-
-- [Python](https://www.python.org/downloads/)
-- [Git](https://git-scm.com/downloads)
+## How to Use 📖
 
 ### 1. Export Your ChatGPT Data 🗂
 
@@ -28,71 +23,27 @@ Ensure you have **Python** and **Git** installed. If not:
 - Navigate: Profile Name (bottom left) -> **Settings** -> **Data controls** -> **Export** -> **Confirm export**.
 - Await email from OpenAI and download the `.zip` file.
 
-### 2. Copy the Tool to Your Computer 📥
+### 2. Install the tool 🛠
 
-- Open a program called "terminal" or "command prompt".
-
-- Type (and hit enter after each line):
+Open a terminal or command prompt and run:
 
 ```bash
-git clone https://github.com/mohamed-chs/chatgpt-history-export-to-md.git
+pip install convoviz
 ```
+
+to install the package.
+
+### 3. Run the Script 🏃‍♂️
+
+With the package installed, run the following command in your terminal:
 
 ```bash
-cd chatgpt-history-export-to-md
+python -m convoviz
 ```
 
-This will copy this GitHub repository on your computer, and navigate to the root directory.
+Next, follow the instructions displayed and choose your desired options, the script will handle the rest.
 
-### 3. Set Up the Environment 🛠️
-
-Type (and hit enter):
-
-```bash
-python setup_env.py
-```
-
-This will create a virtual environment and install the necessary python libraries.
-
-#### Activate the virtual environment
-
-**On Linux or MacOS:**
-
-```bash
-source .venv/bin/activate
-```
-
-**On Windows:**
-
-Using Command Prompt (`cmd.exe`):
-
-```bash
-.venv\Scripts\activate.bat
-```
-
-Using PowerShell:
-
-```powershell
-.venv\Scripts\Activate.ps1
-```
-
-If you encounter an error about script execution in PowerShell, try running:
-
-```powershell
-powershell -ExecutionPolicy ByPass -File .venv\Scripts\Activate.ps1
-```
-
-### 4. Run the Script 🏃‍♂️
-
-With the environment set up, you can now run the script. In the terminal or command prompt, execute:
-
-```bash
-python cli.py
-```
-
-Now, follow the instructions on screen and choose your desired options, the script will handle the rest.
-
-### 5. Check the Output 🎉
+### 4. Check the Output 🎉
 
 And that's it! After running the script, head over to the output folder to see your nice word clouds, graphs, and neatly formatted Markdown files. Enjoy !
 
@@ -120,14 +71,6 @@ And if you've had a great experience, consider giving the project a star ⭐. It
 
 Thank you for being awesome! 🌟
 
-## Contributions 🆘
-
-Feel free to fork this repository and make your enhancements or improvements. ALL contributions are welcome !
-
-See [contributing guide](CONTRIBUTING.md)
-
-> [Related post](https://news.ycombinator.com/item?id=37636701)
-
 ## Notes
 
 This project requires Python 3.8.7 or higher if on Windows. See [known issue](https://github.com/prompt-toolkit/python-prompt-toolkit/issues/1023#issue-534396318)
@@ -136,6 +79,10 @@ This is just a small thing I coded to help me see my convos in beautiful markdow
 
 I wasn't a fan of the clunky, and sometimes paid, browser extensions.
 
+It was also a great opportunity to learn more about Python and type annotations. I had mypy, pyright, and ruff all on strict mode, 'twas fun.
+
+It also works as package, so you can **import** it in your own projects, and use the models and functions as you wish. I need to add more documentation for that tho. Feel free to reach out if you need help.
+
 I'm working on automating it to add new conversations and updating old ones. Had some luck with a JavaScript bookmarklet, still ironing it out tho. Shouldn't take long.
 
-> for an older version with no external dependencies (no virtual environment needed), see https://github.com/mohamed-chs/chatgpt-history-export-to-md/tree/fe13a701fe8653c9f946b1e12979ce3bfe7104b8.
+> for an older version with zero dependencies, see https://github.com/mohamed-chs/chatgpt-history-export-to-md/tree/fe13a701fe8653c9f946b1e12979ce3bfe7104b8.
