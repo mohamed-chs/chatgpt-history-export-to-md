@@ -21,7 +21,7 @@ enable_incomplete_feature = ["Unpack"]
 
 [tool.poetry]
 name = "convoviz"
-version = "0.1.5"
+version = "0.1.6"
 description = "Get analytics and visualizations on your ChatGPT data !"
 authors = ["Mohamed Cheikh Sidiya <mohamedcheikhsidiya77@gmail.com>"]
 license = "MIT"

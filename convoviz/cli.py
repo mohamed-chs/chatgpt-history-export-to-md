@@ -35,7 +35,7 @@ def main() -> None:
 
     print("Loading data 📂 ...\n")
 
-    entire_collection = ConversationSet.from_zip(user.lookup["zip_filepath"])
+    entire_collection = ConversationSet.from_zip(user.configs["zip_filepath"])
 
     bkmrklet_json = latest_bookmarklet_json()
     if bkmrklet_json:
@@ -43,7 +43,7 @@ def main() -> None:
         bkmrklet_collection = ConversationSet.from_json(bkmrklet_json)
         entire_collection.update(bkmrklet_collection)
 
-    output_folder = Path(user.lookup["output_folder"])
+    output_folder = Path(user.configs["output_folder"])
 
     # overwrite the output folder if it already exists (might change this in the future)
     if output_folder.exists() and output_folder.is_dir():
@@ -63,7 +63,7 @@ def main() -> None:
     generate_week_barplots(
         entire_collection,
         graph_folder,
-        **user.lookup["graph"],
+        **user.configs["graph"],
         progress_bar=True,
     )
 
@@ -76,7 +76,7 @@ def main() -> None:
     generate_wordclouds(
         entire_collection,
         wordcloud_folder,
-        **user.lookup["wordcloud"],
+        **user.configs["wordcloud"],
         progress_bar=True,
     )
 

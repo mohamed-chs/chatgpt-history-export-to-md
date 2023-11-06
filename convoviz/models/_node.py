@@ -33,14 +33,18 @@ class Node(BaseModel):
     @classmethod
     def mapping(cls, mapping: dict[str, Node]) -> dict[str, Node]:
         """Return a dictionary of connected Node objects, based on the mapping."""
-        node_mapping = mapping.copy()
+        # Initialize connections
+        for node in mapping.values():
+            node.children_nodes = []  # Ensure list is empty to avoid duplicates
+            node.parent_node = None  # Ensure parent_node is None
 
         # Connect nodes
-        for key, value in node_mapping.items():
-            for child_id in value.children:
-                node_mapping[key].add_child(node_mapping[child_id])
+        for node in mapping.values():
+            for child_id in node.children:
+                child_node = mapping[child_id]
+                node.add_child(child_node)
 
-        return node_mapping
+        return mapping
 
     @property
     def header(self) -> str:

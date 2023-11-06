@@ -47,13 +47,13 @@ class UserConfigs:
 
     def __init__(self) -> None:
         """Initialize UserConfigs object."""
-        # will implement a way to read from a config file later ...
+        self.configs = DEFAULT_USER_CONFIGS.copy()
 
-        self.lookup = DEFAULT_USER_CONFIGS.copy()
+        # will implement a way to read from a config file later ...
 
     def prompt(self) -> None:
         """Prompt the user for input and update the configs."""
-        lookup = self.lookup
+        lookup = self.configs
 
         lookup["zip_filepath"] = qst_path(
             "Enter the path to the zip file :",
@@ -121,7 +121,5 @@ class UserConfigs:
 
     def set_model_configs(self) -> None:
         """Set the configuration for all models."""
-        Message.update_configs(self.lookup["message"])
-        Conversation.update_configs(self.lookup["conversation"])
-
-    # will implement a way to save to a config file later ...
+        Message.update_configs(self.configs["message"])
+        Conversation.update_configs(self.configs["conversation"])

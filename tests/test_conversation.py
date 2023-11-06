@@ -27,7 +27,7 @@ def test_leaf_count() -> None:
 
 def test_chat_link() -> None:
     """Test chat_link method."""
-    assert conversation.chat_link == f"https://chat.openai.com/c/{CONVERSATION_ID_111}"
+    assert conversation.url == f"https://chat.openai.com/c/{CONVERSATION_ID_111}"
 
 
 def test_content_types() -> None:
@@ -60,7 +60,7 @@ def test_model_slug() -> None:
 
 def test_used_plugins() -> None:
     """Test used_plugins method."""
-    assert len(conversation.used_plugins) == 0
+    assert len(conversation.plugins) == 0
 
 
 def test_yaml_header() -> None:

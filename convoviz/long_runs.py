@@ -3,13 +3,11 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Unpack
 
 from tqdm import tqdm
 
 if TYPE_CHECKING:
-    from typing_extensions import Unpack
-
     from .models import ConversationSet
     from .utils import GraphKwargs, WordCloudKwargs
 

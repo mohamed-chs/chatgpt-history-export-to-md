@@ -6,7 +6,7 @@ Groups conversations by week, month, and year, etc.
 from __future__ import annotations
 
 from pathlib import Path
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any, Unpack
 
 from orjson import OPT_INDENT_2, dumps, loads
 from pydantic import BaseModel
@@ -19,11 +19,9 @@ from ._conversation import Conversation  # noqa: TCH001
 
 if TYPE_CHECKING:
     from datetime import datetime
-    from typing import Any
 
     from matplotlib.figure import Figure
     from PIL.Image import Image
-    from typing_extensions import Unpack
 
     from convoviz.utils import GraphKwargs, WordCloudKwargs
 
@@ -91,7 +89,7 @@ class ConversationSet(BaseModel):
 
             instructions_info = {
                 "chat_title": conversation.title,
-                "chat_link": conversation.chat_link,
+                "chat_link": conversation.url,
                 "time": conversation.create_time,
                 "custom_instructions": conversation.custom_instructions,
             }

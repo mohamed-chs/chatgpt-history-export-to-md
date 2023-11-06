@@ -8,7 +8,7 @@ from __future__ import annotations
 from datetime import datetime, timedelta
 from os import utime as os_utime
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, ClassVar
+from typing import TYPE_CHECKING, Any, ClassVar, Unpack
 
 from orjson import loads
 from pydantic import BaseModel
@@ -27,7 +27,6 @@ from ._node import Node
 
 if TYPE_CHECKING:
     from PIL.Image import Image
-    from typing_extensions import Unpack
 
     from ._message import AuthorRole
 
@@ -90,7 +89,7 @@ class Conversation(BaseModel):
         return sum(1 for node in self._all_message_nodes if not node.children_nodes)
 
     @property
-    def chat_link(self) -> str:
+    def url(self) -> str:
         """Chat URL."""
         return f"https://chat.openai.com/c/{self.conversation_id}"
 
@@ -126,7 +125,7 @@ class Conversation(BaseModel):
         return message.metadata.model_slug if message else None
 
     @property
-    def used_plugins(self) -> list[str]:
+    def plugins(self) -> list[str]:
         """List of all ChatGPT plugins used in the conversation."""
         return list(
             {
@@ -137,17 +136,17 @@ class Conversation(BaseModel):
         )
 
     @property
-    def custom_instructions(self) -> dict[str, str] | None:
+    def custom_instructions(self) -> dict[str, str]:
         """Return custom instructions used for the conversation."""
         system_nodes = self._author_nodes("system")
         if len(system_nodes) < 2:
-            return None
+            return {}
 
         context_message = system_nodes[1].message
         if context_message and context_message.metadata.is_user_system_message:
-            return context_message.metadata.user_context_message_data
+            return context_message.metadata.user_context_message_data or {}
 
-        return None
+        return {}
 
         # TODO: check if this is the same for conversations from the bookmarklet
 
@@ -158,11 +157,11 @@ class Conversation(BaseModel):
 
         yaml_map = {
             "title": self.title,
-            "chat_link": self.chat_link,
+            "chat_link": self.url,
             "create_time": self.create_time,
             "update_time": self.update_time,
             "model": self.model,
-            "used_plugins": self.used_plugins,
+            "used_plugins": self.plugins,
             "message_count": self.message_count("user", "assistant"),
             "content_types": self.content_types,
             "custom_instructions": self.custom_instructions,

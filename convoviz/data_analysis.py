@@ -9,7 +9,7 @@ from __future__ import annotations
 
 from collections import defaultdict
 from datetime import datetime, timezone
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Unpack
 
 from matplotlib.figure import Figure
 from nltk import download as nltk_download  # type: ignore[import-untyped]
@@ -20,9 +20,7 @@ from wordcloud import WordCloud  # type: ignore[import-untyped]
 from .utils import DEFAULT_WORDCLOUD_CONFIGS
 
 if TYPE_CHECKING:
-    from matplotlib.axes import Axes
     from PIL.Image import Image
-    from typing_extensions import Unpack
 
     from .utils import GraphKwargs, WordCloudKwargs
 
@@ -52,8 +50,8 @@ def generate_week_barplot(
     x = days
     y = [weekday_counts[day] for day in days]
 
-    fig: Figure = Figure(dpi=300)
-    ax: Axes = fig.add_subplot()
+    fig = Figure(dpi=300)
+    ax = fig.add_subplot()
 
     ax.bar(x, y)
     ax.set_xlabel("Weekday")
@@ -117,5 +115,4 @@ def generate_wordcloud(
         include_numbers=configs.get("include_numbers"),  # pyright: ignore[reportGeneralTypeIssues]
     ).generate(text)
 
-    img: Image = wordcloud.to_image()
-    return img
+    return wordcloud.to_image()
