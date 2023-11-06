@@ -5,16 +5,19 @@ object path : conversations.json -> conversation (one of the list items)
 
 from __future__ import annotations
 
-from datetime import datetime, timedelta, timezone
-from json import load as json_load
+from datetime import datetime, timedelta
 from os import utime as os_utime
 from pathlib import Path
-from time import ctime
-from typing import TYPE_CHECKING, TypedDict
+from typing import TYPE_CHECKING, Any, ClassVar
+
+from orjson import loads
+from pydantic import BaseModel
 
 from convoviz.data_analysis import generate_wordcloud
 from convoviz.utils import (
     DEFAULT_CONVERSATION_CONFIGS,
+    ConversationConfigs,
+    WordCloudKwargs,
     close_code_blocks,
     replace_latex_delimiters,
     sanitize,
@@ -23,43 +26,27 @@ from convoviz.utils import (
 from ._node import Node
 
 if TYPE_CHECKING:
-    from typing import Any
-
     from PIL.Image import Image
-    from typing_extensions import Self, Unpack
-
-    from convoviz.utils import ConversationConfigs, WordCloudKwargs
+    from typing_extensions import Unpack
 
     from ._message import AuthorRole
-    from ._node import NodeJSON
 
 
-class ConversationJSON(TypedDict):
-    """Type of a `conversation` in _a_ `json` file."""
+class Conversation(BaseModel):
+    """Wrapper class for a `conversation` in _a_ `json` file."""
+
+    __configs: ClassVar[ConversationConfigs] = DEFAULT_CONVERSATION_CONFIGS
 
     title: str
-    create_time: float
-    update_time: float
-    mapping: dict[str, NodeJSON]
-    moderation_results: list[Any]  # I'm yet to see this field populated :(
+    create_time: datetime
+    update_time: datetime
+    mapping: dict[str, Node]
+    moderation_results: list[Any]
     current_node: str
-    plugin_ids: list[str]
+    plugin_ids: list[str] | None = None
     conversation_id: str
-    conversation_template_id: str
-    id: str
-
-
-class Conversation:
-    """Wrapper class for a `conversation` in _a_ `json` file.
-
-    see `ConversationJSON` for more details
-    """
-
-    __configs = DEFAULT_CONVERSATION_CONFIGS
-
-    def __init__(self, conversation: ConversationJSON) -> None:
-        """Initialize Conversation object."""
-        self.__data = conversation
+    conversation_template_id: str | None = None
+    id: str | None = None  # noqa: A003
 
     @classmethod
     def update_configs(cls, configs: ConversationConfigs) -> None:
@@ -67,72 +54,22 @@ class Conversation:
         cls.__configs.update(configs)
 
     @classmethod
-    def from_json(cls, filepath: Path | str) -> Self:
+    def from_json(cls, filepath: Path | str) -> Conversation:
         """Load the conversation from a JSON file."""
         filepath = Path(filepath)
 
         with filepath.open(encoding="utf-8") as file:
-            return cls(json_load(file))
+            return cls(**loads(file.read()))
 
     @property
-    def title(self) -> str:
-        """Get the title of the conversation."""
-        return self.__data["title"]
-
-    @property
-    def create_time(self) -> float:
-        """Get the creation time of the conversation."""
-        return self.__data["create_time"]
-
-    @property
-    def create_datetime(self) -> datetime:
-        """Get the creation datetime of the conversation."""
-        return datetime.fromtimestamp(self.create_time, timezone.utc)
-
-    @property
-    def update_time(self) -> float:
-        """Get the update time of the conversation."""
-        return self.__data["update_time"]
-
-    @property
-    def update_datetime(self) -> datetime:
-        """Get the update datetime of the conversation."""
-        return datetime.fromtimestamp(self.update_time, timezone.utc)
-
-    @property
-    def mapping(self) -> dict[str, Node]:
-        """Get the mapping of the conversation."""
-        return Node.mapping(self.__data["mapping"])
-
-    @property
-    def moderation_results(self) -> list[Any]:
-        """Get the moderation results of the conversation."""
-        return self.__data["moderation_results"]
-
-    @property
-    def current_node(self) -> Node:
-        """Get the current node of the conversation."""
-        return self.mapping[self.__data["current_node"]]
-
-    @property
-    def plugin_ids(self) -> list[str]:
-        """Get the plugin ids of the conversation."""
-        return self.__data["plugin_ids"]
-
-    @property
-    def conversation_id(self) -> str:
-        """Get the conversation id of the conversation."""
-        return self.__data["conversation_id"]
-
-    @property
-    def conversation_template_id(self) -> str:
-        """Get the conversation template id of the conversation."""
-        return self.__data["conversation_template_id"]
+    def node_mapping(self) -> dict[str, Node]:
+        """Return a dictionary of connected Node objects, based on the mapping."""
+        return Node.mapping(self.mapping)
 
     @property
     def _all_message_nodes(self) -> list[Node]:
         """List of all nodes that have a message, including all branches."""
-        return [node for node in self.mapping.values() if node.message]
+        return [node for node in self.node_mapping.values() if node.message]
 
     def _author_nodes(
         self,
@@ -144,13 +81,13 @@ class Conversation:
         return [
             node
             for node in self._all_message_nodes
-            if node.message and node.message.author_role in authors
+            if node.message and node.message.author.role in authors
         ]
 
     @property
     def leaf_count(self) -> int:
         """Return the number of leaves in the conversation."""
-        return sum(1 for node in self._all_message_nodes if not node.children)
+        return sum(1 for node in self._all_message_nodes if not node.children_nodes)
 
     @property
     def chat_link(self) -> str:
@@ -162,7 +99,7 @@ class Conversation:
         """List of all content types in the conversation (all branches)."""
         return list(
             {
-                node.message.content_type
+                node.message.content.content_type
                 for node in self._all_message_nodes
                 if node.message
             },
@@ -178,7 +115,7 @@ class Conversation:
         return len(self._author_nodes(*authors))
 
     @property
-    def model_slug(self) -> str | None:
+    def model(self) -> str | None:
         """ChatGPT model used for the conversation."""
         assistant_nodes: list[Node] = self._author_nodes("assistant")
         if not assistant_nodes:
@@ -186,16 +123,16 @@ class Conversation:
 
         message = assistant_nodes[0].message
 
-        return message.model_slug if message else None
+        return message.metadata.model_slug if message else None
 
     @property
     def used_plugins(self) -> list[str]:
         """List of all ChatGPT plugins used in the conversation."""
         return list(
             {
-                node.message.metadata["invoked_plugin"]["namespace"]
+                node.message.metadata.invoked_plugin["namespace"]
                 for node in self._author_nodes("tool")
-                if node.message and "invoked_plugin" in node.message.metadata
+                if node.message and node.message.metadata.invoked_plugin
             },
         )
 
@@ -207,8 +144,8 @@ class Conversation:
             return None
 
         context_message = system_nodes[1].message
-        if context_message and context_message.metadata.get("is_user_system_message"):
-            return context_message.metadata.get("user_context_message_data")
+        if context_message and context_message.metadata.is_user_system_message:
+            return context_message.metadata.user_context_message_data
 
         return None
 
@@ -222,9 +159,9 @@ class Conversation:
         yaml_map = {
             "title": self.title,
             "chat_link": self.chat_link,
-            "create_time": ctime(self.create_time),
-            "update_time": ctime(self.update_time),
-            "model": self.model_slug,
+            "create_time": self.create_time,
+            "update_time": self.update_time,
+            "model": self.model,
             "used_plugins": self.used_plugins,
             "message_count": self.message_count("user", "assistant"),
             "content_types": self.content_types,
@@ -252,7 +189,7 @@ class Conversation:
 
         for node in self._all_message_nodes:
             if node.message:
-                content = close_code_blocks(node.message.content_text)
+                content = close_code_blocks(node.message.text)
                 # prevent empty messages from taking up white space
                 content = f"\n{content}\n" if content else ""
                 if latex_delimiters == "dollars":
@@ -276,7 +213,7 @@ class Conversation:
         with filepath.open("w", encoding="utf-8") as file:
             file.write(self.markdown)
 
-        os_utime(filepath, (self.update_time, self.update_time))
+        os_utime(filepath, (self.update_time.timestamp(), self.update_time.timestamp()))
 
     def timestamps(
         self,
@@ -289,7 +226,7 @@ class Conversation:
         if len(authors) == 0:
             authors = ("user",)
         return [
-            node.message.create_time
+            node.message.create_time.timestamp()
             for node in self._author_nodes(*authors)
             if node.message and node.message.create_time
         ]
@@ -305,9 +242,7 @@ class Conversation:
         if len(authors) == 0:
             authors = ("user",)
         return "\n".join(
-            node.message.content_text
-            for node in self._author_nodes(*authors)
-            if node.message
+            node.message.text for node in self._author_nodes(*authors) if node.message
         )
 
     def wordcloud(
@@ -324,8 +259,8 @@ class Conversation:
     @property
     def week_start(self) -> datetime:
         """Return the monday of the week the conversation was created in."""
-        start_of_week = self.create_datetime - timedelta(
-            days=self.create_datetime.weekday(),
+        start_of_week = self.create_time - timedelta(
+            days=self.create_time.weekday(),
         )
 
         return start_of_week.replace(hour=0, minute=0, second=0, microsecond=0)
@@ -333,14 +268,22 @@ class Conversation:
     @property
     def month_start(self) -> datetime:
         """Return the first of the month the conversation was created in."""
-        return datetime(
-            self.create_datetime.year,
-            self.create_datetime.month,
-            1,
-            tzinfo=timezone.utc,
+        return self.create_time.replace(
+            day=1,
+            hour=0,
+            minute=0,
+            second=0,
+            microsecond=0,
         )
 
     @property
     def year_start(self) -> datetime:
         """Return the first of January of the year the conversation was created in."""
-        return datetime(self.create_datetime.year, 1, 1, tzinfo=timezone.utc)
+        return self.create_time.replace(
+            month=1,
+            day=1,
+            hour=0,
+            minute=0,
+            second=0,
+            microsecond=0,
+        )

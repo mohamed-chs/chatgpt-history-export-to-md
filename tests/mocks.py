@@ -1,12 +1,10 @@
 """Mocks for testing."""
 
+# pyright: reportUnknownVariableType=false
+
 from __future__ import annotations
 
 from datetime import datetime, timedelta, timezone
-from typing import TYPE_CHECKING, Any
-
-if TYPE_CHECKING:
-    from convoviz.models import ConversationJSON, MessageJSON, NodeJSON
 
 DATETIME_111 = datetime(
     year=2023,
@@ -18,9 +16,9 @@ DATETIME_111 = datetime(
     tzinfo=timezone.utc,
 )
 
-DATETIME_112: datetime = DATETIME_111 + timedelta(minutes=5)
+DATETIME_112 = DATETIME_111 + timedelta(minutes=5)
 
-SYSTEM_MESSAGE_111: MessageJSON = {
+SYSTEM_MESSAGE_111 = {
     "id": "system_node_111",
     "author": {"role": "system", "metadata": {}},
     "create_time": DATETIME_111.timestamp(),
@@ -35,7 +33,7 @@ SYSTEM_MESSAGE_111: MessageJSON = {
 
 USER_MESSAGE_TEXT_111 = "user message 111"
 
-USER_MESSAGE_111: MessageJSON = {
+USER_MESSAGE_111 = {
     "id": "user_node_111",
     "author": {"role": "user", "metadata": {}},
     "create_time": DATETIME_111.timestamp(),
@@ -50,7 +48,7 @@ USER_MESSAGE_111: MessageJSON = {
 
 ASSISTANT_MESSAGE_TEXT_111 = "assistant message 111"
 
-ASSISTANT_MESSAGE_111: MessageJSON = {
+ASSISTANT_MESSAGE_111 = {
     "id": "assistant_node_111",
     "author": {"role": "assistant", "metadata": {}},
     "create_time": DATETIME_112.timestamp(),
@@ -64,35 +62,35 @@ ASSISTANT_MESSAGE_111: MessageJSON = {
 }
 
 
-ROOT_NODE_111: NodeJSON = {
+ROOT_NODE_111 = {
     "id": "root_node_111",
     "message": None,
     "parent": None,
     "children": ["system_node_111"],
 }
 
-SYSTEM_NODE_111: NodeJSON = {
+SYSTEM_NODE_111 = {
     "id": "system_node_111",
     "message": SYSTEM_MESSAGE_111,
     "parent": None,
     "children": ["user_node_111"],
 }
 
-USER_NODE_111: NodeJSON = {
+USER_NODE_111 = {
     "id": "user_node_111",
     "message": USER_MESSAGE_111,
     "parent": None,
     "children": ["assistant_node_111"],
 }
 
-ASSISTANT_NODE_111: NodeJSON = {
+ASSISTANT_NODE_111 = {
     "id": "assistant_node_111",
     "message": ASSISTANT_MESSAGE_111,
     "parent": None,
     "children": [],
 }
 
-MAPPING_111: dict[str, NodeJSON] = {
+MAPPING_111 = {
     "root_node_111": ROOT_NODE_111,
     "system_node_111": SYSTEM_NODE_111,
     "user_node_111": USER_NODE_111,
@@ -102,10 +100,10 @@ MAPPING_111: dict[str, NodeJSON] = {
 TITLE_111 = "conversation 111"
 CONVERSATION_ID_111 = "conversation_111"
 TEMPLATE_ID_111 = "template_111"
-PLUGIN_IDS_111: list[str] = []
-MODERATION_RESULTS_111: list[Any] = []
+PLUGIN_IDS_111 = []
+MODERATION_RESULTS_111 = []
 
-CONVERSATION_111: ConversationJSON = {
+CONVERSATION_111 = {
     "title": TITLE_111,
     "create_time": DATETIME_111.timestamp(),
     "update_time": DATETIME_112.timestamp(),

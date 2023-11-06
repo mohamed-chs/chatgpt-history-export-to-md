@@ -10,93 +10,37 @@ and some other version control stuff
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, TypedDict
+from pydantic import BaseModel
 
-from ._message import Message
-
-if TYPE_CHECKING:
-    from typing import Any, ClassVar
-
-    from typing_extensions import NotRequired, Self
-
-    from ._message import MessageJSON
+from ._message import Message  # noqa: TCH001
 
 
-class NodeJSON(TypedDict):
-    """Type of a `node` in the `mapping` field of a `conversation`."""
+class Node(BaseModel):
+    """Wrapper class for a `node` in the `mapping` field of a `conversation`."""
 
-    id: str
-    message: NotRequired[MessageJSON | None]
-    parent: NotRequired[str | None]
+    id: str  # noqa: A003
+    message: Message | None = None
+    parent: str | None = None
     children: list[str]
+    parent_node: Node | None = None
+    children_nodes: list[Node] = []
 
-
-class Node:
-    """Wrapper class for a `node` in the `mapping` field of a `conversation`.
-
-    see `NodeJSON` and `models.Conversation` for more details
-    """
-
-    __configs: ClassVar[dict[str, Any]] = {}
-
-    def __init__(self, node: NodeJSON) -> None:
-        """Initialize Node object."""
-        self.__data = node
-        self._parent: Self | None = None
-        self._children: list[Self] = []
-
-    @classmethod
-    def update_configs(cls, configs: dict[str, Any]) -> None:
-        """Set the configuration for all nodes."""
-        cls.__configs.update(configs)
-
-    @property
-    def n_id(self) -> str:
-        """Get the id of the node."""
-        return self.__data["id"]
-
-    @property
-    def message(self) -> Message | None:
-        """Get the message of the node."""
-        if "message" not in self.__data or self.__data["message"] is None:
-            return None
-        return Message(self.__data["message"])
-
-    @property
-    def parent(self) -> Self | None:
-        """Get the parent of the node."""
-        return self._parent
-
-    @parent.setter
-    def parent(self, node: Self) -> None:
-        """Set the parent of the node."""
-        self._parent = node
-
-    @property
-    def children(self) -> list[Self]:
-        """Get the children of the node."""
-        return self._children
-
-    def add_child(self, node: Self) -> None:
+    def add_child(self, node: Node) -> None:
         """Add a child to the node."""
-        self.children.append(node)
-        node.parent = self
+        self.children_nodes.append(node)
+        node.parent_node = self
 
     @classmethod
-    def mapping(cls, mapping: dict[str, NodeJSON]) -> dict[str, Self]:
+    def mapping(cls, mapping: dict[str, Node]) -> dict[str, Node]:
         """Return a dictionary of connected Node objects, based on the mapping."""
-        nodes: dict[str, Self] = {}
+        node_mapping = mapping.copy()
 
-        # First pass: Create nodes
-        for key, value in mapping.items():
-            nodes[key] = cls(value)
+        # Connect nodes
+        for key, value in node_mapping.items():
+            for child_id in value.children:
+                node_mapping[key].add_child(node_mapping[child_id])
 
-        # Second pass: Connect nodes
-        for key, value in mapping.items():
-            for child_id in value["children"]:
-                nodes[key].add_child(nodes[child_id])
-
-        return nodes
+        return node_mapping
 
     @property
     def header(self) -> str:
@@ -105,21 +49,22 @@ class Node:
             return ""
 
         parent_link = (
-            f"[parent ⬆️](#{self.parent.n_id})\n"
-            if self.parent and self.parent.message
+            f"[parent ⬆️](#{self.parent_node.id})\n"
+            if self.parent_node and self.parent_node.message
             else ""
         )
-        return f"###### {self.n_id}\n{parent_link}{self.message.author_header}\n"
+        return f"###### {self.id}\n{parent_link}{self.message.header}\n"
 
     @property
     def footer(self) -> str:
         """Get the footer of the node message, containing links to its children."""
-        if len(self.children) == 0:
+        if len(self.children_nodes) == 0:
             return ""
-        if len(self.children) == 1:
-            return f"\n[child ⬇️](#{self.children[0].n_id})\n"
+        if len(self.children_nodes) == 1:
+            return f"\n[child ⬇️](#{self.children_nodes[0].id})\n"
 
         footer = "\n" + " | ".join(
-            f"[child {i+1} ⬇️](#{child.n_id})" for i, child in enumerate(self.children)
+            f"[child {i+1} ⬇️](#{child.id})"
+            for i, child in enumerate(self.children_nodes)
         )
         return footer + "\n"

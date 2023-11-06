@@ -5,73 +5,62 @@ Groups conversations by week, month, and year, etc.
 
 from __future__ import annotations
 
-from json import dump as json_dump
-from json import load as json_load
 from pathlib import Path
-from time import ctime
 from typing import TYPE_CHECKING
 
+from orjson import OPT_INDENT_2, dumps, loads
+from pydantic import BaseModel
 from tqdm import tqdm
 
 from convoviz.data_analysis import generate_week_barplot, generate_wordcloud
 from convoviz.utils import get_archive, sanitize
 
-from ._conversation import Conversation
+from ._conversation import Conversation  # noqa: TCH001
 
 if TYPE_CHECKING:
     from datetime import datetime
-    from typing import Any, ClassVar
+    from typing import Any
 
     from matplotlib.figure import Figure
     from PIL.Image import Image
-    from typing_extensions import Self, Unpack
+    from typing_extensions import Unpack
 
     from convoviz.utils import GraphKwargs, WordCloudKwargs
 
-    from ._conversation import ConversationJSON
     from ._message import AuthorRole
 
 
-class ConversationSet:
+class ConversationSet(BaseModel):
     """Stores a set of conversations."""
 
-    _configs: ClassVar[dict[str, Any]] = {}
+    array: list[Conversation]
 
-    def __init__(self, conversations: list[ConversationJSON]) -> None:
-        """Initialize ConversationSet object."""
-        self.index = {
-            conversation["conversation_id"]: Conversation(conversation)
-            for conversation in conversations
-        }
-
-        self.array = list(self.index.values())
+    @property
+    def index(self) -> dict[str, Conversation]:
+        """Get the index of conversations."""
+        return {convo.conversation_id: convo for convo in self.array}
 
     @classmethod
-    def update_configs(cls, configs: dict[str, Any]) -> None:
-        """Set the configuration for all conversation sets."""
-        cls._configs.update(configs)
-
-    @classmethod
-    def from_json(cls, filepath: Path | str) -> Self:
+    def from_json(cls, filepath: Path | str) -> ConversationSet:
         """Load from a JSON file, containing an array of conversations."""
         filepath = Path(filepath)
         with filepath.open(encoding="utf-8") as file:
-            return cls(json_load(file))
+            return cls(array=loads(file.read()))
 
     @classmethod
-    def from_zip(cls, filepath: Path | str) -> Self:
+    def from_zip(cls, filepath: Path | str) -> ConversationSet:
         """Load from a ZIP file, containing a JSON file."""
         filepath = Path(filepath)
-        conversations_path = get_archive(filepath) / "conversations.json"
+        convos_path = get_archive(filepath) / "conversations.json"
 
-        return cls.from_json(conversations_path)
+        return cls.from_json(convos_path)
 
     @property
-    def last_updated(self) -> float:
+    def last_updated(self) -> datetime:
         """Return the timestamp of the last updated conversation in the list."""
         return max(conversation.update_time for conversation in self.array)
 
-    def update(self, conv_set: Self) -> None:
+    def update(self, conv_set: ConversationSet) -> None:
         """Update the conversation set with the new one."""
         if conv_set.last_updated <= self.last_updated:
             return
@@ -103,7 +92,7 @@ class ConversationSet:
             instructions_info = {
                 "chat_title": conversation.title,
                 "chat_link": conversation.chat_link,
-                "time": ctime(conversation.create_time),
+                "time": conversation.create_time,
                 "custom_instructions": conversation.custom_instructions,
             }
 
@@ -115,7 +104,7 @@ class ConversationSet:
         """Save the custom instructions to the file."""
         filepath = Path(filepath)
         with filepath.open("w", encoding="utf-8") as file:
-            json_dump(self.custom_instructions, file, indent=2)
+            file.write(dumps(self.custom_instructions, option=OPT_INDENT_2).decode())
 
     def timestamps(
         self,
@@ -166,38 +155,38 @@ class ConversationSet:
         self.index[conv.conversation_id] = conv
         self.array.append(conv)
 
-    def group_by_week(self) -> dict[datetime, Self]:
+    def group_by_week(self) -> dict[datetime, ConversationSet]:
         """Get a dictionary of conversations grouped by the start of the week."""
-        grouped: dict[datetime, Self] = {}
+        grouped: dict[datetime, ConversationSet] = {}
 
         for conversation in self.array:
             week_start = conversation.week_start
             if week_start not in grouped:
-                grouped[week_start] = self.__class__([])
+                grouped[week_start] = ConversationSet(array=[])
             grouped[week_start].add(conversation)
 
         return grouped
 
-    def group_by_month(self) -> dict[datetime, Self]:
+    def group_by_month(self) -> dict[datetime, ConversationSet]:
         """Get a dictionary of conversations grouped by the start of the month."""
-        grouped: dict[datetime, Self] = {}
+        grouped: dict[datetime, ConversationSet] = {}
 
         for conversation in self.array:
             month_start = conversation.month_start
             if month_start not in grouped:
-                grouped[month_start] = self.__class__([])
+                grouped[month_start] = ConversationSet(array=[])
             grouped[month_start].add(conversation)
 
         return grouped
 
-    def group_by_year(self) -> dict[datetime, Self]:
+    def group_by_year(self) -> dict[datetime, ConversationSet]:
         """Get a dictionary of conversations grouped by the start of the year."""
-        grouped: dict[datetime, Self] = {}
+        grouped: dict[datetime, ConversationSet] = {}
 
         for conversation in self.array:
             year_start = conversation.year_start
             if year_start not in grouped:
-                grouped[year_start] = self.__class__([])
+                grouped[year_start] = ConversationSet(array=[])
             grouped[year_start].add(conversation)
 
         return grouped
