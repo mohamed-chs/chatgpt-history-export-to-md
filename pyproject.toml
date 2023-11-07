@@ -1,27 +1,6 @@
-[tool.ruff]
-select = ["ALL"]
-ignore = [
-    "ANN101", # missing-type-self
-    "ANN102", # missing-type-cls
-    "TD002",  # missing-todo-author
-    "TD003",  # missing-todo-link
-]
-extend-include = ["*.ipynb"]
-
-[tool.ruff.per-file-ignores]
-"convoviz/cli.py" = ["T201"]   # print
-"*.ipynb" = ["T201"]           # print
-"tests/*" = ["S101", "SLF001"] # assert , private-member-access
-
-
-[tool.mypy]
-strict = true
-enable_incomplete_feature = ["Unpack"]
-
-
 [tool.poetry]
 name = "convoviz"
-version = "0.1.6"
+version = "0.1.7"
 description = "Get analytics and visualizations on your ChatGPT data !"
 authors = ["Mohamed Cheikh Sidiya <mohamedcheikhsidiya77@gmail.com>"]
 license = "MIT"
@@ -58,3 +37,24 @@ mypy = "^1.6.1"
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
+
+[tool.ruff]
+select = ["ALL"]
+ignore = [
+    "ANN101", # missing-type-self
+    "ANN102", # missing-type-cls
+    "TD002",  # missing-todo-author
+    "TD003",  # missing-todo-link
+]
+extend-include = ["*.ipynb"]
+
+[tool.ruff.per-file-ignores]
+"convoviz/cli.py" = ["T201"]   # print
+"*.ipynb" = ["T201"]           # print
+"tests/*" = ["S101", "SLF001"] # assert , private-member-access
+
+
+[tool.mypy]
+strict = true
+enable_incomplete_feature = ["Unpack"]

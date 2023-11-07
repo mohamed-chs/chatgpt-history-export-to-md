@@ -6,7 +6,7 @@ Groups conversations by week, month, and year, etc.
 from __future__ import annotations
 
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Unpack
+from typing import TYPE_CHECKING, Any
 
 from orjson import OPT_INDENT_2, dumps, loads
 from pydantic import BaseModel
@@ -22,6 +22,7 @@ if TYPE_CHECKING:
 
     from matplotlib.figure import Figure
     from PIL.Image import Image
+    from typing_extensions import Unpack
 
     from convoviz.utils import GraphKwargs, WordCloudKwargs
 

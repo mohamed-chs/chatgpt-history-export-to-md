@@ -8,7 +8,7 @@ from __future__ import annotations
 from datetime import datetime, timedelta
 from os import utime as os_utime
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, ClassVar, Unpack
+from typing import TYPE_CHECKING, Any, ClassVar
 
 from orjson import loads
 from pydantic import BaseModel
@@ -27,6 +27,7 @@ from ._node import Node
 
 if TYPE_CHECKING:
     from PIL.Image import Image
+    from typing_extensions import Unpack
 
     from ._message import AuthorRole
 

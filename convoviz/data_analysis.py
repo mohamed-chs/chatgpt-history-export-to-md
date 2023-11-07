@@ -9,7 +9,7 @@ from __future__ import annotations
 
 from collections import defaultdict
 from datetime import datetime, timezone
-from typing import TYPE_CHECKING, Unpack
+from typing import TYPE_CHECKING
 
 from matplotlib.figure import Figure
 from nltk import download as nltk_download  # type: ignore[import-untyped]
@@ -21,6 +21,7 @@ from .utils import DEFAULT_WORDCLOUD_CONFIGS
 
 if TYPE_CHECKING:
     from PIL.Image import Image
+    from typing_extensions import Unpack
 
     from .utils import GraphKwargs, WordCloudKwargs
 
