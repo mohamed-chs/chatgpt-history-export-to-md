@@ -5,7 +5,7 @@ object path : conversations.json -> conversation -> mapping -> mapping node -> m
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, ClassVar, Literal
+from typing import TYPE_CHECKING, Any, ClassVar, Literal, Union, Dict, List
 
 from pydantic import BaseModel, ConfigDict
 
@@ -16,6 +16,9 @@ if TYPE_CHECKING:
 
 AuthorRole = Literal["user", "assistant", "system", "tool"]
 
+# Define a new type that can be either a string or a dictionary
+PartType = Union[str, Dict[str, Any]]
+
 
 class MessageAuthor(BaseModel):
     """Type of the `author` field in a `message`."""
@@ -24,15 +27,13 @@ class MessageAuthor(BaseModel):
     name: str | None = None
     metadata: dict[str, Any]
 
-
 class MessageContent(BaseModel):
     """Type of the `content` field in a `message`."""
 
     content_type: str
-    parts: list[str] | None = None
+    parts: List[PartType] | None = None
     text: str | None = None
     result: str | None = None
-
 
 class MessageMetadata(BaseModel):
     """Type of the `metadata` field in a `message`."""
@@ -77,12 +78,13 @@ class Message(BaseModel):
     @property
     def text(self) -> str:
         """Get the text content of the message."""
-        if self.content.parts is not None:
+        if self.content.parts is not None and isinstance(self.content.parts[0], str):
             return str(self.content.parts[0])
         if self.content.text is not None:
             return code_block(self.content.text)
         if self.content.result is not None:
             return self.content.result
+        return ""
 
         # this error caught some hidden bugs in the data. need more of these
         err_msg = f"No valid content found in message: {self.id}"
