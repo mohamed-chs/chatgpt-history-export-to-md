@@ -27,11 +27,10 @@ class MessageAuthor(BaseModel):
 
 class MessageContent(BaseModel):
     """Type of the `content` field in a `message`."""
-
     content_type: str
-    parts: list[str] | None = None
-    text: str | None = None
-    result: str | None = None
+    parts: Optional[List[Any]] = None  # Accept any type of data in parts
+    text: Optional[str] = None
+    result: Optional[str] = None
 
 
 class MessageMetadata(BaseModel):
