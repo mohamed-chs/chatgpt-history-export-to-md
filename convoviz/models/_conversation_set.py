@@ -6,7 +6,7 @@ Groups conversations by week, month, and year, etc.
 from __future__ import annotations
 
 from pathlib import Path
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, List, Optional
 
 from orjson import OPT_INDENT_2, dumps, loads
 from pydantic import BaseModel
@@ -189,3 +189,6 @@ class ConversationSet(BaseModel):
             grouped[year_start].add(conversation)
 
         return grouped
+
+
+ConversationSet.model_rebuild()
