@@ -14,10 +14,12 @@ from orjson import loads
 from pydantic import BaseModel
 
 from convoviz.data_analysis import generate_wordcloud
-from convoviz.utils import (
+from convoviz.config import (
     DEFAULT_CONVERSATION_CONFIGS,
     ConversationConfigs,
     WordCloudKwargs,
+)
+from convoviz.utils import (
     close_code_blocks,
     replace_latex_delimiters,
     sanitize,

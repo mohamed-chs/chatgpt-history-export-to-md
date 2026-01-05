@@ -7,6 +7,7 @@ from __future__ import annotations
 
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
+from datetime import datetime
 
 from orjson import OPT_INDENT_2, dumps, loads
 from pydantic import BaseModel
@@ -18,13 +19,11 @@ from convoviz.utils import get_archive, sanitize
 from ._conversation import Conversation  # noqa: TCH001
 
 if TYPE_CHECKING:
-    from datetime import datetime
-
     from matplotlib.figure import Figure
     from PIL.Image import Image
     from typing_extensions import Unpack
 
-    from convoviz.utils import GraphKwargs, WordCloudKwargs
+    from convoviz.config import GraphKwargs, WordCloudKwargs
 
     from ._message import AuthorRole
 

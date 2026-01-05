@@ -17,13 +17,13 @@ from nltk.corpus import stopwords as nltk_stopwords  # type: ignore[import-untyp
 from nltk.data import find as nltk_find  # type: ignore[import-untyped]
 from wordcloud import WordCloud  # type: ignore[import-untyped]
 
-from .utils import DEFAULT_WORDCLOUD_CONFIGS
+from convoviz.config import DEFAULT_WORDCLOUD_CONFIGS
 
 if TYPE_CHECKING:
     from PIL.Image import Image
     from typing_extensions import Unpack
 
-    from .utils import GraphKwargs, WordCloudKwargs
+    from convoviz.config import GraphKwargs, WordCloudKwargs
 
 
 def generate_week_barplot(

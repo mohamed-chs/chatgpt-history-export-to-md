@@ -10,8 +10,9 @@ from tqdm import tqdm
 if TYPE_CHECKING:
     from typing_extensions import Unpack
 
+    from convoviz.config import GraphKwargs, WordCloudKwargs
+
     from .models import ConversationSet
-    from .utils import GraphKwargs, WordCloudKwargs
 
 
 def generate_week_barplots(

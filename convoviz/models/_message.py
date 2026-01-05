@@ -6,13 +6,15 @@ object path : conversations.json -> conversation -> mapping -> mapping node -> m
 from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any, ClassVar, Literal
+from datetime import datetime
 
 from pydantic import BaseModel, ConfigDict
 
-from convoviz.utils import DEFAULT_MESSAGE_CONFIGS, MessageConfigs, code_block
+from convoviz.config import DEFAULT_MESSAGE_CONFIGS, MessageConfigs
+from convoviz.utils import code_block
 
 if TYPE_CHECKING:
-    from datetime import datetime
+    pass
 
 AuthorRole = Literal["user", "assistant", "system", "tool"]
 

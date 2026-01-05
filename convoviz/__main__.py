@@ -1,5 +1,6 @@
-"""Run convoviz as a module."""
+"""Main entry point."""
 
-from .cli import main
+from convoviz.cli import main_entry
 
-main()
+if __name__ == "__main__":
+    main_entry()
