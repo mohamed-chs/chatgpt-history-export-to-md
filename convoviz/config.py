@@ -1,140 +1,88 @@
-"""Configuration definitions and defaults."""
-
-from __future__ import annotations
+"""Configuration models using Pydantic v2."""
 
 from pathlib import Path
-from typing import Any, Literal, TypedDict
+from typing import Literal
 
-# default configs
-
-
-class AuthorHeaders(TypedDict):
-    """Type hint for the author headers configs."""
-
-    system: str
-    user: str
-    assistant: str
-    tool: str
+from pydantic import BaseModel, Field
 
 
-class MessageConfigs(TypedDict):
-    """Type hint for the message configs."""
+class AuthorHeaders(BaseModel):
+    """Headers for different message authors in markdown output."""
 
-    author_headers: AuthorHeaders
-
-
-DEFAULT_MESSAGE_CONFIGS: MessageConfigs = {
-    "author_headers": {
-        "system": "### System",
-        "user": "# Me",
-        "assistant": "# ChatGPT",
-        "tool": "### Tool output",
-    },
-}
+    system: str = "### System"
+    user: str = "# Me"
+    assistant: str = "# ChatGPT"
+    tool: str = "### Tool output"
 
 
-class MarkdownConfigs(TypedDict):
-    """Type hint for the markdown configs."""
+class MarkdownConfig(BaseModel):
+    """Configuration for markdown output."""
 
-    latex_delimiters: Literal["default", "dollars"]
-
-
-class YAMLConfigs(TypedDict):
-    """Type hint for the yaml configs."""
-
-    title: bool
-    tags: bool
-    chat_link: bool
-    create_time: bool
-    update_time: bool
-    model: bool
-    used_plugins: bool
-    message_count: bool
-    content_types: bool
-    custom_instructions: bool
+    latex_delimiters: Literal["default", "dollars"] = "default"
 
 
-class ConversationConfigs(TypedDict):
-    """Type hint for the conversation configs."""
+class YAMLConfig(BaseModel):
+    """Configuration for YAML frontmatter in markdown files."""
 
-    markdown: MarkdownConfigs
-    yaml: YAMLConfigs
-
-
-DEFAULT_CONVERSATION_CONFIGS: ConversationConfigs = {
-    "markdown": {"latex_delimiters": "default"},
-    "yaml": {
-        "title": True,
-        "tags": False,
-        "chat_link": True,
-        "create_time": True,
-        "update_time": True,
-        "model": True,
-        "used_plugins": True,
-        "message_count": True,
-        "content_types": True,
-        "custom_instructions": True,
-    },
-}
+    title: bool = True
+    tags: bool = False
+    chat_link: bool = True
+    create_time: bool = True
+    update_time: bool = True
+    model: bool = True
+    used_plugins: bool = True
+    message_count: bool = True
+    content_types: bool = True
+    custom_instructions: bool = True
 
 
-class GraphKwargs(TypedDict, total=False):
-    """Type hint for the graph configs."""
+class ConversationConfig(BaseModel):
+    """Configuration for conversation rendering."""
+
+    markdown: MarkdownConfig = Field(default_factory=MarkdownConfig)
+    yaml: YAMLConfig = Field(default_factory=YAMLConfig)
 
 
-class WordCloudKwargs(TypedDict, total=False):
-    """Type hint for the wordcloud configs."""
+class MessageConfig(BaseModel):
+    """Configuration for message rendering."""
 
-    font_path: str
-    colormap: str
-    custom_stopwords: str
-    background_color: str | None
-    mode: Literal["RGB", "RGBA"]
-    include_numbers: bool
-    width: int
-    height: int
+    author_headers: AuthorHeaders = Field(default_factory=AuthorHeaders)
 
 
-# We need to resolve paths dynamically or passed in, but for defaults we can keep them simple
-# or handle the path resolution at runtime/in the interactive module.
-# For now, I'll put placeholders or move the path logic here if it's dependency-free.
-# The original utils had font_path logic. I'll move that helper here or keep it in utils.
-# I'll keep the path resolution logic in utils for now to avoid circular deps if utils needs config.
-# Wait, utils needed config types? No, utils DEFINED them.
-# So I can move types here.
+class WordCloudConfig(BaseModel):
+    """Configuration for word cloud generation."""
 
-DEFAULT_WORDCLOUD_CONFIGS: WordCloudKwargs = {
-    "font_path": "", # Resolved at runtime
-    "colormap": "magma",
-    "custom_stopwords": "use, file, ",
-    "background_color": None,
-    "mode": "RGBA",
-    "include_numbers": False,
-    "width": 1000,
-    "height": 1000,
-}
+    font_path: Path | None = None
+    colormap: str = "magma"
+    custom_stopwords: str = "use, file, "
+    background_color: str | None = None
+    mode: Literal["RGB", "RGBA"] = "RGBA"
+    include_numbers: bool = False
+    width: int = 1000
+    height: int = 1000
 
 
-class AllConfigs(TypedDict):
-    """Type hint for the user config JSON file."""
+class GraphConfig(BaseModel):
+    """Configuration for graph generation."""
 
-    zip_filepath: str
-    output_folder: str
-    message: MessageConfigs
-    conversation: ConversationConfigs
-    wordcloud: WordCloudKwargs
-    graph: GraphKwargs
-    node: dict[str, Any]
-    conversation_set: dict[str, Any]
+    # Extensible for future graph options
+    pass
 
 
-DEFAULT_USER_CONFIGS: AllConfigs = {
-    "zip_filepath": "", # Resolved at runtime
-    "output_folder": str(Path.home() / "Documents" / "ChatGPT Data"),
-    "message": DEFAULT_MESSAGE_CONFIGS,
-    "conversation": DEFAULT_CONVERSATION_CONFIGS,
-    "wordcloud": DEFAULT_WORDCLOUD_CONFIGS,
-    "graph": {},
-    "node": {},
-    "conversation_set": {},
-}
+class ConvovizConfig(BaseModel):
+    """Main configuration for convoviz."""
+
+    zip_filepath: Path | None = None
+    output_folder: Path = Field(default_factory=lambda: Path.home() / "Documents" / "ChatGPT Data")
+    message: MessageConfig = Field(default_factory=MessageConfig)
+    conversation: ConversationConfig = Field(default_factory=ConversationConfig)
+    wordcloud: WordCloudConfig = Field(default_factory=WordCloudConfig)
+    graph: GraphConfig = Field(default_factory=GraphConfig)
+
+    model_config = {"validate_default": True}
+
+
+# Default configuration instance
+def get_default_config() -> ConvovizConfig:
+    """Get a fresh default configuration instance."""
+    return ConvovizConfig()

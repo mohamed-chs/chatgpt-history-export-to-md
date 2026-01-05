@@ -1,102 +1,106 @@
-"""
-Main file for running the program from the command line."""
-
-from __future__ import annotations
+"""Command-line interface for convoviz."""
 
 from pathlib import Path
-from typing import Optional
 
 import typer
-from typing_extensions import Annotated
+from rich.console import Console
 
-from .config import DEFAULT_USER_CONFIGS
-from .interactive import run_interactive_config
-from .process import run_process
+from convoviz.config import get_default_config
+from convoviz.exceptions import ConfigurationError, InvalidZipError
+from convoviz.interactive import run_interactive_config
+from convoviz.io.loaders import find_latest_zip, validate_zip
+from convoviz.pipeline import run_pipeline
+from convoviz.utils import default_font_path
 
-app = typer.Typer(add_completion=False)
+app = typer.Typer(
+    add_completion=False,
+    help="ChatGPT Data Visualizer 📊 - Convert and visualize your ChatGPT history",
+)
+console = Console()
 
 
 @app.callback(invoke_without_command=True)
 def run(
-    ctx: typer.Context,    zip_path: Annotated[
-        Optional[Path],
-        typer.Option(
-            "--zip",
-            "-z",
-            help="Path to the ChatGPT export zip file.",
-        ),
-    ] = None,
-    output_dir: Annotated[
-        Optional[Path],
-        typer.Option(
-            "--output",
-            "-o",
-            help="Path to the output directory.",
-        ),
-    ] = None,
-    interactive: Annotated[
-        Optional[bool],
-        typer.Option(
-            "--interactive/--no-interactive",
-            "-i/-I",
-            help="Force interactive mode.",
-        ),
-    ] = None,
+    ctx: typer.Context,
+    zip_path: Path | None = typer.Option(
+        None,
+        "--zip",
+        "-z",
+        help="Path to the ChatGPT export zip file.",
+        exists=True,
+        file_okay=True,
+        dir_okay=False,
+    ),
+    output_dir: Path | None = typer.Option(
+        None,
+        "--output",
+        "-o",
+        help="Path to the output directory.",
+    ),
+    interactive: bool | None = typer.Option(
+        None,
+        "--interactive/--no-interactive",
+        "-i/-I",
+        help="Force interactive mode on or off.",
+    ),
 ) -> None:
-    """
-    ChatGPT Data Visualizer 📊
-    """
+    """Convert ChatGPT export data to markdown and generate visualizations."""
     if ctx.invoked_subcommand is not None:
         return
 
-    # Start with default configs
-    from copy import deepcopy
-    configs = deepcopy(DEFAULT_USER_CONFIGS)
+    # Start with default config
+    config = get_default_config()
 
-    # Override with CLI args if provided
+    # Override with CLI args
     if zip_path:
-        configs["zip_filepath"] = str(zip_path)
+        config.zip_filepath = zip_path
     if output_dir:
-        configs["output_folder"] = str(output_dir)
+        config.output_folder = output_dir
 
-    # Decision logic for interactive mode
-    # 1. If --interactive is explicitly True, run interactive.
-    # 2. If --no-interactive is explicitly False, run non-interactive.
-    # 3. If None (default):
-    #    - If zip_path is provided, assume non-interactive (batch mode).
-    #    - Else, assume interactive.
-    
-    if interactive is True:
-        mode_interactive = True
-    elif interactive is False:
-        mode_interactive = False
+    # Determine mode: interactive if explicitly requested or no zip provided
+    use_interactive = interactive if interactive is not None else (zip_path is None)
+
+    if use_interactive:
+        console.print("Welcome to ChatGPT Data Visualizer ✨📊!\n")
+        try:
+            config = run_interactive_config(config)
+        except KeyboardInterrupt:
+            console.print("\n[yellow]Cancelled by user.[/yellow]")
+            raise typer.Exit(code=0) from None
     else:
-        # Default behavior
-        mode_interactive = zip_path is None
+        # Non-interactive mode: validate we have what we need
+        if not config.zip_filepath:
+            # Try to find a default
+            latest = find_latest_zip()
+            if latest:
+                console.print(f"No zip file specified, using latest found: {latest}")
+                config.zip_filepath = latest
+            else:
+                console.print(
+                    "[bold red]Error:[/bold red] No zip file provided and none found in Downloads."
+                )
+                raise typer.Exit(code=1)
 
-    if mode_interactive:
-        print("Welcome to ChatGPT Data Visualizer ✨📊!\n")
-        configs = run_interactive_config(configs)
-    else:
-        # Non-interactive mode validation
-        # If zip path is not provided/valid, we must fail (or try to find default, but batch mode should be explicit)
-        if not configs["zip_filepath"]:
-             # Try to find default
-             from .utils import latest_zip
-             try:
-                 found = latest_zip()
-                 print(f"No zip file specified, using latest found: {found}")
-                 configs["zip_filepath"] = str(found)
-             except FileNotFoundError:
-                 print("Error: No zip file provided and none found in Downloads.")
-                 raise typer.Exit(code=1)
-        
-        # We also need to resolve the font path if it's empty in defaults
-        if not configs["wordcloud"]["font_path"]:
-             from .utils import default_font_path
-             configs["wordcloud"]["font_path"] = str(default_font_path())
+        # Validate the zip
+        if not validate_zip(config.zip_filepath):
+            console.print(f"[bold red]Error:[/bold red] Invalid zip file: {config.zip_filepath}")
+            raise typer.Exit(code=1)
 
-    run_process(configs)
+        # Set default font if not set
+        if not config.wordcloud.font_path:
+            config.wordcloud.font_path = default_font_path()
+
+    # Run the pipeline
+    try:
+        run_pipeline(config)
+    except (InvalidZipError, ConfigurationError) as e:
+        console.print(f"[bold red]Error:[/bold red] {e}")
+        raise typer.Exit(code=1) from None
+    except Exception as e:
+        console.print(f"[bold red]Unexpected error:[/bold red] {e}")
+        raise typer.Exit(code=1) from None
+
 
 def main_entry() -> None:
+    """Entry point for the CLI."""
     app()
