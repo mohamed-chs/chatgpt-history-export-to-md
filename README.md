@@ -25,19 +25,24 @@ See examples [here](demo).
 
 ### 2. Install the tool 🛠
 
-You can install the tool using `pip` (or `uv`):
+Try it without installing using uv ([astral-sh/uv](https://github.com/astral-sh/uv)):
 
 ```bash
-pip install convoviz
-# or
-uv pip install convoviz
+uvx convoviz
+```
+
+You can install it with uv (Recommended):
+
+```bash
+uv tool install convoviz
+```
+
+or pipx:
+```bash
+pipx install convoviz
 ```
 
 ### 3. Run the Script 🏃‍♂️
-
-You have two options: **Interactive Mode** or **Command Line Arguments**.
-
-#### Interactive Mode
 
 Simply run the command and follow the prompts:
 
@@ -77,12 +82,14 @@ Whether you're a tech wizard or you're new to all this, I'd love to hear about y
 
 And if you've had a great experience, consider giving the project a star ⭐. It keeps me motivated and helps others discover it!
 
-Thank you for being awesome! 🌟
-
 ## Notes
-
-This project requires Python 3.9 or higher.
 
 This is just a small thing I coded to help me see my convos in beautiful markdown, in [Obsidian](https://obsidian.md/) (my go-to note-taking app).
 
-It also works as package, so you can **import** it in your own projects, and use the models and functions as you wish.
+I wasn't a fan of the clunky, and sometimes paid, browser extensions.
+
+It was also a great opportunity to learn more about Python and type annotations. I had mypy, pyright, and ruff all on strict mode, 'twas fun.
+
+It should(?) also work as library, so you can import and use the models and functions. I need to add more documentation for that tho. Feel free to reach out if you need help.
+
+I'm working on automating it to add new conversations and updating old ones. Had some luck with a JavaScript bookmarklet, still ironing it out tho.
