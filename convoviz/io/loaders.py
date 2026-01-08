@@ -60,7 +60,8 @@ def load_conversation_from_json(filepath: Path | str) -> Conversation:
 def load_collection_from_json(filepath: Path | str) -> ConversationCollection:
     """Load a conversation collection from a JSON file.
 
-    The JSON file should contain an array of conversation objects.
+    The JSON file should contain an array of conversation objects,
+    or an object with a "conversations" key.
 
     Args:
         filepath: Path to the JSON file
@@ -71,6 +72,11 @@ def load_collection_from_json(filepath: Path | str) -> ConversationCollection:
     filepath = Path(filepath)
     with filepath.open(encoding="utf-8") as f:
         data = loads(f.read())
+
+    # Handle case where export is wrapped in a top-level object
+    if isinstance(data, dict) and "conversations" in data:
+        data = data["conversations"]
+
     return ConversationCollection(conversations=data)
 
 

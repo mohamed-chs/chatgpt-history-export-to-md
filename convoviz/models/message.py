@@ -10,7 +10,7 @@ from pydantic import BaseModel, ConfigDict
 
 from convoviz.exceptions import MessageContentError
 
-AuthorRole = Literal["user", "assistant", "system", "tool"]
+AuthorRole = Literal["user", "assistant", "system", "tool", "function"]
 
 
 class MessageAuthor(BaseModel):
@@ -25,7 +25,7 @@ class MessageContent(BaseModel):
     """Content of a message."""
 
     content_type: str
-    parts: list[str] | None = None
+    parts: list[Any] | None = None
     text: str | None = None
     result: str | None = None
 
@@ -62,7 +62,29 @@ class Message(BaseModel):
     def text(self) -> str:
         """Extract the text content of the message."""
         if self.content.parts is not None:
-            return str(self.content.parts[0]) if self.content.parts else ""
+            # Handle multimodal content where parts can be mixed strings and dicts
+            text_parts = []
+            for part in self.content.parts:
+                if isinstance(part, str):
+                    text_parts.append(part)
+                elif isinstance(part, dict) and "text" in part:
+                    # Some parts might be dicts wrapping text (e.g. code interpreter?)
+                    # But based on spec, usually text is just a string in the list.
+                    # We'll stick to string extraction for now.
+                    pass
+            
+            # If we found string parts, join them. 
+            # If parts existed but no strings (e.g. only images), return empty string? 
+            # Or should we return a placeholder? For now, let's return joined text.
+            if text_parts:
+                return "".join(text_parts)
+            
+            # If parts list is not empty but contains no strings, we might want to fall through
+            # or return empty string if we consider it "handled".
+            # The original code returned "" if parts was empty list.
+            if self.content.parts:
+                 return ""
+
         if self.content.text is not None:
             return self.content.text
         if self.content.result is not None:
