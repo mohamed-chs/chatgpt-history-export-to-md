@@ -1,0 +1,75 @@
+# Python
+def
+class
+import
+from
+as
+elif
+finally
+yield
+pass
+lambda
+async
+await
+nonlocal
+assert
+self
+cls
+# JavaScript / TypeScript
+const
+let
+var
+function
+export
+default
+extends
+implements
+static
+# Java / C#
+final
+abstract
+new
+super
+package
+throws
+synchronized
+volatile
+transient
+native
+strictfp
+override
+# C / C++
+unsigned
+signed
+typedef
+sizeof
+extern
+register
+restrict
+inline
+template
+typename
+virtual
+friend
+mutable
+explicit
+operator
+typeid
+# Rust
+mut
+fn
+pub
+mod
+trait
+impl
+where
+loop
+unsafe
+crate
+dyn
+# Go
+func
+chan
+defer
+fallthrough
+goto

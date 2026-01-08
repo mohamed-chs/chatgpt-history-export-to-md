@@ -14,9 +14,9 @@ This document provides context for continuing work on the convoviz project.
 
 **Image Support & I/O Modernization**:
 - **Image Rendering**: Implemented support for rendering images in Markdown (`![Image](assets/...)`).
-    - Updated `convoviz/models/message.py` to extract `image_asset_pointer`.
-    - Created `convoviz/io/assets.py` to resolve assets (checking `dalle-generations` and root) and copy them to the output directory.
-    - Updated `convoviz/renderers/markdown.py` to utilize an asset resolver.
+- **Word Cloud Improvements**: Added programming language keywords and types to the stop words list to reduce noise in technical conversations.
+    - Added `exclude_programming_keywords` to `WordCloudConfig`.
+    - Defined `PROGRAMMING_STOPWORDS` in `convoviz/analysis/wordcloud.py`.
 - **Input Flexibility**: 
     - CLI now accepts `--input` (or `-i`, `-z`, `--zip`) for **directories**, **JSON files**, or **ZIP files**.
     - Updated `config.py`, `pipeline.py`, and `loaders.py` to handle this flexibility.

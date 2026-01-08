@@ -56,6 +56,7 @@ class WordCloudConfig(BaseModel):
     font_path: Path | None = None
     colormap: str = "RdYlBu"
     custom_stopwords: str = "use, file, "
+    exclude_programming_keywords: bool = True
     background_color: str | None = None
     mode: Literal["RGB", "RGBA"] = "RGBA"
     include_numbers: bool = False

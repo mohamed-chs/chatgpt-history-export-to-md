@@ -25,6 +25,23 @@ STOPWORD_LANGUAGES = [
 
 
 @lru_cache(maxsize=1)
+def load_programming_stopwords() -> frozenset[str]:
+    """Load programming keywords and types from assets.
+
+    Returns:
+        Frozen set of programming stop words
+    """
+    stopwords_path = Path(__file__).parent.parent / "assets" / "stopwords.txt"
+    if not stopwords_path.exists():
+        return frozenset()
+
+    with open(stopwords_path, encoding="utf-8") as f:
+        return frozenset(
+            line.strip().lower() for line in f if line.strip() and not line.strip().startswith("#")
+        )
+
+
+@lru_cache(maxsize=1)
 def load_nltk_stopwords() -> frozenset[str]:
     """Load and cache NLTK stopwords.
 
@@ -73,6 +90,9 @@ def generate_wordcloud(text: str, config: WordCloudConfig) -> Image:
     # Combine NLTK and custom stopwords
     stopwords = set(load_nltk_stopwords())
     stopwords.update(parse_custom_stopwords(config.custom_stopwords))
+
+    if config.exclude_programming_keywords:
+        stopwords.update(load_programming_stopwords())
 
     wc = WordCloud(
         font_path=str(config.font_path) if config.font_path else None,
