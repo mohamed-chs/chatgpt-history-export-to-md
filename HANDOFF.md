@@ -10,21 +10,18 @@ This document provides context for continuing work on the convoviz project.
 - Bar plot graphs showing usage patterns
 - JSON export of custom instructions
 
-## Recent Changes (January 2026 Modernization)
+## Recent Updates (January 8, 2026)
 
-The codebase was significantly refactored:
+**JSON Schema Modernization**:
+- **Schema Support**: Updated `convoviz/models/message.py` and `loaders.py` to support the modern ChatGPT export format:
+    - Added `function` role to `AuthorRole`.
+    - Handled polymorphic `parts` (mixed strings and dicts) in `MessageContent`.
+    - Supported top-level dictionary wrappers (`{"conversations": [...]}`) in JSON exports.
+- **Documentation**: Created `AGENTS.md` (symlinked as `GEMINI.md`) for AI agent context.
 
-### Before → After
+## System Architecture
 
-| Aspect | Before | After |
-|--------|--------|-------|
-| Python version | 3.9+ | 3.12+ |
-| Config | TypedDict + deepcopy | Pydantic models |
-| Models | ClassVar for config (anti-pattern) | Pure data classes |
-| Structure | Flat modules | Organized subpackages |
-| Type hints | `Optional[X]`, `from __future__` | `X \| None`, native |
-
-### New Module Structure
+### Module Structure
 
 ```
 convoviz/
@@ -36,10 +33,10 @@ convoviz/
 ├── interactive.py       # Questionary prompts
 ├── pipeline.py          # Main processing pipeline
 ├── utils.py             # Utility functions
-├── models/              # Pure data models
-│   ├── message.py       # Message, MessageAuthor, etc.
+├── models/              # Pure data models (Pydantic)
+│   ├── message.py       # Message, MessageAuthor, Content
 │   ├── node.py          # Node (tree structure)
-│   ├── conversation.py  # Conversation
+│   ├── conversation.py  # Conversation logic
 │   └── collection.py    # ConversationCollection
 ├── renderers/           # Rendering logic
 │   ├── markdown.py      # Markdown generation
@@ -52,15 +49,38 @@ convoviz/
     └── wordcloud.py     # Word clouds
 ```
 
+### Important Patterns
+
+#### Configuration Flow
+```
+get_default_config() → ConvovizConfig
+    └── Can be modified directly or via interactive prompts
+    └── Passed to run_pipeline(config)
+```
+
+#### Data Flow
+```
+ZIP file → load_collection_from_zip() → ConversationCollection
+    └── Contains list of Conversation objects
+    └── Each Conversation has a tree of Node objects (DAG)
+    └── Each Node may have a Message
+```
+
+#### Rendering Flow
+```
+Conversation + Config → render_conversation() → Markdown string
+    └── Uses render_yaml_header() for frontmatter
+    └── Uses render_node() for each message
+```
+
 ## Key Files to Know
 
 | File | Purpose |
 |------|---------|
 | `convoviz/config.py` | All configuration models (ConvovizConfig is the main one) |
 | `convoviz/pipeline.py` | Main processing flow - start here to understand the app |
-| `convoviz/cli.py` | CLI entry point and argument handling |
 | `convoviz/models/conversation.py` | Core data model with most business logic |
-| `tests/conftest.py` | Test fixtures including mock conversation data |
+| `AGENTS.md` | Context and operational guidelines for AI agents |
 
 ## Running the Project
 
@@ -72,115 +92,33 @@ uv sync
 uv run convoviz --help
 uv run convoviz --zip export.zip --output ./output
 
-# Run tests
-uv run pytest -v
-
-# Run linter
-uv run ruff check convoviz tests
-
-# Run type checker
-uv run mypy convoviz
-
-# Format code
-uv run ruff format convoviz tests
+# Full quality check (Tests + Type + Lint)
+uv run ruff check convoviz tests && uv run mypy convoviz && uv run pytest
 ```
 
-## Important Patterns
+## Known Quirks & Gotchas
 
-### Configuration Flow
-```
-get_default_config() → ConvovizConfig
-    └── Can be modified directly or via interactive prompts
-    └── Passed to run_pipeline(config)
-```
+1.  **ChatGPT Data Structure**: It is a **Directed Acyclic Graph (DAG)**, not a linear list. We traverse from `current_node` backwards or recursively through `children`.
+2.  **Polymorphic Content**: The `parts` field in messages can contain strings (text) OR dictionaries (images, tool calls).
+3.  **Font assets**: Fonts are bundled in `convoviz/assets/fonts/`. Default is RobotoSlab-Thin.
+4.  **NLTK stopwords**: Downloaded on first use, cached with `@lru_cache`.
+5.  **Bookmarklet support**: The tool can merge data from a browser bookmarklet export.
 
-### Data Flow
-```
-ZIP file → load_collection_from_zip() → ConversationCollection
-    └── Contains list of Conversation objects
-    └── Each Conversation has a tree of Node objects
-    └── Each Node may have a Message
-```
+## What's NOT Done (Roadmap)
 
-### Rendering Flow
-```
-Conversation + Config → render_conversation() → Markdown string
-    └── Uses render_yaml_header() for frontmatter
-    └── Uses render_node() for each message
-```
-
-## Test Structure
-
-- `test_config.py` - Configuration model tests
-- `test_models.py` - Data model tests
-- `test_renderers.py` - Rendering function tests
-- `test_loaders.py` - File loading tests
-- `test_pipeline.py` - Integration tests
-- `test_cli.py` - CLI tests
-- `test_utils.py` - Utility function tests
-- `test_exceptions.py` - Exception class tests
-
-All tests use fixtures from `conftest.py`, especially `mock_conversation` and `mock_zip_file`.
-
-## Known Quirks
-
-1. **Font assets**: Fonts are bundled in `convoviz/assets/fonts/`. Default is RobotoSlab-Thin.
-
-2. **NLTK stopwords**: Downloaded on first use, cached with `@lru_cache`.
-
-3. **Bookmarklet support**: The tool can merge data from a browser bookmarklet export (looks for `*bookmarklet*.json` in Downloads).
-
-4. **File naming**: Output files use sanitized conversation titles. Duplicates get `(1)`, `(2)` suffixes.
-
-## What's NOT Done
-
-highlights:
-
-- [ ] Tests for `interactive.py`
-- [ ] `GraphConfig` is empty (placeholder for future)
-- [ ] ... and
-- [ ] much ...
-- [ ] more ...
+- [ ] **Content Rendering**: `Message.text` currently ignores non-string parts (like images). It needs to handle multimodal content properly.
+- [ ] **Citations**: Parse invisible characters/metadata in ChatGPT exports that denote citations.
+- [ ] **Canvas Support**: Research and implement support for "Canvas" content.
+- [ ] **Interactive Tests**: No tests exist for `interactive.py`.
+- [ ] **GraphConfig**: Currently empty placeholder.
+- [ ] **Cross-Platform**: Loaders for Claude and Gemini are planned but not started.
 
 ## Dependencies
 
 Key dependencies in `pyproject.toml`:
-- `pydantic` + `pydantic-settings` - Config and data models
+- `pydantic` - Config and data models
 - `typer` + `rich` - CLI
 - `questionary` - Interactive prompts
 - `matplotlib` - Graphs
-- `wordcloud` + `nltk` - Word clouds
+- `wordcloud` - Word clouds
 - `orjson` - Fast JSON parsing
-- `tqdm` - Progress bars
-
-Dev dependencies:
-- `pytest` - Testing
-- `ruff` - Linting and formatting
-- `mypy` - Type checking
-
-## Commands Reference
-
-```bash
-# Full quality check
-uv run ruff check convoviz tests && uv run mypy convoviz && uv run pytest
-
-# Quick test run
-uv run pytest -x -v
-
-# Test specific file
-uv run pytest tests/test_models.py -v
-
-# Format all code
-uv run ruff format convoviz tests
-
-# Fix auto-fixable lint issues
-uv run ruff check --fix convoviz tests
-```
-
-## Notes
-
-This is a working document for brainstorming and info-sharing; it is not a directive.
-It's kinda the entry point for working/continuing work on the project.
-Try to keep it updated; complete rewrites are within the realm of possibility.
-
-Also a good habit to take (I'm talking to you, AI coding agent) is to write other such .md files to persist plans/context in this session and the next. Write them in the root project directory, or in other places if you prefer, depending on the context. Take the liberty to do it anytime, it's very much encouraged and recommended, you don't even have to ask me before you do it, or notify me at all for that matter.
