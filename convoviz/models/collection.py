@@ -4,6 +4,7 @@ This is a pure data model - I/O and visualization logic are in separate modules.
 """
 
 from datetime import datetime
+from pathlib import Path
 from typing import Any
 
 from pydantic import BaseModel, Field
@@ -19,6 +20,7 @@ class ConversationCollection(BaseModel):
     """
 
     conversations: list[Conversation] = Field(default_factory=list)
+    source_path: Path | None = None
 
     @property
     def index(self) -> dict[str, Conversation]:

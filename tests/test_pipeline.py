@@ -15,7 +15,7 @@ def test_run_pipeline(mock_zip_file: Path, tmp_path: Path) -> None:
     output_dir = tmp_path / "output"
 
     config = get_default_config()
-    config.zip_filepath = mock_zip_file
+    config.input_path = mock_zip_file
     config.output_folder = output_dir
 
     # Mock long-running tasks
@@ -41,7 +41,7 @@ def test_run_pipeline(mock_zip_file: Path, tmp_path: Path) -> None:
 def test_run_pipeline_invalid_zip(tmp_path: Path) -> None:
     """Test that run_pipeline raises InvalidZipError for invalid zip."""
     config = get_default_config()
-    config.zip_filepath = tmp_path / "nonexistent.zip"
+    config.input_path = tmp_path / "nonexistent.zip"
 
     with pytest.raises(InvalidZipError):
         run_pipeline(config)
@@ -50,7 +50,7 @@ def test_run_pipeline_invalid_zip(tmp_path: Path) -> None:
 def test_run_pipeline_no_zip() -> None:
     """Test that run_pipeline raises error when no zip specified."""
     config = get_default_config()
-    config.zip_filepath = None
+    config.input_path = None
 
     with pytest.raises(InvalidZipError):
         run_pipeline(config)

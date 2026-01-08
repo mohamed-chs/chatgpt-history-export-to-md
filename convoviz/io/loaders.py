@@ -77,7 +77,7 @@ def load_collection_from_json(filepath: Path | str) -> ConversationCollection:
     if isinstance(data, dict) and "conversations" in data:
         data = data["conversations"]
 
-    return ConversationCollection(conversations=data)
+    return ConversationCollection(conversations=data, source_path=filepath.parent)
 
 
 def load_collection_from_zip(filepath: Path | str) -> ConversationCollection:

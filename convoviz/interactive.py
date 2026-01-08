@@ -7,7 +7,7 @@ from questionary import path as qst_path
 from questionary import text as qst_text
 
 from convoviz.config import ConvovizConfig, get_default_config
-from convoviz.io.loaders import find_latest_zip, validate_zip
+from convoviz.io.loaders import find_latest_zip
 from convoviz.utils import colormaps, default_font_path, font_names, font_path, validate_header
 
 CUSTOM_STYLE = Style(
@@ -38,26 +38,25 @@ def run_interactive_config(initial_config: ConvovizConfig | None = None) -> Conv
     config = initial_config or get_default_config()
 
     # Set sensible defaults if not already set
-    if not config.zip_filepath:
+    if not config.input_path:
         latest = find_latest_zip()
         if latest:
-            config.zip_filepath = latest
+            config.input_path = latest
 
     if not config.wordcloud.font_path:
         config.wordcloud.font_path = default_font_path()
 
-    # Prompt for zip file path
-    zip_default = str(config.zip_filepath) if config.zip_filepath else ""
-    zip_result = qst_path(
-        "Enter the path to the zip file:",
-        default=zip_default,
-        validate=lambda p: validate_zip(Path(p))
-        or "Invalid zip file (must contain conversations.json)",
+    # Prompt for input path
+    input_default = str(config.input_path) if config.input_path else ""
+    input_result = qst_path(
+        "Enter the path to the zip file or extracted directory:",
+        default=input_default,
+        validate=lambda p: Path(p).exists() or "Path must exist",
         style=CUSTOM_STYLE,
     ).ask()
 
-    if zip_result:
-        config.zip_filepath = Path(zip_result)
+    if input_result:
+        config.input_path = Path(input_result)
 
     # Prompt for output folder
     output_result = qst_path(

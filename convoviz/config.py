@@ -72,7 +72,7 @@ class GraphConfig(BaseModel):
 class ConvovizConfig(BaseModel):
     """Main configuration for convoviz."""
 
-    zip_filepath: Path | None = None
+    input_path: Path | None = None
     output_folder: Path = Field(default_factory=lambda: Path.home() / "Documents" / "ChatGPT Data")
     message: MessageConfig = Field(default_factory=MessageConfig)
     conversation: ConversationConfig = Field(default_factory=ConversationConfig)

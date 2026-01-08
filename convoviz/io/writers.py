@@ -7,6 +7,7 @@ from orjson import OPT_INDENT_2, dumps
 from tqdm import tqdm
 
 from convoviz.config import AuthorHeaders, ConversationConfig
+from convoviz.io.assets import copy_asset, resolve_asset_path
 from convoviz.models import Conversation, ConversationCollection
 from convoviz.renderers import render_conversation
 from convoviz.utils import sanitize
@@ -17,6 +18,7 @@ def save_conversation(
     filepath: Path,
     config: ConversationConfig,
     headers: AuthorHeaders,
+    source_path: Path | None = None,
 ) -> Path:
     """Save a conversation to a markdown file.
 
@@ -28,6 +30,7 @@ def save_conversation(
         filepath: Target file path
         config: Conversation rendering configuration
         headers: Author header configuration
+        source_path: Path to the source directory containing assets
 
     Returns:
         The actual path the file was saved to (may differ if there was a conflict)
@@ -41,8 +44,20 @@ def save_conversation(
         counter += 1
         final_path = filepath.with_name(f"{base_name} ({counter}){filepath.suffix}")
 
+    # Define asset resolver
+    def asset_resolver(asset_id: str) -> str | None:
+        if not source_path:
+            return None
+
+        src_file = resolve_asset_path(source_path, asset_id)
+        if not src_file:
+            return None
+
+        # Copy to output directory (relative to the markdown file's directory)
+        return copy_asset(src_file, final_path.parent)
+
     # Render and write
-    markdown = render_conversation(conversation, config, headers)
+    markdown = render_conversation(conversation, config, headers, asset_resolver=asset_resolver)
     with final_path.open("w", encoding="utf-8") as f:
         f.write(markdown)
 
@@ -78,7 +93,7 @@ def save_collection(
         disable=not progress_bar,
     ):
         filepath = directory / f"{sanitize(conv.title)}.md"
-        save_conversation(conv, filepath, config, headers)
+        save_conversation(conv, filepath, config, headers, source_path=collection.source_path)
 
 
 def save_custom_instructions(

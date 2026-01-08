@@ -1,6 +1,7 @@
 """Markdown rendering for conversations."""
 
 import re
+from collections.abc import Callable
 
 from convoviz.config import AuthorHeaders, ConversationConfig
 from convoviz.models import Conversation, Node
@@ -126,13 +127,19 @@ def render_node_footer(node: Node) -> str:
     return f"\n{links}\n"
 
 
-def render_node(node: Node, headers: AuthorHeaders, use_dollar_latex: bool = False) -> str:
+def render_node(
+    node: Node,
+    headers: AuthorHeaders,
+    use_dollar_latex: bool = False,
+    asset_resolver: Callable[[str], str | None] | None = None,
+) -> str:
     """Render a complete node as markdown.
 
     Args:
         node: The node to render
         headers: Configuration for author headers
         use_dollar_latex: Whether to convert LaTeX delimiters to dollars
+        asset_resolver: Function to resolve asset IDs to paths
 
     Returns:
         Complete markdown string for the node
@@ -148,6 +155,16 @@ def render_node(node: Node, headers: AuthorHeaders, use_dollar_latex: bool = Fal
         content = f"\n{content}\n" if content else ""
         if use_dollar_latex:
             content = replace_latex_delimiters(content)
+
+        # Append images if resolver is provided and images exist
+        if asset_resolver and node.message.images:
+            for image_id in node.message.images:
+                rel_path = asset_resolver(image_id)
+                if rel_path:
+                    # Using standard markdown image syntax.
+                    # Obsidian handles this well.
+                    content += f"\n![Image]({rel_path})\n"
+
     except Exception:
         content = ""
 
@@ -157,7 +174,10 @@ def render_node(node: Node, headers: AuthorHeaders, use_dollar_latex: bool = Fal
 
 
 def render_conversation(
-    conversation: Conversation, config: ConversationConfig, headers: AuthorHeaders
+    conversation: Conversation,
+    config: ConversationConfig,
+    headers: AuthorHeaders,
+    asset_resolver: Callable[[str], str | None] | None = None,
 ) -> str:
     """Render a complete conversation as markdown.
 
@@ -165,6 +185,7 @@ def render_conversation(
         conversation: The conversation to render
         config: Conversation rendering configuration
         headers: Configuration for author headers
+        asset_resolver: Function to resolve asset IDs to paths
 
     Returns:
         Complete markdown document string
@@ -177,6 +198,6 @@ def render_conversation(
     # Render all message nodes
     for node in conversation.all_message_nodes:
         if node.message:
-            markdown += render_node(node, headers, use_dollar_latex)
+            markdown += render_node(node, headers, use_dollar_latex, asset_resolver=asset_resolver)
 
     return markdown

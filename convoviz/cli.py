@@ -8,7 +8,7 @@ from rich.console import Console
 from convoviz.config import get_default_config
 from convoviz.exceptions import ConfigurationError, InvalidZipError
 from convoviz.interactive import run_interactive_config
-from convoviz.io.loaders import find_latest_zip, validate_zip
+from convoviz.io.loaders import find_latest_zip
 from convoviz.pipeline import run_pipeline
 from convoviz.utils import default_font_path
 
@@ -22,14 +22,15 @@ console = Console()
 @app.callback(invoke_without_command=True)
 def run(
     ctx: typer.Context,
-    zip_path: Path | None = typer.Option(
+    input_path: Path | None = typer.Option(
         None,
+        "--input",
         "--zip",
         "-z",
-        help="Path to the ChatGPT export zip file.",
+        help="Path to the ChatGPT export zip file, JSON file, or extracted directory.",
         exists=True,
         file_okay=True,
-        dir_okay=False,
+        dir_okay=True,
     ),
     output_dir: Path | None = typer.Option(
         None,
@@ -52,13 +53,13 @@ def run(
     config = get_default_config()
 
     # Override with CLI args
-    if zip_path:
-        config.zip_filepath = zip_path
+    if input_path:
+        config.input_path = input_path
     if output_dir:
         config.output_folder = output_dir
 
-    # Determine mode: interactive if explicitly requested or no zip provided
-    use_interactive = interactive if interactive is not None else (zip_path is None)
+    # Determine mode: interactive if explicitly requested or no input provided
+    use_interactive = interactive if interactive is not None else (input_path is None)
 
     if use_interactive:
         console.print("Welcome to ChatGPT Data Visualizer ✨📊!\n")
@@ -69,21 +70,23 @@ def run(
             raise typer.Exit(code=0) from None
     else:
         # Non-interactive mode: validate we have what we need
-        if not config.zip_filepath:
+        if not config.input_path:
             # Try to find a default
             latest = find_latest_zip()
             if latest:
-                console.print(f"No zip file specified, using latest found: {latest}")
-                config.zip_filepath = latest
+                console.print(f"No input specified, using latest zip found: {latest}")
+                config.input_path = latest
             else:
                 console.print(
-                    "[bold red]Error:[/bold red] No zip file provided and none found in Downloads."
+                    "[bold red]Error:[/bold red] No input file provided and none found in Downloads."
                 )
                 raise typer.Exit(code=1)
 
-        # Validate the zip
-        if not validate_zip(config.zip_filepath):
-            console.print(f"[bold red]Error:[/bold red] Invalid zip file: {config.zip_filepath}")
+        # Validate the input (basic check)
+        if not config.input_path.exists():
+            console.print(
+                f"[bold red]Error:[/bold red] Input path does not exist: {config.input_path}"
+            )
             raise typer.Exit(code=1)
 
         # Set default font if not set

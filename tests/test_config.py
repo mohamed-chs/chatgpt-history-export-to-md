@@ -19,7 +19,7 @@ def test_get_default_config() -> None:
     """Test that get_default_config returns a valid config."""
     config = get_default_config()
     assert isinstance(config, ConvovizConfig)
-    assert config.zip_filepath is None
+    assert config.input_path is None
     assert isinstance(config.output_folder, Path)
 
 

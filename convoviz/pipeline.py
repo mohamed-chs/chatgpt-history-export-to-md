@@ -26,20 +26,32 @@ def run_pipeline(config: ConvovizConfig) -> None:
         config: Complete configuration for the pipeline
 
     Raises:
-        InvalidZipError: If the zip file is invalid
+        InvalidZipError: If the input is invalid
         ConfigurationError: If configuration is incomplete
     """
-    if not config.zip_filepath:
-        raise InvalidZipError("", reason="No zip file specified")
+    if not config.input_path:
+        raise InvalidZipError("", reason="No input path specified")
 
-    zip_path = Path(config.zip_filepath)
-    if not zip_path.exists():
-        raise InvalidZipError(str(zip_path), reason="File does not exist")
+    input_path = Path(config.input_path)
+    if not input_path.exists():
+        raise InvalidZipError(str(input_path), reason="File does not exist")
 
-    console.print("Loading data [bold yellow]📂[/bold yellow] ...\n")
+    console.print(f"Loading data from {input_path} [bold yellow]📂[/bold yellow] ...\n")
 
-    # Load main collection from zip
-    collection = load_collection_from_zip(zip_path)
+    # Load collection based on input type
+    if input_path.is_dir():
+        # Check for conversations.json inside
+        json_path = input_path / "conversations.json"
+        if not json_path.exists():
+            raise InvalidZipError(
+                str(input_path), reason="Directory must contain conversations.json"
+            )
+        collection = load_collection_from_json(json_path)
+    elif input_path.suffix == ".json":
+        collection = load_collection_from_json(input_path)
+    else:
+        # Assume zip
+        collection = load_collection_from_zip(input_path)
 
     # Try to merge bookmarklet data if available
     bookmarklet_json = find_latest_bookmarklet_json()

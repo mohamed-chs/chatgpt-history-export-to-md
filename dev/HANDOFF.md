@@ -12,12 +12,19 @@ This document provides context for continuing work on the convoviz project.
 
 ## Recent Updates (January 8, 2026)
 
-**JSON Schema Modernization**:
-- **Schema Support**: Updated `convoviz/models/message.py` and `loaders.py` to support the modern ChatGPT export format:
-    - Added `function` role to `AuthorRole`.
-    - Handled polymorphic `parts` (mixed strings and dicts) in `MessageContent`.
-    - Supported top-level dictionary wrappers (`{"conversations": [...]}`) in JSON exports.
-- **Documentation**: Created `AGENTS.md` (symlinked as `GEMINI.md`) for AI agent context.
+**Image Support & I/O Modernization**:
+- **Image Rendering**: Implemented support for rendering images in Markdown (`![Image](assets/...)`).
+    - Updated `convoviz/models/message.py` to extract `image_asset_pointer`.
+    - Created `convoviz/io/assets.py` to resolve assets (checking `dalle-generations` and root) and copy them to the output directory.
+    - Updated `convoviz/renderers/markdown.py` to utilize an asset resolver.
+- **Input Flexibility**: 
+    - CLI now accepts `--input` (or `-i`, `-z`, `--zip`) for **directories**, **JSON files**, or **ZIP files**.
+    - Updated `config.py`, `pipeline.py`, and `loaders.py` to handle this flexibility.
+- **Tests**: Added `tests/test_assets.py` and updated `tests/test_renderers.py`.
+
+**JSON Schema Modernization (Previous)**:
+- **Schema Support**: Updated `convoviz/models/message.py` and `loaders.py` to support the modern ChatGPT export format.
+- **Documentation**: Created `AGENTS.md` for AI agent context.
 
 ## System Architecture
 
@@ -43,7 +50,8 @@ convoviz/
 │   └── yaml.py          # YAML frontmatter
 ├── io/                  # File I/O
 │   ├── loaders.py       # ZIP/JSON loading
-│   └── writers.py       # File writing
+│   ├── writers.py       # File writing
+│   └── assets.py        # Asset management (New)
 └── analysis/            # Visualizations
     ├── graphs.py        # Bar plots
     └── wordcloud.py     # Word clouds
@@ -60,10 +68,9 @@ get_default_config() → ConvovizConfig
 
 #### Data Flow
 ```
-ZIP file → load_collection_from_zip() → ConversationCollection
+Input (ZIP/Dir/JSON) → loaders.py → ConversationCollection
     └── Contains list of Conversation objects
-    └── Each Conversation has a tree of Node objects (DAG)
-    └── Each Node may have a Message
+    └── Sets source_path for asset resolution
 ```
 
 #### Rendering Flow
@@ -71,6 +78,7 @@ ZIP file → load_collection_from_zip() → ConversationCollection
 Conversation + Config → render_conversation() → Markdown string
     └── Uses render_yaml_header() for frontmatter
     └── Uses render_node() for each message
+    └── Uses asset_resolver callback to copy/link images
 ```
 
 ## Key Files to Know
@@ -79,7 +87,7 @@ Conversation + Config → render_conversation() → Markdown string
 |------|---------|
 | `convoviz/config.py` | All configuration models (ConvovizConfig is the main one) |
 | `convoviz/pipeline.py` | Main processing flow - start here to understand the app |
-| `convoviz/models/conversation.py` | Core data model with most business logic |
+| `convoviz/io/assets.py`| Logic for finding and copying image assets |
 | `AGENTS.md` | Context and operational guidelines for AI agents |
 
 ## Running the Project
@@ -90,7 +98,8 @@ uv sync
 
 # Run CLI
 uv run convoviz --help
-uv run convoviz --zip export.zip --output ./output
+uv run convoviz --input export.zip --output ./output
+uv run convoviz --input ./extracted_export_dir --output ./output
 
 # Full quality check (Tests + Type + Lint)
 uv run ruff check convoviz tests && uv run mypy convoviz && uv run pytest
@@ -98,27 +107,15 @@ uv run ruff check convoviz tests && uv run mypy convoviz && uv run pytest
 
 ## Known Quirks & Gotchas
 
-1.  **ChatGPT Data Structure**: It is a **Directed Acyclic Graph (DAG)**, not a linear list. We traverse from `current_node` backwards or recursively through `children`.
+1.  **ChatGPT Data Structure**: It is a **Directed Acyclic Graph (DAG)**, not a linear list.
 2.  **Polymorphic Content**: The `parts` field in messages can contain strings (text) OR dictionaries (images, tool calls).
-3.  **Font assets**: Fonts are bundled in `convoviz/assets/fonts/`. Default is RobotoSlab-Thin.
-4.  **NLTK stopwords**: Downloaded on first use, cached with `@lru_cache`.
-5.  **Bookmarklet support**: The tool can merge data from a browser bookmarklet export.
+3.  **Asset Resolution**: Images (DALL-E) are often in a `dalle-generations` subfolder, while user uploads are in the root. The code handles both.
 
 ## What's NOT Done (Roadmap)
 
-- [ ] **Content Rendering**: `Message.text` currently ignores non-string parts (like images). It needs to handle multimodal content properly.
+- [ ] **Performance**: Large exports with thousands of images might be slow to copy. Consider async copy.
 - [ ] **Citations**: Parse invisible characters/metadata in ChatGPT exports that denote citations.
 - [ ] **Canvas Support**: Research and implement support for "Canvas" content.
 - [ ] **Interactive Tests**: No tests exist for `interactive.py`.
 - [ ] **GraphConfig**: Currently empty placeholder.
 - [ ] **Cross-Platform**: Loaders for Claude and Gemini are planned but not started.
-
-## Dependencies
-
-Key dependencies in `pyproject.toml`:
-- `pydantic` - Config and data models
-- `typer` + `rich` - CLI
-- `questionary` - Interactive prompts
-- `matplotlib` - Graphs
-- `wordcloud` - Word clouds
-- `orjson` - Fast JSON parsing

@@ -23,7 +23,7 @@ def test_main_with_args(mock_zip_file: Path, tmp_path: Path) -> None:
         assert result.exit_code == 0
         mock_run.assert_called_once()
         config = mock_run.call_args[0][0]
-        assert config.zip_filepath == mock_zip_file
+        assert config.input_path == mock_zip_file
         assert config.output_folder == output_dir
 
 
@@ -48,7 +48,7 @@ def test_interactive_flag_respected() -> None:
         from convoviz.config import get_default_config
 
         mock_config = get_default_config()
-        mock_config.zip_filepath = Path("dummy.zip")
+        mock_config.input_path = Path("dummy.zip")
         mock_interactive.return_value = mock_config
 
         result = runner.invoke(app, ["--interactive"])

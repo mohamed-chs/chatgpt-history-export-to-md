@@ -59,6 +59,26 @@ class Message(BaseModel):
     recipient: str
 
     @property
+    def images(self) -> list[str]:
+        """Extract image asset pointers from the message content."""
+        if not self.content.parts:
+            return []
+
+        image_ids = []
+        for part in self.content.parts:
+            if isinstance(part, dict) and part.get("content_type") == "image_asset_pointer":
+                pointer = part.get("asset_pointer", "")
+                # Strip prefixes like "file-service://" or "sediment://"
+                if pointer.startswith("file-service://"):
+                    pointer = pointer[len("file-service://") :]
+                elif pointer.startswith("sediment://"):
+                    pointer = pointer[len("sediment://") :]
+
+                if pointer:
+                    image_ids.append(pointer)
+        return image_ids
+
+    @property
     def text(self) -> str:
         """Extract the text content of the message."""
         if self.content.parts is not None:
@@ -72,18 +92,18 @@ class Message(BaseModel):
                     # But based on spec, usually text is just a string in the list.
                     # We'll stick to string extraction for now.
                     pass
-            
-            # If we found string parts, join them. 
-            # If parts existed but no strings (e.g. only images), return empty string? 
+
+            # If we found string parts, join them.
+            # If parts existed but no strings (e.g. only images), return empty string?
             # Or should we return a placeholder? For now, let's return joined text.
             if text_parts:
                 return "".join(text_parts)
-            
+
             # If parts list is not empty but contains no strings, we might want to fall through
             # or return empty string if we consider it "handled".
             # The original code returned "" if parts was empty list.
             if self.content.parts:
-                 return ""
+                return ""
 
         if self.content.text is not None:
             return self.content.text

@@ -36,6 +36,11 @@ Always use `uv` to run commands in the environment.
 - **Persistence**: If you leave incomplete work, update `dev/HANDOFF.md` (do not store tasks here).
 - **Files**: Do not modify `LICENSE` or `uv.lock` unless explicitly instructed.
 
+## Communication & UX Protocol
+- **Directness**: If you need the user to run a test, inspect a file, or provide context, ASK directly. Do not implement complex workarounds to avoid user interaction.
+- **User Experience**: Prioritize the end-user experience (UX) of the application. Do not compromise the application's design or usability to fit temporary development environment constraints.
+- **Transparency**: Be transparent about missing context or difficulties.
+
 ## Meta-Notes
 - This is a working document for brainstorming and info-sharing; it is not a directive.
 - It's the entry point for working/continuing work on the project.

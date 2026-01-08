@@ -144,3 +144,24 @@ class TestRenderConversation:
         assert "user message 111" in markdown
         assert "# ChatGPT" in markdown
         assert "assistant message 111" in markdown
+
+    def test_render_conversation_with_images(self, mock_conversation: Conversation) -> None:
+        """Test conversation rendering with image assets."""
+        config = ConversationConfig()
+        headers = AuthorHeaders()
+
+        # Mock an image in the message
+        mock_conversation.all_message_nodes[0].message.content.parts = [
+            {"content_type": "image_asset_pointer", "asset_pointer": "file-service://file-123"}
+        ]
+
+        def mock_resolver(asset_id: str) -> str | None:
+            if asset_id == "file-123":
+                return "assets/file-123.png"
+            return None
+
+        markdown = render_conversation(
+            mock_conversation, config, headers, asset_resolver=mock_resolver
+        )
+
+        assert "![Image](assets/file-123.png)" in markdown
