@@ -57,8 +57,8 @@ def test_wordcloud_config_defaults() -> None:
     """Test WordCloudConfig default values."""
     wc = WordCloudConfig()
     assert wc.colormap == "magma"
-    assert wc.width == 1000
-    assert wc.height == 1000
+    assert wc.width == 600
+    assert wc.height == 600
     assert wc.mode == "RGBA"
 
 
