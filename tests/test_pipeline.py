@@ -31,7 +31,7 @@ def test_run_pipeline(mock_zip_file: Path, tmp_path: Path) -> None:
         assert output_dir.exists()
         assert (output_dir / "Markdown").exists()
         assert (output_dir / "Graphs").exists()
-        assert (output_dir / "Word Clouds").exists()
+        assert (output_dir / "Word-Clouds").exists()
         assert (output_dir / "custom_instructions.json").exists()
 
         # Check if markdown file was created

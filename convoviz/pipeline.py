@@ -66,11 +66,22 @@ def run_pipeline(config: ConvovizConfig) -> None:
             )
 
     output_folder = config.output_folder
-
-    # Clean and recreate output folder
-    if output_folder.exists() and output_folder.is_dir():
-        rmtree(output_folder)
     output_folder.mkdir(parents=True, exist_ok=True)
+
+    # Clean only specific sub-directories we manage
+    managed_dirs = ["Markdown", "Graphs", "Word-Clouds"]
+    for d in managed_dirs:
+        sub_dir = output_folder / d
+        if sub_dir.exists() and sub_dir.is_dir():
+            rmtree(sub_dir)
+        sub_dir.mkdir(exist_ok=True)
+
+    # Clean specific files we manage
+    managed_files = ["custom_instructions.json"]
+    for f in managed_files:
+        managed_file = output_folder / f
+        if managed_file.exists():
+            managed_file.unlink()
 
     # Save markdown files
     markdown_folder = output_folder / "Markdown"
@@ -101,7 +112,7 @@ def run_pipeline(config: ConvovizConfig) -> None:
     )
 
     # Generate word clouds
-    wordcloud_folder = output_folder / "Word Clouds"
+    wordcloud_folder = output_folder / "Word-Clouds"
     wordcloud_folder.mkdir(parents=True, exist_ok=True)
     generate_wordclouds(
         collection,

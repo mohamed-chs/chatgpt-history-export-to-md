@@ -17,19 +17,25 @@ def resolve_asset_path(source_dir: Path, asset_id: str) -> Path | None:
     if not source_dir.exists():
         return None
 
-    # Safety check
+    source_dir = source_dir.resolve()
+
+    # Safety check for asset_id
     if ".." in asset_id or "/" in asset_id or "\\" in asset_id:
         return None
 
     # 1. Try exact match
-    exact_path = source_dir / asset_id
-    if exact_path.exists() and exact_path.is_file():
+    exact_path = (source_dir / asset_id).resolve()
+    if exact_path.exists() and exact_path.is_file() and exact_path.is_relative_to(source_dir):
         return exact_path
 
     # 2. Try prefix match in root
     try:
         candidates = list(source_dir.glob(f"{asset_id}*"))
-        files = [p for p in candidates if p.is_file()]
+        files = [
+            p.resolve()
+            for p in candidates
+            if p.is_file() and p.resolve().is_relative_to(source_dir)
+        ]
         if files:
             return files[0]
     except Exception:
@@ -38,9 +44,14 @@ def resolve_asset_path(source_dir: Path, asset_id: str) -> Path | None:
     # 3. Try prefix match in dalle-generations
     dalle_dir = source_dir / "dalle-generations"
     if dalle_dir.exists() and dalle_dir.is_dir():
+        dalle_dir = dalle_dir.resolve()
         try:
             candidates = list(dalle_dir.glob(f"{asset_id}*"))
-            files = [p for p in candidates if p.is_file()]
+            files = [
+                p.resolve()
+                for p in candidates
+                if p.is_file() and p.resolve().is_relative_to(dalle_dir)
+            ]
             if files:
                 return files[0]
         except Exception:

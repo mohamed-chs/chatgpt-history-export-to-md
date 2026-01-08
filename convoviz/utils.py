@@ -7,16 +7,54 @@ from pathlib import Path
 def sanitize(filename: str) -> str:
     """Sanitize a string to be safe for use as a filename.
 
-    Replaces invalid characters with underscores.
+    Replaces invalid characters with underscores, handles reserved names,
+    and prevents path traversal characters.
 
     Args:
         filename: The string to sanitize
 
     Returns:
-        A filename-safe string, or "untitled" if empty
+        A filename-safe string, or "untitled" if empty or invalid
     """
+    # Replace invalid characters
     pattern = re.compile(r'[<>:"/\\|?*\n\r\t\f\v]+')
     result = pattern.sub("_", filename.strip())
+
+    # Prevent path traversal
+    result = result.replace("..", "_")
+
+    # Windows reserved names
+    reserved = {
+        "CON",
+        "PRN",
+        "AUX",
+        "NUL",
+        "COM1",
+        "COM2",
+        "COM3",
+        "COM4",
+        "COM5",
+        "COM6",
+        "COM7",
+        "COM8",
+        "COM9",
+        "LPT1",
+        "LPT2",
+        "LPT3",
+        "LPT4",
+        "LPT5",
+        "LPT6",
+        "LPT7",
+        "LPT8",
+        "LPT9",
+    }
+    if result.upper() in reserved:
+        result = f"_{result}_"
+
+    # Enforce length limit (255 is common for many filesystems)
+    if len(result) > 255:
+        result = result[:255]
+
     return result or "untitled"
 
 

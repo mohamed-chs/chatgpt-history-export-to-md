@@ -1,0 +1,64 @@
+import io
+from zipfile import ZipFile
+
+import pytest
+
+from convoviz.config import ConvovizConfig
+from convoviz.exceptions import InvalidZipError
+from convoviz.io.loaders import extract_archive
+from convoviz.pipeline import run_pipeline
+from convoviz.utils import sanitize
+
+
+def test_zip_slip_protection(tmp_path):
+    # Create a malicious ZIP file in memory
+    zip_buffer = io.BytesIO()
+    with ZipFile(zip_buffer, "w") as zf:
+        # Try to extract outside the folder
+        zf.writestr("../evil.txt", "malicious content")
+
+    zip_path = tmp_path / "malicious.zip"
+    zip_path.write_bytes(zip_buffer.getvalue())
+
+    with pytest.raises(InvalidZipError, match="Malicious path in ZIP"):
+        extract_archive(zip_path)
+
+
+def test_sanitize_path_traversal():
+    assert sanitize("../../etc/passwd") == "____etc_passwd"
+    assert sanitize("..\\..\\windows\\system32") == "____windows_system32"
+
+
+def test_sanitize_reserved_names():
+    assert sanitize("CON") == "_CON_"
+    assert sanitize("aux") == "_aux_"
+
+
+def test_safe_directory_management(tmp_path):
+    output_dir = tmp_path / "output"
+    output_dir.mkdir()
+
+    keeper_file = output_dir / "keeper.txt"
+    keeper_file.write_text("I should stay")
+
+    # Create managed dirs to be replaced
+    markdown_dir = output_dir / "Markdown"
+    markdown_dir.mkdir()
+    old_file = markdown_dir / "old.md"
+    old_file.write_text("I should be deleted")
+
+    # Minimal config to run pipeline
+    # We need a dummy input
+    input_dir = tmp_path / "input"
+    input_dir.mkdir()
+    conv_json = input_dir / "conversations.json"
+    conv_json.write_text("[]")
+
+    config = ConvovizConfig(input_path=str(input_dir), output_folder=output_dir)
+
+    run_pipeline(config)
+
+    assert keeper_file.exists()
+    assert keeper_file.read_text() == "I should stay"
+    assert not old_file.exists()
+    assert (output_dir / "Markdown").exists()

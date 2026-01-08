@@ -12,14 +12,36 @@ from convoviz.models import Conversation, ConversationCollection
 def extract_archive(filepath: Path) -> Path:
     """Extract a ZIP file and return the extraction folder path.
 
+    Includes safety checks to prevent Path Traversal (Zip-Slip).
+
     Args:
         filepath: Path to the ZIP file
 
     Returns:
         Path to the extracted folder
+
+    Raises:
+        InvalidZipError: If extraction fails or a security risk is detected
     """
     folder = filepath.with_suffix("")
+    folder.mkdir(parents=True, exist_ok=True)
+
     with ZipFile(filepath) as zf:
+        for member in zf.infolist():
+            # Check for path traversal (Zip-Slip)
+            member_path = Path(member.filename)
+            if member_path.is_absolute() or ".." in member_path.parts:
+                raise InvalidZipError(
+                    str(filepath), reason=f"Malicious path in ZIP: {member.filename}"
+                )
+
+            # Additional check using resolved paths
+            target_path = (folder / member.filename).resolve()
+            if not target_path.is_relative_to(folder.resolve()):
+                raise InvalidZipError(
+                    str(filepath), reason=f"Malicious path in ZIP: {member.filename}"
+                )
+
         zf.extractall(folder)
     return folder
 
