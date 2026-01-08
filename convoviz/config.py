@@ -58,8 +58,8 @@ class WordCloudConfig(BaseModel):
     background_color: str | None = None
     mode: Literal["RGB", "RGBA"] = "RGBA"
     include_numbers: bool = False
-    width: int = 1000
-    height: int = 1000
+    width: int = 600
+    height: int = 600
 
 
 class GraphConfig(BaseModel):
@@ -73,7 +73,7 @@ class ConvovizConfig(BaseModel):
     """Main configuration for convoviz."""
 
     input_path: Path | None = None
-    output_folder: Path = Field(default_factory=lambda: Path.home() / "Documents" / "ChatGPT Data")
+    output_folder: Path = Field(default_factory=lambda: Path.home() / "Documents" / "ChatGPT-Data")
     message: MessageConfig = Field(default_factory=MessageConfig)
     conversation: ConversationConfig = Field(default_factory=ConversationConfig)
     wordcloud: WordCloudConfig = Field(default_factory=WordCloudConfig)
