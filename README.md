@@ -25,41 +25,54 @@ See examples [here](demo).
 
 ### 2. Install the tool 🛠
 
-Open a terminal or command prompt and run:
+Try it without installing using uv ([astral-sh/uv](https://github.com/astral-sh/uv)):
 
 ```bash
-pip install convoviz
+uvx convoviz
 ```
 
-to install the package.
+You can install it with uv (Recommended):
+
+```bash
+uv tool install convoviz
+```
+
+or pipx:
+```bash
+pipx install convoviz
+```
 
 ### 3. Run the Script 🏃‍♂️
 
-With the package installed, run the following command in your terminal:
+Simply run the command and follow the prompts:
 
 ```bash
-python -m convoviz
+convoviz
 ```
 
-Next, follow the instructions displayed and choose your desired options, the script will handle the rest.
+#### Command Line Arguments
+
+You can provide arguments directly to skip the prompts:
+
+```bash
+convoviz --zip path/to/your/export.zip --output path/to/output/folder
+```
+
+For more options, run:
+
+```bash
+convoviz --help
+```
 
 ### 4. Check the Output 🎉
 
 And that's it! After running the script, head over to the output folder to see your nice word clouds, graphs, and neatly formatted Markdown files. Enjoy !
 
-**Tweet Your Discoveries**:
-
-[![Tweet](https://img.shields.io/twitter/url?style=social&url=https%3A%2F%2Fgithub.com%2Fyourusername%2Fyourrepository)](https://twitter.com/intent/tweet?text=So%2C%20this%20is%20what%20my%20entire%20ChatGPT%20history%20looks%20like%20...%0D%0A%0D%0Ahttp%3A%2F%2Fbit.ly%2F3ZuHCCK)
-
-### How to add new conversations ➕
-
-See [How to use the JS script](js/how_to_use.md) for instructions on how to download new conversations.
-
 ## Share Your Feedback! 💌
 
 I hope you find this tool useful. I'm continuously looking to improve on this, but I need your help for that.
 
-Whether you're a tech wizard or you're new to all this (especially if you're new to all this), I'd love to hear about your journey with the tool. Found a quirk? Have a suggestion? Or just want to send some good vibes? I'm all ears!
+Whether you're a tech wizard or you're new to all this, I'd love to hear about your journey with the tool. Found a quirk? Have a suggestion? Or just want to send some good vibes? I'm all ears!
 
 **Here's how you can share your thoughts:**
 
@@ -69,11 +82,7 @@ Whether you're a tech wizard or you're new to all this (especially if you're new
 
 And if you've had a great experience, consider giving the project a star ⭐. It keeps me motivated and helps others discover it!
 
-Thank you for being awesome! 🌟
-
 ## Notes
-
-This project requires Python 3.8.7 or higher if on Windows. See [known issue](https://github.com/prompt-toolkit/python-prompt-toolkit/issues/1023#issue-534396318)
 
 This is just a small thing I coded to help me see my convos in beautiful markdown, in [Obsidian](https://obsidian.md/) (my go-to note-taking app).
 
@@ -81,8 +90,6 @@ I wasn't a fan of the clunky, and sometimes paid, browser extensions.
 
 It was also a great opportunity to learn more about Python and type annotations. I had mypy, pyright, and ruff all on strict mode, 'twas fun.
 
-It also works as package, so you can **import** it in your own projects, and use the models and functions as you wish. I need to add more documentation for that tho. Feel free to reach out if you need help.
+It should(?) also work as library, so you can import and use the models and functions. I need to add more documentation for that tho. Feel free to reach out if you need help.
 
-I'm working on automating it to add new conversations and updating old ones. Had some luck with a JavaScript bookmarklet, still ironing it out tho. Shouldn't take long.
-
-> for an older version with zero dependencies, see https://github.com/mohamed-chs/chatgpt-history-export-to-md/tree/fe13a701fe8653c9f946b1e12979ce3bfe7104b8.
+I'm working on automating it to add new conversations and updating old ones. Had some luck with a JavaScript bookmarklet, still ironing it out tho.

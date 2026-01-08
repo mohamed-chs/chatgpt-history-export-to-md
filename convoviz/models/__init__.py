@@ -1,8 +1,24 @@
-"""Models for the application."""
+"""Data models for convoviz."""
 
-from ._conversation import Conversation
-from ._conversation_set import ConversationSet
-from ._message import Message
-from ._node import Node
+from convoviz.models.collection import ConversationCollection
+from convoviz.models.conversation import Conversation
+from convoviz.models.message import (
+    AuthorRole,
+    Message,
+    MessageAuthor,
+    MessageContent,
+    MessageMetadata,
+)
+from convoviz.models.node import Node, build_node_tree
 
-__all__ = ["Conversation", "ConversationSet", "Message", "Node"]
+__all__ = [
+    "AuthorRole",
+    "Conversation",
+    "ConversationCollection",
+    "Message",
+    "MessageAuthor",
+    "MessageContent",
+    "MessageMetadata",
+    "Node",
+    "build_node_tree",
+]

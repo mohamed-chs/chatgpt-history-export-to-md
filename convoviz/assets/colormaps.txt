@@ -12,5 +12,4 @@ Spectral
 coolwarm
 terrain
 ocean
-prism
 flag

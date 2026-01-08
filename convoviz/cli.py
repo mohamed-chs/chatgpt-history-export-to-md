@@ -1,99 +1,106 @@
-"""Main file for running the program from the command line."""
-
-from __future__ import annotations
+"""Command-line interface for convoviz."""
 
 from pathlib import Path
-from shutil import rmtree
 
-from .configuration import UserConfigs
-from .long_runs import (
-    generate_week_barplots,
-    generate_wordclouds,
+import typer
+from rich.console import Console
+
+from convoviz.config import get_default_config
+from convoviz.exceptions import ConfigurationError, InvalidZipError
+from convoviz.interactive import run_interactive_config
+from convoviz.io.loaders import find_latest_zip, validate_zip
+from convoviz.pipeline import run_pipeline
+from convoviz.utils import default_font_path
+
+app = typer.Typer(
+    add_completion=False,
+    help="ChatGPT Data Visualizer 📊 - Convert and visualize your ChatGPT history",
 )
-from .models import ConversationSet
-from .utils import latest_bookmarklet_json
+console = Console()
 
 
-def main() -> None:
-    """Run the program."""
-    print(
-        "Welcome to ChatGPT Data Visualizer ✨📊!\n\n"
-        "Follow the instructions in the command line.\n\n"
-        "Press 'ENTER' to select the default options.\n\n"
-        "If you encounter any issues 🐛, please report 🚨 them here:\n\n"
-        "➡️ https://github.com/mohamed-chs/chatgpt-history-export-to-md/issues/new/choose"
-        " 🔗\n\n",
-    )
+@app.callback(invoke_without_command=True)
+def run(
+    ctx: typer.Context,
+    zip_path: Path | None = typer.Option(
+        None,
+        "--zip",
+        "-z",
+        help="Path to the ChatGPT export zip file.",
+        exists=True,
+        file_okay=True,
+        dir_okay=False,
+    ),
+    output_dir: Path | None = typer.Option(
+        None,
+        "--output",
+        "-o",
+        help="Path to the output directory.",
+    ),
+    interactive: bool | None = typer.Option(
+        None,
+        "--interactive/--no-interactive",
+        "-i/-I",
+        help="Force interactive mode on or off.",
+    ),
+) -> None:
+    """Convert ChatGPT export data to markdown and generate visualizations."""
+    if ctx.invoked_subcommand is not None:
+        return
 
-    user = UserConfigs()
+    # Start with default config
+    config = get_default_config()
 
-    user.prompt()
+    # Override with CLI args
+    if zip_path:
+        config.zip_filepath = zip_path
+    if output_dir:
+        config.output_folder = output_dir
 
-    print("\n\nAnd we're off! 🚀🚀🚀\n")
+    # Determine mode: interactive if explicitly requested or no zip provided
+    use_interactive = interactive if interactive is not None else (zip_path is None)
 
-    user.set_model_configs()
+    if use_interactive:
+        console.print("Welcome to ChatGPT Data Visualizer ✨📊!\n")
+        try:
+            config = run_interactive_config(config)
+        except KeyboardInterrupt:
+            console.print("\n[yellow]Cancelled by user.[/yellow]")
+            raise typer.Exit(code=0) from None
+    else:
+        # Non-interactive mode: validate we have what we need
+        if not config.zip_filepath:
+            # Try to find a default
+            latest = find_latest_zip()
+            if latest:
+                console.print(f"No zip file specified, using latest found: {latest}")
+                config.zip_filepath = latest
+            else:
+                console.print(
+                    "[bold red]Error:[/bold red] No zip file provided and none found in Downloads."
+                )
+                raise typer.Exit(code=1)
 
-    print("Loading data 📂 ...\n")
+        # Validate the zip
+        if not validate_zip(config.zip_filepath):
+            console.print(f"[bold red]Error:[/bold red] Invalid zip file: {config.zip_filepath}")
+            raise typer.Exit(code=1)
 
-    entire_collection = ConversationSet.from_zip(user.configs["zip_filepath"])
+        # Set default font if not set
+        if not config.wordcloud.font_path:
+            config.wordcloud.font_path = default_font_path()
 
-    bkmrklet_json = latest_bookmarklet_json()
-    if bkmrklet_json:
-        print("Found bookmarklet download, loading 📂 ...\n")
-        bkmrklet_collection = ConversationSet.from_json(bkmrklet_json)
-        entire_collection.update(bkmrklet_collection)
+    # Run the pipeline
+    try:
+        run_pipeline(config)
+    except (InvalidZipError, ConfigurationError) as e:
+        console.print(f"[bold red]Error:[/bold red] {e}")
+        raise typer.Exit(code=1) from None
+    except Exception as e:
+        console.print(f"[bold red]Unexpected error:[/bold red] {e}")
+        raise typer.Exit(code=1) from None
 
-    output_folder = Path(user.configs["output_folder"])
 
-    # overwrite the output folder if it already exists (might change this in the future)
-    if output_folder.exists() and output_folder.is_dir():
-        rmtree(output_folder)
-
-    output_folder.mkdir(parents=True, exist_ok=True)
-
-    markdown_folder = output_folder / "Markdown"
-
-    entire_collection.save(markdown_folder, progress_bar=True)
-
-    print(f"\nDone ✅ ! Check the output 📄 here : {markdown_folder.as_uri()} 🔗\n")
-
-    graph_folder = output_folder / "Graphs"
-    graph_folder.mkdir(parents=True, exist_ok=True)
-
-    generate_week_barplots(
-        entire_collection,
-        graph_folder,
-        **user.configs["graph"],
-        progress_bar=True,
-    )
-
-    print(f"\nDone ✅ ! Check the output 📈 here : {graph_folder.as_uri()} 🔗\n")
-    print("(more graphs 📈 will be added in the future ...)\n")
-
-    wordcloud_folder = output_folder / "Word Clouds"
-    wordcloud_folder.mkdir(parents=True, exist_ok=True)
-
-    generate_wordclouds(
-        entire_collection,
-        wordcloud_folder,
-        **user.configs["wordcloud"],
-        progress_bar=True,
-    )
-
-    print(f"\nDone ✅ ! Check the output 🔡☁️ here : {wordcloud_folder.as_uri()} 🔗\n")
-
-    print("Writing custom instructions 📝 ...\n")
-
-    cstm_inst_filepath = output_folder / "custom_instructions.json"
-
-    entire_collection.save_custom_instructions(cstm_inst_filepath)
-
-    print(f"\nDone ✅ ! Check the output 📝 here : {cstm_inst_filepath.as_uri()} 🔗\n")
-
-    print(
-        "ALL DONE 🎉🎉🎉 !\n\n"
-        f"Explore the full gallery 🖼️ at: {output_folder.as_uri()} 🔗\n\n"
-        "I hope you enjoy the outcome 🤞.\n\n"
-        "If you appreciate it, kindly give the project a star 🌟 on GitHub :\n\n"
-        "➡️ https://github.com/mohamed-chs/chatgpt-history-export-to-md 🔗\n\n",
-    )
+def main_entry() -> None:
+    """Entry point for the CLI."""
+    app()
