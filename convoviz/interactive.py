@@ -93,6 +93,17 @@ def run_interactive_config(initial_config: ConvovizConfig | None = None) -> Conv
     if latex_result:
         config.conversation.markdown.latex_delimiters = latex_result
 
+    # Prompt for markdown flavor
+    flavor_result = select(
+        "Select the markdown flavor:",
+        choices=["obsidian", "standard"],
+        default=config.conversation.markdown.flavor,
+        style=CUSTOM_STYLE,
+    ).ask()
+
+    if flavor_result:
+        config.conversation.markdown.flavor = flavor_result
+
     # Prompt for YAML headers
     yaml_config = config.conversation.yaml
     yaml_choices = [

@@ -56,7 +56,7 @@ def test_markdown_config_defaults() -> None:
 def test_wordcloud_config_defaults() -> None:
     """Test WordCloudConfig default values."""
     wc = WordCloudConfig()
-    assert wc.colormap == "magma"
+    assert wc.colormap == "RdYlBu"
     assert wc.width == 600
     assert wc.height == 600
     assert wc.mode == "RGBA"
@@ -83,4 +83,4 @@ def test_config_independence() -> None:
     config1 = get_default_config()
     config2 = get_default_config()
     config1.wordcloud.colormap = "plasma"
-    assert config2.wordcloud.colormap == "magma"
+    assert config2.wordcloud.colormap == "RdYlBu"

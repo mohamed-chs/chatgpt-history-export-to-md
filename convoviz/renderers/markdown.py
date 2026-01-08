@@ -80,7 +80,7 @@ def render_message_header(role: str, headers: AuthorHeaders) -> str:
     return header_map.get(role, f"### {role.title()}")
 
 
-def render_node_header(node: Node, headers: AuthorHeaders) -> str:
+def render_node_header(node: Node, headers: AuthorHeaders, flavor: str = "obsidian") -> str:
     """Render the header section of a node.
 
     Includes the node ID, parent link, and message author header.
@@ -88,6 +88,7 @@ def render_node_header(node: Node, headers: AuthorHeaders) -> str:
     Args:
         node: The node to render
         headers: Configuration for author headers
+        flavor: Markdown flavor (obsidian, standard)
 
     Returns:
         The header markdown string
@@ -95,35 +96,39 @@ def render_node_header(node: Node, headers: AuthorHeaders) -> str:
     if node.message is None:
         return ""
 
-    parts = [f"###### {node.id}"]
+    if flavor == "standard":
+        return render_message_header(node.message.author.role, headers) + "\n"
+
+    # Obsidian flavor
+    parts = []
 
     # Add parent link if parent has a message
     if node.parent_node and node.parent_node.message:
-        parts.append(f"[parent ⬆️](#{node.parent_node.id})")
+        parts.append(f"[⬆️](#^{node.parent_node.id})")
 
-    parts.append(render_message_header(node.message.author.role, headers))
+    author_header = render_message_header(node.message.author.role, headers)
+    parts.append(f"{author_header} ^{node.id}")
 
     return "\n".join(parts) + "\n"
 
 
-def render_node_footer(node: Node) -> str:
+def render_node_footer(node: Node, flavor: str = "obsidian") -> str:
     """Render the footer section of a node with child links.
 
     Args:
         node: The node to render
+        flavor: Markdown flavor (obsidian, standard)
 
     Returns:
         The footer markdown string with child navigation links
     """
-    if not node.children_nodes:
+    if flavor == "standard" or not node.children_nodes:
         return ""
 
     if len(node.children_nodes) == 1:
-        return f"\n[child ⬇️](#{node.children_nodes[0].id})\n"
+        return f"\n[⬇️](#^{node.children_nodes[0].id})\n"
 
-    links = " | ".join(
-        f"[child {i + 1} ⬇️](#{child.id})" for i, child in enumerate(node.children_nodes)
-    )
+    links = " | ".join(f"[{i + 1} ⬇️](#^{child.id})" for i, child in enumerate(node.children_nodes))
     return f"\n{links}\n"
 
 
@@ -132,6 +137,7 @@ def render_node(
     headers: AuthorHeaders,
     use_dollar_latex: bool = False,
     asset_resolver: Callable[[str], str | None] | None = None,
+    flavor: str = "obsidian",
 ) -> str:
     """Render a complete node as markdown.
 
@@ -140,6 +146,7 @@ def render_node(
         headers: Configuration for author headers
         use_dollar_latex: Whether to convert LaTeX delimiters to dollars
         asset_resolver: Function to resolve asset IDs to paths
+        flavor: Markdown flavor (obsidian, standard)
 
     Returns:
         Complete markdown string for the node
@@ -147,7 +154,7 @@ def render_node(
     if node.message is None:
         return ""
 
-    header = render_node_header(node, headers)
+    header = render_node_header(node, headers, flavor=flavor)
 
     # Get and process content
     try:
@@ -168,7 +175,7 @@ def render_node(
     except Exception:
         content = ""
 
-    footer = render_node_footer(node)
+    footer = render_node_footer(node, flavor=flavor)
 
     return f"\n{header}{content}{footer}\n---\n"
 
@@ -191,6 +198,7 @@ def render_conversation(
         Complete markdown document string
     """
     use_dollar_latex = config.markdown.latex_delimiters == "dollars"
+    flavor = config.markdown.flavor
 
     # Start with YAML header
     markdown = render_yaml_header(conversation, config.yaml)
@@ -198,6 +206,8 @@ def render_conversation(
     # Render all message nodes
     for node in conversation.all_message_nodes:
         if node.message:
-            markdown += render_node(node, headers, use_dollar_latex, asset_resolver=asset_resolver)
+            markdown += render_node(
+                node, headers, use_dollar_latex, asset_resolver=asset_resolver, flavor=flavor
+            )
 
     return markdown

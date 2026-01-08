@@ -19,6 +19,7 @@ class MarkdownConfig(BaseModel):
     """Configuration for markdown output."""
 
     latex_delimiters: Literal["default", "dollars"] = "default"
+    flavor: Literal["obsidian", "standard"] = "obsidian"
 
 
 class YAMLConfig(BaseModel):
@@ -53,7 +54,7 @@ class WordCloudConfig(BaseModel):
     """Configuration for word cloud generation."""
 
     font_path: Path | None = None
-    colormap: str = "magma"
+    colormap: str = "RdYlBu"
     custom_stopwords: str = "use, file, "
     background_color: str | None = None
     mode: Literal["RGB", "RGBA"] = "RGBA"

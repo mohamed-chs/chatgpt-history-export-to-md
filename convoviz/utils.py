@@ -125,9 +125,9 @@ def default_font_path() -> Path:
     """Get the path to the default font.
 
     Returns:
-        Path to RobotoSlab-Thin.ttf
+        Path to Kalam-Regular.ttf
     """
-    return font_path("RobotoSlab-Thin")
+    return font_path("Kalam-Regular")
 
 
 def colormaps() -> list[str]:
