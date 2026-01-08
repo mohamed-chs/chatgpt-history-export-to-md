@@ -88,6 +88,18 @@ def root_dir() -> Path:
     return Path(__file__).parent
 
 
+def get_asset_path(relative_path: str) -> Path:
+    """Get the absolute path to an asset file.
+
+    Args:
+        relative_path: Path relative to convoviz root (e.g., "assets/fonts/foo.ttf")
+
+    Returns:
+        Absolute Path to the asset
+    """
+    return root_dir() / relative_path
+
+
 def font_dir() -> Path:
     """Get the path to the fonts directory.
 

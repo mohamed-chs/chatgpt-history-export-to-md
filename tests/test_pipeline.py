@@ -20,9 +20,9 @@ def test_run_pipeline(mock_zip_file: Path, tmp_path: Path) -> None:
 
     # Mock long-running tasks
     with (
-        patch("convoviz.analysis.graphs.generate_week_barplots") as mock_graphs,
+        patch("convoviz.analysis.graphs.generate_graphs") as mock_graphs,
         patch("convoviz.analysis.wordcloud.generate_wordclouds") as mock_clouds,
-        patch("convoviz.pipeline.generate_week_barplots", mock_graphs),
+        patch("convoviz.pipeline.generate_graphs", mock_graphs),
         patch("convoviz.pipeline.generate_wordclouds", mock_clouds),
     ):
         run_pipeline(config)

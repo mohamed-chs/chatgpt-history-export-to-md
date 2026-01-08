@@ -5,7 +5,7 @@ from shutil import rmtree
 
 from rich.console import Console
 
-from convoviz.analysis.graphs import generate_week_barplots
+from convoviz.analysis.graphs import generate_graphs
 from convoviz.analysis.wordcloud import generate_wordclouds
 from convoviz.config import ConvovizConfig
 from convoviz.exceptions import InvalidZipError
@@ -100,7 +100,7 @@ def run_pipeline(config: ConvovizConfig) -> None:
     # Generate graphs
     graph_folder = output_folder / "Graphs"
     graph_folder.mkdir(parents=True, exist_ok=True)
-    generate_week_barplots(
+    generate_graphs(
         collection,
         graph_folder,
         config.graph,

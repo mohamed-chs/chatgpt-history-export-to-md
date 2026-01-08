@@ -66,8 +66,11 @@ class WordCloudConfig(BaseModel):
 class GraphConfig(BaseModel):
     """Configuration for graph generation."""
 
-    # Extensible for future graph options
-    pass
+    color: str = "#4A90E2"
+    grid: bool = True
+    show_counts: bool = True
+    font_name: str = "Montserrat-Regular.ttf"
+    figsize: tuple[int, int] = (10, 6)
 
 
 class ConvovizConfig(BaseModel):
