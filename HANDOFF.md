@@ -132,17 +132,15 @@ All tests use fixtures from `conftest.py`, especially `mock_conversation` and `m
 
 4. **File naming**: Output files use sanitized conversation titles. Duplicates get `(1)`, `(2)` suffixes.
 
-5. **Backward compatibility**: `ConversationSet` is an alias for `ConversationCollection`.
-
 ## What's NOT Done
 
-See `NEXT_STEPS.md` for full list, but highlights:
+highlights:
 
 - [ ] Tests for `interactive.py`
-- [ ] README.md needs updating
-- [ ] No CI/CD pipeline
-- [ ] Not published to PyPI
 - [ ] `GraphConfig` is empty (placeholder for future)
+- [ ] ... and
+- [ ] much ...
+- [ ] more ...
 
 ## Dependencies
 
@@ -179,7 +177,10 @@ uv run ruff format convoviz tests
 uv run ruff check --fix convoviz tests
 ```
 
-## Contact
+## Notes
 
-Original author: Mohamed Cheikh Sidiya
-GitHub: https://github.com/mohamed-chs/chatgpt-history-export-to-md
+This is a working document for brainstorming and info-sharing; it is not a directive.
+It's kinda the entry point for working/continuing work on the project.
+Try to keep it updated; complete rewrites are within the realm of possibility.
+
+Also a good habit to take (I'm talking to you, AI coding agent) is to write other such .md files to persist plans/context in this session and the next. Write them in the root project directory, or in other places if you prefer, depending on the context.

@@ -11,14 +11,10 @@ from convoviz.models.message import (
 )
 from convoviz.models.node import Node, build_node_tree
 
-# Backward compatibility alias
-ConversationSet = ConversationCollection
-
 __all__ = [
     "AuthorRole",
     "Conversation",
     "ConversationCollection",
-    "ConversationSet",
     "Message",
     "MessageAuthor",
     "MessageContent",
