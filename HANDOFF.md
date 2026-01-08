@@ -183,4 +183,4 @@ This is a working document for brainstorming and info-sharing; it is not a direc
 It's kinda the entry point for working/continuing work on the project.
 Try to keep it updated; complete rewrites are within the realm of possibility.
 
-Also a good habit to take (I'm talking to you, AI coding agent) is to write other such .md files to persist plans/context in this session and the next. Write them in the root project directory, or in other places if you prefer, depending on the context.
+Also a good habit to take (I'm talking to you, AI coding agent) is to write other such .md files to persist plans/context in this session and the next. Write them in the root project directory, or in other places if you prefer, depending on the context. Take the liberty to do it anytime, it's very much encouraged and recommended, you don't even have to ask me before you do it, or notify me at all for that matter.
