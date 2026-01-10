@@ -128,5 +128,5 @@ uv run ruff check convoviz tests && uv run mypy convoviz && uv run pytest
 - [ ] **Performance**: Large exports with thousands of images might be slow to copy. Consider async copy.
 - [ ] **Citations**: Parse invisible characters/metadata in ChatGPT exports that denote citations.
 - [ ] **Canvas Support**: Research and implement support for "Canvas" content.
-- [ ] **Interactive Tests**: No tests exist for `interactive.py`.
+- [x] **Interactive Tests**: Added tests covering cancellation behavior and prompt flow (`tests/test_interactive.py`).
 - [ ] **Cross-Platform**: Loaders for Claude and Gemini are planned but not started.

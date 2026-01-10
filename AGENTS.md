@@ -47,6 +47,7 @@ Always use `uv` to run commands in the environment.
 - **Startup**: ALWAYS start by reading `dev/HANDOFF.md`, then conduct a deep codebase analysis to understand the current state and conventions.
 - **Critical Mindset**: Do not assume the codebase is perfectly implemented. Be alert for missing or buggy logic, including features that may appear complete but still require refinement or further work.
 - **Verification**: ALWAYS run the full quality gate before submitting changes (or at minimum `ruff check` + `pytest` for docs-only work).
+- **Docs stay current**: Reflexively keep relevant `.md` docs updated when behavior/UX changes (README, `dev/HANDOFF.md`, and any feature docs touched by the change).
 - **Persistence**: If you leave incomplete work, update `dev/HANDOFF.md` (do not store tasks here).
 - **Files**:
     - Do not modify `LICENSE` unless explicitly instructed.
