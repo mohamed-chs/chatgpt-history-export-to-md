@@ -28,6 +28,7 @@ Always use `uv` to run commands in the environment.
     - `mapping` contains nodes; `current_node` points to the active leaf.
     - `content.parts` is polymorphic (strings mixed with dicts).
     - Top-level can be a list OR `{ conversations: [...] }`.
+    - **Hidden Messages**: Internal tool calls (search queries, code inputs) are filtered via `is_hidden`. This logic checks for `recipient="browser"` or `content_type="code"` on assistant messages.
 - **References**: See `docs/chatgpt-spec-unofficial.md` for a deep research on ChatGPT export schema.
 
 ## Agent Protocol

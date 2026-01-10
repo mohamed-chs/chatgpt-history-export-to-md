@@ -10,7 +10,12 @@ This document provides context for continuing work on the convoviz project.
 - Bar plot graphs showing usage patterns
 - JSON export of custom instructions
 
-## Recent Updates (January 8, 2026)
+## Recent Updates (January 10, 2026)
+
+**Content Filtering (Fix)**:
+- **Hidden Internal Tool Calls**: Improved logic to hide internal assistant tool calls (e.g., `search(...)` or Code Interpreter inputs) which were previously leaking into the Markdown output.
+    - Updated `convoviz/models/message.py` to hide messages where `recipient="browser"` OR (`role="assistant"` AND `content_type="code"`).
+    - Verified with new test cases in `tests/test_models.py`.
 
 **Image Support & I/O Modernization**:
 - **Image Rendering**: Implemented support for rendering images in Markdown (`![Image](assets/...)`).

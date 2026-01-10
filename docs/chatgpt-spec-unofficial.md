@@ -174,6 +174,8 @@ Canvas data is often decoupled from `conversations.json`.
       "text": "import pandas as pd..."
     }
     ```
+    *Observation:* Assistant inputs (e.g., `search('query')`) often have `recipient: "browser"` BUT can also have `recipient: "all"`. Reliable filtering requires checking `role="assistant"` AND (`recipient="browser"` OR `content_type="code"`).
+
 *   **Output (`role: tool`):**
     ```json
     {
