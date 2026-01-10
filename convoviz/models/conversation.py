@@ -98,12 +98,10 @@ class Conversation(BaseModel):
     def custom_instructions(self) -> dict[str, str]:
         """Get custom instructions used for this conversation."""
         system_nodes = self.nodes_by_author("system")
-        if len(system_nodes) < 2:
-            return {}
-
-        context_message = system_nodes[1].message
-        if context_message and context_message.metadata.is_user_system_message:
-            return context_message.metadata.user_context_message_data or {}
+        for node in system_nodes:
+            context_message = node.message
+            if context_message and context_message.metadata.is_user_system_message:
+                return context_message.metadata.user_context_message_data or {}
         return {}
 
     def timestamps(self, *authors: AuthorRole) -> list[float]:

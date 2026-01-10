@@ -37,14 +37,20 @@ class ConversationCollection(BaseModel):
     def update(self, other: "ConversationCollection") -> None:
         """Merge another collection into this one.
 
-        Only updates if the other collection has newer content.
-        """
-        if other.last_updated <= self.last_updated:
-            return
+        Merges per-conversation, keeping the newest version when IDs collide.
 
-        merged_index = self.index
-        merged_index.update(other.index)
-        self.conversations = list(merged_index.values())
+        Note: We intentionally do *not* gate on ``other.last_updated`` because
+        "new" conversations can still have older timestamps than the most recent
+        conversation in this collection (e.g. bookmarklet downloads).
+        """
+        merged: dict[str, Conversation] = dict(self.index)
+
+        for conv_id, incoming in other.index.items():
+            existing = merged.get(conv_id)
+            if existing is None or incoming.update_time > existing.update_time:
+                merged[conv_id] = incoming
+
+        self.conversations = list(merged.values())
 
     def add(self, conversation: Conversation) -> None:
         """Add a conversation to the collection."""

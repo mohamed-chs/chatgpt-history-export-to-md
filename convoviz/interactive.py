@@ -49,7 +49,7 @@ def run_interactive_config(initial_config: ConvovizConfig | None = None) -> Conv
     # Prompt for input path
     input_default = str(config.input_path) if config.input_path else ""
     input_result = qst_path(
-        "Enter the path to the zip file or extracted directory:",
+        "Enter the path to the export ZIP, conversations JSON, or extracted directory:",
         default=input_default,
         validate=lambda p: Path(p).exists() or "Path must exist",
         style=CUSTOM_STYLE,

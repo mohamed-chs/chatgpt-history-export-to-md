@@ -4,6 +4,7 @@ import re
 from collections.abc import Callable
 
 from convoviz.config import AuthorHeaders, ConversationConfig
+from convoviz.exceptions import MessageContentError
 from convoviz.models import Conversation, Node
 from convoviz.renderers.yaml import render_yaml_header
 
@@ -161,26 +162,58 @@ def render_node(
 
     # Get and process content
     try:
-        content = close_code_blocks(node.message.text)
-        content = f"\n{content}\n" if content else ""
-        if use_dollar_latex:
-            content = replace_latex_delimiters(content)
+        text = node.message.text
+    except MessageContentError:
+        # Some message types only contain non-text parts; those still may have images.
+        text = ""
 
-        # Append images if resolver is provided and images exist
-        if asset_resolver and node.message.images:
-            for image_id in node.message.images:
-                rel_path = asset_resolver(image_id)
-                if rel_path:
-                    # Using standard markdown image syntax.
-                    # Obsidian handles this well.
-                    content += f"\n![Image]({rel_path})\n"
+    content = close_code_blocks(text)
+    content = f"\n{content}\n" if content else ""
+    if use_dollar_latex:
+        content = replace_latex_delimiters(content)
 
-    except Exception:
-        content = ""
+    # Append images if resolver is provided and images exist
+    if asset_resolver and node.message.images:
+        for image_id in node.message.images:
+            rel_path = asset_resolver(image_id)
+            if rel_path:
+                # Using standard markdown image syntax.
+                # Obsidian handles this well.
+                content += f"\n![Image]({rel_path})\n"
 
     footer = render_node_footer(node, flavor=flavor)
 
     return f"\n{header}{content}{footer}\n---\n"
+
+
+def _ordered_nodes(conversation: Conversation) -> list[Node]:
+    """Return nodes in a deterministic depth-first traversal order.
+
+    ChatGPT exports store nodes in a mapping; dict iteration order is not a
+    reliable semantic ordering. For markdown output, we traverse from roots.
+    """
+    mapping = conversation.node_mapping
+    roots = sorted((n for n in mapping.values() if n.parent is None), key=lambda n: n.id)
+
+    visited: set[str] = set()
+    ordered: list[Node] = []
+
+    def dfs(node: Node) -> None:
+        if node.id in visited:
+            return
+        visited.add(node.id)
+        ordered.append(node)
+        for child in node.children_nodes:
+            dfs(child)
+
+    for root in roots:
+        dfs(root)
+
+    # Include any disconnected/orphan nodes deterministically at the end.
+    for node in sorted(mapping.values(), key=lambda n: n.id):
+        dfs(node)
+
+    return ordered
 
 
 def render_conversation(
@@ -206,8 +239,8 @@ def render_conversation(
     # Start with YAML header
     markdown = render_yaml_header(conversation, config.yaml)
 
-    # Render all message nodes
-    for node in conversation.all_message_nodes:
+    # Render message nodes in a deterministic traversal order.
+    for node in _ordered_nodes(conversation):
         if node.message:
             markdown += render_node(
                 node, headers, use_dollar_latex, asset_resolver=asset_resolver, flavor=flavor

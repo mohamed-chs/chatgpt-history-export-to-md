@@ -1,12 +1,33 @@
 """Loading functions for conversations and collections."""
 
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 from zipfile import ZipFile
 
 from orjson import loads
 
 from convoviz.exceptions import InvalidZipError
 from convoviz.models import Conversation, ConversationCollection
+
+
+def _is_safe_zip_member_name(name: str) -> bool:
+    """Return True if a ZIP entry name is safe to extract.
+
+    This is intentionally OS-agnostic: it treats both ``/`` and ``\\`` as path
+    separators and rejects absolute paths, drive-letter paths, and ``..`` parts.
+    """
+    normalized = name.replace("\\", "/")
+    member_path = PurePosixPath(normalized)
+
+    # Absolute paths (e.g. "/etc/passwd") or empty names
+    if not normalized or member_path.is_absolute():
+        return False
+
+    # Windows drive letters / UNC-style prefixes stored in the archive
+    first = member_path.parts[0] if member_path.parts else ""
+    if first.endswith(":") or first.startswith("//") or first.startswith("\\\\"):
+        return False
+
+    return ".." not in member_path.parts
 
 
 def extract_archive(filepath: Path) -> Path:
@@ -28,15 +49,17 @@ def extract_archive(filepath: Path) -> Path:
 
     with ZipFile(filepath) as zf:
         for member in zf.infolist():
-            # Check for path traversal (Zip-Slip)
-            member_path = Path(member.filename)
-            if member_path.is_absolute() or ".." in member_path.parts:
+            # Check for path traversal (Zip-Slip) in an OS-agnostic way.
+            # ZIP files are typically POSIX-path-like, but malicious archives can
+            # embed backslashes or drive-letter tricks.
+            if not _is_safe_zip_member_name(member.filename):
                 raise InvalidZipError(
                     str(filepath), reason=f"Malicious path in ZIP: {member.filename}"
                 )
 
             # Additional check using resolved paths
-            target_path = (folder / member.filename).resolve()
+            normalized = member.filename.replace("\\", "/")
+            target_path = (folder / normalized).resolve()
             if not target_path.is_relative_to(folder.resolve()):
                 raise InvalidZipError(
                     str(filepath), reason=f"Malicious path in ZIP: {member.filename}"

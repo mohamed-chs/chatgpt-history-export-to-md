@@ -1,4 +1,4 @@
-# Convoviz 📊: Visualize your entire ChatGPT data !
+# Convoviz 📊: Visualize your entire ChatGPT data
 
 Convert your ChatGPT history into well-formatted Markdown files. Additionally, visualize your data with word clouds 🔡☁️, view your prompt history graphs 📈, and access all your custom instructions 🤖 in a single location.
 
@@ -42,7 +42,7 @@ or pipx:
 pipx install convoviz
 ```
 
-### 3. Run the Script 🏃‍♂️
+### 3. Run the tool 🏃‍♂️
 
 Simply run the command and follow the prompts:
 
@@ -55,8 +55,17 @@ convoviz
 You can provide arguments directly to skip the prompts:
 
 ```bash
-convoviz --zip path/to/your/export.zip --output path/to/output/folder
+convoviz --input path/to/your/export.zip --output path/to/output/folder
 ```
+
+Inputs can be any of:
+- A ChatGPT export ZIP (downloaded from OpenAI)
+- An extracted export directory containing `conversations.json`
+- A `conversations.json` file directly
+
+Notes:
+- `--zip` / `-z` is kept as an alias for `--input` for convenience.
+- You can force non-interactive mode with `--no-interactive`.
 
 For more options, run:
 
@@ -92,4 +101,20 @@ It was also a great opportunity to learn more about Python and type annotations.
 
 It should(?) also work as library, so you can import and use the models and functions. I need to add more documentation for that tho. Feel free to reach out if you need help.
 
-I'm working on automating it to add new conversations and updating old ones. Had some luck with a JavaScript bookmarklet, still ironing it out tho.
+### Offline / reproducible runs
+
+Convoviz uses NLTK stopwords for word clouds. If you’re offline and NLTK data isn’t already installed, pre-download it once:
+
+```bash
+python -c "import nltk; nltk.download('stopwords')"
+```
+
+If you’re using `uv` without a global install, you can run:
+
+```bash
+uv run python -c "import nltk; nltk.download('stopwords')"
+```
+
+### Bookmarklet
+
+There’s also a JavaScript bookmarklet flow under `js/` (experimental) for exporting additional conversation data outside the official ZIP export.

@@ -6,7 +6,7 @@ Object path: conversations.json -> conversation -> mapping -> mapping node -> me
 from datetime import datetime
 from typing import Any, Literal
 
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
 
 from convoviz.exceptions import MessageContentError
 
@@ -18,7 +18,7 @@ class MessageAuthor(BaseModel):
 
     role: AuthorRole
     name: str | None = None
-    metadata: dict[str, Any] = {}
+    metadata: dict[str, Any] = Field(default_factory=dict)
 
 
 class MessageContent(BaseModel):
@@ -55,8 +55,8 @@ class Message(BaseModel):
     status: str
     end_turn: bool | None = None
     weight: float
-    metadata: MessageMetadata
-    recipient: str
+    metadata: MessageMetadata = Field(default_factory=MessageMetadata)
+    recipient: str | None = None
 
     @property
     def images(self) -> list[str]:

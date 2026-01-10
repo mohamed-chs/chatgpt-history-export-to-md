@@ -16,6 +16,8 @@ def test_zip_slip_protection(tmp_path):
     with ZipFile(zip_buffer, "w") as zf:
         # Try to extract outside the folder
         zf.writestr("../evil.txt", "malicious content")
+        # Windows-style traversal should also be rejected (even on POSIX)
+        zf.writestr("..\\evil2.txt", "malicious content")
 
     zip_path = tmp_path / "malicious.zip"
     zip_path.write_bytes(zip_buffer.getvalue())

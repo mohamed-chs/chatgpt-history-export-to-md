@@ -62,7 +62,7 @@ def load_nltk_stopwords() -> frozenset[str]:
     return frozenset(words)
 
 
-def parse_custom_stopwords(stopwords_str: str) -> set[str]:
+def parse_custom_stopwords(stopwords_str: str | None) -> set[str]:
     """Parse a comma-separated string of custom stopwords.
 
     Args:

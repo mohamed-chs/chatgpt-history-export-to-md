@@ -1,6 +1,6 @@
 This is the **Master Synthesis** of the ChatGPT User Data Export specification. It combines the structural precision of Gemini’s breakdown, the formal schema definitions and practical tooling from ChatGPT, and the edge-case handling from both.
 
-> **Disclaimer:** This specification is **reverse-engineered**. OpenAI does not publish an official contract for this data. The format evolves silently (e.g., the addition of `textdocs` for Canvas or changes to DALL-E `asset_pointers`). This document reflects the state of exports as of **early 2025**.
+> **Disclaimer:** This specification is **reverse-engineered**. OpenAI does not publish an official contract for this data. The format evolves silently (e.g., the addition of `textdocs` for Canvas or changes to DALL-E `asset_pointers`). This document reflects the state of exports as observed up to **early 2026**, but may still lag behind current production exports.
 
 ---
 

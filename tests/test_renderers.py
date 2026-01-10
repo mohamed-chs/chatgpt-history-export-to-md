@@ -91,7 +91,7 @@ class TestRenderYamlHeader:
         config = YAMLConfig()
         yaml = render_yaml_header(mock_conversation, config)
         assert "---" in yaml
-        assert "title: conversation 111" in yaml
+        assert 'title: "conversation 111"' in yaml
         assert "chat_link:" in yaml
 
     def test_minimal_fields(self, mock_conversation: Conversation) -> None:
@@ -111,6 +111,24 @@ class TestRenderYamlHeader:
         yaml = render_yaml_header(mock_conversation, config)
         assert "title:" in yaml
         assert "chat_link:" not in yaml
+
+    def test_tags_enabled(self, mock_conversation: Conversation) -> None:
+        """Test YAML header includes tags when enabled."""
+        config = YAMLConfig(
+            title=False,
+            tags=True,
+            chat_link=False,
+            create_time=False,
+            update_time=False,
+            model=False,
+            used_plugins=False,
+            message_count=False,
+            content_types=False,
+            custom_instructions=False,
+        )
+        yaml = render_yaml_header(mock_conversation, config)
+        assert "tags:" in yaml
+        assert '- "chatgpt"' in yaml
 
     def test_no_fields(self, mock_conversation: Conversation) -> None:
         """Test YAML header with no fields enabled."""

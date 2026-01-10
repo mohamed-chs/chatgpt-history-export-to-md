@@ -1,8 +1,10 @@
 """Tests for the models."""
 
+import copy
 from datetime import datetime
 
 from convoviz.models import Conversation
+from convoviz.models.collection import ConversationCollection
 from convoviz.models.message import Message, MessageAuthor, MessageContent, MessageMetadata
 
 
@@ -150,3 +152,35 @@ def test_message_visibility() -> None:
         **{**base_data, "recipient": "all"},
     )
     assert msg.is_hidden
+
+
+def test_collection_update_merges_new_conversations_even_if_older(
+    mock_conversation: Conversation, mock_conversation_data: dict
+) -> None:
+    """A new conversation should not be skipped just because it's older than last_updated."""
+    base = ConversationCollection(conversations=[mock_conversation])
+
+    older_new_data = copy.deepcopy(mock_conversation_data)
+    older_new_data["title"] = "conversation 222"
+    older_new_data["conversation_id"] = "conversation_222"
+    older_new_data["id"] = "conversation_222"
+    # Deliberately set update_time earlier than base.last_updated
+    older_new_data["update_time"] = older_new_data["create_time"]
+
+    other = ConversationCollection(conversations=[Conversation(**older_new_data)])
+    base.update(other)
+
+    ids = {c.conversation_id for c in base.conversations}
+    assert "conversation_111" in ids
+    assert "conversation_222" in ids
+
+
+def test_collection_update_keeps_newest_when_ids_collide(mock_conversation: Conversation) -> None:
+    """When IDs collide, the newest update_time should win."""
+    base = ConversationCollection(conversations=[mock_conversation])
+
+    updated = mock_conversation.model_copy(deep=True)
+    updated.update_time = updated.update_time.replace(year=updated.update_time.year + 1)
+
+    base.update(ConversationCollection(conversations=[updated]))
+    assert base.index[mock_conversation.conversation_id].update_time == updated.update_time

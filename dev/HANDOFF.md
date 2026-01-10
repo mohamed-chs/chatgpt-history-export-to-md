@@ -31,6 +31,13 @@ This document provides context for continuing work on the convoviz project.
 - **Schema Support**: Updated `convoviz/models/message.py` and `loaders.py` to support the modern ChatGPT export format.
 - **Documentation**: Created `AGENTS.md` for AI agent context.
 
+**Hardening & Correctness (January 2026)**:
+- **ZIP extraction safety**: Hardened ZIP member validation to reject Windows-style traversal (e.g. `..\\evil.txt`) in addition to `../evil.txt`.
+- **Output path robustness**: Made pipeline output links resilient to relative paths (best-effort URI printing).
+- **Safer output cleanup**: Output cleanup now avoids following symlinks for managed directories/files.
+- **Collection merge correctness**: Fixed `ConversationCollection.update()` so it won’t skip “new but older-timestamped” conversations (common with bookmarklet data). Added tests.
+- **YAML frontmatter correctness**: YAML frontmatter is now emitted as real YAML (quoted strings, lists/dicts, ISO datetimes) and supports `tags` when enabled.
+
 ## System Architecture
 
 ### Module Structure
@@ -122,5 +129,4 @@ uv run ruff check convoviz tests && uv run mypy convoviz && uv run pytest
 - [ ] **Citations**: Parse invisible characters/metadata in ChatGPT exports that denote citations.
 - [ ] **Canvas Support**: Research and implement support for "Canvas" content.
 - [ ] **Interactive Tests**: No tests exist for `interactive.py`.
-- [ ] **GraphConfig**: Currently empty placeholder.
 - [ ] **Cross-Platform**: Loaders for Claude and Gemini are planned but not started.
