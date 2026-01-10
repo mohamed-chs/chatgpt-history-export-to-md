@@ -8,6 +8,24 @@ from convoviz.exceptions import MessageContentError
 from convoviz.models import Conversation, Node
 from convoviz.renderers.yaml import render_yaml_header
 
+# Length for shortened node IDs in markdown output (similar to Git short hashes)
+SHORT_ID_LENGTH = 8
+
+
+def shorten_id(node_id: str) -> str:
+    """Shorten a node ID for display in markdown.
+
+    Takes the first 8 characters of the ID, which is typically the first
+    segment of a UUID and provides sufficient uniqueness within a conversation.
+
+    Args:
+        node_id: The full node ID (often a UUID)
+
+    Returns:
+        Shortened ID string
+    """
+    return node_id[:SHORT_ID_LENGTH]
+
 
 def close_code_blocks(text: str) -> str:
     """Ensure all code blocks in the text are properly closed.
@@ -105,10 +123,10 @@ def render_node_header(node: Node, headers: AuthorHeaders, flavor: str = "standa
 
     # Add parent link if parent has a message
     if node.parent_node and node.parent_node.message:
-        parts.append(f"[⬆️](#^{node.parent_node.id})")
+        parts.append(f"[⬆️](#^{shorten_id(node.parent_node.id)})")
 
     author_header = render_message_header(node.message.author.role, headers)
-    parts.append(f"{author_header} ^{node.id}")
+    parts.append(f"{author_header} ^{shorten_id(node.id)}")
 
     return "\n".join(parts) + "\n"
 
@@ -127,9 +145,11 @@ def render_node_footer(node: Node, flavor: str = "standard") -> str:
         return ""
 
     if len(node.children_nodes) == 1:
-        return f"\n[⬇️](#^{node.children_nodes[0].id})\n"
+        return f"\n[⬇️](#^{shorten_id(node.children_nodes[0].id)})\n"
 
-    links = " | ".join(f"[{i + 1} ⬇️](#^{child.id})" for i, child in enumerate(node.children_nodes))
+    links = " | ".join(
+        f"[{i + 1} ⬇️](#^{shorten_id(child.id)})" for i, child in enumerate(node.children_nodes)
+    )
     return f"\n{links}\n"
 
 
