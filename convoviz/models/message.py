@@ -147,8 +147,10 @@ class Message(BaseModel):
         if self.author.role == "tool" and self.author.name == "browser":
             return True
 
-        # Hide assistant calls to browser tool (e.g. "search(...)")
-        if self.author.role == "assistant" and self.recipient == "browser":
+        # Hide assistant calls to browser tool (e.g. "search(...)") or code interpreter
+        if self.author.role == "assistant" and (
+            self.recipient == "browser" or self.content.content_type == "code"
+        ):
             return True
             
         # Hide browsing status messages

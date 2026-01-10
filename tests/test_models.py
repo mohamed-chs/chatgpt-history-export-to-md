@@ -141,3 +141,12 @@ def test_message_visibility() -> None:
         **{**base_data, "recipient": "browser"},
     )
     assert msg.is_hidden
+
+    # Case 8: Assistant tool call with recipient=all (hidden due to content_type=code)
+    msg = Message(
+        author=MessageAuthor(role="assistant"),
+        content=MessageContent(content_type="code", parts=["search('foo')"]),
+        metadata=MessageMetadata(),
+        **{**base_data, "recipient": "all"},
+    )
+    assert msg.is_hidden
