@@ -7,7 +7,7 @@ from questionary import path as qst_path
 from questionary import text as qst_text
 
 from convoviz.config import ConvovizConfig, get_default_config
-from convoviz.io.loaders import find_latest_zip
+from convoviz.io.loaders import find_latest_zip, validate_zip
 from convoviz.utils import colormaps, default_font_path, font_names, font_path, validate_header
 
 CUSTOM_STYLE = Style(
@@ -24,6 +24,25 @@ CUSTOM_STYLE = Style(
         ("disabled", "fg:#858585 italic"),
     ]
 )
+
+
+def _validate_input_path(raw: str) -> bool | str:
+    path = Path(raw)
+    if not path.exists():
+        return "Path must exist"
+
+    if path.is_dir():
+        if (path / "conversations.json").exists():
+            return True
+        return "Directory must contain conversations.json"
+
+    if path.suffix.lower() == ".json":
+        return True
+
+    if path.suffix.lower() == ".zip":
+        return True if validate_zip(path) else "ZIP must contain conversations.json"
+
+    return "Input must be a .zip, a .json, or a directory containing conversations.json"
 
 
 def run_interactive_config(initial_config: ConvovizConfig | None = None) -> ConvovizConfig:
@@ -51,7 +70,7 @@ def run_interactive_config(initial_config: ConvovizConfig | None = None) -> Conv
     input_result = qst_path(
         "Enter the path to the export ZIP, conversations JSON, or extracted directory:",
         default=input_default,
-        validate=lambda p: Path(p).exists() or "Path must exist",
+        validate=_validate_input_path,
         style=CUSTOM_STYLE,
     ).ask()
 

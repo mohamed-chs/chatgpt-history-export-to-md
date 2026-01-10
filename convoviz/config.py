@@ -72,6 +72,8 @@ class GraphConfig(BaseModel):
     show_counts: bool = True
     font_name: str = "Montserrat-Regular.ttf"
     figsize: tuple[int, int] = (10, 6)
+    dpi: int = 300
+    timezone: Literal["utc", "local"] = "local"
 
 
 class ConvovizConfig(BaseModel):

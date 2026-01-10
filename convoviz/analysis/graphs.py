@@ -4,7 +4,9 @@ from collections import defaultdict
 from datetime import UTC, datetime
 from pathlib import Path
 
+import matplotlib.dates as mdates
 import matplotlib.font_manager as fm
+from matplotlib.axes import Axes
 from matplotlib.figure import Figure
 from tqdm import tqdm
 
@@ -23,10 +25,10 @@ WEEKDAYS = [
 ]
 
 
-def _setup_figure(config: GraphConfig) -> tuple[Figure, fm.FontProperties]:
+def _setup_figure(config: GraphConfig) -> tuple[Figure, Axes, fm.FontProperties]:
     """Internal helper to setup a figure with common styling."""
-    fig = Figure(figsize=config.figsize, dpi=300)
-    ax = fig.add_subplot()
+    fig = Figure(figsize=config.figsize, dpi=config.dpi)
+    ax: Axes = fig.add_subplot()
 
     # Load custom font if possible
     font_path = get_asset_path(f"fonts/{config.font_name}")
@@ -35,12 +37,27 @@ def _setup_figure(config: GraphConfig) -> tuple[Figure, fm.FontProperties]:
     )
 
     # Styling
+    fig.set_facecolor("white")
+    ax.set_facecolor("white")
     ax.spines["top"].set_visible(False)
     ax.spines["right"].set_visible(False)
     if config.grid:
         ax.grid(axis="y", linestyle="--", alpha=0.7)
+    ax.set_axisbelow(True)
 
-    return fig, font_prop
+    return fig, ax, font_prop
+
+
+def _ts_to_dt(ts: float, config: GraphConfig) -> datetime:
+    """Convert epoch timestamps into aware datetimes based on config."""
+    dt_utc = datetime.fromtimestamp(ts, UTC)
+    if config.timezone == "utc":
+        return dt_utc
+    return dt_utc.astimezone()
+
+
+def _tz_label(config: GraphConfig) -> str:
+    return "UTC" if config.timezone == "utc" else "Local"
 
 
 def generate_week_barplot(
@@ -59,37 +76,37 @@ def generate_week_barplot(
         Matplotlib Figure object
     """
     cfg = config or get_default_config().graph
-    dates = [datetime.fromtimestamp(ts, UTC) for ts in timestamps]
+    dates = [_ts_to_dt(ts, cfg) for ts in timestamps]
 
     weekday_counts: defaultdict[str, int] = defaultdict(int)
     for date in dates:
         weekday_counts[WEEKDAYS[date.weekday()]] += 1
 
-    x = WEEKDAYS
+    x = list(range(len(WEEKDAYS)))
     y = [weekday_counts[day] for day in WEEKDAYS]
 
-    fig, font_prop = _setup_figure(cfg)
-    ax = fig.gca()
+    fig, ax, font_prop = _setup_figure(cfg)
 
-    bars = ax.bar(x, y, color=cfg.color, alpha=0.8)
+    bars = ax.bar(x, y, color=cfg.color, alpha=0.85)
 
     if cfg.show_counts:
         for bar in bars:
             height = bar.get_height()
-            ax.text(
-                bar.get_x() + bar.get_width() / 2.0,
-                height,
-                f"{int(height)}",
-                ha="center",
-                va="bottom",
-                fontproperties=font_prop,
-            )
+            if height > 0:
+                ax.text(
+                    bar.get_x() + bar.get_width() / 2.0,
+                    height,
+                    f"{int(height)}",
+                    ha="center",
+                    va="bottom",
+                    fontproperties=font_prop,
+                )
 
     ax.set_xlabel("Weekday", fontproperties=font_prop)
-    ax.set_ylabel("Prompt Count", fontproperties=font_prop)
+    ax.set_ylabel("User Prompt Count", fontproperties=font_prop)
     ax.set_title(title, fontproperties=font_prop, fontsize=16, pad=20)
-    ax.set_xticks(range(len(x)))
-    ax.set_xticklabels(x, rotation=45, fontproperties=font_prop)
+    ax.set_xticks(x)
+    ax.set_xticklabels(WEEKDAYS, rotation=45, fontproperties=font_prop)
 
     for label in ax.get_yticklabels():
         label.set_fontproperties(font_prop)
@@ -114,7 +131,7 @@ def generate_hour_barplot(
         Matplotlib Figure object
     """
     cfg = config or get_default_config().graph
-    dates = [datetime.fromtimestamp(ts, UTC) for ts in timestamps]
+    dates = [_ts_to_dt(ts, cfg) for ts in timestamps]
 
     hour_counts: dict[int, int] = dict.fromkeys(range(24), 0)
     for date in dates:
@@ -123,8 +140,7 @@ def generate_hour_barplot(
     x = [f"{i:02d}:00" for i in range(24)]
     y = [hour_counts[i] for i in range(24)]
 
-    fig, font_prop = _setup_figure(cfg)
-    ax = fig.gca()
+    fig, ax, font_prop = _setup_figure(cfg)
 
     bars = ax.bar(range(24), y, color=cfg.color, alpha=0.8)
 
@@ -142,8 +158,8 @@ def generate_hour_barplot(
                     fontsize=8,
                 )
 
-    ax.set_xlabel("Hour of Day (UTC)", fontproperties=font_prop)
-    ax.set_ylabel("Prompt Count", fontproperties=font_prop)
+    ax.set_xlabel(f"Hour of Day ({_tz_label(cfg)})", fontproperties=font_prop)
+    ax.set_ylabel("User Prompt Count", fontproperties=font_prop)
     ax.set_title(f"{title} - Hourly Distribution", fontproperties=font_prop, fontsize=16, pad=20)
     ax.set_xticks(range(24))
     ax.set_xticklabels(x, rotation=90, fontproperties=font_prop)
@@ -180,8 +196,7 @@ def generate_model_piechart(
     total = sum(model_counts.values())
     if total == 0:
         # Return empty figure or figure with "No Data"
-        fig, font_prop = _setup_figure(cfg)
-        ax = fig.gca()
+        fig, ax, font_prop = _setup_figure(cfg)
         ax.text(0.5, 0.5, "No Data", ha="center", va="center", fontproperties=font_prop)
         return fig
 
@@ -204,8 +219,7 @@ def generate_model_piechart(
     labels = [item[0] for item in sorted_items]
     sizes = [item[1] for item in sorted_items]
 
-    fig, font_prop = _setup_figure(cfg)
-    ax = fig.gca()
+    fig, ax, font_prop = _setup_figure(cfg)
 
     colors = [
         "#4A90E2",
@@ -250,17 +264,16 @@ def generate_length_histogram(
     cfg = config or get_default_config().graph
     lengths = [conv.message_count("user") for conv in collection.conversations]
 
-    fig, font_prop = _setup_figure(cfg)
-    ax = fig.gca()
+    fig, ax, font_prop = _setup_figure(cfg)
 
     if not lengths:
         ax.text(0.5, 0.5, "No Data", ha="center", va="center", fontproperties=font_prop)
         return fig
 
-    import numpy as np
-
     # Cap at 95th percentile to focus on most conversations
-    cap = int(np.percentile(lengths, 95))
+    sorted_lengths = sorted(lengths)
+    idx = int(0.95 * (len(sorted_lengths) - 1))
+    cap = int(sorted_lengths[idx])
     cap = max(cap, 5)  # Ensure at least some range
 
     # Filter lengths for the histogram plot, but keep the data correct
@@ -306,10 +319,10 @@ def generate_monthly_activity_barplot(
     x = [m.strftime("%b '%y") for m in sorted_months]
     y = [len(month_groups[m].timestamps("user")) for m in sorted_months]
 
-    fig, font_prop = _setup_figure(cfg)
-    ax = fig.gca()
+    fig, ax, font_prop = _setup_figure(cfg)
 
-    bars = ax.bar(x, y, color=cfg.color, alpha=0.8)
+    positions = list(range(len(x)))
+    bars = ax.bar(positions, y, color=cfg.color, alpha=0.85)
 
     if cfg.show_counts:
         for bar in bars:
@@ -326,12 +339,53 @@ def generate_monthly_activity_barplot(
                 )
 
     ax.set_xlabel("Month", fontproperties=font_prop)
-    ax.set_ylabel("Total Prompt Count", fontproperties=font_prop)
+    ax.set_ylabel("User Prompt Count", fontproperties=font_prop)
     ax.set_title("Monthly Activity History", fontproperties=font_prop, fontsize=16, pad=20)
-    ax.set_xticks(range(len(x)))
-    ax.set_xticklabels(x, rotation=45, fontproperties=font_prop)
+    tick_step = max(1, len(positions) // 12)  # show ~12 labels max
+    shown = positions[::tick_step] if positions else []
+    ax.set_xticks(shown)
+    ax.set_xticklabels([x[i] for i in shown], rotation=45, fontproperties=font_prop)
 
     for label in ax.get_yticklabels():
+        label.set_fontproperties(font_prop)
+
+    fig.tight_layout()
+    return fig
+
+
+def generate_daily_activity_lineplot(
+    collection: ConversationCollection,
+    config: GraphConfig | None = None,
+) -> Figure:
+    """Create a line chart showing user prompt count per day."""
+    cfg = config or get_default_config().graph
+    timestamps = collection.timestamps("user")
+
+    fig, ax, font_prop = _setup_figure(cfg)
+    if not timestamps:
+        ax.text(0.5, 0.5, "No Data", ha="center", va="center", fontproperties=font_prop)
+        return fig
+
+    counts: defaultdict[datetime, int] = defaultdict(int)
+    for ts in timestamps:
+        dt = _ts_to_dt(ts, cfg)
+        day = dt.replace(hour=0, minute=0, second=0, microsecond=0)
+        counts[day] += 1
+
+    days = sorted(counts.keys())
+    values = [counts[d] for d in days]
+
+    x = mdates.date2num(days)
+    ax.plot(x, values, color=cfg.color, linewidth=2.0)
+    ax.fill_between(x, values, color=cfg.color, alpha=0.15)
+    locator = mdates.AutoDateLocator()
+    ax.xaxis.set_major_locator(locator)
+    ax.xaxis.set_major_formatter(mdates.ConciseDateFormatter(locator))
+    ax.set_title("Daily Activity History", fontproperties=font_prop, fontsize=16, pad=20)
+    ax.set_xlabel(f"Day ({_tz_label(cfg)})", fontproperties=font_prop)
+    ax.set_ylabel("User Prompt Count", fontproperties=font_prop)
+
+    for label in ax.get_xticklabels() + ax.get_yticklabels():
         label.set_fontproperties(font_prop)
 
     fig.tight_layout()
@@ -367,6 +421,10 @@ def generate_summary_graphs(
     # Monthly activity
     fig_activity = generate_monthly_activity_barplot(collection, config)
     fig_activity.savefig(summary_dir / "monthly_activity.png")
+
+    # Daily activity
+    fig_daily = generate_daily_activity_lineplot(collection, config)
+    fig_daily.savefig(summary_dir / "daily_activity.png")
 
 
 def generate_graphs(
