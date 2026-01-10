@@ -75,7 +75,19 @@ convoviz --help
 
 ### 4. Check the Output 🎉
 
-And that's it! After running the script, head over to the output folder to see your nice word clouds, graphs, and neatly formatted Markdown files. Enjoy !
+And that's it! After running the script, head over to the output folder to see your neatly formatted Markdown files and visualizations.
+
+The main outputs are:
+
+- **`Markdown/`**: one `.md` file per conversation
+- **`Graphs/`**: a small set of high-signal plots, including:
+  - `overview.png` (dashboard)
+  - `activity_heatmap.png` (weekday × hour)
+  - `daily_activity.png` / `monthly_activity.png`
+  - `model_usage.png`, `conversation_lengths.png`
+  - `weekday_pattern.png`, `hourly_pattern.png`, `conversation_lifetimes.png`
+- **`Word-Clouds/`**: weekly/monthly/yearly word clouds
+- **`custom_instructions.json`**: extracted custom instructions
 
 ## Share Your Feedback! 💌
 

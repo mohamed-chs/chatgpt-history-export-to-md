@@ -74,6 +74,8 @@ class GraphConfig(BaseModel):
     figsize: tuple[int, int] = (10, 6)
     dpi: int = 300
     timezone: Literal["utc", "local"] = "local"
+    generate_monthly_breakdowns: bool = False
+    generate_yearly_breakdowns: bool = False
 
 
 class ConvovizConfig(BaseModel):

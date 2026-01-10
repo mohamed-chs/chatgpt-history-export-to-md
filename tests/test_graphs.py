@@ -1,6 +1,7 @@
 from matplotlib.figure import Figure
 
 from convoviz.analysis.graphs import (
+    generate_activity_heatmap,
     generate_graphs,
     generate_hour_barplot,
     generate_length_histogram,
@@ -26,10 +27,27 @@ def test_generate_hour_barplot():
 def test_generate_graphs(tmp_path):
     # Minimal collection
     collection = ConversationCollection(conversations=[])
-    generate_graphs(collection, tmp_path)
+    output_dir = tmp_path / "graphs"
+    generate_graphs(collection, output_dir)
     # Even with no conversations, it shouldn't crash
-    assert tmp_path.exists()
-    assert (tmp_path / "Summary").exists()
+    assert output_dir.exists()
+
+
+def test_generate_graphs_writes_summary_images(tmp_path, mock_conversation):
+    collection = ConversationCollection(conversations=[mock_conversation])
+    output_dir = tmp_path / "graphs"
+    generate_graphs(collection, output_dir)
+
+    assert output_dir.exists()
+    assert (output_dir / "overview.png").exists()
+    assert (output_dir / "activity_heatmap.png").exists()
+    assert (output_dir / "monthly_activity.png").exists()
+    assert (output_dir / "daily_activity.png").exists()
+    assert (output_dir / "model_usage.png").exists()
+    assert (output_dir / "conversation_lengths.png").exists()
+    assert (output_dir / "conversation_lifetimes.png").exists()
+    assert (output_dir / "weekday_pattern.png").exists()
+    assert (output_dir / "hourly_pattern.png").exists()
 
 
 def test_generate_model_piechart():
@@ -47,4 +65,10 @@ def test_generate_length_histogram():
 def test_generate_monthly_activity_barplot():
     collection = ConversationCollection(conversations=[])
     fig = generate_monthly_activity_barplot(collection)
+    assert isinstance(fig, Figure)
+
+
+def test_generate_activity_heatmap():
+    collection = ConversationCollection(conversations=[])
+    fig = generate_activity_heatmap(collection)
     assert isinstance(fig, Figure)
