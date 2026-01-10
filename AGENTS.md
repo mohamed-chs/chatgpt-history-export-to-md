@@ -24,6 +24,23 @@ Always use `uv` to run commands in the environment.
 - **Type Check**: `uv run mypy convoviz`
 - **Full quality gate**: `uv run ruff check convoviz tests && uv run mypy convoviz && uv run pytest`
 
+## Release Workflow
+To publish a new version to PyPI:
+
+```bash
+# 1. Bump version (patch/minor/major)
+uv version --bump patch
+
+# 2. Commit changes
+git add -A && git commit -m "feat: description of changes"
+
+# 3. Build
+uv build
+
+# 4. Publish (token in .env as UV_PUBLISH_TOKEN)
+export $(cat .env | xargs) && uv publish
+```
+
 ## Architectural Directives
 1.  **Pure Data Models**: Classes in `convoviz/models/` must be pure Pydantic models. NO I/O, NO heavy logic, NO visualization code.
 2.  **Functional Rendering**: Renderers (`convoviz/renderers/`) accept a Model + Config and return artifacts (strings, bytes). They do not write to disk.
