@@ -55,3 +55,14 @@ def test_interactive_flag_respected() -> None:
         assert result.exit_code == 0
         mock_interactive.assert_called_once()
         mock_run.assert_called_once()
+
+
+def test_interactive_ctrl_c_exits_cleanly() -> None:
+    """Test Ctrl+C in interactive mode exits without running pipeline."""
+    with (
+        patch("convoviz.cli.run_interactive_config", side_effect=KeyboardInterrupt),
+        patch("convoviz.cli.run_pipeline") as mock_run,
+    ):
+        result = runner.invoke(app, ["--interactive"])
+        assert result.exit_code == 0
+        mock_run.assert_not_called()

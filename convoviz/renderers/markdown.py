@@ -81,7 +81,7 @@ def render_message_header(role: str, headers: AuthorHeaders) -> str:
     return header_map.get(role, f"### {role.title()}")
 
 
-def render_node_header(node: Node, headers: AuthorHeaders, flavor: str = "obsidian") -> str:
+def render_node_header(node: Node, headers: AuthorHeaders, flavor: str = "standard") -> str:
     """Render the header section of a node.
 
     Includes the node ID, parent link, and message author header.
@@ -113,7 +113,7 @@ def render_node_header(node: Node, headers: AuthorHeaders, flavor: str = "obsidi
     return "\n".join(parts) + "\n"
 
 
-def render_node_footer(node: Node, flavor: str = "obsidian") -> str:
+def render_node_footer(node: Node, flavor: str = "standard") -> str:
     """Render the footer section of a node with child links.
 
     Args:
@@ -138,7 +138,7 @@ def render_node(
     headers: AuthorHeaders,
     use_dollar_latex: bool = False,
     asset_resolver: Callable[[str], str | None] | None = None,
-    flavor: str = "obsidian",
+    flavor: str = "standard",
 ) -> str:
     """Render a complete node as markdown.
 

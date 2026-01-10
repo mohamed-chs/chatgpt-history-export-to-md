@@ -55,6 +55,7 @@ Always use `uv` to run commands in the environment.
 
 ## Communication & UX Protocol
 - **Directness**: If you need the user to run a test, inspect a file, or provide context, ASK directly. Do not implement complex workarounds to avoid user interaction.
+- **Push back when helpful**: The maintainer is almost always open to you questioning prompts, proposing refinements/better ideas, or even rejecting an idea if you think it’s harmful/incorrect (they’re not a very experienced programmer).
 - **User Experience**: Prioritize the end-user experience (UX) of the application. Do not compromise the application's design or usability to fit temporary development environment constraints.
 - **Transparency**: Be transparent about missing context or difficulties.
 

@@ -6,7 +6,7 @@ from convoviz.renderers.markdown import render_conversation
 
 
 def test_obsidian_flavor_rendering(mock_conversation: Conversation) -> None:
-    """Test rendering with obsidian flavor (default)."""
+    """Test rendering with obsidian flavor."""
     # Force obsidian flavor
     config = ConversationConfig(markdown=MarkdownConfig(flavor="obsidian"))
     headers = AuthorHeaders()

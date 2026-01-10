@@ -19,7 +19,7 @@ class MarkdownConfig(BaseModel):
     """Configuration for markdown output."""
 
     latex_delimiters: Literal["default", "dollars"] = "default"
-    flavor: Literal["obsidian", "standard"] = "obsidian"
+    flavor: Literal["obsidian", "standard"] = "standard"
 
 
 class YAMLConfig(BaseModel):

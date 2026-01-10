@@ -1,6 +1,7 @@
 """Interactive configuration prompts using questionary."""
 
 from pathlib import Path
+from typing import Literal, Protocol, cast
 
 from questionary import Choice, Style, checkbox, select
 from questionary import path as qst_path
@@ -24,6 +25,23 @@ CUSTOM_STYLE = Style(
         ("disabled", "fg:#858585 italic"),
     ]
 )
+
+class _QuestionaryPrompt[T](Protocol):
+    def ask(self) -> T | None: ...
+
+
+def _ask_or_cancel[T](prompt: _QuestionaryPrompt[T]) -> T:
+    """Ask a questionary prompt; treat Ctrl+C/Ctrl+D as cancelling the run.
+
+    questionary's `.ask()` returns `None` on cancellation (Ctrl+C / Ctrl+D). We
+    convert that to `KeyboardInterrupt` so callers can abort the whole
+    interactive session with a single Ctrl+C.
+    """
+
+    result = prompt.ask()
+    if result is None:
+        raise KeyboardInterrupt
+    return result
 
 
 def _validate_input_path(raw: str) -> bool | str:
@@ -67,22 +85,26 @@ def run_interactive_config(initial_config: ConvovizConfig | None = None) -> Conv
 
     # Prompt for input path
     input_default = str(config.input_path) if config.input_path else ""
-    input_result = qst_path(
-        "Enter the path to the export ZIP, conversations JSON, or extracted directory:",
-        default=input_default,
-        validate=_validate_input_path,
-        style=CUSTOM_STYLE,
-    ).ask()
+    input_result: str = _ask_or_cancel(
+        qst_path(
+            "Enter the path to the export ZIP, conversations JSON, or extracted directory:",
+            default=input_default,
+            validate=_validate_input_path,
+            style=CUSTOM_STYLE,
+        )
+    )
 
     if input_result:
         config.input_path = Path(input_result)
 
     # Prompt for output folder
-    output_result = qst_path(
-        "Enter the path to the output folder:",
-        default=str(config.output_folder),
-        style=CUSTOM_STYLE,
-    ).ask()
+    output_result: str = _ask_or_cancel(
+        qst_path(
+            "Enter the path to the output folder:",
+            default=str(config.output_folder),
+            style=CUSTOM_STYLE,
+        )
+    )
 
     if output_result:
         config.output_folder = Path(output_result)
@@ -91,34 +113,46 @@ def run_interactive_config(initial_config: ConvovizConfig | None = None) -> Conv
     headers = config.message.author_headers
     for role in ["system", "user", "assistant", "tool"]:
         current = getattr(headers, role)
-        result = qst_text(
-            f"Enter the message header for '{role}':",
-            default=current,
-            validate=lambda t: validate_header(t)
-            or "Must be a valid markdown header (e.g., # Title)",
-            style=CUSTOM_STYLE,
-        ).ask()
+        result: str = _ask_or_cancel(
+            qst_text(
+                f"Enter the message header for '{role}':",
+                default=current,
+                validate=lambda t: validate_header(t)
+                or "Must be a valid markdown header (e.g., # Title)",
+                style=CUSTOM_STYLE,
+            )
+        )
         if result:
             setattr(headers, role, result)
 
     # Prompt for LaTeX delimiters
-    latex_result = select(
-        "Select the LaTeX math delimiters:",
-        choices=["default", "dollars"],
-        default=config.conversation.markdown.latex_delimiters,
-        style=CUSTOM_STYLE,
-    ).ask()
+    latex_result = cast(
+        Literal["default", "dollars"],
+        _ask_or_cancel(
+            select(
+                "Select the LaTeX math delimiters:",
+                choices=["default", "dollars"],
+                default=config.conversation.markdown.latex_delimiters,
+                style=CUSTOM_STYLE,
+            )
+        ),
+    )
 
     if latex_result:
         config.conversation.markdown.latex_delimiters = latex_result
 
     # Prompt for markdown flavor
-    flavor_result = select(
-        "Select the markdown flavor:",
-        choices=["obsidian", "standard"],
-        default=config.conversation.markdown.flavor,
-        style=CUSTOM_STYLE,
-    ).ask()
+    flavor_result = cast(
+        Literal["obsidian", "standard"],
+        _ask_or_cancel(
+            select(
+                "Select the markdown flavor:",
+                choices=["obsidian", "standard"],
+                default=config.conversation.markdown.flavor,
+                style=CUSTOM_STYLE,
+            )
+        ),
+    )
 
     if flavor_result:
         config.conversation.markdown.flavor = flavor_result
@@ -141,27 +175,28 @@ def run_interactive_config(initial_config: ConvovizConfig | None = None) -> Conv
         ]
     ]
 
-    selected = checkbox(
-        "Select YAML metadata headers to include:",
-        choices=yaml_choices,
-        style=CUSTOM_STYLE,
-    ).ask()
+    selected: list[str] = _ask_or_cancel(
+        checkbox(
+            "Select YAML metadata headers to include:",
+            choices=yaml_choices,
+            style=CUSTOM_STYLE,
+        )
+    )
 
-    if selected is not None:
-        selected_set = set(selected)
-        for field_name in [
-            "title",
-            "tags",
-            "chat_link",
-            "create_time",
-            "update_time",
-            "model",
-            "used_plugins",
-            "message_count",
-            "content_types",
-            "custom_instructions",
-        ]:
-            setattr(yaml_config, field_name, field_name in selected_set)
+    selected_set = set(selected)
+    for field_name in [
+        "title",
+        "tags",
+        "chat_link",
+        "create_time",
+        "update_time",
+        "model",
+        "used_plugins",
+        "message_count",
+        "content_types",
+        "custom_instructions",
+    ]:
+        setattr(yaml_config, field_name, field_name in selected_set)
 
     # Prompt for font
     available_fonts = font_names()
@@ -169,12 +204,14 @@ def run_interactive_config(initial_config: ConvovizConfig | None = None) -> Conv
         current_font = (
             config.wordcloud.font_path.stem if config.wordcloud.font_path else available_fonts[0]
         )
-        font_result = select(
-            "Select the font for word clouds:",
-            choices=available_fonts,
-            default=current_font if current_font in available_fonts else available_fonts[0],
-            style=CUSTOM_STYLE,
-        ).ask()
+        font_result: str = _ask_or_cancel(
+            select(
+                "Select the font for word clouds:",
+                choices=available_fonts,
+                default=current_font if current_font in available_fonts else available_fonts[0],
+                style=CUSTOM_STYLE,
+            )
+        )
 
         if font_result:
             config.wordcloud.font_path = font_path(font_result)
@@ -182,26 +219,29 @@ def run_interactive_config(initial_config: ConvovizConfig | None = None) -> Conv
     # Prompt for colormap
     available_colormaps = colormaps()
     if available_colormaps:
-        colormap_result = select(
-            "Select the color theme for word clouds:",
-            choices=available_colormaps,
-            default=config.wordcloud.colormap
-            if config.wordcloud.colormap in available_colormaps
-            else available_colormaps[0],
-            style=CUSTOM_STYLE,
-        ).ask()
+        colormap_result: str = _ask_or_cancel(
+            select(
+                "Select the color theme for word clouds:",
+                choices=available_colormaps,
+                default=config.wordcloud.colormap
+                if config.wordcloud.colormap in available_colormaps
+                else available_colormaps[0],
+                style=CUSTOM_STYLE,
+            )
+        )
 
         if colormap_result:
             config.wordcloud.colormap = colormap_result
 
     # Prompt for custom stopwords
-    stopwords_result = qst_text(
-        "Enter custom stopwords (comma-separated):",
-        default=config.wordcloud.custom_stopwords,
-        style=CUSTOM_STYLE,
-    ).ask()
+    stopwords_result: str = _ask_or_cancel(
+        qst_text(
+            "Enter custom stopwords (comma-separated):",
+            default=config.wordcloud.custom_stopwords,
+            style=CUSTOM_STYLE,
+        )
+    )
 
-    if stopwords_result is not None:
-        config.wordcloud.custom_stopwords = stopwords_result
+    config.wordcloud.custom_stopwords = stopwords_result
 
     return config
