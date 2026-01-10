@@ -150,8 +150,9 @@ class TestRenderConversation:
         config = ConversationConfig()
         headers = AuthorHeaders()
 
-        # Mock an image in the message
-        mock_conversation.all_message_nodes[0].message.content.parts = [
+        # Mock an image in the message (use a user node as system nodes are hidden by default)
+        user_nodes = mock_conversation.nodes_by_author("user")
+        user_nodes[0].message.content.parts = [
             {"content_type": "image_asset_pointer", "asset_pointer": "file-service://file-123"}
         ]
 

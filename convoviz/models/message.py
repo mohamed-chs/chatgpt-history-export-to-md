@@ -117,3 +117,42 @@ class Message(BaseModel):
         return bool(
             self.content.parts or self.content.text is not None or self.content.result is not None
         )
+
+    @property
+    def is_empty(self) -> bool:
+        """Check if the message is effectively empty (no text, no images)."""
+        try:
+            return not self.text.strip() and not self.images
+        except MessageContentError:
+            return True
+
+    @property
+    def is_hidden(self) -> bool:
+        """Check if message should be hidden in export.
+        
+        Hidden if:
+        1. It is empty (no text, no images).
+        2. It is an internal system message (not custom instructions).
+        3. It is a browser tool output (intermediate search steps).
+        """
+        if self.is_empty:
+            return True
+        
+        # Hide internal system messages
+        if self.author.role == "system":
+            # Only show if explicitly marked as user system message (Custom Instructions)
+            return not self.metadata.is_user_system_message
+            
+        # Hide browser tool outputs (usually intermediate search steps)
+        if self.author.role == "tool" and self.author.name == "browser":
+            return True
+
+        # Hide assistant calls to browser tool (e.g. "search(...)")
+        if self.author.role == "assistant" and self.recipient == "browser":
+            return True
+            
+        # Hide browsing status messages
+        if self.content.content_type == "tether_browsing_display":
+            return True
+
+        return False

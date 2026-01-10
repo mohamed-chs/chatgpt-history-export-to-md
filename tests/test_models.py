@@ -1,6 +1,9 @@
 """Tests for the models."""
 
+from datetime import datetime
+
 from convoviz.models import Conversation
+from convoviz.models.message import Message, MessageAuthor, MessageContent, MessageMetadata
 
 
 def test_leaf_count(mock_conversation: Conversation) -> None:
@@ -59,3 +62,82 @@ def test_all_message_nodes(mock_conversation: Conversation) -> None:
     """Test all_message_nodes property."""
     nodes = mock_conversation.all_message_nodes
     assert len(nodes) == 3  # system, user, assistant
+
+
+def test_message_visibility() -> None:
+    """Test message is_empty and is_hidden properties."""
+    base_data = {
+        "id": "msg_id",
+        "create_time": datetime.now(),
+        "update_time": datetime.now(),
+        "status": "finished_successfully",
+        "end_turn": True,
+        "weight": 1.0,
+        "recipient": "all",
+    }
+
+    # Case 1: Empty message
+    msg = Message(
+        author=MessageAuthor(role="user"),
+        content=MessageContent(content_type="text", parts=[""]),
+        metadata=MessageMetadata(),
+        **base_data,
+    )
+    assert msg.is_empty
+    assert msg.is_hidden
+
+    # Case 2: Visible user message
+    msg = Message(
+        author=MessageAuthor(role="user"),
+        content=MessageContent(content_type="text", parts=["Hello"]),
+        metadata=MessageMetadata(),
+        **base_data,
+    )
+    assert not msg.is_empty
+    assert not msg.is_hidden
+
+    # Case 3: Internal System message (hidden)
+    msg = Message(
+        author=MessageAuthor(role="system"),
+        content=MessageContent(content_type="text", parts=["You are ChatGPT"]),
+        metadata=MessageMetadata(),
+        **base_data,
+    )
+    assert not msg.is_empty
+    assert msg.is_hidden
+
+    # Case 4: User System message (visible)
+    msg = Message(
+        author=MessageAuthor(role="system"),
+        content=MessageContent(content_type="text", parts=["My instructions"]),
+        metadata=MessageMetadata(is_user_system_message=True),
+        **base_data,
+    )
+    assert not msg.is_hidden
+
+    # Case 5: Browser tool (hidden)
+    msg = Message(
+        author=MessageAuthor(role="tool", name="browser"),
+        content=MessageContent(content_type="text", parts=["search query"]),
+        metadata=MessageMetadata(),
+        **base_data,
+    )
+    assert msg.is_hidden
+
+    # Case 6: Browsing status (hidden)
+    msg = Message(
+        author=MessageAuthor(role="assistant"),
+        content=MessageContent(content_type="tether_browsing_display", parts=["Browsing..."]),
+        metadata=MessageMetadata(),
+        **base_data,
+    )
+    assert msg.is_hidden
+
+    # Case 7: Assistant tool call to browser (hidden)
+    msg = Message(
+        author=MessageAuthor(role="assistant"),
+        content=MessageContent(content_type="code", parts=["search('foo')"]),
+        metadata=MessageMetadata(),
+        **{**base_data, "recipient": "browser"},
+    )
+    assert msg.is_hidden

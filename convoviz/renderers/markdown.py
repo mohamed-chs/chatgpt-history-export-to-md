@@ -154,6 +154,9 @@ def render_node(
     if node.message is None:
         return ""
 
+    if node.message.is_hidden:
+        return ""
+
     header = render_node_header(node, headers, flavor=flavor)
 
     # Get and process content
