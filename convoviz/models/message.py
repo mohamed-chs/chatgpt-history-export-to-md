@@ -129,7 +129,7 @@ class Message(BaseModel):
     @property
     def is_hidden(self) -> bool:
         """Check if message should be hidden in export.
-        
+
         Hidden if:
         1. It is empty (no text, no images).
         2. It is an internal system message (not custom instructions).
@@ -137,12 +137,12 @@ class Message(BaseModel):
         """
         if self.is_empty:
             return True
-        
+
         # Hide internal system messages
         if self.author.role == "system":
             # Only show if explicitly marked as user system message (Custom Instructions)
             return not self.metadata.is_user_system_message
-            
+
         # Hide browser tool outputs (usually intermediate search steps)
         if self.author.role == "tool" and self.author.name == "browser":
             return True
@@ -152,9 +152,6 @@ class Message(BaseModel):
             self.recipient == "browser" or self.content.content_type == "code"
         ):
             return True
-            
-        # Hide browsing status messages
-        if self.content.content_type == "tether_browsing_display":
-            return True
 
-        return False
+        # Hide browsing status messages
+        return self.content.content_type == "tether_browsing_display"
