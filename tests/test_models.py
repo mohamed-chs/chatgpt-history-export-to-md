@@ -28,12 +28,16 @@ def test_message_count(mock_conversation: Conversation) -> None:
     assert mock_conversation.message_count("user", "assistant") == 2
     assert mock_conversation.message_count("user") == 1
     assert mock_conversation.message_count("assistant") == 1
+    # Internal system messages are hidden by default and should not be counted.
+    assert mock_conversation.message_count("system") == 0
 
 
 def test_plaintext(mock_conversation: Conversation) -> None:
     """Test plaintext method."""
     assert mock_conversation.plaintext("user") == "user message 111"
     assert mock_conversation.plaintext("assistant") == "assistant message 111"
+    # Internal system messages are hidden by default and should not contribute plaintext.
+    assert mock_conversation.plaintext("system") == ""
 
 
 def test_model(mock_conversation: Conversation) -> None:
@@ -58,6 +62,8 @@ def test_nodes_by_author(mock_conversation: Conversation) -> None:
     assert len(user_nodes) == 1
     assert user_nodes[0].message is not None
     assert user_nodes[0].message.author.role == "user"
+    # Internal system messages are hidden by default.
+    assert mock_conversation.nodes_by_author("system") == []
 
 
 def test_all_message_nodes(mock_conversation: Conversation) -> None:

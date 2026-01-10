@@ -36,22 +36,29 @@ class Conversation(BaseModel):
 
     @property
     def all_message_nodes(self) -> list[Node]:
-        """Get all nodes that have messages (including all branches)."""
+        """Get all nodes that have messages (including hidden/internal ones)."""
         return [node for node in self.node_mapping.values() if node.has_message]
 
-    def nodes_by_author(self, *authors: AuthorRole) -> list[Node]:
+    @property
+    def visible_message_nodes(self) -> list[Node]:
+        """Get all nodes that have *visible* (non-hidden) messages."""
+        return [
+            node
+            for node in self.node_mapping.values()
+            if node.has_message and node.message is not None and not node.message.is_hidden
+        ]
+
+    def nodes_by_author(self, *authors: AuthorRole, include_hidden: bool = False) -> list[Node]:
         """Get nodes with messages from specified authors.
 
         Args:
             *authors: Author roles to filter by. Defaults to ("user",) if empty.
+            include_hidden: Whether to include hidden/internal messages.
         """
         if not authors:
             authors = ("user",)
-        return [
-            node
-            for node in self.all_message_nodes
-            if node.message and node.message.author.role in authors
-        ]
+        nodes = self.all_message_nodes if include_hidden else self.visible_message_nodes
+        return [node for node in nodes if node.message and node.message.author.role in authors]
 
     @property
     def leaf_count(self) -> int:
@@ -65,9 +72,13 @@ class Conversation(BaseModel):
 
     @property
     def content_types(self) -> list[str]:
-        """Get all unique content types in the conversation."""
+        """Get all unique content types in the conversation (excluding hidden messages)."""
         return list(
-            {node.message.content.content_type for node in self.all_message_nodes if node.message}
+            {
+                node.message.content.content_type
+                for node in self.visible_message_nodes
+                if node.message
+            }
         )
 
     def message_count(self, *authors: AuthorRole) -> int:
