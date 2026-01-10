@@ -28,10 +28,11 @@ Always use `uv` to run commands in the environment.
     - `mapping` contains nodes; `current_node` points to the active leaf.
     - `content.parts` is polymorphic (strings mixed with dicts).
     - Top-level can be a list OR `{ conversations: [...] }`.
-- **References**: See `docs/quest-for-spec.md` for a deep research on AI export schemas.
+- **References**: See `docs/chatgpt-spec-unofficial.md` for a deep research on ChatGPT export schema.
 
 ## Agent Protocol
 - **Startup**: ALWAYS start by reading `dev/HANDOFF.md`, then conduct a deep codebase analysis to understand the current state and conventions.
+- **Critical Mindset**: Do not assume the codebase is perfectly implemented. Be alert for missing or buggy logic, including features that may appear complete but still require refinement or further work.
 - **Verification**: ALWAYS run `uv run pytest` and `uv run ruff check` before submitting changes.
 - **Persistence**: If you leave incomplete work, update `dev/HANDOFF.md` (do not store tasks here).
 - **Files**: Do not modify `LICENSE` or `uv.lock` unless explicitly instructed.
