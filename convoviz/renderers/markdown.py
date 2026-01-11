@@ -8,24 +8,6 @@ from convoviz.exceptions import MessageContentError
 from convoviz.models import Conversation, Node
 from convoviz.renderers.yaml import render_yaml_header
 
-# Length for shortened node IDs in markdown output (similar to Git short hashes)
-SHORT_ID_LENGTH = 8
-
-
-def shorten_id(node_id: str) -> str:
-    """Shorten a node ID for display in markdown.
-
-    Takes the first 8 characters of the ID, which is typically the first
-    segment of a UUID and provides sufficient uniqueness within a conversation.
-
-    Args:
-        node_id: The full node ID (often a UUID)
-
-    Returns:
-        Shortened ID string
-    """
-    return node_id[:SHORT_ID_LENGTH]
-
 
 def close_code_blocks(text: str) -> str:
     """Ensure all code blocks in the text are properly closed.
@@ -99,15 +81,12 @@ def render_message_header(role: str, headers: AuthorHeaders) -> str:
     return header_map.get(role, f"### {role.title()}")
 
 
-def render_node_header(node: Node, headers: AuthorHeaders, flavor: str = "standard") -> str:
+def render_node_header(node: Node, headers: AuthorHeaders) -> str:
     """Render the header section of a node.
-
-    Includes the node ID, parent link, and message author header.
 
     Args:
         node: The node to render
         headers: Configuration for author headers
-        flavor: Markdown flavor (obsidian, standard)
 
     Returns:
         The header markdown string
@@ -115,42 +94,7 @@ def render_node_header(node: Node, headers: AuthorHeaders, flavor: str = "standa
     if node.message is None:
         return ""
 
-    if flavor == "standard":
-        return render_message_header(node.message.author.role, headers) + "\n"
-
-    # Obsidian flavor
-    parts = []
-
-    # Add parent link if parent has a message
-    if node.parent_node and node.parent_node.message:
-        parts.append(f"[⬆️](#^{shorten_id(node.parent_node.id)})")
-
-    author_header = render_message_header(node.message.author.role, headers)
-    parts.append(f"{author_header} ^{shorten_id(node.id)}")
-
-    return "\n".join(parts) + "\n"
-
-
-def render_node_footer(node: Node, flavor: str = "standard") -> str:
-    """Render the footer section of a node with child links.
-
-    Args:
-        node: The node to render
-        flavor: Markdown flavor (obsidian, standard)
-
-    Returns:
-        The footer markdown string with child navigation links
-    """
-    if flavor == "standard" or not node.children_nodes:
-        return ""
-
-    if len(node.children_nodes) == 1:
-        return f"\n[⬇️](#^{shorten_id(node.children_nodes[0].id)})\n"
-
-    links = " | ".join(
-        f"[{i + 1} ⬇️](#^{shorten_id(child.id)})" for i, child in enumerate(node.children_nodes)
-    )
-    return f"\n{links}\n"
+    return render_message_header(node.message.author.role, headers) + "\n"
 
 
 def render_node(
@@ -158,7 +102,6 @@ def render_node(
     headers: AuthorHeaders,
     use_dollar_latex: bool = False,
     asset_resolver: Callable[[str], str | None] | None = None,
-    flavor: str = "standard",
 ) -> str:
     """Render a complete node as markdown.
 
@@ -167,7 +110,6 @@ def render_node(
         headers: Configuration for author headers
         use_dollar_latex: Whether to convert LaTeX delimiters to dollars
         asset_resolver: Function to resolve asset IDs to paths
-        flavor: Markdown flavor (obsidian, standard)
 
     Returns:
         Complete markdown string for the node
@@ -178,7 +120,7 @@ def render_node(
     if node.message.is_hidden:
         return ""
 
-    header = render_node_header(node, headers, flavor=flavor)
+    header = render_node_header(node, headers)
 
     # Get and process content
     try:
@@ -201,9 +143,7 @@ def render_node(
                 # Obsidian handles this well.
                 content += f"\n![Image]({rel_path})\n"
 
-    footer = render_node_footer(node, flavor=flavor)
-
-    return f"\n{header}{content}{footer}\n---\n"
+    return f"\n{header}{content}\n---\n"
 
 
 def _ordered_nodes(conversation: Conversation) -> list[Node]:
@@ -254,7 +194,7 @@ def render_conversation(
         Complete markdown document string
     """
     use_dollar_latex = config.markdown.latex_delimiters == "dollars"
-    flavor = config.markdown.flavor
+    # Note: config.markdown.flavor is available for future obsidian-specific features
 
     # Start with YAML header
     markdown = render_yaml_header(conversation, config.yaml)
@@ -263,7 +203,7 @@ def render_conversation(
     for node in _ordered_nodes(conversation):
         if node.message:
             markdown += render_node(
-                node, headers, use_dollar_latex, asset_resolver=asset_resolver, flavor=flavor
+                node, headers, use_dollar_latex, asset_resolver=asset_resolver
             )
 
     return markdown

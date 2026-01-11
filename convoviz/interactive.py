@@ -143,11 +143,11 @@ def run_interactive_config(initial_config: ConvovizConfig | None = None) -> Conv
 
     # Prompt for markdown flavor
     flavor_result = cast(
-        Literal["obsidian", "standard"],
+        Literal["standard", "obsidian"],
         _ask_or_cancel(
             select(
                 "Select the markdown flavor:",
-                choices=["obsidian", "standard"],
+                choices=["standard", "obsidian"],
                 default=config.conversation.markdown.flavor,
                 style=CUSTOM_STYLE,
             )
