@@ -1,5 +1,7 @@
 # Convoviz 📊: Visualize your entire ChatGPT data
 
+![wordcloud example](demo/wordcloud-example.png)
+
 Convert your ChatGPT history into well-formatted Markdown files. Additionally, visualize your data with word clouds 🔡☁️, view your prompt history graphs 📈, and access all your custom instructions 🤖 in a single location.
 
 ![GitHub last commit](https://img.shields.io/github/last-commit/mohamed-chs/chatgpt-history-export-to-md)
