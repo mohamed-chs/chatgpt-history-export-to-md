@@ -2,6 +2,7 @@
 
 from os import utime as os_utime
 from pathlib import Path
+from urllib.parse import quote
 
 from orjson import OPT_INDENT_2, dumps
 from tqdm import tqdm
@@ -32,8 +33,8 @@ _MONTH_NAMES = [
 def get_date_folder_path(conversation: Conversation) -> Path:
     """Get the date-based folder path for a conversation.
 
-    Creates a nested structure: year/month/week
-    Example: 2024/03-March/Week-02/
+    Creates a nested structure: year/month
+    Example: 2024/03-March/
 
     Args:
         conversation: The conversation to get the path for
@@ -51,13 +52,7 @@ def get_date_folder_path(conversation: Conversation) -> Path:
     month_name = _MONTH_NAMES[month_num - 1]
     month = f"{month_num:02d}-{month_name}"
 
-    # Week folder: "Week-01" through "Week-05" (week of the month)
-    # Calculate which week of the month this date falls into
-    day = create_time.day
-    week_of_month = (day - 1) // 7 + 1
-    week = f"Week-{week_of_month:02d}"
-
-    return Path(year) / month / week
+    return Path(year) / month
 
 
 def save_conversation(
@@ -115,6 +110,62 @@ def save_conversation(
     return final_path
 
 
+def _generate_year_index(year_dir: Path, year: str) -> None:
+    """Generate a _index.md file for a year folder.
+
+    Args:
+        year_dir: Path to the year directory
+        year: The year string (e.g., "2024")
+    """
+    months = sorted(
+        [d.name for d in year_dir.iterdir() if d.is_dir()],
+        key=lambda m: int(m.split("-")[0]),
+    )
+
+    lines = [
+        f"# {year}",
+        "",
+        "## Months",
+        "",
+    ]
+
+    for month in months:
+        month_name = month.split("-", 1)[1] if "-" in month else month
+        lines.append(f"- [{month_name}]({month}/_index.md)")
+
+    index_path = year_dir / "_index.md"
+    index_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+
+
+def _generate_month_index(month_dir: Path, year: str, month: str) -> None:
+    """Generate a _index.md file for a month folder.
+
+    Args:
+        month_dir: Path to the month directory
+        year: The year string (e.g., "2024")
+        month: The month folder name (e.g., "03-March")
+    """
+    month_name = month.split("-", 1)[1] if "-" in month else month
+    files = sorted(
+        [f.name for f in month_dir.glob("*.md") if f.name != "_index.md"]
+    )
+
+    lines = [
+        f"# {month_name} {year}",
+        "",
+        "## Conversations",
+        "",
+    ]
+
+    for file in files:
+        title = file[:-3]  # Remove .md extension
+        encoded_file = quote(file)
+        lines.append(f"- [{title}]({encoded_file})")
+
+    index_path = month_dir / "_index.md"
+    index_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+
+
 def save_collection(
     collection: ConversationCollection,
     directory: Path,
@@ -150,6 +201,15 @@ def save_collection(
 
         filepath = target_dir / f"{sanitize(conv.title)}.md"
         save_conversation(conv, filepath, config, headers, source_path=collection.source_path)
+
+    # Generate index files for date organization
+    if folder_organization == FolderOrganization.DATE:
+        for year_dir in directory.iterdir():
+            if year_dir.is_dir() and year_dir.name.isdigit():
+                for month_dir in year_dir.iterdir():
+                    if month_dir.is_dir():
+                        _generate_month_index(month_dir, year_dir.name, month_dir.name)
+                _generate_year_index(year_dir, year_dir.name)
 
 
 def save_custom_instructions(

@@ -35,10 +35,14 @@ def test_run_pipeline(mock_zip_file: Path, tmp_path: Path) -> None:
         assert (output_dir / "custom_instructions.json").exists()
 
         # Check if markdown file was created (in date folder by default)
-        # The mock conversation is dated July 29, 2023 -> 2023/07-July/Week-05/
+        # The mock conversation is dated July 29, 2023 -> 2023/07-July/
         assert (
-            output_dir / "Markdown" / "2023" / "07-July" / "Week-05" / "conversation 111.md"
+            output_dir / "Markdown" / "2023" / "07-July" / "conversation 111.md"
         ).exists()
+
+        # Check that index files were generated
+        assert (output_dir / "Markdown" / "2023" / "_index.md").exists()
+        assert (output_dir / "Markdown" / "2023" / "07-July" / "_index.md").exists()
 
 
 def test_run_pipeline_invalid_zip(tmp_path: Path) -> None:

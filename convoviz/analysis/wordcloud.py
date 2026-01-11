@@ -139,7 +139,8 @@ def generate_wordclouds(
         text = group.plaintext("user", "assistant")
         if text.strip():
             img = generate_wordcloud(text, config)
-            img.save(output_dir / f"{week.strftime('%Y week %W')}.png", optimize=True)
+            # Format: 2024-W15.png (ISO week format)
+            img.save(output_dir / f"{week.strftime('%Y-W%W')}.png", optimize=True)
 
     for month, group in tqdm(
         month_groups.items(),
@@ -149,7 +150,8 @@ def generate_wordclouds(
         text = group.plaintext("user", "assistant")
         if text.strip():
             img = generate_wordcloud(text, config)
-            img.save(output_dir / f"{month.strftime('%Y %B')}.png", optimize=True)
+            # Format: 2024-03-March.png (consistent with folder naming)
+            img.save(output_dir / f"{month.strftime('%Y-%m-%B')}.png", optimize=True)
 
     for year, group in tqdm(
         year_groups.items(),
@@ -159,4 +161,5 @@ def generate_wordclouds(
         text = group.plaintext("user", "assistant")
         if text.strip():
             img = generate_wordcloud(text, config)
+            # Format: 2024.png
             img.save(output_dir / f"{year.strftime('%Y')}.png", optimize=True)

@@ -10,7 +10,6 @@ Convert your ChatGPT history into well-formatted Markdown files. Additionally, v
 - **YAML Headers**: Optional and included by default.
 - **Inline Images**: Media attachments rendered directly in Markdown.
 - **Data Visualizations**: Word clouds, graphs, and more.
-- **Custom Instructions**: All your custom instructions in one JSON file.
 
 See examples [here](demo).
 

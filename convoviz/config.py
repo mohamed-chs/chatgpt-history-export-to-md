@@ -10,8 +10,8 @@ from pydantic import BaseModel, Field
 class FolderOrganization(str, Enum):
     """How to organize markdown output files in folders."""
 
-    FLAT = "flat"  # All files in one directory (default)
-    DATE = "date"  # Nested by year/month/week
+    FLAT = "flat"  # All files in one directory
+    DATE = "date"  # Nested by year/month (default)
 
 
 class AuthorHeaders(BaseModel):
