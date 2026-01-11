@@ -327,12 +327,18 @@ Summary of chain-of-thought reasoning (o1/o3 models):
 
 #### **Type H: Thoughts** (`content_type: "thoughts"`) — New 2025
 
-Internal reasoning thoughts (visible in some contexts):
+Internal reasoning thoughts (visible in some contexts). Note: `thoughts` is a **list** of thought objects, not a string.
 
 ```json
 {
   "content_type": "thoughts",
-  "thoughts": "Internal chain of thought...",
+  "thoughts": [
+    {
+      "summary": "Thinking about the problem...",
+      "content": [],
+      "finished": true
+    }
+  ],
   "source_analysis_msg_id": "uuid"
 }
 ```

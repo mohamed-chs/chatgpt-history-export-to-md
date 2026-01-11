@@ -190,3 +190,141 @@ def test_collection_update_keeps_newest_when_ids_collide(mock_conversation: Conv
 
     base.update(ConversationCollection(conversations=[updated]))
     assert base.index[mock_conversation.conversation_id].update_time == updated.update_time
+
+
+def test_message_visibility_extended() -> None:
+    """Test extended is_hidden cases from spec v2."""
+    base_data = {
+        "id": "msg_id",
+        "create_time": datetime.now(),
+        "update_time": datetime.now(),
+        "status": "finished_successfully",
+        "end_turn": True,
+        "weight": 1.0,
+        "recipient": "all",
+    }
+
+    # Case 1: is_visually_hidden_from_conversation metadata (hidden)
+    msg = Message(
+        author=MessageAuthor(role="assistant"),
+        content=MessageContent(content_type="text", parts=["Hello"]),
+        metadata=MessageMetadata(is_visually_hidden_from_conversation=True),
+        **base_data,
+    )
+    assert msg.is_hidden
+
+    # Case 2: Assistant targeting dalle.text2im (hidden - tool-targeted)
+    msg = Message(
+        author=MessageAuthor(role="assistant"),
+        content=MessageContent(content_type="text", parts=["Generate image"]),
+        metadata=MessageMetadata(),
+        **{**base_data, "recipient": "dalle.text2im"},
+    )
+    assert msg.is_hidden
+
+    # Case 3: Assistant targeting python (hidden - tool-targeted)
+    msg = Message(
+        author=MessageAuthor(role="assistant"),
+        content=MessageContent(content_type="text", parts=["Run code"]),
+        metadata=MessageMetadata(),
+        **{**base_data, "recipient": "python"},
+    )
+    assert msg.is_hidden
+
+    # Case 4: Tool output (not browser) is visible
+    msg = Message(
+        author=MessageAuthor(role="tool", name="python"),
+        content=MessageContent(content_type="execution_output", result="42"),
+        metadata=MessageMetadata(),
+        **base_data,
+    )
+    assert not msg.is_hidden
+
+
+def test_new_content_types() -> None:
+    """Test new content types from spec v2: reasoning_recap, thoughts, tether_quote."""
+    base_data = {
+        "id": "msg_id",
+        "create_time": datetime.now(),
+        "update_time": datetime.now(),
+        "status": "finished_successfully",
+        "end_turn": True,
+        "weight": 1.0,
+        "recipient": "all",
+    }
+
+    # Case 1: reasoning_recap content type (hidden by default - internal reasoning)
+    msg = Message(
+        author=MessageAuthor(role="assistant"),
+        content=MessageContent(content_type="reasoning_recap", content="I reasoned about X"),
+        metadata=MessageMetadata(),
+        **base_data,
+    )
+    assert msg.text == "I reasoned about X"
+    assert msg.is_hidden  # Hidden: internal reasoning noise
+
+    # Case 2: thoughts content type (hidden by default - internal reasoning)
+    msg = Message(
+        author=MessageAuthor(role="assistant"),
+        content=MessageContent(
+            content_type="thoughts",
+            thoughts=[
+                {"summary": "Thinking about the problem...", "finished": True},
+                {"summary": "Considering alternatives.", "finished": True},
+            ],
+        ),
+        metadata=MessageMetadata(),
+        **base_data,
+    )
+    assert "Thinking about the problem..." in msg.text
+    assert "Considering alternatives." in msg.text
+    assert msg.is_hidden  # Hidden: internal reasoning noise
+
+    # Case 3: tether_quote with full attribution
+    msg = Message(
+        author=MessageAuthor(role="assistant"),
+        content=MessageContent(
+            content_type="tether_quote",
+            text="Important quote here",
+            url="https://example.com/article",
+            domain="example.com",
+            title="Article Title",
+        ),
+        metadata=MessageMetadata(),
+        **base_data,
+    )
+    text = msg.text
+    assert "> Important quote here" in text
+    assert "[Article Title](https://example.com/article)" in text
+    assert not msg.is_hidden
+
+    # Case 4: tether_quote with only domain
+    msg = Message(
+        author=MessageAuthor(role="assistant"),
+        content=MessageContent(
+            content_type="tether_quote",
+            text="Another quote",
+            url="https://example.org/page",
+            domain="example.org",
+        ),
+        metadata=MessageMetadata(),
+        **base_data,
+    )
+    text = msg.text
+    assert "> Another quote" in text
+    assert "[example.org](https://example.org/page)" in text
+
+    # Case 5: tether_quote with only URL
+    msg = Message(
+        author=MessageAuthor(role="assistant"),
+        content=MessageContent(
+            content_type="tether_quote",
+            text="Minimal quote",
+            url="https://example.net/",
+        ),
+        metadata=MessageMetadata(),
+        **base_data,
+    )
+    text = msg.text
+    assert "> Minimal quote" in text
+    assert "<https://example.net/>" in text

@@ -57,6 +57,22 @@ def resolve_asset_path(source_dir: Path, asset_id: str) -> Path | None:
         except Exception:
             pass
 
+    # 4. Try prefix match in user-* directories (new 2025 format)
+    try:
+        for user_dir in source_dir.glob("user-*"):
+            if user_dir.is_dir():
+                user_dir = user_dir.resolve()
+                candidates = list(user_dir.glob(f"{asset_id}*"))
+                files = [
+                    p.resolve()
+                    for p in candidates
+                    if p.is_file() and p.resolve().is_relative_to(user_dir)
+                ]
+                if files:
+                    return files[0]
+    except Exception:
+        pass
+
     return None
 
 

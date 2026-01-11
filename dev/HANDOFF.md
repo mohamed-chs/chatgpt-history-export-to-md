@@ -12,6 +12,17 @@ This document provides context for continuing work on the convoviz project.
 
 ## Recent Updates (January 11, 2026)
 
+**Spec v2 Alignment**:
+- **Fixed `is_hidden` Logic**: Now hides ALL tool-targeted assistant messages (`recipient not in ("all", None)`), not just `recipient="browser"`. This correctly hides internal calls to `dalle.text2im`, `python`, etc.
+- **Added `is_visually_hidden_from_conversation` Check**: Messages explicitly marked as hidden by OpenAI are now respected.
+- **New Content Types Supported**:
+  - `reasoning_recap`: o1/o3 model reasoning summaries — **hidden by default** (internal noise)
+  - `thoughts`: o1/o3 internal reasoning (list of thought objects) — **hidden by default** (internal noise)
+  - `tether_quote`: Web citations rendered as blockquotes with source attribution — **visible**
+- **Asset Resolution**: Now searches `user-*/` folders for images (new 2025 export format).
+
+**Date-Based Folder Organization (Default)**:
+
 **Date-Based Folder Organization (Default)**:
 - Markdown files are now organized by default in nested date folders: `year/month/week`
 - Structure example: `2024/03-March/Week-02/`
@@ -134,7 +145,8 @@ uv run ruff check convoviz tests && uv run mypy convoviz && uv run pytest
 2.  **Polymorphic Content**: The `parts` field in messages can contain strings (text) OR dictionaries (images, tool calls).
 3.  **Asset Resolution**: Images (DALL-E) are often in a `dalle-generations` subfolder (WebP), while user uploads are in the root. The code handles both.
 4.  **Asset Pointer Protocols**: Modern exports use `sediment://` protocol; legacy used `file-service://`.
-5.  **New Content Types (2025)**: `reasoning_recap`, `thoughts`, `tether_quote` for o1/o3 reasoning models.
+5.  **New Content Types (2025)**: `reasoning_recap`, `thoughts`, `tether_quote` for o1/o3 reasoning models — now supported.
+6.  **New Asset Folders (2025)**: `user-{id}/` directories contain system-generated images in PNG format — now supported.
 
 ## What's NOT Done (Roadmap)
 
@@ -144,4 +156,4 @@ uv run ruff check convoviz tests && uv run mypy convoviz && uv run pytest
 - [x] **Interactive Tests**: Added tests covering cancellation behavior and prompt flow (`tests/test_interactive.py`).
 - [ ] **Cross-Platform**: Loaders for Claude and Gemini are planned but not started.
 - [x] **Schema Documentation**: Updated spec at `docs/chatgpt-spec-unofficial-v2.md` (Jan 2026).
-- [ ] **Reasoning Content**: Support `reasoning_recap` and `thoughts` content types from o1/o3 models.
+- [x] **Reasoning Content**: Support `reasoning_recap` and `thoughts` content types from o1/o3 models.

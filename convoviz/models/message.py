@@ -28,6 +28,14 @@ class MessageContent(BaseModel):
     parts: list[Any] | None = None
     text: str | None = None
     result: str | None = None
+    # reasoning_recap content type
+    content: str | None = None
+    # thoughts content type (list of thought objects with summary/content/finished)
+    thoughts: list[Any] | None = None
+    # tether_quote content type
+    url: str | None = None
+    domain: str | None = None
+    title: str | None = None
 
 
 class MessageMetadata(BaseModel):
@@ -36,6 +44,7 @@ class MessageMetadata(BaseModel):
     model_slug: str | None = None
     invoked_plugin: dict[str, Any] | None = None
     is_user_system_message: bool | None = None
+    is_visually_hidden_from_conversation: bool | None = None
     user_context_message_data: dict[str, Any] | None = None
 
     model_config = ConfigDict(protected_namespaces=())
@@ -105,11 +114,47 @@ class Message(BaseModel):
             if self.content.parts:
                 return ""
 
+        # tether_quote: render as a blockquote with attribution (check before .text)
+        if self.content.content_type == "tether_quote":
+            return self._render_tether_quote()
         if self.content.text is not None:
             return self.content.text
         if self.content.result is not None:
             return self.content.result
+        # reasoning_recap content type uses 'content' field
+        if self.content.content is not None:
+            return self.content.content
+        # thoughts content type uses 'thoughts' field (list of thought objects)
+        if self.content.thoughts is not None:
+            return self._render_thoughts()
         raise MessageContentError(self.id)
+
+    def _render_thoughts(self) -> str:
+        """Render thoughts content (list of thought objects with summary/content)."""
+        if not self.content.thoughts:
+            return ""
+        summaries = []
+        for thought in self.content.thoughts:
+            if isinstance(thought, dict) and (summary := thought.get("summary")):
+                summaries.append(summary)
+        return "\n".join(summaries) if summaries else ""
+
+    def _render_tether_quote(self) -> str:
+        """Render tether_quote content as a blockquote."""
+        quote_text = self.content.text or ""
+        if not quote_text.strip():
+            return ""
+        # Format as blockquote with source
+        lines = [f"> {line}" for line in quote_text.strip().split("\n")]
+        blockquote = "\n".join(lines)
+        # Add attribution if we have title/domain/url
+        if self.content.title and self.content.url:
+            blockquote += f"\n> — [{self.content.title}]({self.content.url})"
+        elif self.content.domain and self.content.url:
+            blockquote += f"\n> — [{self.content.domain}]({self.content.url})"
+        elif self.content.url:
+            blockquote += f"\n> — <{self.content.url}>"
+        return blockquote
 
     @property
     def has_content(self) -> bool:
@@ -132,10 +177,19 @@ class Message(BaseModel):
 
         Hidden if:
         1. It is empty (no text, no images).
-        2. It is an internal system message (not custom instructions).
-        3. It is a browser tool output (intermediate search steps).
+        2. Explicitly marked as visually hidden.
+        3. It is an internal system message (not custom instructions).
+        4. It is a browser tool output (intermediate search steps).
+        5. It is an assistant message targeting a tool (internal call).
+        6. It is code interpreter input (content_type="code").
+        7. It is browsing status (tether_browsing_display).
+        8. It is internal reasoning (thoughts, reasoning_recap from o1/o3).
         """
         if self.is_empty:
+            return True
+
+        # Explicitly marked as hidden by OpenAI
+        if self.metadata.is_visually_hidden_from_conversation:
             return True
 
         # Hide internal system messages
@@ -143,15 +197,22 @@ class Message(BaseModel):
             # Only show if explicitly marked as user system message (Custom Instructions)
             return not self.metadata.is_user_system_message
 
-        # Hide browser tool outputs (usually intermediate search steps)
+        # Hide browser tool outputs (intermediate search steps)
         if self.author.role == "tool" and self.author.name == "browser":
             return True
 
-        # Hide assistant calls to browser tool (e.g. "search(...)") or code interpreter
-        if self.author.role == "assistant" and (
-            self.recipient == "browser" or self.content.content_type == "code"
-        ):
+        # Hide assistant messages targeting tools (e.g., search(...), code input)
+        # recipient="all" or None means it's for the user; anything else is internal
+        if self.author.role == "assistant" and self.recipient not in ("all", None):
             return True
 
-        # Hide browsing status messages
-        return self.content.content_type == "tether_browsing_display"
+        # Hide code interpreter input (content_type="code")
+        if self.author.role == "assistant" and self.content.content_type == "code":
+            return True
+
+        # Hide browsing status and internal reasoning steps (o1/o3 models)
+        return self.content.content_type in (
+            "tether_browsing_display",
+            "thoughts",
+            "reasoning_recap",
+        )
