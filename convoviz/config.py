@@ -1,9 +1,17 @@
 """Configuration models using Pydantic v2."""
 
+from enum import Enum
 from pathlib import Path
 from typing import Literal
 
 from pydantic import BaseModel, Field
+
+
+class FolderOrganization(str, Enum):
+    """How to organize markdown output files in folders."""
+
+    FLAT = "flat"  # All files in one directory (default)
+    DATE = "date"  # Nested by year/month/week
 
 
 class AuthorHeaders(BaseModel):
@@ -83,6 +91,7 @@ class ConvovizConfig(BaseModel):
 
     input_path: Path | None = None
     output_folder: Path = Field(default_factory=lambda: Path.home() / "Documents" / "ChatGPT-Data")
+    folder_organization: FolderOrganization = FolderOrganization.DATE
     message: MessageConfig = Field(default_factory=MessageConfig)
     conversation: ConversationConfig = Field(default_factory=ConversationConfig)
     wordcloud: WordCloudConfig = Field(default_factory=WordCloudConfig)

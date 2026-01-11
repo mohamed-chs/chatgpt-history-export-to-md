@@ -5,7 +5,7 @@ from pathlib import Path
 import typer
 from rich.console import Console
 
-from convoviz.config import get_default_config
+from convoviz.config import FolderOrganization, get_default_config
 from convoviz.exceptions import ConfigurationError, InvalidZipError
 from convoviz.interactive import run_interactive_config
 from convoviz.io.loaders import find_latest_zip
@@ -38,6 +38,12 @@ def run(
         "-o",
         help="Path to the output directory.",
     ),
+    flat: bool = typer.Option(
+        False,
+        "--flat",
+        "-f",
+        help="Put all markdown files in a single folder (disables date organization).",
+    ),
     interactive: bool | None = typer.Option(
         None,
         "--interactive/--no-interactive",
@@ -57,6 +63,8 @@ def run(
         config.input_path = input_path
     if output_dir:
         config.output_folder = output_dir
+    if flat:
+        config.folder_organization = FolderOrganization.FLAT
 
     # Determine mode: interactive if explicitly requested or no input provided
     use_interactive = interactive if interactive is not None else (input_path is None)

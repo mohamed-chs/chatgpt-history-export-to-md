@@ -113,6 +113,7 @@ def run_pipeline(config: ConvovizConfig) -> None:
         markdown_folder,
         config.conversation,
         config.message.author_headers,
+        folder_organization=config.folder_organization,
         progress_bar=True,
     )
     console.print(

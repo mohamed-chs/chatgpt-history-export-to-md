@@ -10,7 +10,18 @@ This document provides context for continuing work on the convoviz project.
 - Bar plot graphs showing usage patterns
 - JSON export of custom instructions
 
-## Recent Updates (January 10, 2026)
+## Recent Updates (January 11, 2026)
+
+**Date-Based Folder Organization (Default)**:
+- Markdown files are now organized by default in nested date folders: `year/month/week`
+- Structure example: `2024/03-March/Week-02/`
+- Week numbers are based on the day of the month (days 1-7 = Week-01, days 8-14 = Week-02, etc.)
+- Added `--flat` (`-f`) CLI flag to disable date organization and put all files in a single folder
+- Added `FolderOrganization` enum to `config.py` with `FLAT` and `DATE` (default) options
+- Added `get_date_folder_path()` helper in `convoviz/io/writers.py`
+- Tests in `tests/test_writers.py`
+
+## Updates (January 10, 2026)
 
 **Content Filtering (Fix)**:
 - **Hidden Internal Tool Calls**: Improved logic to hide internal assistant tool calls (e.g., `search(...)` or Code Interpreter inputs) which were previously leaking into the Markdown output.

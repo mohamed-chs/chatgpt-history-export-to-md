@@ -58,11 +58,6 @@ You can provide arguments directly to skip the prompts:
 convoviz --input path/to/your/export.zip --output path/to/output/folder
 ```
 
-Inputs can be any of:
-- A ChatGPT export ZIP (downloaded from OpenAI)
-- An extracted export directory containing `conversations.json`
-- A `conversations.json` file directly
-
 Notes:
 - `--zip` / `-z` is kept as an alias for `--input` for convenience.
 - You can force non-interactive mode with `--no-interactive`.
