@@ -132,7 +132,9 @@ uv run ruff check convoviz tests && uv run mypy convoviz && uv run pytest
 
 1.  **ChatGPT Data Structure**: It is a **Directed Acyclic Graph (DAG)**, not a linear list.
 2.  **Polymorphic Content**: The `parts` field in messages can contain strings (text) OR dictionaries (images, tool calls).
-3.  **Asset Resolution**: Images (DALL-E) are often in a `dalle-generations` subfolder, while user uploads are in the root. The code handles both.
+3.  **Asset Resolution**: Images (DALL-E) are often in a `dalle-generations` subfolder (WebP), while user uploads are in the root. The code handles both.
+4.  **Asset Pointer Protocols**: Modern exports use `sediment://` protocol; legacy used `file-service://`.
+5.  **New Content Types (2025)**: `reasoning_recap`, `thoughts`, `tether_quote` for o1/o3 reasoning models.
 
 ## What's NOT Done (Roadmap)
 
@@ -141,3 +143,5 @@ uv run ruff check convoviz tests && uv run mypy convoviz && uv run pytest
 - [ ] **Canvas Support**: Research and implement support for "Canvas" content.
 - [x] **Interactive Tests**: Added tests covering cancellation behavior and prompt flow (`tests/test_interactive.py`).
 - [ ] **Cross-Platform**: Loaders for Claude and Gemini are planned but not started.
+- [x] **Schema Documentation**: Updated spec at `docs/chatgpt-spec-unofficial-v2.md` (Jan 2026).
+- [ ] **Reasoning Content**: Support `reasoning_recap` and `thoughts` content types from o1/o3 models.
