@@ -98,7 +98,10 @@ And if you've had a great experience, consider giving the project a star ⭐. It
 
 ## Notes
 
-This is just a small thing I coded to help me see my convos in beautiful markdown. It was originally built with [Obsidian](https://obsidian.md/) (my go-to note-taking app) in mind, but the default output is standard Markdown (and you can choose an Obsidian-flavored mode in the interactive config if you want block IDs / navigation links).
+This is just a small thing I coded to help me see my convos in beautiful markdown. It was originally built with [Obsidian](https://obsidian.md/) (my go-to note-taking app) in mind, but the default output is standard Markdown.
+
+You can choose obsidian flavored md in the cli to get extra features like:
+- model reasoning (`reasoning_recap`, `thoughts`) rendered as collapsible `> [!NOTE]-` callouts instead of being hidden.
 
 I wasn't a fan of the clunky, and sometimes paid, browser extensions.
 
@@ -109,12 +112,6 @@ It should(?) also work as library, so you can import and use the models and func
 ### Offline / reproducible runs
 
 Convoviz uses NLTK stopwords for word clouds. If you’re offline and NLTK data isn’t already installed, pre-download it once:
-
-```bash
-python -c "import nltk; nltk.download('stopwords')"
-```
-
-If you’re using `uv` without a global install, you can run:
 
 ```bash
 uv run python -c "import nltk; nltk.download('stopwords')"

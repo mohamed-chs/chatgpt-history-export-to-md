@@ -12,6 +12,11 @@ This document provides context for continuing work on the convoviz project.
 
 ## Recent Updates (January 11, 2026)
 
+**Obsidian Markdown Flavor Enhancements**:
+- **AI Reasoning Callouts**: For `obsidian` flavor, `reasoning_recap` and `thoughts` content types (o1/o3 models) are now rendered as collapsible callouts (`> [!NOTE]- 🧠 AI Reasoning`) instead of being hidden.
+- This uses Obsidian's native collapsible callout syntax which degrades gracefully on GitHub (renders as a blockquote with `[!NOTE]` prefix).
+- Standard flavor behavior unchanged (these content types remain hidden).
+
 **Spec v2 Alignment**:
 - **Fixed `is_hidden` Logic**: Now hides ALL tool-targeted assistant messages (`recipient not in ("all", None)`), not just `recipient="browser"`. This correctly hides internal calls to `dalle.text2im`, `python`, etc.
 - **Added `is_visually_hidden_from_conversation` Check**: Messages explicitly marked as hidden by OpenAI are now respected.
