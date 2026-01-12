@@ -8,7 +8,7 @@
 ## Tech Stack & Standards
 - **Runtime**: Python 3.12+ (Managed by `uv`)
 - **Core Libraries**: `pydantic` (Data Models), `typer` (CLI), `matplotlib` (Graphs), `wordcloud`.
-- **Style**: strict typing (`mypy`), `ruff` for linting/formatting.
+- **Style**: strict typing (`ty`), `ruff` for linting/formatting.
 
 ## Scope, Precedence, and Editing Style (Meta)
 - **Precedence**: If you ever add nested agent instructions (e.g. subprojects), the closest file to the code being edited should win. Keep root-level guidance general; put specifics near the code.
@@ -21,8 +21,8 @@ Always use `uv` to run commands in the environment.
 - **Test**: `uv run pytest` (Comprehensive), `uv run pytest -x` (Stop on first fail)
 - **Lint**: `uv run ruff check convoviz tests`
 - **Format**: `uv run ruff format`
-- **Type Check**: `uv run mypy convoviz`
-- **Full quality gate**: `uv run ruff check convoviz tests && uv run mypy convoviz && uv run pytest`
+- **Type Check**: `uv run ty check convoviz`
+- **Full quality gate**: `uv run ruff check convoviz tests && uv run ty check convoviz && uv run pytest`
 
 ## Release Workflow
 To publish a new version to PyPI:

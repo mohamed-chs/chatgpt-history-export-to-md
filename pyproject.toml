@@ -62,9 +62,9 @@ convoviz = "convoviz.cli:main_entry"
 
 [dependency-groups]
 dev = [
-    "mypy>=1.19.1",
     "pytest>=8.4.2",
     "ruff>=0.14.10",
+    "ty>=0.0.11",
     "types-tqdm>=4.67.0.20250809",
 ]
 

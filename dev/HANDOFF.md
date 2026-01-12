@@ -144,7 +144,7 @@ uv run convoviz --input export.zip --output ./output
 uv run convoviz --input ./extracted_export_dir --output ./output
 
 # Full quality check (Tests + Type + Lint)
-uv run ruff check convoviz tests && uv run mypy convoviz && uv run pytest
+uv run ruff check convoviz tests && uv run ty check convoviz && uv run pytest
 ```
 
 ## Known Quirks & Gotchas
