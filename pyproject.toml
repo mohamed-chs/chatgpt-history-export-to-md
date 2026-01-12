@@ -92,11 +92,8 @@ ignore = [
 [tool.ruff.lint.isort]
 known-first-party = ["convoviz"]
 
-[tool.mypy]
-python_version = "3.12"
-warn_return_any = true
-warn_unused_configs = true
-ignore_missing_imports = true
+[tool.ty.environment]
+python-version = "3.12"
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
