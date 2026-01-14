@@ -70,6 +70,7 @@ class WordCloudConfig(BaseModel):
     include_numbers: bool = False
     width: int = 600
     height: int = 600
+    max_workers: int | None = None  # None = use half CPU count
 
 
 class GraphConfig(BaseModel):

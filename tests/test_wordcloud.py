@@ -1,13 +1,19 @@
 """Tests for word cloud generation and stop words."""
 
+from pathlib import Path
 from unittest.mock import patch
 
+import pytest
+
 from convoviz.analysis.wordcloud import (
+    _generate_and_save_wordcloud,
     generate_wordcloud,
+    generate_wordclouds,
     load_nltk_stopwords,
     parse_custom_stopwords,
 )
 from convoviz.config import WordCloudConfig
+from convoviz.models import ConversationCollection
 
 
 def test_load_nltk_stopwords():
@@ -41,3 +47,64 @@ def test_generate_wordcloud_no_programming_stopwords(mock_wc):
     assert "python" in passed_stopwords  # From custom
     assert "def" not in passed_stopwords  # Should NOT be there
     assert "class" not in passed_stopwords  # Should NOT be there
+
+
+def test_generate_and_save_wordcloud_skips_empty_text(tmp_path: Path):
+    """Test that _generate_and_save_wordcloud skips empty text."""
+    config = WordCloudConfig()
+    result = _generate_and_save_wordcloud(("", "test.png", tmp_path, config))
+    assert result is False
+    assert not (tmp_path / "test.png").exists()
+
+    result = _generate_and_save_wordcloud(("   ", "test2.png", tmp_path, config))
+    assert result is False
+    assert not (tmp_path / "test2.png").exists()
+
+
+def test_generate_and_save_wordcloud_creates_file(tmp_path: Path):
+    """Test that _generate_and_save_wordcloud creates a wordcloud file."""
+    config = WordCloudConfig()
+    text = "hello world python programming code test example"
+    result = _generate_and_save_wordcloud((text, "test.png", tmp_path, config))
+    assert result is True
+    assert (tmp_path / "test.png").exists()
+
+
+def test_generate_wordclouds_empty_collection(tmp_path: Path):
+    """Test generate_wordclouds with an empty collection."""
+    collection = ConversationCollection()
+    config = WordCloudConfig()
+    # Should not raise, just do nothing
+    generate_wordclouds(collection, tmp_path, config)
+    # No files should be created (only directory)
+    assert list(tmp_path.glob("*.png")) == []
+
+
+def test_generate_wordclouds_parallel(tmp_path: Path, mock_conversation):
+    """Test that generate_wordclouds works with parallel execution."""
+    collection = ConversationCollection(conversations=[mock_conversation])
+    config = WordCloudConfig(max_workers=2)
+
+    generate_wordclouds(collection, tmp_path, config)
+
+    # Should create at least one wordcloud (weekly, monthly, or yearly)
+    png_files = list(tmp_path.glob("*.png"))
+    assert len(png_files) >= 1
+
+
+def test_generate_wordclouds_single_worker(tmp_path: Path, mock_conversation):
+    """Test that generate_wordclouds works with a single worker."""
+    collection = ConversationCollection(conversations=[mock_conversation])
+    config = WordCloudConfig(max_workers=1)
+
+    generate_wordclouds(collection, tmp_path, config)
+
+    png_files = list(tmp_path.glob("*.png"))
+    assert len(png_files) >= 1
+
+
+@pytest.mark.parametrize("max_workers", [None, 1, 2, 4])
+def test_wordcloud_config_max_workers(max_workers):
+    """Test that max_workers config option is accepted."""
+    config = WordCloudConfig(max_workers=max_workers)
+    assert config.max_workers == max_workers

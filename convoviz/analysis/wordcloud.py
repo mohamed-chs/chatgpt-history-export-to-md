@@ -1,5 +1,7 @@
 """Word cloud generation for conversation text."""
 
+import os
+from concurrent.futures import ProcessPoolExecutor
 from functools import lru_cache
 from pathlib import Path
 
@@ -110,6 +112,25 @@ def generate_wordcloud(text: str, config: WordCloudConfig) -> Image:
     return result
 
 
+def _generate_and_save_wordcloud(args: tuple[str, str, Path, WordCloudConfig]) -> bool:
+    """Worker function for parallel wordcloud generation.
+
+    Must be at module level for pickling by ProcessPoolExecutor.
+
+    Args:
+        args: Tuple of (text, filename, output_dir, config)
+
+    Returns:
+        True if wordcloud was generated, False if skipped (empty text)
+    """
+    text, filename, output_dir, config = args
+    if not text.strip():
+        return False
+    img = generate_wordcloud(text, config)
+    img.save(output_dir / filename, optimize=True)
+    return True
+
+
 def generate_wordclouds(
     collection: ConversationCollection,
     output_dir: Path,
@@ -118,6 +139,8 @@ def generate_wordclouds(
     progress_bar: bool = False,
 ) -> None:
     """Generate word clouds for weekly, monthly, and yearly groupings.
+
+    Uses parallel processing to speed up generation on multi-core systems.
 
     Args:
         collection: Collection of conversations
@@ -131,35 +154,43 @@ def generate_wordclouds(
     month_groups = collection.group_by_month()
     year_groups = collection.group_by_year()
 
-    for week, group in tqdm(
-        week_groups.items(),
-        desc="Creating weekly wordclouds 🔡☁️",
-        disable=not progress_bar,
-    ):
-        text = group.plaintext("user", "assistant")
-        if text.strip():
-            img = generate_wordcloud(text, config)
-            # Format: 2024-W15.png (ISO week format)
-            img.save(output_dir / f"{week.strftime('%Y-W%W')}.png", optimize=True)
+    # Build list of all tasks: (text, filename, output_dir, config)
+    tasks: list[tuple[str, str, Path, WordCloudConfig]] = []
 
-    for month, group in tqdm(
-        month_groups.items(),
-        desc="Creating monthly wordclouds 🔡☁️",
-        disable=not progress_bar,
-    ):
+    for week, group in week_groups.items():
         text = group.plaintext("user", "assistant")
-        if text.strip():
-            img = generate_wordcloud(text, config)
-            # Format: 2024-03-March.png (consistent with folder naming)
-            img.save(output_dir / f"{month.strftime('%Y-%m-%B')}.png", optimize=True)
+        # Format: 2024-W15.png (ISO week format)
+        filename = f"{week.strftime('%Y-W%W')}.png"
+        tasks.append((text, filename, output_dir, config))
 
-    for year, group in tqdm(
-        year_groups.items(),
-        desc="Creating yearly wordclouds 🔡☁️",
-        disable=not progress_bar,
-    ):
+    for month, group in month_groups.items():
         text = group.plaintext("user", "assistant")
-        if text.strip():
-            img = generate_wordcloud(text, config)
-            # Format: 2024.png
-            img.save(output_dir / f"{year.strftime('%Y')}.png", optimize=True)
+        # Format: 2024-03-March.png (consistent with folder naming)
+        filename = f"{month.strftime('%Y-%m-%B')}.png"
+        tasks.append((text, filename, output_dir, config))
+
+    for year, group in year_groups.items():
+        text = group.plaintext("user", "assistant")
+        # Format: 2024.png
+        filename = f"{year.strftime('%Y')}.png"
+        tasks.append((text, filename, output_dir, config))
+
+    if not tasks:
+        return
+
+    # Determine worker count: use config if set, otherwise half CPU count (min 1)
+    max_workers = config.max_workers
+    if max_workers is None:
+        cpu_count = os.cpu_count() or 2
+        max_workers = max(1, cpu_count // 2)
+
+    # Use parallel processing for speedup on multi-core systems
+    with ProcessPoolExecutor(max_workers=max_workers) as executor:
+        list(
+            tqdm(
+                executor.map(_generate_and_save_wordcloud, tasks),
+                total=len(tasks),
+                desc="Creating wordclouds 🔡☁️",
+                disable=not progress_bar,
+            )
+        )
