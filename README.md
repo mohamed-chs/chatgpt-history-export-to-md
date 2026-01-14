@@ -23,7 +23,7 @@ See examples [here](demo).
 
 ### 2. Install the tool 🛠
 
-Try it without installing using uv ([astral-sh/uv](https://github.com/astral-sh/uv)):
+Try it without installing using uv ([astral-sh/uv](https://github.com/astral-sh/uv?tab=readme-ov-file#highlights)):
 
 ```bash
 uvx convoviz
