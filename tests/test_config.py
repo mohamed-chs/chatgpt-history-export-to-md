@@ -50,7 +50,7 @@ def test_yaml_config_defaults() -> None:
 def test_markdown_config_defaults() -> None:
     """Test MarkdownConfig default values."""
     md = MarkdownConfig()
-    assert md.latex_delimiters == "default"
+    assert md.latex_delimiters == "dollars"
 
 
 def test_wordcloud_config_defaults() -> None:

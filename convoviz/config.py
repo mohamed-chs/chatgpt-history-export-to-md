@@ -26,7 +26,7 @@ class AuthorHeaders(BaseModel):
 class MarkdownConfig(BaseModel):
     """Configuration for markdown output."""
 
-    latex_delimiters: Literal["default", "dollars"] = "default"
+    latex_delimiters: Literal["default", "dollars"] = "dollars"
     flavor: Literal["standard", "obsidian"] = "standard"
 
 
@@ -39,10 +39,10 @@ class YAMLConfig(BaseModel):
     create_time: bool = True
     update_time: bool = True
     model: bool = True
-    used_plugins: bool = True
+    used_plugins: bool = False
     message_count: bool = True
-    content_types: bool = True
-    custom_instructions: bool = True
+    content_types: bool = False
+    custom_instructions: bool = False
 
 
 class ConversationConfig(BaseModel):

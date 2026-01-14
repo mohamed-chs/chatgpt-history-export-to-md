@@ -112,7 +112,7 @@ def run_interactive_config(initial_config: ConvovizConfig | None = None) -> Conv
 
     # Prompt for author headers
     headers = config.message.author_headers
-    for role in ["system", "user", "assistant", "tool"]:
+    for role in ["user", "assistant"]:
         current = getattr(headers, role)
         result: str = _ask_or_cancel(
             qst_text(
@@ -125,22 +125,6 @@ def run_interactive_config(initial_config: ConvovizConfig | None = None) -> Conv
         )
         if result:
             setattr(headers, role, result)
-
-    # Prompt for LaTeX delimiters
-    latex_result = cast(
-        Literal["default", "dollars"],
-        _ask_or_cancel(
-            select(
-                "Select the LaTeX math delimiters:",
-                choices=["default", "dollars"],
-                default=config.conversation.markdown.latex_delimiters,
-                style=CUSTOM_STYLE,
-            )
-        ),
-    )
-
-    if latex_result:
-        config.conversation.markdown.latex_delimiters = latex_result
 
     # Prompt for markdown flavor
     flavor_result = cast(
