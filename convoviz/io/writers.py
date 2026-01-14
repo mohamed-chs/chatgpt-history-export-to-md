@@ -146,9 +146,7 @@ def _generate_month_index(month_dir: Path, year: str, month: str) -> None:
         month: The month folder name (e.g., "03-March")
     """
     month_name = month.split("-", 1)[1] if "-" in month else month
-    files = sorted(
-        [f.name for f in month_dir.glob("*.md") if f.name != "_index.md"]
-    )
+    files = sorted([f.name for f in month_dir.glob("*.md") if f.name != "_index.md"])
 
     lines = [
         f"# {month_name} {year}",

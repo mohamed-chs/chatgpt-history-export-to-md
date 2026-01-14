@@ -26,6 +26,7 @@ CUSTOM_STYLE = Style(
     ]
 )
 
+
 class _QuestionaryPrompt[T](Protocol):
     def ask(self) -> T | None: ...
 

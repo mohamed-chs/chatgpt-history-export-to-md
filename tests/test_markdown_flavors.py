@@ -179,9 +179,7 @@ class TestObsidianReasoningContent:
 
     def test_obsidian_renders_thoughts_as_callout(self) -> None:
         """Test that obsidian flavor renders thoughts as a collapsible callout."""
-        conv = self._make_conversation_with_reasoning(
-            "thoughts", "Let me think about this..."
-        )
+        conv = self._make_conversation_with_reasoning("thoughts", "Let me think about this...")
         config = ConversationConfig(markdown=MarkdownConfig(flavor="obsidian"))
         headers = AuthorHeaders()
 
@@ -193,9 +191,7 @@ class TestObsidianReasoningContent:
 
     def test_standard_hides_reasoning_recap(self) -> None:
         """Test that standard flavor hides reasoning_recap (unchanged behavior)."""
-        conv = self._make_conversation_with_reasoning(
-            "reasoning_recap", "I analyzed the problem."
-        )
+        conv = self._make_conversation_with_reasoning("reasoning_recap", "I analyzed the problem.")
         config = ConversationConfig(markdown=MarkdownConfig(flavor="standard"))
         headers = AuthorHeaders()
 
@@ -207,9 +203,7 @@ class TestObsidianReasoningContent:
 
     def test_standard_hides_thoughts(self) -> None:
         """Test that standard flavor hides thoughts (unchanged behavior)."""
-        conv = self._make_conversation_with_reasoning(
-            "thoughts", "Let me think..."
-        )
+        conv = self._make_conversation_with_reasoning("thoughts", "Let me think...")
         config = ConversationConfig(markdown=MarkdownConfig(flavor="standard"))
         headers = AuthorHeaders()
 

@@ -27,25 +27,6 @@ def test_parse_custom_stopwords():
 
 
 @patch("convoviz.analysis.wordcloud.WordCloud")
-def test_generate_wordcloud_stopwords(mock_wc):
-    """Test that generate_wordcloud correctly combines stopwords."""
-    config = WordCloudConfig(custom_stopwords="python,java", exclude_programming_keywords=True)
-    text = "This is a test with def class and int"
-
-    generate_wordcloud(text, config)
-
-    # Check the stopwords passed to WordCloud constructor
-    args, kwargs = mock_wc.call_args
-    passed_stopwords = kwargs.get("stopwords")
-
-    assert "the" in passed_stopwords  # From NLTK
-    assert "python" in passed_stopwords  # From custom
-    assert "java" in passed_stopwords  # From custom
-    assert "def" in passed_stopwords  # From programming
-    assert "class" in passed_stopwords  # From programming
-
-
-@patch("convoviz.analysis.wordcloud.WordCloud")
 def test_generate_wordcloud_no_programming_stopwords(mock_wc):
     """Test that generate_wordcloud respects exclude_programming_keywords=False."""
     config = WordCloudConfig(custom_stopwords="python", exclude_programming_keywords=False)

@@ -347,7 +347,9 @@ def generate_length_histogram(
         color="#cf222e",
     )
 
-    ax.set_title("Conversation length (user prompts)", fontproperties=font_prop, fontsize=14, pad=14)
+    ax.set_title(
+        "Conversation length (user prompts)", fontproperties=font_prop, fontsize=14, pad=14
+    )
     ax.set_xlabel("User prompts per conversation", fontproperties=font_prop)
     ax.set_ylabel("Conversations", fontproperties=font_prop)
     ax.set_xlim(left=0, right=cap)
@@ -619,7 +621,9 @@ def generate_summary_dashboard(
         locator = mdates.AutoDateLocator(minticks=4, maxticks=10)
         ax_ts.xaxis.set_major_locator(locator)
         ax_ts.xaxis.set_major_formatter(mdates.ConciseDateFormatter(locator))
-        ax_ts.set_title("Monthly activity (user prompts)", fontproperties=font_prop, fontsize=13, pad=10)
+        ax_ts.set_title(
+            "Monthly activity (user prompts)", fontproperties=font_prop, fontsize=13, pad=10
+        )
         ax_ts.set_ylabel("User prompts", fontproperties=font_prop)
         ax_ts.set_xlabel(f"Month ({_tz_label(cfg)})", fontproperties=font_prop)
         _apply_tick_font(ax_ts, font_prop)
@@ -741,11 +745,27 @@ def generate_summary_graphs(
 
     tasks: list[tuple[str, str, Callable[[], Figure]]] = [
         ("Overview", "overview.png", lambda: generate_summary_dashboard(collection, cfg)),
-        ("Activity heatmap", "activity_heatmap.png", lambda: generate_activity_heatmap(collection, cfg)),
-        ("Daily activity", "daily_activity.png", lambda: generate_daily_activity_lineplot(collection, cfg)),
-        ("Monthly activity", "monthly_activity.png", lambda: generate_monthly_activity_barplot(collection, cfg)),
+        (
+            "Activity heatmap",
+            "activity_heatmap.png",
+            lambda: generate_activity_heatmap(collection, cfg),
+        ),
+        (
+            "Daily activity",
+            "daily_activity.png",
+            lambda: generate_daily_activity_lineplot(collection, cfg),
+        ),
+        (
+            "Monthly activity",
+            "monthly_activity.png",
+            lambda: generate_monthly_activity_barplot(collection, cfg),
+        ),
         ("Model usage", "model_usage.png", lambda: generate_model_piechart(collection, cfg)),
-        ("Conversation lengths", "conversation_lengths.png", lambda: generate_length_histogram(collection, cfg)),
+        (
+            "Conversation lengths",
+            "conversation_lengths.png",
+            lambda: generate_length_histogram(collection, cfg),
+        ),
         (
             "Conversation lifetimes",
             "conversation_lifetimes.png",
