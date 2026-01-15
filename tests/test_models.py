@@ -1,11 +1,12 @@
 """Tests for the models."""
 
 import copy
-from datetime import datetime
+from datetime import UTC, datetime, timedelta
 
 from convoviz.models import Conversation
 from convoviz.models.collection import ConversationCollection
 from convoviz.models.message import Message, MessageAuthor, MessageContent, MessageMetadata
+from convoviz.models.node import Node, build_node_tree
 
 
 def test_leaf_count(mock_conversation: Conversation) -> None:
@@ -328,3 +329,316 @@ def test_new_content_types() -> None:
     text = msg.text
     assert "> Minimal quote" in text
     assert "<https://example.net/>" in text
+
+
+# =============================================================================
+# Node and Tree Building Tests
+# =============================================================================
+
+
+class TestBuildNodeTree:
+    """Tests for the build_node_tree function."""
+
+    def test_simple_tree(self) -> None:
+        """Test building a simple linear tree."""
+        mapping = {
+            "root": Node(id="root", parent=None, children=["child1"]),
+            "child1": Node(id="child1", parent="root", children=["child2"]),
+            "child2": Node(id="child2", parent="child1", children=[]),
+        }
+
+        result = build_node_tree(mapping)
+
+        # Check parent-child relationships are established
+        assert result["child1"].parent_node == result["root"]
+        assert result["child2"].parent_node == result["child1"]
+        assert result["child1"] in result["root"].children_nodes
+        assert result["child2"] in result["child1"].children_nodes
+
+    def test_branching_tree(self) -> None:
+        """Test building a tree with branches (DAG structure)."""
+        mapping = {
+            "root": Node(id="root", parent=None, children=["branch_a", "branch_b"]),
+            "branch_a": Node(id="branch_a", parent="root", children=["leaf_a"]),
+            "branch_b": Node(id="branch_b", parent="root", children=["leaf_b"]),
+            "leaf_a": Node(id="leaf_a", parent="branch_a", children=[]),
+            "leaf_b": Node(id="leaf_b", parent="branch_b", children=[]),
+        }
+
+        result = build_node_tree(mapping)
+
+        # Root should have two children
+        assert len(result["root"].children_nodes) == 2
+        assert result["branch_a"] in result["root"].children_nodes
+        assert result["branch_b"] in result["root"].children_nodes
+
+        # Leaves should be properly connected
+        assert result["leaf_a"].parent_node == result["branch_a"]
+        assert result["leaf_b"].parent_node == result["branch_b"]
+
+    def test_repeated_calls_reset_connections(self) -> None:
+        """Test that repeated calls don't duplicate connections."""
+        mapping = {
+            "root": Node(id="root", parent=None, children=["child"]),
+            "child": Node(id="child", parent="root", children=[]),
+        }
+
+        # Call twice
+        build_node_tree(mapping)
+        result = build_node_tree(mapping)
+
+        # Should still have only one child
+        assert len(result["root"].children_nodes) == 1
+        assert result["child"].parent_node == result["root"]
+
+    def test_missing_child_reference_handled(self) -> None:
+        """Test that missing child references are handled gracefully."""
+        mapping = {
+            "root": Node(id="root", parent=None, children=["missing_id"]),
+        }
+
+        # Should not raise, just skip the missing child
+        result = build_node_tree(mapping)
+        assert len(result["root"].children_nodes) == 0
+
+    def test_node_is_leaf(self) -> None:
+        """Test Node.is_leaf property."""
+        mapping = {
+            "root": Node(id="root", parent=None, children=["child"]),
+            "child": Node(id="child", parent="root", children=[]),
+        }
+
+        result = build_node_tree(mapping)
+
+        assert not result["root"].is_leaf
+        assert result["child"].is_leaf
+
+
+# =============================================================================
+# Conversation Date/Time Property Tests
+# =============================================================================
+
+
+class TestConversationTimeProperties:
+    """Tests for Conversation time-related properties."""
+
+    def _make_conversation(self, create_time: datetime) -> Conversation:
+        """Helper to create a minimal conversation at a specific time."""
+        return Conversation(
+            title="Test",
+            create_time=create_time,
+            update_time=create_time + timedelta(hours=1),
+            mapping={
+                "root": {
+                    "id": "root",
+                    "message": None,
+                    "parent": None,
+                    "children": [],
+                }
+            },
+            moderation_results=[],
+            current_node="root",
+            conversation_id="test_conv",
+        )
+
+    def test_week_start_monday(self) -> None:
+        """Test that week_start returns the Monday of that week."""
+        # Wednesday, January 15, 2025
+        conv = self._make_conversation(datetime(2025, 1, 15, 14, 30, tzinfo=UTC))
+        week_start = conv.week_start
+
+        assert week_start.weekday() == 0  # Monday
+        assert week_start.day == 13  # Monday was Jan 13
+        assert week_start.hour == 0
+        assert week_start.minute == 0
+
+    def test_week_start_on_monday(self) -> None:
+        """Test that week_start on a Monday returns that same day."""
+        # Monday, January 13, 2025
+        conv = self._make_conversation(datetime(2025, 1, 13, 10, 0, tzinfo=UTC))
+        week_start = conv.week_start
+
+        assert week_start.day == 13
+        assert week_start.weekday() == 0
+
+    def test_month_start(self) -> None:
+        """Test that month_start returns the first of the month."""
+        conv = self._make_conversation(datetime(2025, 3, 18, 15, 45, tzinfo=UTC))
+        month_start = conv.month_start
+
+        assert month_start.day == 1
+        assert month_start.month == 3
+        assert month_start.year == 2025
+        assert month_start.hour == 0
+
+    def test_year_start(self) -> None:
+        """Test that year_start returns January 1st."""
+        conv = self._make_conversation(datetime(2025, 7, 29, 12, 0, tzinfo=UTC))
+        year_start = conv.year_start
+
+        assert year_start.day == 1
+        assert year_start.month == 1
+        assert year_start.year == 2025
+
+
+class TestConversationCustomInstructions:
+    """Tests for Conversation.custom_instructions property."""
+
+    def test_custom_instructions_extraction(self) -> None:
+        """Test extracting custom instructions from a system message."""
+        ts = datetime(2024, 1, 1, tzinfo=UTC).timestamp()
+        instructions_data = {
+            "about_user_message": "I am a software developer",
+            "about_model_message": "Be concise",
+        }
+
+        conv = Conversation(
+            title="Test",
+            create_time=ts,
+            update_time=ts,
+            mapping={
+                "root": {
+                    "id": "root",
+                    "message": None,
+                    "parent": None,
+                    "children": ["system_node"],
+                },
+                "system_node": {
+                    "id": "system_node",
+                    "message": {
+                        "id": "system_node",
+                        "author": {"role": "system", "metadata": {}},
+                        "create_time": ts,
+                        "update_time": ts,
+                        "content": {"content_type": "text", "parts": ["Custom instructions"]},
+                        "status": "finished_successfully",
+                        "end_turn": True,
+                        "weight": 1.0,
+                        "metadata": {
+                            "is_user_system_message": True,
+                            "user_context_message_data": instructions_data,
+                        },
+                        "recipient": "all",
+                    },
+                    "parent": "root",
+                    "children": [],
+                },
+            },
+            moderation_results=[],
+            current_node="system_node",
+            conversation_id="test_conv",
+        )
+
+        assert conv.custom_instructions == instructions_data
+
+    def test_no_custom_instructions(self, mock_conversation: Conversation) -> None:
+        """Test conversation without custom instructions returns empty dict."""
+        assert mock_conversation.custom_instructions == {}
+
+
+# =============================================================================
+# Collection Grouping Tests
+# =============================================================================
+
+
+class TestCollectionGrouping:
+    """Tests for ConversationCollection grouping methods."""
+
+    def _make_collection_with_dates(self, dates: list[datetime]) -> ConversationCollection:
+        """Helper to create a collection with conversations at specific dates."""
+        conversations = []
+        for i, dt in enumerate(dates):
+            conv = Conversation(
+                title=f"Conv {i}",
+                create_time=dt,
+                update_time=dt + timedelta(hours=1),
+                mapping={
+                    "root": {
+                        "id": "root",
+                        "message": None,
+                        "parent": None,
+                        "children": [],
+                    }
+                },
+                moderation_results=[],
+                current_node="root",
+                conversation_id=f"conv_{i}",
+            )
+            conversations.append(conv)
+        return ConversationCollection(conversations=conversations)
+
+    def test_group_by_week(self) -> None:
+        """Test grouping conversations by week."""
+        dates = [
+            datetime(2024, 1, 8, 10, 0, tzinfo=UTC),  # Week of Jan 8 (Monday)
+            datetime(2024, 1, 10, 10, 0, tzinfo=UTC),  # Same week
+            datetime(2024, 1, 15, 10, 0, tzinfo=UTC),  # Week of Jan 15
+        ]
+        collection = self._make_collection_with_dates(dates)
+
+        groups = collection.group_by_week()
+
+        assert len(groups) == 2
+        # Find the week of Jan 8 (Monday)
+        week_jan_8 = datetime(2024, 1, 8, 0, 0, 0, 0, tzinfo=UTC)
+        assert len(groups[week_jan_8].conversations) == 2
+
+    def test_group_by_month(self) -> None:
+        """Test grouping conversations by month."""
+        dates = [
+            datetime(2024, 1, 5, tzinfo=UTC),
+            datetime(2024, 1, 20, tzinfo=UTC),
+            datetime(2024, 3, 10, tzinfo=UTC),
+        ]
+        collection = self._make_collection_with_dates(dates)
+
+        groups = collection.group_by_month()
+
+        assert len(groups) == 2  # January and March
+        jan = datetime(2024, 1, 1, 0, 0, 0, 0, tzinfo=UTC)
+        assert len(groups[jan].conversations) == 2
+
+    def test_group_by_year(self) -> None:
+        """Test grouping conversations by year."""
+        dates = [
+            datetime(2023, 6, 15, tzinfo=UTC),
+            datetime(2024, 1, 1, tzinfo=UTC),
+            datetime(2024, 12, 31, tzinfo=UTC),
+        ]
+        collection = self._make_collection_with_dates(dates)
+
+        groups = collection.group_by_year()
+
+        assert len(groups) == 2  # 2023 and 2024
+        year_2024 = datetime(2024, 1, 1, 0, 0, 0, 0, tzinfo=UTC)
+        assert len(groups[year_2024].conversations) == 2
+
+    def test_empty_collection_grouping(self) -> None:
+        """Test grouping methods on empty collection."""
+        collection = ConversationCollection()
+
+        assert collection.group_by_week() == {}
+        assert collection.group_by_month() == {}
+        assert collection.group_by_year() == {}
+
+
+class TestCollectionProperties:
+    """Tests for ConversationCollection properties."""
+
+    def test_last_updated_empty(self) -> None:
+        """Test last_updated on empty collection."""
+        collection = ConversationCollection()
+        assert collection.last_updated == datetime.min
+
+    def test_last_updated_with_conversations(self, mock_conversation: Conversation) -> None:
+        """Test last_updated returns most recent update_time."""
+        collection = ConversationCollection(conversations=[mock_conversation])
+        assert collection.last_updated == mock_conversation.update_time
+
+    def test_index_property(self, mock_conversation: Conversation) -> None:
+        """Test index property returns conversations by ID."""
+        collection = ConversationCollection(conversations=[mock_conversation])
+        index = collection.index
+
+        assert "conversation_111" in index
+        assert index["conversation_111"] == mock_conversation

@@ -1,11 +1,16 @@
 """Tests for the io/loaders module."""
 
+import json
+import time
 from pathlib import Path
+from zipfile import ZipFile
 
 import pytest
 
 from convoviz.exceptions import InvalidZipError
 from convoviz.io.loaders import (
+    find_latest_bookmarklet_json,
+    find_latest_zip,
     load_collection_from_json,
     load_collection_from_zip,
     validate_zip,
@@ -21,8 +26,6 @@ class TestValidateZip:
 
     def test_invalid_zip_no_conversations(self, tmp_path: Path) -> None:
         """Test validation of zip without conversations.json."""
-        from zipfile import ZipFile
-
         zip_path = tmp_path / "invalid.zip"
         with ZipFile(zip_path, "w") as zf:
             zf.writestr("other.txt", "content")
@@ -60,11 +63,132 @@ class TestLoadCollectionFromZip:
 
     def test_load_invalid_zip(self, tmp_path: Path) -> None:
         """Test loading an invalid zip file raises error."""
-        from zipfile import ZipFile
-
         zip_path = tmp_path / "invalid.zip"
         with ZipFile(zip_path, "w") as zf:
             zf.writestr("other.txt", "content")
 
         with pytest.raises(InvalidZipError):
             load_collection_from_zip(zip_path)
+
+
+class TestLoadCollectionFromJsonFormats:
+    """Tests for different JSON format support."""
+
+    def test_load_wrapped_format(self, tmp_path: Path) -> None:
+        """Test loading JSON with { conversations: [...] } wrapper."""
+        data = {
+            "conversations": [
+                {
+                    "title": "Test",
+                    "create_time": 1704067200.0,
+                    "update_time": 1704067200.0,
+                    "mapping": {
+                        "root": {
+                            "id": "root",
+                            "message": None,
+                            "parent": None,
+                            "children": [],
+                        }
+                    },
+                    "moderation_results": [],
+                    "current_node": "root",
+                    "conversation_id": "test_id",
+                }
+            ]
+        }
+        json_path = tmp_path / "wrapped.json"
+        json_path.write_text(json.dumps(data))
+
+        collection = load_collection_from_json(json_path)
+        assert len(collection.conversations) == 1
+        assert collection.conversations[0].title == "Test"
+
+    def test_source_path_set(self, mock_conversations_json: Path) -> None:
+        """Test that source_path is set correctly."""
+        collection = load_collection_from_json(mock_conversations_json)
+        assert collection.source_path == mock_conversations_json.parent
+
+
+class TestFindLatestZip:
+    """Tests for the find_latest_zip function."""
+
+    def test_finds_most_recent(self, tmp_path: Path) -> None:
+        """Test that the most recently created ZIP is found."""
+        # Create older zip
+        old_zip = tmp_path / "old_export.zip"
+        with ZipFile(old_zip, "w") as zf:
+            zf.writestr("conversations.json", "[]")
+
+        # Small delay to ensure different timestamps
+        time.sleep(0.01)
+
+        # Create newer zip
+        new_zip = tmp_path / "new_export.zip"
+        with ZipFile(new_zip, "w") as zf:
+            zf.writestr("conversations.json", "[]")
+
+        result = find_latest_zip(tmp_path)
+        assert result == new_zip
+
+    def test_returns_none_when_no_zips(self, tmp_path: Path) -> None:
+        """Test that None is returned when no ZIP files exist."""
+        # Create a non-zip file
+        (tmp_path / "not_a_zip.txt").write_text("hello")
+
+        result = find_latest_zip(tmp_path)
+        assert result is None
+
+    def test_returns_none_for_empty_directory(self, tmp_path: Path) -> None:
+        """Test that None is returned for empty directory."""
+        empty_dir = tmp_path / "empty"
+        empty_dir.mkdir()
+
+        result = find_latest_zip(empty_dir)
+        assert result is None
+
+
+class TestFindLatestBookmarkletJson:
+    """Tests for the find_latest_bookmarklet_json function."""
+
+    def test_finds_bookmarklet_file(self, tmp_path: Path) -> None:
+        """Test finding a bookmarklet JSON file."""
+        bookmarklet = tmp_path / "chatgpt-bookmarklet-data.json"
+        bookmarklet.write_text("[]")
+
+        result = find_latest_bookmarklet_json(tmp_path)
+        assert result == bookmarklet
+
+    def test_finds_most_recent_bookmarklet(self, tmp_path: Path) -> None:
+        """Test that the most recent bookmarklet file is found."""
+        old_file = tmp_path / "old-bookmarklet.json"
+        old_file.write_text("[]")
+
+        time.sleep(0.01)
+
+        new_file = tmp_path / "new-bookmarklet.json"
+        new_file.write_text("[]")
+
+        result = find_latest_bookmarklet_json(tmp_path)
+        assert result == new_file
+
+    def test_ignores_non_bookmarklet_json(self, tmp_path: Path) -> None:
+        """Test that non-bookmarklet JSON files are ignored."""
+        # Regular JSON file (not bookmarklet)
+        regular = tmp_path / "conversations.json"
+        regular.write_text("[]")
+
+        result = find_latest_bookmarklet_json(tmp_path)
+        assert result is None
+
+    def test_returns_none_when_none_found(self, tmp_path: Path) -> None:
+        """Test that None is returned when no bookmarklet files exist."""
+        result = find_latest_bookmarklet_json(tmp_path)
+        assert result is None
+
+    def test_case_insensitive_matching(self, tmp_path: Path) -> None:
+        """Test that bookmarklet matching is case-insensitive."""
+        upper = tmp_path / "ChatGPT-BOOKMARKLET.json"
+        upper.write_text("[]")
+
+        result = find_latest_bookmarklet_json(tmp_path)
+        assert result == upper
