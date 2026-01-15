@@ -70,40 +70,19 @@ convoviz --help
 
 And that's it! After running the script, head over to the output folder to see your neatly formatted Markdown files and visualizations.
 
-The main outputs are:
-
-- **`Markdown/`**: one `.md` file per conversation
-- **`Graphs/`**: a small set of high-signal plots, including:
-  - `overview.png` (dashboard)
-  - `activity_heatmap.png` (weekday × hour)
-  - `daily_activity.png` / `monthly_activity.png`
-  - `model_usage.png`, `conversation_lengths.png`
-  - `weekday_pattern.png`, `hourly_pattern.png`, `conversation_lifetimes.png`
-- **`Word-Clouds/`**: weekly/monthly/yearly word clouds
-- **`custom_instructions.json`**: extracted custom instructions
-
 ![wordcloud example](demo/wordcloud-example.png)
 
 ## Share Your Feedback! 💌
 
 I hope you find this tool useful. I'm continuously looking to improve on this, but I need your help for that.
 
-Whether you're a tech wizard or you're new to all this, I'd love to hear about your journey with the tool. Found a quirk? Have a suggestion? Or just want to send some good vibes? I'm all ears!
-
-**Here's how you can share your thoughts:**
-
-1. **GitHub Issues**: For more specific feedback or if you've stumbled upon a bug, please open an [issue](https://github.com/mohamed-chs/chatgpt-history-export-to-md/issues). This helps me track and address them effectively.
-
-2. **GitHub Discussions**: If you just want to share your general experience, have a suggestion, or maybe a cool idea for a new feature, jump into the [discussions](https://github.com/mohamed-chs/chatgpt-history-export-to-md/discussions) page. It's a more casual space where we can chat.
+Whether you're a tech wizard or you're new to all this, I'd love to hear about your journey with the tool. Found a quirk? Have a suggestion? Or just want to send some good vibes? I'm all ears! (see [issues](https://github.com/mohamed-chs/chatgpt-history-export-to-md/issues))
 
 And if you've had a great experience, consider giving the project a star ⭐. It keeps me motivated and helps others discover it!
 
 ## Notes
 
 This is just a small thing I coded to help me see my convos in beautiful markdown. It was originally built with [Obsidian](https://obsidian.md/) (my go-to note-taking app) in mind, but the default output is standard Markdown.
-
-You can choose obsidian flavored md in the cli to get extra features like:
-- model reasoning (`reasoning_recap`, `thoughts`) rendered as collapsible `> [!NOTE]-` callouts instead of being hidden.
 
 I wasn't a fan of the clunky, and sometimes paid, browser extensions.
 
