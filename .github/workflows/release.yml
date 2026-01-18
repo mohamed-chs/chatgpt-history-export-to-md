@@ -1,0 +1,130 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+
+permissions:
+  contents: write
+  id-token: write
+
+jobs:
+  build:
+    name: Build Package
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+
+      - name: Set up Python
+        run: uv python install 3.12
+
+      - name: Verify version matches tag
+        run: |
+          VERSION=$(grep -Po '(?<=^version = ")[^"]+' pyproject.toml)
+          TAG_VERSION="${GITHUB_REF#refs/tags/v}"
+          if [[ "$VERSION" != "$TAG_VERSION" ]]; then
+            echo "Error: pyproject.toml version ($VERSION) doesn't match tag (v$TAG_VERSION)"
+            exit 1
+          fi
+          echo "Version verified: $VERSION"
+
+      - name: Build package
+        run: uv build
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist/
+
+  test-install:
+    name: Test Installation
+    needs: build
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        python-version: ["3.12", "3.13"]
+    steps:
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+
+      - name: Set up Python ${{ matrix.python-version }}
+        run: uv python install ${{ matrix.python-version }}
+
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist/
+
+      - name: Install from wheel (Unix)
+        if: runner.os != 'Windows'
+        run: |
+          uv venv test-env
+          source test-env/bin/activate
+          uv pip install dist/*.whl
+
+      - name: Install from wheel (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          uv venv test-env
+          test-env\Scripts\activate
+          $wheel = Get-ChildItem dist/*.whl | Select-Object -First 1
+          uv pip install $wheel.FullName
+
+      - name: Verify CLI works (Unix)
+        if: runner.os != 'Windows'
+        run: |
+          source test-env/bin/activate
+          convoviz --help
+
+      - name: Verify CLI works (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          test-env\Scripts\activate
+          convoviz --help
+
+  publish-pypi:
+    name: Publish to PyPI
+    needs: [build, test-install]
+    runs-on: ubuntu-latest
+    environment: pypi
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist/
+
+      - name: Publish to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          verbose: true
+
+  create-release:
+    name: Create GitHub Release
+    needs: publish-pypi
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist/
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/*
+          generate_release_notes: true
+          draft: false
