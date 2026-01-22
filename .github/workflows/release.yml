@@ -88,6 +88,8 @@ jobs:
       - name: Verify CLI works (Windows)
         if: runner.os == 'Windows'
         shell: pwsh
+        env:
+          PYTHONUTF8: "1"
         run: |
           test-env\Scripts\activate
           convoviz --help
