@@ -45,6 +45,14 @@ uv tool install "convoviz[viz]"
 
 The `[viz]` extra includes graphs and word clouds. Skip it for a faster markdown-only install.
 
+#### Alternative: pip
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate  # Windows: .venv\Scripts\activate
+pip install "convoviz[viz]"
+```
+
 ### 3. Run the tool 🏃‍♂️
 
 Simply run the command and follow the prompts:
