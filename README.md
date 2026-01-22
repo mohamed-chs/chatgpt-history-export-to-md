@@ -31,7 +31,7 @@ MacOS / Linux:
 curl -LsSf https://astral.sh/uv/install.sh | sh
 ```
 
-Windows (PowerShell):
+Windows:
 
 ```powershell
 powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
@@ -45,7 +45,7 @@ uv tool install "convoviz[viz]"
 
 The `[viz]` extra includes graphs and word clouds. Skip it for a faster markdown-only install.
 
-#### Alternative: pip
+### Alternative: pip
 
 ```bash
 python3 -m venv .venv
