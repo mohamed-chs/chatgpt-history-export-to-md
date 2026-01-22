@@ -5,7 +5,7 @@ from pathlib import Path
 import typer
 from rich.console import Console
 
-from convoviz.config import FolderOrganization, get_default_config
+from convoviz.config import FolderOrganization, OutputKind, get_default_config
 from convoviz.exceptions import ConfigurationError, InvalidZipError
 from convoviz.interactive import run_interactive_config
 from convoviz.io.loaders import find_latest_zip
@@ -38,6 +38,12 @@ def run(
         "-o",
         help="Path to the output directory.",
     ),
+    outputs: list[OutputKind] | None = typer.Option(
+        None,
+        "--outputs",
+        help="Output types to generate (repeatable). Options: markdown, graphs, wordclouds. "
+        "If not specified, all outputs are generated.",
+    ),
     flat: bool = typer.Option(
         False,
         "--flat",
@@ -63,6 +69,8 @@ def run(
         config.input_path = input_path
     if output_dir:
         config.output_folder = output_dir
+    if outputs:
+        config.outputs = set(outputs)
     if flat:
         config.folder_organization = FolderOrganization.FLAT
 

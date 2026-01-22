@@ -6,6 +6,7 @@ from unittest.mock import patch
 from typer.testing import CliRunner
 
 from convoviz.cli import app
+from convoviz.config import OutputKind
 
 runner = CliRunner()
 
@@ -66,3 +67,67 @@ def test_interactive_ctrl_c_exits_cleanly() -> None:
         result = runner.invoke(app, ["--interactive"])
         assert result.exit_code == 0
         mock_run.assert_not_called()
+
+
+def test_outputs_flag_single(mock_zip_file: Path, tmp_path: Path) -> None:
+    """Test --outputs flag with single value."""
+    output_dir = tmp_path / "output"
+
+    with patch("convoviz.cli.run_pipeline") as mock_run:
+        result = runner.invoke(
+            app,
+            [
+                "--zip",
+                str(mock_zip_file),
+                "--output",
+                str(output_dir),
+                "--outputs",
+                "markdown",
+            ],
+        )
+
+        assert result.exit_code == 0
+        mock_run.assert_called_once()
+        config = mock_run.call_args[0][0]
+        assert config.outputs == {OutputKind.MARKDOWN}
+
+
+def test_outputs_flag_multiple(mock_zip_file: Path, tmp_path: Path) -> None:
+    """Test --outputs flag with multiple values."""
+    output_dir = tmp_path / "output"
+
+    with patch("convoviz.cli.run_pipeline") as mock_run:
+        result = runner.invoke(
+            app,
+            [
+                "--zip",
+                str(mock_zip_file),
+                "--output",
+                str(output_dir),
+                "--outputs",
+                "markdown",
+                "--outputs",
+                "graphs",
+            ],
+        )
+
+        assert result.exit_code == 0
+        mock_run.assert_called_once()
+        config = mock_run.call_args[0][0]
+        assert config.outputs == {OutputKind.MARKDOWN, OutputKind.GRAPHS}
+
+
+def test_outputs_flag_default_all(mock_zip_file: Path, tmp_path: Path) -> None:
+    """Test that without --outputs flag, all outputs are selected."""
+    output_dir = tmp_path / "output"
+
+    with patch("convoviz.cli.run_pipeline") as mock_run:
+        result = runner.invoke(
+            app,
+            ["--zip", str(mock_zip_file), "--output", str(output_dir)],
+        )
+
+        assert result.exit_code == 0
+        mock_run.assert_called_once()
+        config = mock_run.call_args[0][0]
+        assert config.outputs == {OutputKind.MARKDOWN, OutputKind.GRAPHS, OutputKind.WORDCLOUDS}

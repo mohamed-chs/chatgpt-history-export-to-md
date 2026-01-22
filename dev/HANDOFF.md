@@ -10,7 +10,21 @@ This document provides context for continuing work on the convoviz project.
 - Bar plot graphs showing usage patterns
 - JSON export of custom instructions
 
-## Recent Updates (January 11, 2026)
+## Recent Updates (January 22, 2026)
+
+**Selectable Output Types**:
+- Users can now choose which outputs to generate: **Markdown**, **Graphs**, **Wordclouds** (defaults to all).
+- **Interactive mode**: New checkbox prompt to select outputs; markdown-specific prompts (author headers, flavor, YAML fields) are skipped when markdown is not selected; wordcloud-specific prompts (font, colormap, stopwords) are skipped when wordclouds are not selected.
+- **CLI mode**: New `--outputs` flag (repeatable) to select outputs, e.g. `--outputs markdown --outputs graphs`.
+- **Pipeline changes**:
+  - Only creates/cleans directories for selected outputs.
+  - Lazy imports for `graphs` and `wordcloud` modules (prepares for future optional dependencies).
+  - **Note**: `custom_instructions.json` export is temporarily disabled (needs rework).
+- **Config changes**: Added `OutputKind` enum and `ConvovizConfig.outputs` field in `config.py`.
+- **Tests**: New tests in `test_pipeline.py`, `test_cli.py`, `test_interactive.py`, `test_config.py`.
+- **Docs**: Updated `README.md` with new `--outputs` flag documentation.
+
+## Updates (January 11, 2026)
 
 **Obsidian Markdown Flavor Enhancements**:
 - **AI Reasoning Callouts**: For `obsidian` flavor, `reasoning_recap` and `thoughts` content types (o1/o3 models) are now rendered as collapsible callouts (`> [!NOTE]- 🧠 AI Reasoning`) instead of being hidden.
@@ -158,6 +172,8 @@ uv run ruff check convoviz tests && uv run ty check convoviz && uv run pytest
 
 ## What's NOT Done (Roadmap)
 
+- [ ] **Custom Instructions Export**: Re-enable and fix `custom_instructions.json` export (currently disabled).
+- [ ] **Optional Dependencies**: Move visualization deps (`matplotlib`, `wordcloud`, `nltk`, `pillow`) to optional extras in `pyproject.toml` (e.g., `convoviz[viz]`) so markdown-only installs are faster. The lazy imports are already in place.
 - [ ] **Performance**: Large exports with thousands of images might be slow to copy. Consider async copy.
 - [ ] **Citations**: Parse invisible characters/metadata in ChatGPT exports that denote citations.
 - [ ] **Canvas Support**: Research and implement support for "Canvas" content.
@@ -165,3 +181,4 @@ uv run ruff check convoviz tests && uv run ty check convoviz && uv run pytest
 - [ ] **Cross-Platform**: Loaders for Claude and Gemini are planned but not started.
 - [x] **Schema Documentation**: Updated spec at `docs/chatgpt-spec-unofficial-v2.md` (Jan 2026).
 - [x] **Reasoning Content**: Support `reasoning_recap` and `thoughts` content types from o1/o3 models.
+- [x] **Selectable Outputs**: Users can choose which outputs to generate (Markdown, Graphs, Wordclouds).

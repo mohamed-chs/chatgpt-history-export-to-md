@@ -3,12 +3,14 @@
 from pathlib import Path
 
 from convoviz.config import (
+    ALL_OUTPUTS,
     AuthorHeaders,
     ConversationConfig,
     ConvovizConfig,
     GraphConfig,
     MarkdownConfig,
     MessageConfig,
+    OutputKind,
     WordCloudConfig,
     YAMLConfig,
     get_default_config,
@@ -84,3 +86,28 @@ def test_config_independence() -> None:
     config2 = get_default_config()
     config1.wordcloud.colormap = "plasma"
     assert config2.wordcloud.colormap == "RdYlBu"
+
+
+def test_output_kind_enum() -> None:
+    """Test OutputKind enum values."""
+    assert OutputKind.MARKDOWN.value == "markdown"
+    assert OutputKind.GRAPHS.value == "graphs"
+    assert OutputKind.WORDCLOUDS.value == "wordclouds"
+
+
+def test_all_outputs_constant() -> None:
+    """Test ALL_OUTPUTS contains all output kinds."""
+    assert frozenset({OutputKind.MARKDOWN, OutputKind.GRAPHS, OutputKind.WORDCLOUDS}) == ALL_OUTPUTS
+
+
+def test_default_outputs() -> None:
+    """Test that default config includes all outputs."""
+    config = get_default_config()
+    assert config.outputs == {OutputKind.MARKDOWN, OutputKind.GRAPHS, OutputKind.WORDCLOUDS}
+
+
+def test_outputs_can_be_modified() -> None:
+    """Test that outputs can be modified."""
+    config = get_default_config()
+    config.outputs = {OutputKind.MARKDOWN}
+    assert config.outputs == {OutputKind.MARKDOWN}

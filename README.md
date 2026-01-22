@@ -56,9 +56,28 @@ You can provide arguments directly to skip the prompts:
 convoviz --input path/to/your/export.zip --output path/to/output/folder
 ```
 
-Notes:
+##### Selective Output Generation
+
+By default, Convoviz generates all outputs (Markdown files, graphs, and word clouds). You can select specific outputs using the `--outputs` flag:
+
+```bash
+# Generate only Markdown files (fastest)
+convoviz --input export.zip --outputs markdown
+
+# Generate Markdown and graphs (no word clouds)
+convoviz --input export.zip --outputs markdown --outputs graphs
+
+# Generate all outputs (default behavior)
+convoviz --input export.zip --outputs markdown --outputs graphs --outputs wordclouds
+```
+
+In interactive mode, you'll be prompted to select which outputs to generate.
+
+##### Other Notes
+
 - `--zip` / `-z` is kept as an alias for `--input` for convenience.
 - You can force non-interactive mode with `--no-interactive`.
+- Use `--flat` to put all Markdown files in a single folder instead of organizing by date.
 
 For more options, run:
 

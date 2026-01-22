@@ -7,7 +7,7 @@ from questionary import Choice, Style, checkbox, select
 from questionary import path as qst_path
 from questionary import text as qst_text
 
-from convoviz.config import ConvovizConfig, get_default_config
+from convoviz.config import ConvovizConfig, OutputKind, get_default_config
 from convoviz.io.loaders import find_latest_zip, validate_zip
 from convoviz.utils import colormaps, default_font_path, font_names, font_path, validate_header
 
@@ -110,43 +110,85 @@ def run_interactive_config(initial_config: ConvovizConfig | None = None) -> Conv
     if output_result:
         config.output_folder = Path(output_result)
 
-    # Prompt for author headers
-    headers = config.message.author_headers
-    for role in ["user", "assistant"]:
-        current = getattr(headers, role)
-        result: str = _ask_or_cancel(
-            qst_text(
-                f"Enter the message header for '{role}':",
-                default=current,
-                validate=lambda t: validate_header(t)
-                or "Must be a valid markdown header (e.g., # Title)",
+    # Prompt for outputs to generate
+    output_choices = [
+        Choice(title="Markdown conversations", value=OutputKind.MARKDOWN, checked=True),
+        Choice(title="Graphs (usage analytics)", value=OutputKind.GRAPHS, checked=True),
+        Choice(title="Word clouds", value=OutputKind.WORDCLOUDS, checked=True),
+    ]
+
+    selected_outputs: list[OutputKind] = _ask_or_cancel(
+        checkbox(
+            "Select outputs to generate:",
+            choices=output_choices,
+            style=CUSTOM_STYLE,
+        )
+    )
+
+    config.outputs = set(selected_outputs) if selected_outputs else set()
+
+    # Prompt for markdown settings (only if markdown output is selected)
+    if OutputKind.MARKDOWN in config.outputs:
+        # Prompt for author headers
+        headers = config.message.author_headers
+        for role in ["user", "assistant"]:
+            current = getattr(headers, role)
+            result: str = _ask_or_cancel(
+                qst_text(
+                    f"Enter the message header for '{role}':",
+                    default=current,
+                    validate=lambda t: validate_header(t)
+                    or "Must be a valid markdown header (e.g., # Title)",
+                    style=CUSTOM_STYLE,
+                )
+            )
+            if result:
+                setattr(headers, role, result)
+
+        # Prompt for markdown flavor
+        flavor_result = cast(
+            Literal["standard", "obsidian"],
+            _ask_or_cancel(
+                select(
+                    "Select the markdown flavor:",
+                    choices=["standard", "obsidian"],
+                    default=config.conversation.markdown.flavor,
+                    style=CUSTOM_STYLE,
+                )
+            ),
+        )
+
+        if flavor_result:
+            config.conversation.markdown.flavor = flavor_result
+
+        # Prompt for YAML headers
+        yaml_config = config.conversation.yaml
+        yaml_choices = [
+            Choice(title=field, checked=getattr(yaml_config, field))
+            for field in [
+                "title",
+                "tags",
+                "chat_link",
+                "create_time",
+                "update_time",
+                "model",
+                "used_plugins",
+                "message_count",
+                "content_types",
+                "custom_instructions",
+            ]
+        ]
+
+        selected: list[str] = _ask_or_cancel(
+            checkbox(
+                "Select YAML metadata headers to include:",
+                choices=yaml_choices,
                 style=CUSTOM_STYLE,
             )
         )
-        if result:
-            setattr(headers, role, result)
 
-    # Prompt for markdown flavor
-    flavor_result = cast(
-        Literal["standard", "obsidian"],
-        _ask_or_cancel(
-            select(
-                "Select the markdown flavor:",
-                choices=["standard", "obsidian"],
-                default=config.conversation.markdown.flavor,
-                style=CUSTOM_STYLE,
-            )
-        ),
-    )
-
-    if flavor_result:
-        config.conversation.markdown.flavor = flavor_result
-
-    # Prompt for YAML headers
-    yaml_config = config.conversation.yaml
-    yaml_choices = [
-        Choice(title=field, checked=getattr(yaml_config, field))
-        for field in [
+        selected_set = set(selected)
+        for field_name in [
             "title",
             "tags",
             "chat_link",
@@ -157,76 +199,57 @@ def run_interactive_config(initial_config: ConvovizConfig | None = None) -> Conv
             "message_count",
             "content_types",
             "custom_instructions",
-        ]
-    ]
+        ]:
+            setattr(yaml_config, field_name, field_name in selected_set)
 
-    selected: list[str] = _ask_or_cancel(
-        checkbox(
-            "Select YAML metadata headers to include:",
-            choices=yaml_choices,
-            style=CUSTOM_STYLE,
-        )
-    )
+    # Prompt for wordcloud settings (only if wordclouds output is selected)
+    if OutputKind.WORDCLOUDS in config.outputs:
+        # Prompt for font
+        available_fonts = font_names()
+        if available_fonts:
+            current_font = (
+                config.wordcloud.font_path.stem
+                if config.wordcloud.font_path
+                else available_fonts[0]
+            )
+            font_result: str = _ask_or_cancel(
+                select(
+                    "Select the font for word clouds:",
+                    choices=available_fonts,
+                    default=current_font if current_font in available_fonts else available_fonts[0],
+                    style=CUSTOM_STYLE,
+                )
+            )
 
-    selected_set = set(selected)
-    for field_name in [
-        "title",
-        "tags",
-        "chat_link",
-        "create_time",
-        "update_time",
-        "model",
-        "used_plugins",
-        "message_count",
-        "content_types",
-        "custom_instructions",
-    ]:
-        setattr(yaml_config, field_name, field_name in selected_set)
+            if font_result:
+                config.wordcloud.font_path = font_path(font_result)
 
-    # Prompt for font
-    available_fonts = font_names()
-    if available_fonts:
-        current_font = (
-            config.wordcloud.font_path.stem if config.wordcloud.font_path else available_fonts[0]
-        )
-        font_result: str = _ask_or_cancel(
-            select(
-                "Select the font for word clouds:",
-                choices=available_fonts,
-                default=current_font if current_font in available_fonts else available_fonts[0],
+        # Prompt for colormap
+        available_colormaps = colormaps()
+        if available_colormaps:
+            colormap_result: str = _ask_or_cancel(
+                select(
+                    "Select the color theme for word clouds:",
+                    choices=available_colormaps,
+                    default=config.wordcloud.colormap
+                    if config.wordcloud.colormap in available_colormaps
+                    else available_colormaps[0],
+                    style=CUSTOM_STYLE,
+                )
+            )
+
+            if colormap_result:
+                config.wordcloud.colormap = colormap_result
+
+        # Prompt for custom stopwords
+        stopwords_result: str = _ask_or_cancel(
+            qst_text(
+                "Enter custom stopwords (comma-separated):",
+                default=config.wordcloud.custom_stopwords,
                 style=CUSTOM_STYLE,
             )
         )
 
-        if font_result:
-            config.wordcloud.font_path = font_path(font_result)
-
-    # Prompt for colormap
-    available_colormaps = colormaps()
-    if available_colormaps:
-        colormap_result: str = _ask_or_cancel(
-            select(
-                "Select the color theme for word clouds:",
-                choices=available_colormaps,
-                default=config.wordcloud.colormap
-                if config.wordcloud.colormap in available_colormaps
-                else available_colormaps[0],
-                style=CUSTOM_STYLE,
-            )
-        )
-
-        if colormap_result:
-            config.wordcloud.colormap = colormap_result
-
-    # Prompt for custom stopwords
-    stopwords_result: str = _ask_or_cancel(
-        qst_text(
-            "Enter custom stopwords (comma-separated):",
-            default=config.wordcloud.custom_stopwords,
-            style=CUSTOM_STYLE,
-        )
-    )
-
-    config.wordcloud.custom_stopwords = stopwords_result
+        config.wordcloud.custom_stopwords = stopwords_result
 
     return config

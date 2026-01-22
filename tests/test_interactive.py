@@ -6,7 +6,7 @@ from pathlib import Path
 
 import pytest
 
-from convoviz.config import get_default_config
+from convoviz.config import OutputKind, get_default_config
 from convoviz.interactive import run_interactive_config
 
 
@@ -43,7 +43,164 @@ def test_ctrl_c_mid_flow_aborts_interactive(
         return FakePrompt(next(path_answers))
 
     monkeypatch.setattr(interactive, "qst_path", fake_qst_path)
-    monkeypatch.setattr(interactive, "qst_text", lambda *_a, **_k: FakePrompt(None))
+    # Ctrl+C on the output selection checkbox (which comes after the two path prompts)
+    monkeypatch.setattr(interactive, "checkbox", lambda *_a, **_k: FakePrompt(None))
 
     with pytest.raises(KeyboardInterrupt):
         run_interactive_config(get_default_config())
+
+
+def test_ctrl_c_on_outputs_checkbox_aborts_interactive(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    """Test Ctrl+C on the outputs checkbox prompt aborts."""
+    import convoviz.interactive as interactive
+
+    monkeypatch.setattr(interactive, "find_latest_zip", lambda: None)
+
+    path_answers = iter(["dummy.zip", str(tmp_path / "out")])
+
+    def fake_qst_path(*_a, **_k):
+        return FakePrompt(next(path_answers))
+
+    monkeypatch.setattr(interactive, "qst_path", fake_qst_path)
+    monkeypatch.setattr(interactive, "checkbox", lambda *_a, **_k: FakePrompt(None))
+
+    with pytest.raises(KeyboardInterrupt):
+        run_interactive_config(get_default_config())
+
+
+def test_outputs_selection_sets_config(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+    """Test that output selection correctly sets config.outputs."""
+    import convoviz.interactive as interactive
+
+    monkeypatch.setattr(interactive, "find_latest_zip", lambda: None)
+
+    path_answers = iter(["dummy.zip", str(tmp_path / "out")])
+
+    def fake_qst_path(*_a, **_k):
+        return FakePrompt(next(path_answers))
+
+    checkbox_call_count = [0]
+
+    def fake_checkbox(*_a, **_k):
+        checkbox_call_count[0] += 1
+        if checkbox_call_count[0] == 1:
+            # First checkbox is the outputs selection - only select markdown
+            return FakePrompt([OutputKind.MARKDOWN])
+        else:
+            # Second checkbox is YAML fields
+            return FakePrompt(["title", "chat_link"])
+
+    monkeypatch.setattr(interactive, "qst_path", fake_qst_path)
+    monkeypatch.setattr(interactive, "checkbox", fake_checkbox)
+    monkeypatch.setattr(interactive, "qst_text", lambda *_a, **_k: FakePrompt("# Me"))
+    monkeypatch.setattr(interactive, "select", lambda *_a, **_k: FakePrompt("standard"))
+
+    config = run_interactive_config(get_default_config())
+
+    # Should have only markdown selected
+    assert config.outputs == {OutputKind.MARKDOWN}
+
+
+def test_wordcloud_prompts_skipped_when_not_selected(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    """Test that wordcloud prompts are skipped when wordclouds output is not selected."""
+    import convoviz.interactive as interactive
+
+    monkeypatch.setattr(interactive, "find_latest_zip", lambda: None)
+    monkeypatch.setattr(interactive, "font_names", lambda: ["Font1", "Font2"])
+    monkeypatch.setattr(interactive, "colormaps", lambda: ["cmap1", "cmap2"])
+
+    path_answers = iter(["dummy.zip", str(tmp_path / "out")])
+
+    def fake_qst_path(*_a, **_k):
+        return FakePrompt(next(path_answers))
+
+    checkbox_call_count = [0]
+
+    def fake_checkbox(*_a, **_k):
+        checkbox_call_count[0] += 1
+        if checkbox_call_count[0] == 1:
+            # First checkbox: select only markdown (no wordclouds)
+            return FakePrompt([OutputKind.MARKDOWN])
+        else:
+            # Second checkbox: YAML fields
+            return FakePrompt(["title"])
+
+    select_call_count = [0]
+
+    def fake_select(*_a, **_k):
+        select_call_count[0] += 1
+        # Only one select call expected (markdown flavor), not font/colormap
+        return FakePrompt("standard")
+
+    text_call_count = [0]
+
+    def fake_text(*_a, **_k):
+        text_call_count[0] += 1
+        return FakePrompt("# Me")
+
+    monkeypatch.setattr(interactive, "qst_path", fake_qst_path)
+    monkeypatch.setattr(interactive, "checkbox", fake_checkbox)
+    monkeypatch.setattr(interactive, "select", fake_select)
+    monkeypatch.setattr(interactive, "qst_text", fake_text)
+
+    run_interactive_config(get_default_config())
+
+    # Only 1 select call (markdown flavor), not 3 (flavor + font + colormap)
+    assert select_call_count[0] == 1
+    # Only 2 text calls (user header + assistant header), not 3 (+ stopwords)
+    assert text_call_count[0] == 2
+
+
+def test_markdown_prompts_skipped_when_not_selected(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    """Test that markdown prompts are skipped when markdown output is not selected."""
+    import convoviz.interactive as interactive
+
+    monkeypatch.setattr(interactive, "find_latest_zip", lambda: None)
+    monkeypatch.setattr(interactive, "font_names", lambda: ["Font1", "Font2"])
+    monkeypatch.setattr(interactive, "colormaps", lambda: ["cmap1", "cmap2"])
+
+    path_answers = iter(["dummy.zip", str(tmp_path / "out")])
+
+    def fake_qst_path(*_a, **_k):
+        return FakePrompt(next(path_answers))
+
+    checkbox_call_count = [0]
+
+    def fake_checkbox(*_a, **_k):
+        checkbox_call_count[0] += 1
+        # Only checkbox: select only graphs (no markdown, no wordclouds)
+        return FakePrompt([OutputKind.GRAPHS])
+
+    select_call_count = [0]
+
+    def fake_select(*_a, **_k):
+        select_call_count[0] += 1
+        return FakePrompt("standard")
+
+    text_call_count = [0]
+
+    def fake_text(*_a, **_k):
+        text_call_count[0] += 1
+        return FakePrompt("# Me")
+
+    monkeypatch.setattr(interactive, "qst_path", fake_qst_path)
+    monkeypatch.setattr(interactive, "checkbox", fake_checkbox)
+    monkeypatch.setattr(interactive, "select", fake_select)
+    monkeypatch.setattr(interactive, "qst_text", fake_text)
+
+    config = run_interactive_config(get_default_config())
+
+    # No select calls (no markdown flavor, no font, no colormap)
+    assert select_call_count[0] == 0
+    # No text calls (no author headers, no stopwords)
+    assert text_call_count[0] == 0
+    # Only 1 checkbox call (output selection), no YAML fields checkbox
+    assert checkbox_call_count[0] == 1
+    # Verify only graphs selected
+    assert config.outputs == {OutputKind.GRAPHS}

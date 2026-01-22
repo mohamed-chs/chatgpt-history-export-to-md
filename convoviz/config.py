@@ -14,6 +14,18 @@ class FolderOrganization(str, Enum):
     DATE = "date"  # Nested by year/month (default)
 
 
+class OutputKind(str, Enum):
+    """Types of outputs that can be generated."""
+
+    MARKDOWN = "markdown"  # Conversation markdown files
+    GRAPHS = "graphs"  # Usage analytics graphs
+    WORDCLOUDS = "wordclouds"  # Word cloud visualizations
+
+
+# Default: generate all outputs
+ALL_OUTPUTS: frozenset[OutputKind] = frozenset(OutputKind)
+
+
 class AuthorHeaders(BaseModel):
     """Headers for different message authors in markdown output."""
 
@@ -93,6 +105,7 @@ class ConvovizConfig(BaseModel):
     input_path: Path | None = None
     output_folder: Path = Field(default_factory=lambda: Path.home() / "Documents" / "ChatGPT-Data")
     folder_organization: FolderOrganization = FolderOrganization.DATE
+    outputs: set[OutputKind] = Field(default_factory=lambda: set(ALL_OUTPUTS))
     message: MessageConfig = Field(default_factory=MessageConfig)
     conversation: ConversationConfig = Field(default_factory=ConversationConfig)
     wordcloud: WordCloudConfig = Field(default_factory=WordCloudConfig)

@@ -5,16 +5,14 @@ from shutil import rmtree
 
 from rich.console import Console
 
-from convoviz.analysis.graphs import generate_graphs
-from convoviz.analysis.wordcloud import generate_wordclouds
-from convoviz.config import ConvovizConfig
+from convoviz.config import ConvovizConfig, OutputKind
 from convoviz.exceptions import InvalidZipError
 from convoviz.io.loaders import (
     find_latest_bookmarklet_json,
     load_collection_from_json,
     load_collection_from_zip,
 )
-from convoviz.io.writers import save_collection, save_custom_instructions
+from convoviz.io.writers import save_collection
 
 console = Console()
 
@@ -80,10 +78,21 @@ def run_pipeline(config: ConvovizConfig) -> None:
     output_folder = config.output_folder
     output_folder.mkdir(parents=True, exist_ok=True)
 
-    # Clean only specific sub-directories we manage
-    managed_dirs = ["Markdown", "Graphs", "Word-Clouds"]
-    for d in managed_dirs:
-        sub_dir = output_folder / d
+    # Determine which outputs are selected
+    selected_outputs = config.outputs
+
+    # Build mapping of output kind -> directory name
+    output_dir_map: dict[OutputKind, str] = {
+        OutputKind.MARKDOWN: "Markdown",
+        OutputKind.GRAPHS: "Graphs",
+        OutputKind.WORDCLOUDS: "Word-Clouds",
+    }
+
+    # Clean only specific sub-directories we manage (only for selected outputs)
+    for output_kind, dir_name in output_dir_map.items():
+        if output_kind not in selected_outputs:
+            continue
+        sub_dir = output_folder / dir_name
         if sub_dir.exists():
             # Never follow symlinks; just unlink them.
             if sub_dir.is_symlink():
@@ -94,69 +103,57 @@ def run_pipeline(config: ConvovizConfig) -> None:
                 sub_dir.unlink()
         sub_dir.mkdir(exist_ok=True)
 
-    # Clean specific files we manage
-    managed_files = ["custom_instructions.json"]
-    for f in managed_files:
-        managed_file = output_folder / f
-        if managed_file.exists():
-            if managed_file.is_symlink() or managed_file.is_file():
-                managed_file.unlink()
-            elif managed_file.is_dir():
-                rmtree(managed_file)
-            else:
-                managed_file.unlink()
+    # Save markdown files (if selected)
+    if OutputKind.MARKDOWN in selected_outputs:
+        markdown_folder = output_folder / "Markdown"
+        save_collection(
+            collection,
+            markdown_folder,
+            config.conversation,
+            config.message.author_headers,
+            folder_organization=config.folder_organization,
+            progress_bar=True,
+        )
+        console.print(
+            f"\nDone [bold green]✅[/bold green] ! "
+            f"Check the output [bold blue]📄[/bold blue] here: {_safe_uri(markdown_folder)} 🔗\n"
+        )
 
-    # Save markdown files
-    markdown_folder = output_folder / "Markdown"
-    save_collection(
-        collection,
-        markdown_folder,
-        config.conversation,
-        config.message.author_headers,
-        folder_organization=config.folder_organization,
-        progress_bar=True,
-    )
-    console.print(
-        f"\nDone [bold green]✅[/bold green] ! "
-        f"Check the output [bold blue]📄[/bold blue] here: {_safe_uri(markdown_folder)} 🔗\n"
-    )
+    # Generate graphs (if selected)
+    if OutputKind.GRAPHS in selected_outputs:
+        # Lazy import to allow markdown-only usage without matplotlib
+        from convoviz.analysis.graphs import generate_graphs
 
-    # Generate graphs
-    graph_folder = output_folder / "Graphs"
-    graph_folder.mkdir(parents=True, exist_ok=True)
-    generate_graphs(
-        collection,
-        graph_folder,
-        config.graph,
-        progress_bar=True,
-    )
-    console.print(
-        f"\nDone [bold green]✅[/bold green] ! "
-        f"Check the output [bold blue]📈[/bold blue] here: {_safe_uri(graph_folder)} 🔗\n"
-    )
+        graph_folder = output_folder / "Graphs"
+        graph_folder.mkdir(parents=True, exist_ok=True)
+        generate_graphs(
+            collection,
+            graph_folder,
+            config.graph,
+            progress_bar=True,
+        )
+        console.print(
+            f"\nDone [bold green]✅[/bold green] ! "
+            f"Check the output [bold blue]📈[/bold blue] here: {_safe_uri(graph_folder)} 🔗\n"
+        )
 
-    # Generate word clouds
-    wordcloud_folder = output_folder / "Word-Clouds"
-    wordcloud_folder.mkdir(parents=True, exist_ok=True)
-    generate_wordclouds(
-        collection,
-        wordcloud_folder,
-        config.wordcloud,
-        progress_bar=True,
-    )
-    console.print(
-        f"\nDone [bold green]✅[/bold green] ! "
-        f"Check the output [bold blue]🔡☁️[/bold blue] here: {_safe_uri(wordcloud_folder)} 🔗\n"
-    )
+    # Generate word clouds (if selected)
+    if OutputKind.WORDCLOUDS in selected_outputs:
+        # Lazy import to allow markdown-only usage without wordcloud/nltk
+        from convoviz.analysis.wordcloud import generate_wordclouds
 
-    # Save custom instructions
-    console.print("Writing custom instructions [bold blue]📝[/bold blue] ...\n")
-    instructions_path = output_folder / "custom_instructions.json"
-    save_custom_instructions(collection, instructions_path)
-    console.print(
-        f"\nDone [bold green]✅[/bold green] ! "
-        f"Check the output [bold blue]📝[/bold blue] here: {_safe_uri(instructions_path)} 🔗\n"
-    )
+        wordcloud_folder = output_folder / "Word-Clouds"
+        wordcloud_folder.mkdir(parents=True, exist_ok=True)
+        generate_wordclouds(
+            collection,
+            wordcloud_folder,
+            config.wordcloud,
+            progress_bar=True,
+        )
+        console.print(
+            f"\nDone [bold green]✅[/bold green] ! "
+            f"Check the output [bold blue]🔡☁️[/bold blue] here: {_safe_uri(wordcloud_folder)} 🔗\n"
+        )
 
     console.print(
         "ALL DONE [bold green]🎉🎉🎉[/bold green] !\n\n"
