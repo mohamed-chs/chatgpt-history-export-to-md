@@ -2,9 +2,6 @@
 
 Convert your ChatGPT history into well-formatted Markdown files. Visualize your data with word clouds 🔡☁️ and usage graphs 📈.
 
-![GitHub last commit](https://img.shields.io/github/last-commit/mohamed-chs/chatgpt-history-export-to-md)
-![GitHub issues](https://img.shields.io/github/issues/mohamed-chs/chatgpt-history-export-to-md)
-
 ## Features
 
 - **YAML Headers**: Optional and included by default.
