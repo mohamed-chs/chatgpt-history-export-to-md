@@ -4,6 +4,7 @@ from pathlib import Path
 
 import typer
 from rich.console import Console
+from rich.markup import escape
 
 from convoviz.config import FolderOrganization, OutputKind, get_default_config
 from convoviz.exceptions import ConfigurationError, InvalidZipError
@@ -113,10 +114,10 @@ def run(
     try:
         run_pipeline(config)
     except (InvalidZipError, ConfigurationError) as e:
-        console.print(f"[bold red]Error:[/bold red] {e}")
+        console.print(f"[bold red]Error:[/bold red] {escape(str(e))}")
         raise typer.Exit(code=1) from None
     except Exception as e:
-        console.print(f"[bold red]Unexpected error:[/bold red] {e}")
+        console.print(f"[bold red]Unexpected error:[/bold red] {escape(str(e))}")
         raise typer.Exit(code=1) from None
 
 

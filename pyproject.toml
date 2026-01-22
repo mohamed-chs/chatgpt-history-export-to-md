@@ -1,6 +1,6 @@
 [project]
 name = "convoviz"
-version = "0.3.4"
+version = "0.3.5"
 description = "Get analytics and visualizations on your ChatGPT data!"
 license = "MIT"
 keywords = [
