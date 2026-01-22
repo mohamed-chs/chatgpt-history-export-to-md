@@ -126,7 +126,8 @@ def run_pipeline(config: ConvovizConfig) -> None:
             from convoviz.analysis.graphs import generate_graphs
         except ModuleNotFoundError as e:
             raise ConfigurationError(
-                "Graph generation requires matplotlib. Install with: pip install convoviz[viz]"
+                "Graph generation requires matplotlib. "
+                'Reinstall with the [viz] extra: uv tool install "convoviz[viz]"'
             ) from e
 
         graph_folder = output_folder / "Graphs"
@@ -150,7 +151,7 @@ def run_pipeline(config: ConvovizConfig) -> None:
         except ModuleNotFoundError as e:
             raise ConfigurationError(
                 "Word cloud generation requires wordcloud and nltk. "
-                "Install with: pip install convoviz[viz]"
+                'Reinstall with the [viz] extra: uv tool install "convoviz[viz]"'
             ) from e
 
         wordcloud_folder = output_folder / "Word-Clouds"

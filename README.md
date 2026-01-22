@@ -1,6 +1,6 @@
 # Convoviz 📊: Visualize your entire ChatGPT data
 
-Convert your ChatGPT history into well-formatted Markdown files. Additionally, visualize your data with word clouds 🔡☁️, view your prompt history graphs 📈, and access all your custom instructions 🤖 in a single location.
+Convert your ChatGPT history into well-formatted Markdown files. Visualize your data with word clouds 🔡☁️ and usage graphs 📈.
 
 ![GitHub last commit](https://img.shields.io/github/last-commit/mohamed-chs/chatgpt-history-export-to-md)
 ![GitHub issues](https://img.shields.io/github/issues/mohamed-chs/chatgpt-history-export-to-md)
@@ -17,24 +17,33 @@ See examples [here](demo).
 
 ### 1. Export Your ChatGPT Data 🗂
 
-- Sign in at [chat.openai.com](https://chat.openai.com).
+- Sign in at [chatgpt.com](https://chatgpt.com).
 - Navigate: Profile Name (bottom left) -> **Settings** -> **Data controls** -> **Export** -> **Confirm export**.
 - Await email from OpenAI and download the `.zip` file.
 
 ### 2. Install the tool 🛠
 
-With uv ([astral-sh/uv](https://github.com/astral-sh/uv?tab=readme-ov-file#highlights)):
+First, install [uv](https://github.com/astral-sh/uv) (if you don't have it):
+
+MacOS / Linux:
+
+```bash
+curl -LsSf https://astral.sh/uv/install.sh | sh
+```
+
+Windows (PowerShell):
+
+```powershell
+powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
+```
+
+Then install convoviz:
 
 ```bash
 uv tool install "convoviz[viz]"
 ```
 
-or pipx:
-```bash
-pipx install "convoviz[viz]"
-```
-
-The `[viz]` extra includes graphs and word clouds. If you only need markdown conversion, you can skip it for a faster install (`uv tool install convoviz`).
+The `[viz]` extra includes graphs and word clouds. Skip it for a faster markdown-only install.
 
 ### 3. Run the tool 🏃‍♂️
 
@@ -52,22 +61,15 @@ You can provide arguments directly to skip the prompts:
 convoviz --input path/to/your/export.zip --output path/to/output/folder
 ```
 
-##### Selective Output Generation
+##### Selective Output
 
-By default, Convoviz generates all outputs (Markdown files, graphs, and word clouds). You can select specific outputs using the `--outputs` flag:
+By default, all outputs are generated. Use `--outputs` to pick specific ones:
 
 ```bash
-# Generate only Markdown files (fastest)
-convoviz --input export.zip --outputs markdown
-
-# Generate Markdown and graphs (no word clouds)
 convoviz --input export.zip --outputs markdown --outputs graphs
-
-# Generate all outputs (default behavior)
-convoviz --input export.zip --outputs markdown --outputs graphs --outputs wordclouds
 ```
 
-In interactive mode, you'll be prompted to select which outputs to generate.
+Options: `markdown`, `graphs`, `wordclouds`. In interactive mode, you'll be prompted.
 
 ##### Other Notes
 

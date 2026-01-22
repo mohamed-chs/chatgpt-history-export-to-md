@@ -1,6 +1,6 @@
 """Data analysis and visualization for convoviz.
 
-Requires the [viz] extra: pip install convoviz[viz]
+Requires the [viz] extra: uv tool install "convoviz[viz]"
 """
 
 __all__ = [
