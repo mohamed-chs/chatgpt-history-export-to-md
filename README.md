@@ -23,22 +23,18 @@ See examples [here](demo).
 
 ### 2. Install the tool 🛠
 
-Try it without installing using uv ([astral-sh/uv](https://github.com/astral-sh/uv?tab=readme-ov-file#highlights)):
+With uv ([astral-sh/uv](https://github.com/astral-sh/uv?tab=readme-ov-file#highlights)):
 
 ```bash
-uvx convoviz
-```
-
-You can install it with uv (Recommended):
-
-```bash
-uv tool install convoviz
+uv tool install convoviz[viz]
 ```
 
 or pipx:
 ```bash
-pipx install convoviz
+pipx install convoviz[viz]
 ```
+
+The `[viz]` extra includes graphs and word clouds. If you only need markdown conversion, you can skip it for a faster install (`uv tool install convoviz`).
 
 ### 3. Run the tool 🏃‍♂️
 
@@ -111,12 +107,12 @@ It should(?) also work as library, so you can import and use the models and func
 
 ### Offline / reproducible runs
 
-Convoviz uses NLTK stopwords for word clouds. If you’re offline and NLTK data isn’t already installed, pre-download it once:
+Word clouds use NLTK stopwords. If you're offline and NLTK data isn't installed yet, pre-download it:
 
 ```bash
-uv run python -c "import nltk; nltk.download('stopwords')"
+python -c "import nltk; nltk.download('stopwords')"
 ```
 
 ### Bookmarklet
 
-There’s also a JavaScript bookmarklet flow under `js/` (experimental) for exporting additional conversation data outside the official ZIP export.
+There's also a JavaScript bookmarklet flow under `js/` (experimental) for exporting additional conversation data outside the official ZIP export.

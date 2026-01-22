@@ -100,51 +100,56 @@ wheels = [
 
 [[package]]
 name = "convoviz"
-version = "0.3.0"
+version = "0.3.1"
 source = { editable = "." }
 dependencies = [
-    { name = "matplotlib" },
-    { name = "nltk" },
     { name = "orjson" },
-    { name = "pillow" },
     { name = "pydantic" },
     { name = "pydantic-settings" },
     { name = "questionary" },
     { name = "rich" },
     { name = "tqdm" },
     { name = "typer" },
+]
+
+[package.optional-dependencies]
+viz = [
+    { name = "nltk" },
     { name = "wordcloud" },
 ]
 
 [package.dev-dependencies]
 dev = [
+    { name = "nltk" },
     { name = "pytest" },
     { name = "ruff" },
     { name = "ty" },
     { name = "types-tqdm" },
+    { name = "wordcloud" },
 ]
 
 [package.metadata]
 requires-dist = [
-    { name = "matplotlib", specifier = ">=3.9.4" },
-    { name = "nltk", specifier = ">=3.9.2" },
+    { name = "nltk", marker = "extra == 'viz'", specifier = ">=3.9.2" },
     { name = "orjson", specifier = ">=3.11.5" },
-    { name = "pillow", specifier = ">=11.3.0" },
     { name = "pydantic", specifier = ">=2.12.5" },
     { name = "pydantic-settings", specifier = ">=2.7.0" },
     { name = "questionary", specifier = ">=2.1.1" },
     { name = "rich", specifier = ">=14.2.0" },
     { name = "tqdm", specifier = ">=4.67.1" },
     { name = "typer", specifier = ">=0.21.0" },
-    { name = "wordcloud", specifier = ">=1.9.5" },
+    { name = "wordcloud", marker = "extra == 'viz'", specifier = ">=1.9.5" },
 ]
+provides-extras = ["viz"]
 
 [package.metadata.requires-dev]
 dev = [
+    { name = "nltk", specifier = ">=3.9.2" },
     { name = "pytest", specifier = ">=8.4.2" },
     { name = "ruff", specifier = ">=0.14.10" },
     { name = "ty", specifier = ">=0.0.11" },
     { name = "types-tqdm", specifier = ">=4.67.0.20250809" },
+    { name = "wordcloud", specifier = ">=1.9.5" },
 ]
 
 [[package]]

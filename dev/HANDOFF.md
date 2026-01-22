@@ -173,7 +173,7 @@ uv run ruff check convoviz tests && uv run ty check convoviz && uv run pytest
 ## What's NOT Done (Roadmap)
 
 - [ ] **Custom Instructions Export**: Re-enable and fix `custom_instructions.json` export (currently disabled).
-- [ ] **Optional Dependencies**: Move visualization deps (`matplotlib`, `wordcloud`, `nltk`, `pillow`) to optional extras in `pyproject.toml` (e.g., `convoviz[viz]`) so markdown-only installs are faster. The lazy imports are already in place.
+- [x] **Optional Dependencies**: Visualization deps (`wordcloud`, `nltk`) are now in the optional `[viz]` extra. Markdown-only installs are fast. Runtime guards provide clear install guidance when deps are missing.
 - [ ] **Performance**: Large exports with thousands of images might be slow to copy. Consider async copy.
 - [ ] **Citations**: Parse invisible characters/metadata in ChatGPT exports that denote citations.
 - [ ] **Canvas Support**: Research and implement support for "Canvas" content.

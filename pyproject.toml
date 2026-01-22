@@ -1,6 +1,6 @@
 [project]
 name = "convoviz"
-version = "0.3.0"
+version = "0.3.1"
 description = "Get analytics and visualizations on your ChatGPT data!"
 license = "MIT"
 keywords = [
@@ -18,16 +18,18 @@ authors = [
     { name = "Mohamed Cheikh Sidiya", email = "mohamedcheikhsidiya77@gmail.com" }
 ]
 dependencies = [
-    "matplotlib>=3.9.4",
-    "nltk>=3.9.2",
     "orjson>=3.11.5",
-    "pillow>=11.3.0",
     "pydantic>=2.12.5",
     "pydantic-settings>=2.7.0",
     "questionary>=2.1.1",
     "rich>=14.2.0",
     "tqdm>=4.67.1",
     "typer>=0.21.0",
+]
+
+[project.optional-dependencies]
+viz = [
+    "nltk>=3.9.2",
     "wordcloud>=1.9.5",
 ]
 
@@ -66,6 +68,9 @@ dev = [
     "ruff>=0.14.10",
     "ty>=0.0.11",
     "types-tqdm>=4.67.0.20250809",
+    # Viz extras for testing (wordcloud pulls in matplotlib + pillow)
+    "nltk>=3.9.2",
+    "wordcloud>=1.9.5",
 ]
 
 [tool.ruff]

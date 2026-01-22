@@ -6,7 +6,7 @@ from shutil import rmtree
 from rich.console import Console
 
 from convoviz.config import ConvovizConfig, OutputKind
-from convoviz.exceptions import InvalidZipError
+from convoviz.exceptions import ConfigurationError, InvalidZipError
 from convoviz.io.loaders import (
     find_latest_bookmarklet_json,
     load_collection_from_json,
@@ -122,7 +122,13 @@ def run_pipeline(config: ConvovizConfig) -> None:
     # Generate graphs (if selected)
     if OutputKind.GRAPHS in selected_outputs:
         # Lazy import to allow markdown-only usage without matplotlib
-        from convoviz.analysis.graphs import generate_graphs
+        try:
+            from convoviz.analysis.graphs import generate_graphs
+        except ModuleNotFoundError as e:
+            raise ConfigurationError(
+                "Graph generation requires matplotlib. "
+                "Install with: pip install convoviz[viz]"
+            ) from e
 
         graph_folder = output_folder / "Graphs"
         graph_folder.mkdir(parents=True, exist_ok=True)
@@ -140,7 +146,13 @@ def run_pipeline(config: ConvovizConfig) -> None:
     # Generate word clouds (if selected)
     if OutputKind.WORDCLOUDS in selected_outputs:
         # Lazy import to allow markdown-only usage without wordcloud/nltk
-        from convoviz.analysis.wordcloud import generate_wordclouds
+        try:
+            from convoviz.analysis.wordcloud import generate_wordclouds
+        except ModuleNotFoundError as e:
+            raise ConfigurationError(
+                "Word cloud generation requires wordcloud and nltk. "
+                "Install with: pip install convoviz[viz]"
+            ) from e
 
         wordcloud_folder = output_folder / "Word-Clouds"
         wordcloud_folder.mkdir(parents=True, exist_ok=True)
