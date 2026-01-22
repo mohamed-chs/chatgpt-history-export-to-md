@@ -126,8 +126,7 @@ def run_pipeline(config: ConvovizConfig) -> None:
             from convoviz.analysis.graphs import generate_graphs
         except ModuleNotFoundError as e:
             raise ConfigurationError(
-                "Graph generation requires matplotlib. "
-                "Install with: pip install convoviz[viz]"
+                "Graph generation requires matplotlib. Install with: pip install convoviz[viz]"
             ) from e
 
         graph_folder = output_folder / "Graphs"
