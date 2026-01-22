@@ -26,12 +26,12 @@ See examples [here](demo).
 With uv ([astral-sh/uv](https://github.com/astral-sh/uv?tab=readme-ov-file#highlights)):
 
 ```bash
-uv tool install convoviz[viz]
+uv tool install "convoviz[viz]"
 ```
 
 or pipx:
 ```bash
-pipx install convoviz[viz]
+pipx install "convoviz[viz]"
 ```
 
 The `[viz]` extra includes graphs and word clouds. If you only need markdown conversion, you can skip it for a faster install (`uv tool install convoviz`).
