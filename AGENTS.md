@@ -14,7 +14,9 @@ Always use `uv` to run commands in the environment.
 - **Type Check**: `uv run ty check convoviz`
 
 ## 🚀 First Step
-**ALWAYS start by reading [`docs/dev/HANDOFF.md`](docs/dev/HANDOFF.md)** to understand the current project state, recent updates, and known issues.
+**CRITICAL: YOU MUST ALWAYS START BY READING [`docs/dev/HANDOFF.md`](docs/dev/HANDOFF.md) AND CONDUCTING A THOROUGH CODEBASE EXPLORATION.**
+
+This is **MANDATORY AND NON-NEGOTIABLE**, regardless of how simple, small, or straightforward the task may seem. You **MUST** understand the current project state, recent updates, and local context **BEFORE** making any assumptions, changes, or plans. **DO NOT SKIP THIS STEP.** Only after this initial mandatory orientation should you proceed with task-specific exploration and implementation.
 
 ## 📚 Documentation Index
 - **[Workflow & Protocols](docs/dev/workflow.md)**: Release steps, git usage, agent behavior rules.
