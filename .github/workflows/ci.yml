@@ -129,7 +129,7 @@ jobs:
         run: |
           source test-env-viz/bin/activate
           convoviz --help
-          python -c "import wordcloud; import nltk; from convoviz.analysis.wordcloud import WordCloudGenerator; print('Viz components OK')"
+          python -c "import wordcloud; import nltk; from convoviz.analysis.wordcloud import generate_wordcloud; print('Viz components OK')"
 
   # Final gate that requires all jobs to pass
   ci-success:
