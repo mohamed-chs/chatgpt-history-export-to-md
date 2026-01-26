@@ -154,6 +154,9 @@ def generate_wordclouds(
     month_groups = collection.group_by_month()
     year_groups = collection.group_by_year()
 
+    # Pre-load/download NLTK stopwords in the main process to avoid race conditions in workers
+    load_nltk_stopwords()
+
     # Build list of all tasks: (text, filename, output_dir, config)
     tasks: list[tuple[str, str, Path, WordCloudConfig]] = []
 
