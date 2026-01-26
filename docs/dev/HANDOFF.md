@@ -66,7 +66,7 @@ This document provides context for continuing work on the convoviz project.
 - **Word Cloud Improvements**: Added programming language keywords and types to the stop words list to reduce noise in technical conversations.
     - Added `exclude_programming_keywords` to `WordCloudConfig`.
     - Defined `PROGRAMMING_STOPWORDS` in `convoviz/analysis/wordcloud.py`.
-- **Input Flexibility**: 
+- **Input Flexibility**:
     - CLI now accepts `--input` (or `-i`, `-z`, `--zip`) for **directories**, **JSON files**, or **ZIP files**.
     - Updated `config.py`, `pipeline.py`, and `loaders.py` to handle this flexibility.
 - **Tests**: Added `tests/test_assets.py` and updated `tests/test_renderers.py`.
@@ -76,7 +76,7 @@ This document provides context for continuing work on the convoviz project.
 - **Documentation**: Created `AGENTS.md` for AI agent context.
 
 **Hardening & Correctness (January 2026)**:
-- **ZIP extraction safety**: Hardened ZIP member validation to reject Windows-style traversal (e.g. `..\\evil.txt`) in addition to `../evil.txt`.
+- **ZIP extraction safety**: Hardened ZIP member validation to reject Windows-style traversal (e.g. `..\evil.txt`) in addition to `../evil.txt`.
 - **Output path robustness**: Made pipeline output links resilient to relative paths (best-effort URI printing).
 - **Safer output cleanup**: Output cleanup now avoids following symlinks for managed directories/files.
 - **Collection merge correctness**: Fixed `ConversationCollection.update()` so it won’t skip “new but older-timestamped” conversations (common with bookmarklet data). Added tests.
@@ -140,7 +140,7 @@ Conversation + Config → render_conversation() → Markdown string
 ## Key Files to Know
 
 | File | Purpose |
-|------|---------|
+|------|
 | `convoviz/config.py` | All configuration models (ConvovizConfig is the main one) |
 | `convoviz/pipeline.py` | Main processing flow - start here to understand the app |
 | `convoviz/io/assets.py`| Logic for finding and copying image assets |
@@ -182,3 +182,9 @@ uv run ruff check convoviz tests && uv run ty check convoviz && uv run pytest
 - [x] **Schema Documentation**: Updated spec at `docs/chatgpt-spec-unofficial-v2.md` (Jan 2026).
 - [x] **Reasoning Content**: Support `reasoning_recap` and `thoughts` content types from o1/o3 models.
 - [x] **Selectable Outputs**: Users can choose which outputs to generate (Markdown, Graphs, Wordclouds).
+
+## Meta-Notes
+- This is a working document for brainstorming and info-sharing; it is not a directive.
+- It's the entry point for working/continuing work on the project.
+- Try to keep it updated; complete rewrites are within the realm of possibility.
+- **A good habit to take (I'm talking to you, AI coding agent) is to write other such .md files to persist plans/context in this session and the next.** Write them in the root project directory, or in other places if you prefer (like ./dev/), depending on the context. Take the liberty to do it anytime, it's very much encouraged and recommended; you don't even have to ask before you do it, or notify the user at all for that matter.
