@@ -108,6 +108,10 @@ jobs:
     needs: [build, test-install]
     runs-on: ubuntu-latest
     environment: pypi
+    permissions:
+      id-token: write      # Required for OIDC Trusted Publishing
+      attestations: write # Required for generating PyPI provenance attestations
+      contents: read       # Basic repo access for metadata
     steps:
       - name: Download artifacts
         uses: actions/download-artifact@v7
