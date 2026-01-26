@@ -50,6 +50,7 @@ jobs:
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
         python-version: ["3.12", "3.13", "3.14"]
+        extra: ["", "[viz]"]
     steps:
       - name: Install uv
         uses: astral-sh/setup-uv@v7
@@ -68,7 +69,8 @@ jobs:
         run: |
           uv venv test-env
           source test-env/bin/activate
-          uv pip install dist/*.whl
+          WHEEL=$(ls dist/*.whl)
+          uv pip install "${WHEEL}${{ matrix.extra }}"
 
       - name: Install from wheel (Windows)
         if: runner.os == 'Windows'
@@ -77,13 +79,17 @@ jobs:
           uv venv test-env
           test-env\Scripts\activate
           $wheel = Get-ChildItem dist/*.whl | Select-Object -First 1
-          uv pip install $wheel.FullName
+          $target = $wheel.FullName + "${{ matrix.extra }}"
+          uv pip install $target
 
       - name: Verify CLI works (Unix)
         if: runner.os != 'Windows'
         run: |
           source test-env/bin/activate
           convoviz --help
+          if [[ "${{ matrix.extra }}" == "[viz]" ]]; then
+            python -c "import wordcloud; import nltk; print('Viz OK')"
+          fi
 
       - name: Verify CLI works (Windows)
         if: runner.os == 'Windows'
@@ -93,6 +99,9 @@ jobs:
         run: |
           test-env\Scripts\activate
           convoviz --help
+          if ("${{ matrix.extra }}" -eq "[viz]") {
+            python -c "import wordcloud; import nltk; print('Viz OK')"
+          }
 
   publish-pypi:
     name: Publish to PyPI

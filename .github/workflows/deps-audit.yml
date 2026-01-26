@@ -41,7 +41,16 @@ jobs:
           source fresh-env/bin/activate
           uv pip install convoviz
           convoviz --help
-          echo "PyPI install verification passed"
+          echo "PyPI base install verification passed"
+        continue-on-error: true
+
+      - name: Test fresh install with [viz] from PyPI
+        run: |
+          uv venv fresh-env-viz
+          source fresh-env-viz/bin/activate
+          uv pip install "convoviz[viz]"
+          convoviz --help
+          python -c "import wordcloud; import nltk; print('PyPI viz install verification passed')"
         continue-on-error: true
 
   compatibility:
