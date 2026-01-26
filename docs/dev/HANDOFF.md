@@ -10,6 +10,13 @@ This document provides context for continuing work on the convoviz project.
 - Bar plot graphs showing usage patterns
 - JSON export of custom instructions
 
+## Recent Updates (January 26, 2026)
+
+**CI/CD Pipeline Automation**:
+- **Automated PyPI Publishing**: Replaced manual `uv publish` with a fully automated GitHub Actions workflow (`release.yml`). Pushing a version tag (e.g., `v0.3.7`) now triggers the build and publish process.
+- **Trusted Publishing & Provenance**: Enabled OIDC-based Trusted Publishing and configured `attestations: write` permission to generate PEP 740 provenance attestations on PyPI.
+- **Workflow Docs**: Updated `docs/dev/workflow.md` to reflect the new release procedure (Tag & Push).
+
 ## Recent Updates (January 22, 2026)
 
 **Selectable Output Types**:

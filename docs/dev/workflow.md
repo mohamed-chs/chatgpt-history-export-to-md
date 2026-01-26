@@ -1,20 +1,21 @@
 # Development Workflow & Agent Protocol
 
 ## Release Workflow
-To publish a new version to PyPI:
+To publish a new version to PyPI (automated via GitHub Actions):
 
 ```bash
 # 1. Bump version (patch/minor/major)
+# This updates pyproject.toml and uv.lock
 uv version --bump patch
 
 # 2. Commit changes
-git add -A && git commit -m "feat: description of changes"
+git add pyproject.toml uv.lock
+git commit -m "chore: bump version to X.Y.Z"
 
-# 3. Build
-uv build
-
-# 4. Publish (token in .env as UV_PUBLISH_TOKEN)
-export $(cat .env | xargs) && uv publish
+# 3. Create and push tag
+# This triggers the 'Release' workflow which builds and publishes to PyPI
+git tag vX.Y.Z
+git push && git push origin vX.Y.Z
 ```
 
 ## Agent Protocol
