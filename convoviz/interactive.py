@@ -1,12 +1,12 @@
 """Interactive configuration prompts using questionary."""
 
+import logging
 from pathlib import Path
 from typing import Literal, Protocol, cast
 
 from questionary import Choice, Style, checkbox, select
 from questionary import path as qst_path
 from questionary import text as qst_text
-import logging
 
 from convoviz.config import ConvovizConfig, OutputKind, get_default_config
 from convoviz.io.loaders import find_latest_zip, validate_zip

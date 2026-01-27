@@ -1,5 +1,6 @@
 """Writing functions for conversations and collections."""
 
+import logging
 from os import utime as os_utime
 from pathlib import Path
 from urllib.parse import quote
@@ -12,7 +13,6 @@ from convoviz.io.assets import copy_asset, resolve_asset_path
 from convoviz.models import Conversation, ConversationCollection
 from convoviz.renderers import render_conversation
 from convoviz.utils import sanitize
-import logging
 
 logger = logging.getLogger(__name__)
 

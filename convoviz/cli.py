@@ -1,5 +1,6 @@
 """Command-line interface for convoviz."""
 
+import logging
 from pathlib import Path
 
 import typer
@@ -10,10 +11,9 @@ from convoviz.config import FolderOrganization, OutputKind, get_default_config
 from convoviz.exceptions import ConfigurationError, InvalidZipError
 from convoviz.interactive import run_interactive_config
 from convoviz.io.loaders import find_latest_zip
+from convoviz.logging_config import setup_logging
 from convoviz.pipeline import run_pipeline
 from convoviz.utils import default_font_path
-from convoviz.logging_config import setup_logging
-import logging
 
 app = typer.Typer(
     add_completion=False,

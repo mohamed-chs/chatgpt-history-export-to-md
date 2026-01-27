@@ -1,10 +1,10 @@
 """Word cloud generation for conversation text."""
 
+import logging
 import os
 from concurrent.futures import ProcessPoolExecutor
 from functools import lru_cache
 from pathlib import Path
-import logging
 
 from nltk import download as nltk_download
 from nltk.corpus import stopwords as nltk_stopwords

@@ -1,8 +1,8 @@
 """Main processing pipeline for convoviz."""
 
+import logging
 from pathlib import Path
 from shutil import rmtree
-import logging
 
 from rich.console import Console
 

@@ -1,8 +1,8 @@
 """Loading functions for conversations and collections."""
 
+import logging
 from pathlib import Path, PurePosixPath
 from zipfile import ZipFile
-import logging
 
 from orjson import loads
 

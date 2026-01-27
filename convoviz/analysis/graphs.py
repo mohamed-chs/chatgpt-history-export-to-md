@@ -8,11 +8,11 @@ Goals:
 
 from __future__ import annotations
 
+import logging
 from collections import defaultdict
 from collections.abc import Callable, Iterable
 from datetime import UTC, datetime
 from pathlib import Path
-import logging
 
 import matplotlib.dates as mdates
 import matplotlib.font_manager as fm

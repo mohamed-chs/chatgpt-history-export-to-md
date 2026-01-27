@@ -20,6 +20,8 @@ This is **MANDATORY AND NON-NEGOTIABLE**, regardless of how simple, small, or st
 
 **IMPORTANT: YOU MUST ALWAYS KEEP ALL RELEVANT .MD FILES UPDATED WITH YOUR CHANGES. THIS INCLUDES `AGENTS.md`, `README.md`, AND `docs/dev/HANDOFF.md`. THIS IS A CRITICAL REQUIREMENT.**
 
+**CRITICAL: ALWAYS RUN THE FULL QUALITY GATE (tests, type checking, linting, formatting) AND FIX ALL ISSUES BEFORE SUBMITTING CHANGES.**
+
 ## 📚 Documentation Index
 - **[Workflow & Protocols](docs/dev/workflow.md)**: Release steps, git usage, agent behavior rules.
 - **[Architecture & Standards](docs/dev/architecture.md)**: Tech stack, core design patterns.

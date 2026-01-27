@@ -1,8 +1,8 @@
 "Asset management functions."
 
+import logging
 import shutil
 from pathlib import Path
-import logging
 
 logger = logging.getLogger(__name__)
 
