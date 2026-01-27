@@ -2,6 +2,7 @@
 
 from pathlib import Path
 from shutil import rmtree
+import logging
 
 from rich.console import Console
 
@@ -15,6 +16,7 @@ from convoviz.io.loaders import (
 from convoviz.io.writers import save_collection
 
 console = Console()
+logger = logging.getLogger(__name__)
 
 
 def _safe_uri(path: Path) -> str:
@@ -46,6 +48,7 @@ def run_pipeline(config: ConvovizConfig) -> None:
     if not input_path.exists():
         raise InvalidZipError(str(input_path), reason="File does not exist")
 
+    logger.info(f"Starting pipeline with input: {input_path}")
     console.print(f"Loading data from {input_path} [bold yellow]📂[/bold yellow] ...\n")
 
     # Load collection based on input type
@@ -62,6 +65,7 @@ def run_pipeline(config: ConvovizConfig) -> None:
     else:
         # Assume zip
         collection = load_collection_from_zip(input_path)
+    logger.info(f"Loaded collection with {len(collection.conversations)} conversations")
 
     # Try to merge bookmarklet data if available
     bookmarklet_json = find_latest_bookmarklet_json()
@@ -70,6 +74,7 @@ def run_pipeline(config: ConvovizConfig) -> None:
         try:
             bookmarklet_collection = load_collection_from_json(bookmarklet_json)
             collection.update(bookmarklet_collection)
+            logger.info("Merged bookmarklet data")
         except Exception as e:
             console.print(
                 f"[bold yellow]Warning:[/bold yellow] Failed to load bookmarklet data: {e}"
@@ -114,6 +119,7 @@ def run_pipeline(config: ConvovizConfig) -> None:
             folder_organization=config.folder_organization,
             progress_bar=True,
         )
+        logger.info("Markdown generation complete")
         console.print(
             f"\nDone [bold green]✅[/bold green] ! "
             f"Check the output [bold blue]📄[/bold blue] here: {_safe_uri(markdown_folder)} 🔗\n"
@@ -138,6 +144,7 @@ def run_pipeline(config: ConvovizConfig) -> None:
             config.graph,
             progress_bar=True,
         )
+        logger.info("Graph generation complete")
         console.print(
             f"\nDone [bold green]✅[/bold green] ! "
             f"Check the output [bold blue]📈[/bold blue] here: {_safe_uri(graph_folder)} 🔗\n"
@@ -162,6 +169,7 @@ def run_pipeline(config: ConvovizConfig) -> None:
             config.wordcloud,
             progress_bar=True,
         )
+        logger.info("Wordcloud generation complete")
         console.print(
             f"\nDone [bold green]✅[/bold green] ! "
             f"Check the output [bold blue]🔡☁️[/bold blue] here: {_safe_uri(wordcloud_folder)} 🔗\n"

@@ -12,6 +12,8 @@ from convoviz.interactive import run_interactive_config
 from convoviz.io.loaders import find_latest_zip
 from convoviz.pipeline import run_pipeline
 from convoviz.utils import default_font_path
+from convoviz.logging_config import setup_logging
+import logging
 
 app = typer.Typer(
     add_completion=False,
@@ -57,8 +59,26 @@ def run(
         "-i/-I",
         help="Force interactive mode on or off.",
     ),
+    verbose: int = typer.Option(
+        0,
+        "--verbose",
+        "-v",
+        help="Increase verbosity. Use -vv for debug.",
+        count=True,
+    ),
+    log_file: Path | None = typer.Option(
+        None,
+        "--log-file",
+        help="Path to log file. Defaults to a temporary file.",
+    ),
 ) -> None:
     """Convert ChatGPT export data to markdown and generate visualizations."""
+    # Setup logging immediately
+    log_path = setup_logging(verbose, log_file)
+    logger = logging.getLogger("convoviz.cli")
+    console.print(f"[dim]Logging to: {log_path}[/dim]")
+    logger.debug(f"Logging initialized. Output: {log_path}")
+
     if ctx.invoked_subcommand is not None:
         return
 
@@ -114,10 +134,13 @@ def run(
     try:
         run_pipeline(config)
     except (InvalidZipError, ConfigurationError) as e:
+        logger.error(f"Known error: {e}")
         console.print(f"[bold red]Error:[/bold red] {escape(str(e))}")
         raise typer.Exit(code=1) from None
     except Exception as e:
+        logger.exception("Unexpected error occurred")
         console.print(f"[bold red]Unexpected error:[/bold red] {escape(str(e))}")
+        console.print(f"[dim]See log file for details: {log_path}[/dim]")
         raise typer.Exit(code=1) from None
 
 

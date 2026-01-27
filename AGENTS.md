@@ -18,6 +18,8 @@ Always use `uv` to run commands in the environment.
 
 This is **MANDATORY AND NON-NEGOTIABLE**, regardless of how simple, small, or straightforward the task may seem. You **MUST** understand the current project state, recent updates, and local context **BEFORE** making any assumptions, changes, or plans. **DO NOT SKIP THIS STEP.** Only after this initial mandatory orientation should you proceed with task-specific exploration and implementation.
 
+**IMPORTANT: YOU MUST ALWAYS KEEP ALL RELEVANT .MD FILES UPDATED WITH YOUR CHANGES. THIS INCLUDES `AGENTS.md`, `README.md`, AND `docs/dev/HANDOFF.md`. THIS IS A CRITICAL REQUIREMENT.**
+
 ## 📚 Documentation Index
 - **[Workflow & Protocols](docs/dev/workflow.md)**: Release steps, git usage, agent behavior rules.
 - **[Architecture & Standards](docs/dev/architecture.md)**: Tech stack, core design patterns.

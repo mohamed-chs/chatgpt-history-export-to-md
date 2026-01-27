@@ -4,6 +4,7 @@ import os
 from concurrent.futures import ProcessPoolExecutor
 from functools import lru_cache
 from pathlib import Path
+import logging
 
 from nltk import download as nltk_download
 from nltk.corpus import stopwords as nltk_stopwords
@@ -14,6 +15,8 @@ from wordcloud import WordCloud
 
 from convoviz.config import WordCloudConfig
 from convoviz.models import ConversationCollection
+
+logger = logging.getLogger(__name__)
 
 # Languages for stopwords
 STOPWORD_LANGUAGES = [
@@ -149,6 +152,7 @@ def generate_wordclouds(
         progress_bar: Whether to show progress bars
     """
     output_dir.mkdir(parents=True, exist_ok=True)
+    logger.info(f"Generating wordclouds to {output_dir}")
 
     week_groups = collection.group_by_week()
     month_groups = collection.group_by_month()
@@ -188,6 +192,7 @@ def generate_wordclouds(
         max_workers = max(1, cpu_count // 2)
 
     # Use parallel processing for speedup on multi-core systems
+    logger.debug(f"Starting wordcloud generation with {max_workers} workers for {len(tasks)} tasks")
     with ProcessPoolExecutor(max_workers=max_workers) as executor:
         list(
             tqdm(

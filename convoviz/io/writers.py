@@ -12,6 +12,9 @@ from convoviz.io.assets import copy_asset, resolve_asset_path
 from convoviz.models import Conversation, ConversationCollection
 from convoviz.renderers import render_conversation
 from convoviz.utils import sanitize
+import logging
+
+logger = logging.getLogger(__name__)
 
 # Month names for folder naming
 _MONTH_NAMES = [
@@ -102,6 +105,7 @@ def save_conversation(
     markdown = render_conversation(conversation, config, headers, asset_resolver=asset_resolver)
     with final_path.open("w", encoding="utf-8") as f:
         f.write(markdown)
+    logger.debug(f"Saved conversation: {final_path}")
 
     # Set modification time
     timestamp = conversation.update_time.timestamp()
@@ -135,6 +139,7 @@ def _generate_year_index(year_dir: Path, year: str) -> None:
 
     index_path = year_dir / "_index.md"
     index_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+    logger.debug(f"Generated year index: {index_path}")
 
 
 def _generate_month_index(month_dir: Path, year: str, month: str) -> None:
@@ -162,6 +167,7 @@ def _generate_month_index(month_dir: Path, year: str, month: str) -> None:
 
     index_path = month_dir / "_index.md"
     index_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+    logger.debug(f"Generated month index: {index_path}")
 
 
 def save_collection(

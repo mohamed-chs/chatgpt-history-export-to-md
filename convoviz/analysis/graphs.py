@@ -12,6 +12,7 @@ from collections import defaultdict
 from collections.abc import Callable, Iterable
 from datetime import UTC, datetime
 from pathlib import Path
+import logging
 
 import matplotlib.dates as mdates
 import matplotlib.font_manager as fm
@@ -24,6 +25,8 @@ from tqdm import tqdm
 from convoviz.config import GraphConfig, get_default_config
 from convoviz.models import ConversationCollection
 from convoviz.utils import get_asset_path
+
+logger = logging.getLogger(__name__)
 
 WEEKDAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
 
@@ -742,6 +745,7 @@ def generate_summary_graphs(
     cfg = config or get_default_config().graph
 
     user_ts = collection.timestamps("user")
+    logger.info(f"Generating summary graphs to {output_dir}")
 
     tasks: list[tuple[str, str, Callable[[], Figure]]] = [
         ("Overview", "overview.png", lambda: generate_summary_dashboard(collection, cfg)),

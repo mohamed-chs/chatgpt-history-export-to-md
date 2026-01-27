@@ -81,6 +81,8 @@ Options: `markdown`, `graphs`, `wordclouds`. In interactive mode, you'll be prom
 - `--zip` / `-z` is kept as an alias for `--input` for convenience.
 - You can force non-interactive mode with `--no-interactive`.
 - Use `--flat` to put all Markdown files in a single folder instead of organizing by date.
+- Use `--verbose` or `-v` for detailed logging (use `-vv` for debug logs).
+- Use `--log-file` to specify a custom log file (logs default to a temporary file if not specified).
 
 For more options, run:
 

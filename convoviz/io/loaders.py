@@ -2,11 +2,14 @@
 
 from pathlib import Path, PurePosixPath
 from zipfile import ZipFile
+import logging
 
 from orjson import loads
 
 from convoviz.exceptions import InvalidZipError
 from convoviz.models import Conversation, ConversationCollection
+
+logger = logging.getLogger(__name__)
 
 
 def _is_safe_zip_member_name(name: str) -> bool:
@@ -46,6 +49,7 @@ def extract_archive(filepath: Path) -> Path:
     """
     folder = filepath.with_suffix("")
     folder.mkdir(parents=True, exist_ok=True)
+    logger.info(f"Extracting archive: {filepath} to {folder}")
 
     with ZipFile(filepath) as zf:
         for member in zf.infolist():
@@ -115,6 +119,7 @@ def load_collection_from_json(filepath: Path | str) -> ConversationCollection:
         Loaded ConversationCollection object
     """
     filepath = Path(filepath)
+    logger.debug(f"Loading collection from JSON: {filepath}")
     with filepath.open(encoding="utf-8") as f:
         data = loads(f.read())
 

@@ -2,6 +2,15 @@
 
 This document provides context for continuing work on the convoviz project.
 
+## Recent Updates (January 27, 2026)
+
+**Pervasive Logging System**:
+- **Console & File Logging**: Implemented a robust logging system using `rich` for console and standard logging for files.
+- ** CLI Flags**: Added `--verbose` (`-v`) and `--log-file` to control logging.
+- **Debug Logs**: Full debug tracebacks are captured in log files (temp file by default) for easier debugging.
+- **Instrumentation**: Major components (CLI, Pipeline, Loaders, Writers, Assets, Analysis) are instrumented with logging calls.
+- **Docs**: Updated `README.md` and `AGENTS.md` to reflect these changes.
+
 ## Project Overview
 
 **Convoviz** is a CLI tool that converts ChatGPT export data (ZIP files) into:
@@ -195,3 +204,4 @@ uv run ruff check convoviz tests && uv run ty check convoviz && uv run pytest
 - It's the entry point for working/continuing work on the project.
 - Try to keep it updated; complete rewrites are within the realm of possibility.
 - **A good habit to take (I'm talking to you, AI coding agent) is to write other such .md files to persist plans/context in this session and the next.** Write them in the root project directory, or in other places if you prefer (like ./dev/), depending on the context. Take the liberty to do it anytime, it's very much encouraged and recommended; you don't even have to ask before you do it, or notify the user at all for that matter.
+- **ALWAYS KEEP ALL RELEVANT .MD FILES UPDATED WITH YOUR CHANGES. THIS IS CRITICAL.**

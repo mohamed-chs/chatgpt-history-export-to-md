@@ -6,6 +6,7 @@ from typing import Literal, Protocol, cast
 from questionary import Choice, Style, checkbox, select
 from questionary import path as qst_path
 from questionary import text as qst_text
+import logging
 
 from convoviz.config import ConvovizConfig, OutputKind, get_default_config
 from convoviz.io.loaders import find_latest_zip, validate_zip
@@ -25,6 +26,8 @@ CUSTOM_STYLE = Style(
         ("disabled", "fg:#858585 italic"),
     ]
 )
+
+logger = logging.getLogger(__name__)
 
 
 class _QuestionaryPrompt[T](Protocol):
@@ -74,6 +77,7 @@ def run_interactive_config(initial_config: ConvovizConfig | None = None) -> Conv
         Updated configuration based on user input
     """
     config = initial_config or get_default_config()
+    logger.info("Starting interactive configuration")
 
     # Set sensible defaults if not already set
     if not config.input_path:
@@ -97,6 +101,7 @@ def run_interactive_config(initial_config: ConvovizConfig | None = None) -> Conv
 
     if input_result:
         config.input_path = Path(input_result)
+    logger.debug(f"User selected input: {config.input_path}")
 
     # Prompt for output folder
     output_result: str = _ask_or_cancel(
@@ -109,6 +114,7 @@ def run_interactive_config(initial_config: ConvovizConfig | None = None) -> Conv
 
     if output_result:
         config.output_folder = Path(output_result)
+    logger.debug(f"User selected output: {config.output_folder}")
 
     # Prompt for outputs to generate
     output_choices = [
@@ -126,6 +132,7 @@ def run_interactive_config(initial_config: ConvovizConfig | None = None) -> Conv
     )
 
     config.outputs = set(selected_outputs) if selected_outputs else set()
+    logger.debug(f"User selected outputs: {config.outputs}")
 
     # Prompt for markdown settings (only if markdown output is selected)
     if OutputKind.MARKDOWN in config.outputs:
@@ -144,6 +151,7 @@ def run_interactive_config(initial_config: ConvovizConfig | None = None) -> Conv
             )
             if result:
                 setattr(headers, role, result)
+        logger.debug(f"User selected headers: {headers}")
 
         # Prompt for markdown flavor
         flavor_result = cast(
@@ -160,6 +168,7 @@ def run_interactive_config(initial_config: ConvovizConfig | None = None) -> Conv
 
         if flavor_result:
             config.conversation.markdown.flavor = flavor_result
+        logger.debug(f"User selected flavor: {config.conversation.markdown.flavor}")
 
         # Prompt for YAML headers
         yaml_config = config.conversation.yaml
