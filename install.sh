@@ -54,4 +54,7 @@ success "convoviz installed successfully"
 
 # Done
 echo -e "\n${GREEN}${BOLD}Installation complete!${RESET}"
-echo -e "Run ${BOLD}convoviz${RESET} to get started.\n"
+echo -e "\nTo start using convoviz, either:"
+echo -e "  1. Restart your terminal, or"
+echo -e "  2. Run: ${BOLD}source ~/.local/bin/env${RESET}"
+echo -e "\nThen run ${BOLD}convoviz${RESET} to get started.\n"

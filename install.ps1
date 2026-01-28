@@ -44,4 +44,5 @@ Write-Success "convoviz installed successfully"
 
 # Done
 Write-Host "`nInstallation complete!" -ForegroundColor Green
-Write-Host "Run 'convoviz' to get started.`n"
+Write-Host "`nTo start using convoviz, restart your terminal."
+Write-Host "Then run 'convoviz' to get started.`n"
