@@ -20,29 +20,23 @@ See examples [here](demo).
 
 ### 2. Install the tool 🛠
 
-First, install [uv](https://github.com/astral-sh/uv) (if you don't have it):
+One command to install everything:
 
-MacOS / Linux:
+**Linux / macOS:**
 
 ```bash
-curl -LsSf https://astral.sh/uv/install.sh | sh
+curl -fsSL https://raw.githubusercontent.com/mohamed-chs/chatgpt-history-export-to-md/main/install.sh | bash
 ```
 
-Windows:
+**Windows (PowerShell):**
 
 ```powershell
-powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
+irm https://raw.githubusercontent.com/mohamed-chs/chatgpt-history-export-to-md/main/install.ps1 | iex
 ```
 
-Then install convoviz:
+This installs [uv](https://github.com/astral-sh/uv) (if needed) and convoviz with graphs and word clouds.
 
-```bash
-uv tool install "convoviz[viz]"
-```
-
-The `[viz]` extra includes graphs and word clouds. Skip it for a faster markdown-only install.
-
-### Alternative: pip
+#### Alternative: pip
 
 ```bash
 python3 -m venv .venv

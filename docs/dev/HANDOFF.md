@@ -2,6 +2,14 @@
 
 This document provides context for continuing work on the convoviz project.
 
+## Recent Updates (January 28, 2026)
+
+**Streamlined Installation Scripts**:
+- **New `install.sh`**: One-liner installation for Linux/macOS. Checks for uv, installs if missing, then installs convoviz.
+- **New `install.ps1`**: One-liner installation for Windows PowerShell. Same behavior as bash script.
+- **README**: Added "Quick Install" section with copy-paste commands for both platforms.
+- **Features**: Color output, proper error handling (`set -euo pipefail` / `Try-Catch`), graceful curl/wget fallback.
+
 ## Recent Updates (January 27, 2026)
 
 **Pervasive Logging System**:
