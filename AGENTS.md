@@ -1,12 +1,12 @@
 # AGENTS.md
 
-> **Source of truth**: `CLAUDE.md` and `GEMINI.md` are symlinks to this file in this repo.
+> `CLAUDE.md` and `GEMINI.md` are symlinks to this file.
 
 ## Project Context
 **Convoviz** converts ChatGPT export data (JSON/ZIP) into Markdown, visualizations (Word Clouds, Graphs), and metadata. It handles complex, non-linear conversation trees (DAGs) and polymorphic content types.
 
 ## Operational Commands
-Always use `uv` to run commands in the environment.
+Always use `uv` to run commands in the environment. Favor native CLI tools over manual file modifications whenever possible (e.g., `uv add` instead of editing `pyproject.toml`, or `uv run ruff check --fix` for linting).
 
 - **Test**: `uv run pytest` (Comprehensive), `uv run pytest -x` (Stop on first fail)
 - **Lint**: `uv run ruff check convoviz tests`
