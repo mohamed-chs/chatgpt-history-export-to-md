@@ -3,6 +3,13 @@
 ## Release Workflow
 To publish a new version to PyPI (automated via GitHub Actions):
 
+You can use the helper script:
+```bash
+./scripts/release.sh X.Y.Z
+```
+
+Or perform the steps manually:
+
 ```bash
 # 1. Bump version (patch/minor/major)
 # This updates pyproject.toml and uv.lock
