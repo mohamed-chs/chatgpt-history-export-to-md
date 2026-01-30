@@ -164,7 +164,7 @@ Conversation + Config → render_conversation() → Markdown string
 ## Key Files to Know
 
 | File | Purpose |
-|------|
+|------|---------|
 | `convoviz/config.py` | All configuration models (ConvovizConfig is the main one) |
 | `convoviz/pipeline.py` | Main processing flow - start here to understand the app |
 | `convoviz/io/assets.py`| Logic for finding and copying image assets |
