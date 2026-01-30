@@ -10,7 +10,7 @@
 <p align="center">
   <a href="https://pypi.org/project/convoviz/"><img src="https://img.shields.io/pypi/v/convoviz?style=for-the-badge&logo=python&logoColor=white" alt="PyPI Version"></a>
   <a href="https://github.com/mohamed-chs/convoviz/blob/main/LICENSE"><img src="https://img.shields.io/pypi/l/convoviz?style=for-the-badge" alt="License"></a>
-  <a href="https://pepy.tech/projects/convoviz"><img src="https://img.shields.io/pepy/dt/convoviz?style=for-the-badge" alt="Downloads"></a>
+  <a href="https://pepy.tech/projects/convoviz"><img src="https://img.shields.io/pepy/dt/convoviz?style=for-the-badge&color=blue" alt="Downloads"></a>
   <a href="https://github.com/mohamed-chs/convoviz/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/mohamed-chs/convoviz/ci.yml?style=for-the-badge&logo=github&label=CI" alt="CI Status"></a>
 </p>
 
