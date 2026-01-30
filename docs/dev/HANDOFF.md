@@ -2,6 +2,15 @@
 
 This document provides context for continuing work on the convoviz project.
 
+## Recent Updates (January 30, 2026)
+
+**CONTRIBUTING.md Added**:
+- Created succinct contributor guide covering dev setup, code quality, and testing.
+- Links to existing issue templates.
+
+**CLI Updates**:
+- Added `--version` (`-V`) flag to display version number and exit.
+
 ## Recent Updates (January 28, 2026)
 
 **Streamlined Installation Scripts**:

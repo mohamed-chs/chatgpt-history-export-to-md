@@ -1,9 +1,0 @@
-{
-  "editor.inlayHints.enabled": "onUnlessPressed",
-  "python.analysis.inlayHints.functionReturnTypes": true,
-  "python.analysis.inlayHints.pytestParameters": true,
-  "python.analysis.inlayHints.variableTypes": true,
-  "python.analysis.inlayHints.callArgumentNames": "partial",
-  "python.testing.pytestArgs": ["tests"],
-  "python.testing.pytestEnabled": true
-}

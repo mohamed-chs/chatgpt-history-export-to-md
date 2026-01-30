@@ -1,6 +1,7 @@
 """Command-line interface for convoviz."""
 
 import logging
+from importlib.metadata import version as get_version
 from pathlib import Path
 
 import typer
@@ -20,6 +21,13 @@ app = typer.Typer(
     help="ChatGPT Data Visualizer 📊 - Convert and visualize your ChatGPT history",
 )
 console = Console()
+
+
+def _version_callback(value: bool) -> None:
+    """Print version and exit."""
+    if value:
+        console.print(f"convoviz {get_version('convoviz')}")
+        raise typer.Exit()
 
 
 @app.callback(invoke_without_command=True)
@@ -70,6 +78,14 @@ def run(
         None,
         "--log-file",
         help="Path to log file. Defaults to a temporary file.",
+    ),
+    _version: bool = typer.Option(
+        False,
+        "--version",
+        "-V",
+        help="Show version and exit.",
+        callback=_version_callback,
+        is_eager=True,
     ),
 ) -> None:
     """Convert ChatGPT export data to markdown and generate visualizations."""

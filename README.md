@@ -25,7 +25,7 @@
 | ☁️ **Word Clouds** | Visual breakdowns of your most-used words and phrases |
 | 📈 **Usage Graphs** | Bar plots and charts showing your conversation patterns |
 
-> 💡 **See examples in the [`demo/`](demo) folder!**
+> 💡 **See examples in the [`demo/`](https://github.com/mohamed-chs/convoviz/tree/main/demo) folder!**
 
 ---
 
@@ -149,6 +149,12 @@ Whether you're a tech wizard or you're new to all this, I'd love to hear about y
 👉 **[Open an Issue](https://github.com/mohamed-chs/convoviz/issues)**
 
 And if you've had a great experience, consider giving the project a ⭐ **star**! It keeps me motivated and helps others discover it!
+
+---
+
+## 🤝 Contributing
+
+Interested in contributing? Check out the **[Contributing Guide](https://github.com/mohamed-chs/convoviz/tree/main/CONTRIBUTING.md)** for development setup, code style, and how to submit a pull request.
 
 ---
 
