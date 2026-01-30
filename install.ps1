@@ -36,7 +36,7 @@ if (Test-Command "uv") {
 # Step 2: Install convoviz
 Write-Info "Installing convoviz..."
 try {
-    uv tool install "convoviz[viz]"
+    uv tool install --python ">=3.12" "convoviz[viz]"
 } catch {
     Write-Err "Failed to install convoviz: $_"
 }

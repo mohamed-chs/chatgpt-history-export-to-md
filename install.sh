@@ -49,7 +49,7 @@ fi
 
 # Step 2: Install convoviz
 info "Installing convoviz..."
-uv tool install "convoviz[viz]"
+uv tool install --python ">=3.12" "convoviz[viz]"
 success "convoviz installed successfully"
 
 # Done
