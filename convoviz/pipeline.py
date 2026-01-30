@@ -180,5 +180,5 @@ def run_pipeline(config: ConvovizConfig) -> None:
         f"Explore the full gallery [bold yellow]🖼️[/bold yellow] at: {_safe_uri(output_folder)} 🔗\n\n"
         "I hope you enjoy the outcome 🤞.\n\n"
         "If you appreciate it, kindly give the project a star 🌟 on GitHub:\n\n"
-        "➡️ https://github.com/mohamed-chs/chatgpt-history-export-to-md 🔗\n\n"
+        "➡️ https://github.com/mohamed-chs/convoviz 🔗\n\n"
     )

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Convoviz Installer for Linux/macOS
-# https://github.com/mohamed-chs/chatgpt-history-export-to-md
+# https://github.com/mohamed-chs/convoviz
 
 set -euo pipefail
 

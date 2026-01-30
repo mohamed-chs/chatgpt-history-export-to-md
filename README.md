@@ -25,13 +25,13 @@ One command to install everything:
 **Linux / macOS:**
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/mohamed-chs/chatgpt-history-export-to-md/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/mohamed-chs/convoviz/main/install.sh | bash
 ```
 
 **Windows (PowerShell):**
 
 ```powershell
-irm https://raw.githubusercontent.com/mohamed-chs/chatgpt-history-export-to-md/main/install.ps1 | iex
+irm https://raw.githubusercontent.com/mohamed-chs/convoviz/main/install.ps1 | iex
 ```
 
 This installs [uv](https://github.com/astral-sh/uv) (if needed) and convoviz with graphs and word clouds.
@@ -94,7 +94,7 @@ And that's it! After running the script, head over to the output folder to see y
 
 I hope you find this tool useful. I'm continuously looking to improve on this, but I need your help for that.
 
-Whether you're a tech wizard or you're new to all this, I'd love to hear about your journey with the tool. Found a quirk? Have a suggestion? Or just want to send some good vibes? I'm all ears! (see [issues](https://github.com/mohamed-chs/chatgpt-history-export-to-md/issues))
+Whether you're a tech wizard or you're new to all this, I'd love to hear about your journey with the tool. Found a quirk? Have a suggestion? Or just want to send some good vibes? I'm all ears! (see [issues](https://github.com/mohamed-chs/convoviz/issues))
 
 And if you've had a great experience, consider giving the project a star ⭐. It keeps me motivated and helps others discover it!
 

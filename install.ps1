@@ -1,5 +1,5 @@
 # Convoviz Installer for Windows
-# https://github.com/mohamed-chs/chatgpt-history-export-to-md
+# https://github.com/mohamed-chs/convoviz
 
 $ErrorActionPreference = "Stop"
 

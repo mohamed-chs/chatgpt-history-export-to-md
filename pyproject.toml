@@ -1,6 +1,6 @@
 [project]
 name = "convoviz"
-version = "0.3.9"
+version = "0.4.0"
 description = "Get analytics and visualizations on your ChatGPT data!"
 license = "MIT"
 keywords = [
@@ -34,7 +34,7 @@ viz = [
 ]
 
 [project.urls]
-Repository = "https://github.com/mohamed-chs/chatgpt-history-export-to-md"
+Repository = "https://github.com/mohamed-chs/convoviz"
 
 [build-system]
 requires = ["uv_build"]
