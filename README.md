@@ -8,9 +8,10 @@
 </p>
 
 <p align="center">
-  <a href="https://pypi.org/project/convoviz/"><img src="https://img.shields.io/pypi/v/convoviz?style=flat-square&logo=pypi&logoColor=white&label=PyPI" alt="PyPI Version"></a>
-  <a href="https://pepy.tech/projects/convoviz"><img src="https://static.pepy.tech/personalized-badge/convoviz?period=total&units=INTERNATIONAL_SYSTEM&left_color=GREY&right_color=BLUE&left_text=Downloads" alt="PyPI Downloads"></a>
-  <a href="https://github.com/mohamed-chs/convoviz/blob/main/LICENSE"><img src="https://img.shields.io/github/license/mohamed-chs/convoviz?style=flat-square" alt="License"></a>
+  <a href="https://pypi.org/project/convoviz/"><img src="https://img.shields.io/pypi/v/convoviz?style=for-the-badge&logo=python&logoColor=white" alt="PyPI Version"></a>
+  <a href="https://github.com/mohamed-chs/convoviz/blob/main/LICENSE"><img src="https://img.shields.io/pypi/l/convoviz?style=for-the-badge" alt="License"></a>
+  <a href="https://pepy.tech/projects/convoviz"><img src="https://img.shields.io/pepy/dt/convoviz?style=for-the-badge" alt="Downloads"></a>
+  <a href="https://github.com/mohamed-chs/convoviz/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/mohamed-chs/convoviz/ci.yml?style=for-the-badge&logo=github&label=CI" alt="CI Status"></a>
 </p>
 
 ---
@@ -135,7 +136,7 @@ After running the script, head to your output folder to see:
 - 📝 Neatly formatted Markdown files
 - 📊 Visualizations and graphs
 
-![wordcloud example](demo/wordcloud-example.png)
+![wordcloud example](https://raw.githubusercontent.com/mohamed-chs/convoviz/main/demo/wordcloud-example.png)
 
 ---
 
