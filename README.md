@@ -1,26 +1,50 @@
-# Convoviz 📊: Visualize your entire ChatGPT data
+<p align="center">
+  <h1 align="center">Convoviz 📊</h1>
+  <p align="center"><strong>Visualize your entire ChatGPT data</strong></p>
+  <p align="center">
+    Convert your ChatGPT history into well-formatted Markdown files.<br>
+    Visualize your data with word clouds 🔡☁️ and usage graphs 📈.
+  </p>
+</p>
 
-Convert your ChatGPT history into well-formatted Markdown files. Visualize your data with word clouds 🔡☁️ and usage graphs 📈.
+<p align="center">
+  <a href="https://pypi.org/project/convoviz/"><img src="https://img.shields.io/pypi/v/convoviz?style=flat-square&logo=pypi&logoColor=white&label=PyPI" alt="PyPI Version"></a>
+  <a href="https://github.com/mohamed-chs/convoviz/releases"><img src="https://img.shields.io/github/v/release/mohamed-chs/convoviz?style=flat-square&logo=github&label=Release" alt="GitHub Release"></a>
+  <a href="https://github.com/mohamed-chs/convoviz/blob/main/LICENSE"><img src="https://img.shields.io/github/license/mohamed-chs/convoviz?style=flat-square" alt="License"></a>
+</p>
 
-## Features
+---
 
-- **YAML Headers**: Optional and included by default.
-- **Inline Images**: Media attachments rendered directly in Markdown.
-- **Data Visualizations**: Word clouds, graphs, and more.
+## ✨ Features
 
-See examples [here](demo).
+| Feature | Description |
+|---------|-------------|
+| 📝 **Markdown Export** | Clean, well-formatted Markdown with optional YAML headers |
+| 🖼️ **Inline Images** | Media attachments rendered directly in your Markdown files |
+| ☁️ **Word Clouds** | Visual breakdowns of your most-used words and phrases |
+| 📈 **Usage Graphs** | Bar plots and charts showing your conversation patterns |
 
-## How to Use 📖
+> 💡 **See examples in the [`demo/`](demo) folder!**
 
-### 1. Export Your ChatGPT Data 🗂
+---
 
-- Sign in at [chatgpt.com](https://chatgpt.com).
-- Navigate: Profile Name (bottom left) -> **Settings** -> **Data controls** -> **Export** -> **Confirm export**.
-- Await email from OpenAI and download the `.zip` file.
+## 📖 How to Use
 
-### 2. Install the tool 🛠
+### Step 1: Export Your ChatGPT Data
 
-One command to install everything:
+1. Sign in at [chatgpt.com](https://chatgpt.com)
+2. Navigate to: **Profile Name** (bottom left) → **Settings** → **Data controls** → **Export**
+3. Click **Confirm export**
+4. Wait for the email from OpenAI, then download the `.zip` file
+
+---
+
+### Step 2: Install Convoviz
+
+<details open>
+<summary><strong>🚀 Quick Install (Recommended)</strong></summary>
+
+One command installs everything you need — [uv](https://github.com/astral-sh/uv) (a fast Python package manager) and convoviz with graphs and word clouds.
 
 **Linux / macOS:**
 
@@ -34,71 +58,103 @@ curl -fsSL https://raw.githubusercontent.com/mohamed-chs/convoviz/main/install.s
 irm https://raw.githubusercontent.com/mohamed-chs/convoviz/main/install.ps1 | iex
 ```
 
-This installs [uv](https://github.com/astral-sh/uv) (if needed) and convoviz with graphs and word clouds.
+</details>
 
-#### Alternative: pip
+<details>
+<summary><strong>📦 Alternative: Install with pip</strong></summary>
+
+If you prefer using `pip` directly:
 
 ```bash
+# Create a virtual environment (keeps your system Python clean)
 python3 -m venv .venv
-source .venv/bin/activate  # Windows: .venv\Scripts\activate
+
+# Activate the virtual environment
+source .venv/bin/activate  # On Windows: .venv\Scripts\activate
+
+# Install convoviz with visualization extras
 pip install "convoviz[viz]"
 ```
 
-### 3. Run the tool 🏃‍♂️
+</details>
 
-Simply run the command and follow the prompts:
+---
+
+### Step 3: Run Convoviz
+
+The simplest way is to run the command and follow the interactive prompts:
 
 ```bash
 convoviz
 ```
 
-#### Command Line Arguments
-
-You can provide arguments directly to skip the prompts:
+Or, provide arguments directly to skip the prompts:
 
 ```bash
 convoviz --input path/to/your/export.zip --output path/to/output/folder
 ```
 
-##### Selective Output
+<details>
+<summary><strong>⚙️ Command Line Options</strong></summary>
 
-By default, all outputs are generated. Use `--outputs` to pick specific ones:
+#### Selective Output
+
+By default, all outputs (Markdown, graphs, word clouds) are generated. Use `--outputs` to pick specific ones:
 
 ```bash
 convoviz --input export.zip --outputs markdown --outputs graphs
 ```
 
-Options: `markdown`, `graphs`, `wordclouds`. In interactive mode, you'll be prompted.
+Available options: `markdown`, `graphs`, `wordclouds`
 
-##### Other Notes
+> In interactive mode, you'll be prompted to choose which outputs to generate.
 
-- `--zip` / `-z` is kept as an alias for `--input` for convenience.
-- You can force non-interactive mode with `--no-interactive`.
-- Use `--flat` to put all Markdown files in a single folder instead of organizing by date.
-- Use `--verbose` or `-v` for detailed logging (use `-vv` for debug logs).
-- Use `--log-file` to specify a custom log file (logs default to a temporary file if not specified).
+#### Other Useful Flags
 
-For more options, run:
+| Flag | Description |
+|------|-------------|
+| `--zip` / `-z` | Alias for `--input` (for convenience) |
+| `--no-interactive` | Force non-interactive mode |
+| `--flat` | Put all Markdown files in a single folder (instead of organizing by date) |
+| `--verbose` / `-v` | Enable detailed logging (use `-vv` for debug logs) |
+| `--log-file PATH` | Specify a custom log file location |
+
+For a complete list of options:
 
 ```bash
 convoviz --help
 ```
 
-### 4. Check the Output 🎉
+</details>
 
-And that's it! After running the script, head over to the output folder to see your neatly formatted Markdown files and visualizations.
+---
+
+### Step 4: Check the Output 🎉
+
+After running the script, head to your output folder to see:
+- 📝 Neatly formatted Markdown files
+- 📊 Visualizations and graphs
 
 ![wordcloud example](demo/wordcloud-example.png)
 
-## Share Your Feedback! 💌
+---
+
+## 💌 Share Your Feedback!
 
 I hope you find this tool useful. I'm continuously looking to improve on this, but I need your help for that.
 
-Whether you're a tech wizard or you're new to all this, I'd love to hear about your journey with the tool. Found a quirk? Have a suggestion? Or just want to send some good vibes? I'm all ears! (see [issues](https://github.com/mohamed-chs/convoviz/issues))
+Whether you're a tech wizard or you're new to all this, I'd love to hear about your journey with the tool. Found a quirk? Have a suggestion? Or just want to send some good vibes? I'm all ears!
 
-And if you've had a great experience, consider giving the project a star ⭐. It keeps me motivated and helps others discover it!
+👉 **[Open an Issue](https://github.com/mohamed-chs/convoviz/issues)**
 
-## Notes
+And if you've had a great experience, consider giving the project a ⭐ **star**! It keeps me motivated and helps others discover it!
+
+---
+
+## 📝 Notes
+
+<details>
+<summary><strong>About This Project</strong></summary>
 
 This is just a small thing I coded to help me see my convos in beautiful markdown. It was originally built with [Obsidian](https://obsidian.md/) (my go-to note-taking app) in mind, but the default output is standard Markdown.
 
@@ -106,9 +162,17 @@ I wasn't a fan of the clunky, and sometimes paid, browser extensions.
 
 It was also a great opportunity to learn more about Python and type annotations. I had mypy, pyright, and ruff all on strict mode, 'twas fun.
 
-It should(?) also work as library, so you can import and use the models and functions. I need to add more documentation for that tho. Feel free to reach out if you need help.
+</details>
 
-### Offline / reproducible runs
+<details>
+<summary><strong>Using as a Library</strong></summary>
+
+It should also work as a library, so you can import and use the models and functions. I need to add more documentation for that though. Feel free to reach out if you need help.
+
+</details>
+
+<details>
+<summary><strong>Offline / Reproducible Runs</strong></summary>
 
 Word clouds use NLTK stopwords. If you're offline and NLTK data isn't installed yet, pre-download it:
 
@@ -116,6 +180,11 @@ Word clouds use NLTK stopwords. If you're offline and NLTK data isn't installed 
 python -c "import nltk; nltk.download('stopwords')"
 ```
 
-### Bookmarklet
+</details>
 
-There's also a JavaScript bookmarklet flow under `js/` (experimental) for exporting additional conversation data outside the official ZIP export.
+<details>
+<summary><strong>Bookmarklet (Experimental)</strong></summary>
+
+There's also a JavaScript bookmarklet flow under `js/` for exporting additional conversation data outside the official ZIP export. This is experimental.
+
+</details>
