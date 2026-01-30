@@ -11,6 +11,10 @@ This document provides context for continuing work on the convoviz project.
 **CLI Updates**:
 - Added `--version` (`-V`) flag to display version number and exit.
 
+**Issue Templates Refreshed**:
+- Rewrote `bug_report.md`, `feature_request.md`, and `general_feedback.md` to be more specific and aligned with `CONTRIBUTING.md`.
+- Added fields for system info, version numbers, and logs in bug reports.
+
 ## Recent Updates (January 28, 2026)
 
 **Streamlined Installation Scripts**:
