@@ -2,7 +2,12 @@
   <h1 align="center">Convoviz 📊</h1>
   <p align="center"><strong>Visualize your entire ChatGPT data</strong></p>
   <p align="center">
-    Convert your ChatGPT history into well-formatted Markdown files.<br>
+    Convert your ChatGPT history into clean, readable Markdown (text files).
+  </p>
+  <p align="center"><strong>
+    Perfect for archiving, local search, or use with note-taking apps like Obsidian.
+  </strong></p>
+  <p align="center">
     Visualize your data with word clouds 🔡☁️ and usage graphs 📈.
   </p>
 </p>
@@ -42,24 +47,28 @@
 
 ### Step 2: Install Convoviz
 
-<details open>
-<summary><strong>🚀 Quick Install (Recommended)</strong></summary>
+### 🚀 Quick Install
 
-One command installs everything you need — [uv](https://github.com/astral-sh/uv) (a fast Python package manager) and convoviz with graphs and word clouds.
+Run one of the commands below to install **everything** you need automatically.
 
-**Linux / macOS:**
+#### 🍎 macOS / 🐧 Linux
+1. Open `Terminal`.
+   - **macOS**: Press `Cmd + Space`, type "Terminal", and hit Enter.
+   - **Linux**: Press `Ctrl + Alt + T`, or search "Terminal" in your app menu.
+2. Copy and paste this command:
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/mohamed-chs/convoviz/main/install.sh | bash
 ```
 
-**Windows (PowerShell):**
+#### 🪟 Windows
+1. Open `PowerShell`.
+   - Press the `Windows` key, type "PowerShell", and hit Enter.
+2. Copy and paste this command:
 
 ```powershell
 irm https://raw.githubusercontent.com/mohamed-chs/convoviz/main/install.ps1 | iex
 ```
-
-</details>
 
 <details>
 <summary><strong>📦 Alternative: Install with pip</strong></summary>
@@ -83,7 +92,7 @@ pip install "convoviz[viz]"
 
 ### Step 3: Run Convoviz
 
-The simplest way is to run the command and follow the interactive prompts:
+The simplest way is to run this in your terminal and follow the interactive prompts:
 
 ```bash
 convoviz
@@ -132,7 +141,7 @@ convoviz --help
 
 ### Step 4: Check the Output 🎉
 
-After running the script, head to your output folder to see:
+After running the script, head to your output folder (defaults to `Documents/ChatGPT-Data` if you didn't change it) to see:
 - 📝 Neatly formatted Markdown files
 - 📊 Visualizations and graphs
 
