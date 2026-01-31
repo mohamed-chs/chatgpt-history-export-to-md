@@ -27,6 +27,16 @@ Check existing issues first. Describe the problem you're solving and your propos
 
 ---
 
+## Looking for Ideas?
+
+Contributions are particularly welcome in the following areas:
+
+### 📊 Enriching Graph Visualizations
+
+The current graph visualizations (`convoviz/analysis/graphs.py`) are kinda lacking. Contributions that make them more meaningful, insightful, and visually appealing are highly appreciated.
+
+---
+
 ## Development Setup
 
 **Prerequisites**: Python 3.12+, [uv](https://github.com/astral-sh/uv)
