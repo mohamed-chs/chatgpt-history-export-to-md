@@ -1,37 +1,41 @@
 [project]
 name = "convoviz"
-version = "0.4.3"
-description = "Get analytics and visualizations on your ChatGPT data!"
+version = "0.4.4"
+description = "Convert your ChatGPT export (ZIP) into clean Markdown text files with inline media, and generate data visualizations like word clouds and usage graphs."
 license = "MIT"
 keywords = [
-    "markdown", "chatgpt", "openai", "visualization",
-    "analytics", "json", "export", "data-analysis", "obsidian"
+  "markdown",
+  "chatgpt",
+  "openai",
+  "visualization",
+  "analytics",
+  "json",
+  "export",
+  "data-analysis",
+  "obsidian",
 ]
 classifiers = [
-    "License :: OSI Approved :: MIT License",
-    "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.12",
+  "License :: OSI Approved :: MIT License",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.12",
 ]
 readme = "README.md"
 requires-python = ">=3.12"
 authors = [
-    { name = "Mohamed Cheikh Sidiya", email = "mohamedcheikhsidiya77@gmail.com" }
+  { name = "Mohamed Cheikh Sidiya", email = "mohamedcheikhsidiya77@gmail.com" },
 ]
 dependencies = [
-    "orjson>=3.11.5",
-    "pydantic>=2.12.5",
-    "pydantic-settings>=2.7.0",
-    "questionary>=2.1.1",
-    "rich>=14.2.0",
-    "tqdm>=4.67.1",
-    "typer>=0.21.0",
+  "orjson>=3.11.5",
+  "pydantic>=2.12.5",
+  "pydantic-settings>=2.7.0",
+  "questionary>=2.1.1",
+  "rich>=14.2.0",
+  "tqdm>=4.67.1",
+  "typer>=0.21.0",
 ]
 
 [project.optional-dependencies]
-viz = [
-    "nltk>=3.9.2",
-    "wordcloud>=1.9.5",
-]
+viz = ["nltk>=3.9.2", "wordcloud>=1.9.5"]
 
 [project.urls]
 Repository = "https://github.com/mohamed-chs/convoviz"
@@ -46,17 +50,17 @@ module-root = "."
 
 # Files to exclude from the Source Distribution (sdist)
 source-exclude = [
-    ".github",
-    ".vscode",
-    ".gitattributes",
-    ".gitignore",
-    "dev",
-    "playground.ipynb",
-    "pyproject.toml.bak",
-    "uv.lock",
-    "demo",
-    "js",
-    "tests",
+  ".github",
+  ".vscode",
+  ".gitattributes",
+  ".gitignore",
+  "dev",
+  "playground.ipynb",
+  "pyproject.toml.bak",
+  "uv.lock",
+  "demo",
+  "js",
+  "tests",
 ]
 
 [project.scripts]
@@ -64,13 +68,13 @@ convoviz = "convoviz.cli:main_entry"
 
 [dependency-groups]
 dev = [
-    "pytest>=8.4.2",
-    "ruff>=0.14.10",
-    "ty>=0.0.11",
-    "types-tqdm>=4.67.0.20250809",
-    # Viz extras for testing (wordcloud pulls in matplotlib + pillow)
-    "nltk>=3.9.2",
-    "wordcloud>=1.9.5",
+  "pytest>=8.4.2",
+  "ruff>=0.14.10",
+  "ty>=0.0.11",
+  "types-tqdm>=4.67.0.20250809",
+  # Viz extras for testing (wordcloud pulls in matplotlib + pillow)
+  "nltk>=3.9.2",
+  "wordcloud>=1.9.5",
 ]
 
 [tool.ruff]
@@ -79,19 +83,19 @@ line-length = 100
 
 [tool.ruff.lint]
 select = [
-    "E",      # pycodestyle errors
-    "W",      # pycodestyle warnings
-    "F",      # Pyflakes
-    "I",      # isort
-    "B",      # flake8-bugbear
-    "C4",     # flake8-comprehensions
-    "UP",     # pyupgrade
-    "ARG",    # flake8-unused-arguments
-    "SIM",    # flake8-simplify
+  "E",   # pycodestyle errors
+  "W",   # pycodestyle warnings
+  "F",   # Pyflakes
+  "I",   # isort
+  "B",   # flake8-bugbear
+  "C4",  # flake8-comprehensions
+  "UP",  # pyupgrade
+  "ARG", # flake8-unused-arguments
+  "SIM", # flake8-simplify
 ]
 ignore = [
-    "E501",   # line too long (handled by formatter)
-    "B008",   # do not perform function calls in argument defaults
+  "E501", # line too long (handled by formatter)
+  "B008", # do not perform function calls in argument defaults
 ]
 
 [tool.ruff.lint.isort]
