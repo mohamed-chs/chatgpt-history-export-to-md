@@ -2,6 +2,11 @@
 
 This document provides context for continuing work on the convoviz project.
 
+## Recent Updates (January 31, 2026)
+
+**Improved Installation Scripts**:
+- Both `install.sh` and `install.ps1` now include a step to pre-download NLTK stopwords using `uv run --with nltk`. This ensures that word cloud generation is ready to use immediately after installation without waiting for a download on the first run.
+
 ## Recent Updates (January 30, 2026)
 
 **CONTRIBUTING.md Added**:

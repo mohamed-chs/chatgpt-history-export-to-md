@@ -42,6 +42,15 @@ try {
 }
 Write-Success "convoviz installed successfully"
 
+# Step 3: Download NLTK stopwords
+Write-Info "Downloading NLTK stopwords..."
+try {
+    uv run --with nltk python -c "import nltk; nltk.download('stopwords')"
+} catch {
+    Write-Warning "Failed to download NLTK stopwords: $_"
+}
+Write-Success "NLTK stopwords downloaded successfully"
+
 # Done
 Write-Host "`nInstallation complete!" -ForegroundColor Green
 Write-Host "`nTo start using convoviz, restart your terminal."

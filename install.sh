@@ -52,6 +52,11 @@ info "Installing convoviz..."
 uv tool install --python ">=3.12" "convoviz[viz]"
 success "convoviz installed successfully"
 
+# Step 3: Download NLTK stopwords
+info "Downloading NLTK stopwords..."
+uv run --with nltk python -c "import nltk; nltk.download('stopwords')"
+success "NLTK stopwords downloaded successfully"
+
 # Done
 echo -e "\n${GREEN}${BOLD}Installation complete!${RESET}"
 echo -e "\nTo start using convoviz, either:"
