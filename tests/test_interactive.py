@@ -204,3 +204,43 @@ def test_markdown_prompts_skipped_when_not_selected(
     assert checkbox_call_count[0] == 1
     # Verify only graphs selected
     assert config.outputs == {OutputKind.GRAPHS}
+
+
+def test_outputs_prompt_respects_existing_config(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Test that the outputs prompt respects the pre-existing configuration."""
+    import convoviz.interactive as interactive
+
+    # Setup mocks
+    monkeypatch.setattr(interactive, "find_latest_zip", lambda: None)
+
+    captured_choices = []
+
+    def fake_checkbox(*_a, **_k):
+        choices = _k.get("choices", _a[1] if len(_a) > 1 else [])
+        captured_choices.append(choices)
+        # Simulate user pressing enter immediately (returning the checked items)
+        selected = [c.value for c in choices if c.checked]
+        return FakePrompt(selected)
+
+    monkeypatch.setattr(interactive, "checkbox", fake_checkbox)
+    # Mock other prompts to just return defaults
+    monkeypatch.setattr(interactive, "qst_path", lambda *_a, **_k: FakePrompt("dummy"))
+    # Mock text/select just in case
+    monkeypatch.setattr(interactive, "qst_text", lambda *_a, **_k: FakePrompt("val"))
+    monkeypatch.setattr(interactive, "select", lambda *_a, **_k: FakePrompt("val"))
+
+    # Create a config with ONLY Markdown selected
+    initial_config = get_default_config()
+    initial_config.outputs = {OutputKind.MARKDOWN}
+
+    # Run
+    run_interactive_config(initial_config)
+
+    # Verify the first checkbox (Outputs) had only Markdown checked
+    output_choices = captured_choices[0]
+
+    markdown_choice = next(c for c in output_choices if c.value == OutputKind.MARKDOWN)
+    graphs_choice = next(c for c in output_choices if c.value == OutputKind.GRAPHS)
+
+    assert markdown_choice.checked is True
+    assert graphs_choice.checked is False

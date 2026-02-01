@@ -110,6 +110,13 @@ uv run ruff check convoviz tests && uv run ty check convoviz && uv run pytest
 - **A GOOD HABIT TO HAVE (I'm talking to you, AI coding agent) is to write other such .md files to persist plans/context in this session and the next.** Write them in the root project directory, or in other places if you prefer (like ./dev/), depending on the context. Take the liberty to do it anytime, it's very much encouraged and recommended; you don't even have to ask before you do it, or notify the user at all for that matter.
 - **ALWAYS KEEP ALL RELEVANT .MD FILES UPDATED WITH YOUR CHANGES. THIS IS CRITICAL.**
 
+## Recent Updates (February 1, 2026)
+
+**Interactive CLI Fixes**:
+- **Fixed "Outputs State Amnesia"**: The interactive prompt for selecting outputs (Markdown, Graphs, Wordclouds) now correctly respects the pre-existing configuration passed from CLI flags. Previously, it would reset to default (all selected).
+- **Dynamic Configuration Prompts**: Refactored `interactive.py` to generate choices dynamically from `OutputKind` enum and `YAMLConfig` Pydantic model. This improves maintainability and ensures new options are automatically available in the interactive mode.
+- **Regression Tests**: Added `test_outputs_prompt_respects_existing_config` to `tests/test_interactive.py`.
+
 ## Recent Updates (January 31, 2026)
 
 **Improved Installation Scripts**:

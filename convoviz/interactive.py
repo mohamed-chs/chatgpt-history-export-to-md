@@ -8,9 +8,15 @@ from questionary import Choice, Style, checkbox, select
 from questionary import path as qst_path
 from questionary import text as qst_text
 
-from convoviz.config import ConvovizConfig, OutputKind, get_default_config
+from convoviz.config import ConvovizConfig, OutputKind, YAMLConfig, get_default_config
 from convoviz.io.loaders import find_latest_zip, validate_zip
 from convoviz.utils import colormaps, default_font_path, font_names, font_path, validate_header
+
+OUTPUT_TITLES = {
+    OutputKind.MARKDOWN: "Markdown conversations",
+    OutputKind.GRAPHS: "Graphs (usage analytics)",
+    OutputKind.WORDCLOUDS: "Word clouds",
+}
 
 CUSTOM_STYLE = Style(
     [
@@ -118,9 +124,12 @@ def run_interactive_config(initial_config: ConvovizConfig | None = None) -> Conv
 
     # Prompt for outputs to generate
     output_choices = [
-        Choice(title="Markdown conversations", value=OutputKind.MARKDOWN, checked=True),
-        Choice(title="Graphs (usage analytics)", value=OutputKind.GRAPHS, checked=True),
-        Choice(title="Word clouds", value=OutputKind.WORDCLOUDS, checked=True),
+        Choice(
+            title=OUTPUT_TITLES.get(kind, kind.value.title()),
+            value=kind,
+            checked=kind in config.outputs,
+        )
+        for kind in OutputKind
     ]
 
     selected_outputs: list[OutputKind] = _ask_or_cancel(
@@ -172,20 +181,9 @@ def run_interactive_config(initial_config: ConvovizConfig | None = None) -> Conv
 
         # Prompt for YAML headers
         yaml_config = config.conversation.yaml
+        yaml_fields = list(YAMLConfig.model_fields.keys())
         yaml_choices = [
-            Choice(title=field, checked=getattr(yaml_config, field))
-            for field in [
-                "title",
-                "tags",
-                "chat_link",
-                "create_time",
-                "update_time",
-                "model",
-                "used_plugins",
-                "message_count",
-                "content_types",
-                "custom_instructions",
-            ]
+            Choice(title=field, checked=getattr(yaml_config, field)) for field in yaml_fields
         ]
 
         selected: list[str] = _ask_or_cancel(
@@ -197,18 +195,7 @@ def run_interactive_config(initial_config: ConvovizConfig | None = None) -> Conv
         )
 
         selected_set = set(selected)
-        for field_name in [
-            "title",
-            "tags",
-            "chat_link",
-            "create_time",
-            "update_time",
-            "model",
-            "used_plugins",
-            "message_count",
-            "content_types",
-            "custom_instructions",
-        ]:
+        for field_name in yaml_fields:
             setattr(yaml_config, field_name, field_name in selected_set)
 
     # Prompt for wordcloud settings (only if wordclouds output is selected)
