@@ -145,6 +145,8 @@ After running the script, head to your output folder (defaults to `Documents/Cha
 - 📝 Neatly formatted Markdown files
 - 📊 Visualizations and graphs
 
+If you've had a great experience, consider giving the project a ⭐ **star**! It keeps me motivated and helps others discover it!
+
 ![wordcloud example](https://raw.githubusercontent.com/mohamed-chs/convoviz/main/demo/wordcloud-example.png)
 
 ---
@@ -156,8 +158,6 @@ I hope you find this tool useful. I'm continuously looking to improve on this, b
 Whether you're a tech wizard or you're new to all this, I'd love to hear about your journey with the tool. Found a quirk? Have a suggestion? Or just want to send some good vibes? I'm all ears!
 
 👉 **[Open an Issue](https://github.com/mohamed-chs/convoviz/issues)**
-
-And if you've had a great experience, consider giving the project a ⭐ **star**! It keeps me motivated and helps others discover it!
 
 ---
 
