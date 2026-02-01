@@ -170,6 +170,19 @@ Interested in contributing? Check out the **[Contributing Guide](https://github.
 ## 📝 Notes
 
 <details>
+<summary><strong>Offline</strong></summary>
+
+Word clouds use NLTK stopwords. If you're offline and NLTK data isn't installed yet, pre-download it:
+
+```bash
+python -c "import nltk; nltk.download('stopwords')"
+```
+
+**NOTE:** The install script already handles this, so you can immediately go offline after running it.
+
+</details>
+
+<details>
 <summary><strong>About This Project</strong></summary>
 
 This is just a small thing I coded to help me see my convos in beautiful markdown. It was originally built with [Obsidian](https://obsidian.md/) (my go-to note-taking app) in mind, but the default output is standard Markdown.
@@ -184,17 +197,6 @@ It was also a great opportunity to learn more about Python and type annotations.
 <summary><strong>Using as a Library</strong></summary>
 
 It should also work as a library, so you can import and use the models and functions. I need to add more documentation for that though. Feel free to reach out if you need help.
-
-</details>
-
-<details>
-<summary><strong>Offline / Reproducible Runs</strong></summary>
-
-Word clouds use NLTK stopwords. If you're offline and NLTK data isn't installed yet, pre-download it:
-
-```bash
-python -c "import nltk; nltk.download('stopwords')"
-```
 
 </details>
 

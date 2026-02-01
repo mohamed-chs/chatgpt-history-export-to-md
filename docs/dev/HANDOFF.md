@@ -2,6 +2,114 @@
 
 This document provides context for continuing work on the convoviz project.
 
+## System Architecture
+
+### Module Structure
+
+```
+convoviz/
+├── __init__.py          # Public API exports
+├── __main__.py          # python -m convoviz entry
+├── cli.py               # Typer CLI
+├── config.py            # Pydantic configuration models
+├── exceptions.py        # Custom exception hierarchy
+├── interactive.py       # Questionary prompts
+├── pipeline.py          # Main processing pipeline
+├── utils.py             # Utility functions
+├── models/              # Pure data models (Pydantic)
+│   ├── message.py       # Message, MessageAuthor, Content
+│   ├── node.py          # Node (tree structure)
+│   ├── conversation.py  # Conversation logic
+│   └── collection.py    # ConversationCollection
+├── renderers/           # Rendering logic
+│   ├── markdown.py      # Markdown generation
+│   └── yaml.py          # YAML frontmatter
+├── io/                  # File I/O
+│   ├── loaders.py       # ZIP/JSON loading
+│   ├── writers.py       # File writing
+│   └── assets.py        # Asset management (New)
+└── analysis/            # Visualizations
+    ├── graphs.py        # Bar plots
+    └── wordcloud.py     # Word clouds
+```
+
+### Important Patterns
+
+#### Configuration Flow
+```
+get_default_config() → ConvovizConfig
+    └── Can be modified directly or via interactive prompts
+    └── Passed to run_pipeline(config)
+```
+
+#### Data Flow
+```
+Input (ZIP/Dir/JSON) → loaders.py → ConversationCollection
+    └── Contains list of Conversation objects
+    └── Sets source_path for asset resolution
+```
+
+#### Rendering Flow
+```
+Conversation + Config → render_conversation() → Markdown string
+    └── Uses render_yaml_header() for frontmatter
+    └── Uses render_node() for each message
+    └── Uses asset_resolver callback to copy/link images
+```
+
+## Key Files to Know
+
+| File | Purpose |
+|------|---------|
+| `convoviz/config.py` | All configuration models (ConvovizConfig is the main one) |
+| `convoviz/pipeline.py` | Main processing flow - start here to understand the app |
+| `convoviz/io/assets.py`| Logic for finding and copying image assets |
+| `AGENTS.md` | Context and operational guidelines for AI agents |
+
+## Running the Project
+
+```bash
+# Install dependencies
+uv sync
+
+# Run CLI
+uv run convoviz --help
+uv run convoviz --input export.zip --output ./output
+uv run convoviz --input ./extracted_export_dir --output ./output
+
+# Full quality check (Tests + Type + Lint)
+uv run ruff check convoviz tests && uv run ty check convoviz && uv run pytest
+```
+
+## Known Quirks & Gotchas
+
+1.  **ChatGPT Data Structure**: It is a **Directed Acyclic Graph (DAG)**, not a linear list.
+2.  **Polymorphic Content**: The `parts` field in messages can contain strings (text) OR dictionaries (images, tool calls).
+3.  **Asset Resolution**: Images (DALL-E) are often in a `dalle-generations` subfolder (WebP), while user uploads are in the root. The code handles both.
+4.  **Asset Pointer Protocols**: Modern exports use `sediment://` protocol; legacy used `file-service://`.
+5.  **New Content Types (2025)**: `reasoning_recap`, `thoughts`, `tether_quote` for o1/o3 reasoning models — now supported.
+6.  **New Asset Folders (2025)**: `user-{id}/` directories contain system-generated images in PNG format — now supported.
+
+## What's NOT Done (Roadmap)
+
+- [ ] **Custom Instructions Export**: Re-enable and fix `custom_instructions.json` export (currently disabled).
+- [x] **Optional Dependencies**: Visualization deps (`wordcloud`, `nltk`) are now in the optional `[viz]` extra. Markdown-only installs are fast. Runtime guards provide clear install guidance when deps are missing.
+- [ ] **Performance**: Large exports with thousands of images might be slow to copy. Consider async copy.
+- [ ] **Citations**: Parse invisible characters/metadata in ChatGPT exports that denote citations.
+- [ ] **Canvas Support**: Research and implement support for "Canvas" content.
+- [x] **Interactive Tests**: Added tests covering cancellation behavior and prompt flow (`tests/test_interactive.py`).
+- [ ] **Cross-Platform**: Loaders for Claude and Gemini are planned but not started.
+- [x] **Schema Documentation**: Updated spec at `docs/chatgpt-spec-unofficial-v2.md` (Jan 2026).
+- [x] **Reasoning Content**: Support `reasoning_recap` and `thoughts` content types from o1/o3 models.
+- [x] **Selectable Outputs**: Users can choose which outputs to generate (Markdown, Graphs, Wordclouds).
+
+## Meta-Notes
+- This is a working document for brainstorming and info-sharing; it is not a directive.
+- It's the entry point for working/continuing work on the project.
+- Try to keep it updated; complete rewrites are within the realm of possibility.
+- **A GOOD HABIT TO HAVE (I'm talking to you, AI coding agent) is to write other such .md files to persist plans/context in this session and the next.** Write them in the root project directory, or in other places if you prefer (like ./dev/), depending on the context. Take the liberty to do it anytime, it's very much encouraged and recommended; you don't even have to ask before you do it, or notify the user at all for that matter.
+- **ALWAYS KEEP ALL RELEVANT .MD FILES UPDATED WITH YOUR CHANGES. THIS IS CRITICAL.**
+
 ## Recent Updates (January 31, 2026)
 
 **Improved Installation Scripts**:
@@ -124,110 +232,3 @@ This document provides context for continuing work on the convoviz project.
 - **Collection merge correctness**: Fixed `ConversationCollection.update()` so it won’t skip “new but older-timestamped” conversations (common with bookmarklet data). Added tests.
 - **YAML frontmatter correctness**: YAML frontmatter is now emitted as real YAML (quoted strings, lists/dicts, ISO datetimes) and supports `tags` when enabled.
 
-## System Architecture
-
-### Module Structure
-
-```
-convoviz/
-├── __init__.py          # Public API exports
-├── __main__.py          # python -m convoviz entry
-├── cli.py               # Typer CLI
-├── config.py            # Pydantic configuration models
-├── exceptions.py        # Custom exception hierarchy
-├── interactive.py       # Questionary prompts
-├── pipeline.py          # Main processing pipeline
-├── utils.py             # Utility functions
-├── models/              # Pure data models (Pydantic)
-│   ├── message.py       # Message, MessageAuthor, Content
-│   ├── node.py          # Node (tree structure)
-│   ├── conversation.py  # Conversation logic
-│   └── collection.py    # ConversationCollection
-├── renderers/           # Rendering logic
-│   ├── markdown.py      # Markdown generation
-│   └── yaml.py          # YAML frontmatter
-├── io/                  # File I/O
-│   ├── loaders.py       # ZIP/JSON loading
-│   ├── writers.py       # File writing
-│   └── assets.py        # Asset management (New)
-└── analysis/            # Visualizations
-    ├── graphs.py        # Bar plots
-    └── wordcloud.py     # Word clouds
-```
-
-### Important Patterns
-
-#### Configuration Flow
-```
-get_default_config() → ConvovizConfig
-    └── Can be modified directly or via interactive prompts
-    └── Passed to run_pipeline(config)
-```
-
-#### Data Flow
-```
-Input (ZIP/Dir/JSON) → loaders.py → ConversationCollection
-    └── Contains list of Conversation objects
-    └── Sets source_path for asset resolution
-```
-
-#### Rendering Flow
-```
-Conversation + Config → render_conversation() → Markdown string
-    └── Uses render_yaml_header() for frontmatter
-    └── Uses render_node() for each message
-    └── Uses asset_resolver callback to copy/link images
-```
-
-## Key Files to Know
-
-| File | Purpose |
-|------|---------|
-| `convoviz/config.py` | All configuration models (ConvovizConfig is the main one) |
-| `convoviz/pipeline.py` | Main processing flow - start here to understand the app |
-| `convoviz/io/assets.py`| Logic for finding and copying image assets |
-| `AGENTS.md` | Context and operational guidelines for AI agents |
-
-## Running the Project
-
-```bash
-# Install dependencies
-uv sync
-
-# Run CLI
-uv run convoviz --help
-uv run convoviz --input export.zip --output ./output
-uv run convoviz --input ./extracted_export_dir --output ./output
-
-# Full quality check (Tests + Type + Lint)
-uv run ruff check convoviz tests && uv run ty check convoviz && uv run pytest
-```
-
-## Known Quirks & Gotchas
-
-1.  **ChatGPT Data Structure**: It is a **Directed Acyclic Graph (DAG)**, not a linear list.
-2.  **Polymorphic Content**: The `parts` field in messages can contain strings (text) OR dictionaries (images, tool calls).
-3.  **Asset Resolution**: Images (DALL-E) are often in a `dalle-generations` subfolder (WebP), while user uploads are in the root. The code handles both.
-4.  **Asset Pointer Protocols**: Modern exports use `sediment://` protocol; legacy used `file-service://`.
-5.  **New Content Types (2025)**: `reasoning_recap`, `thoughts`, `tether_quote` for o1/o3 reasoning models — now supported.
-6.  **New Asset Folders (2025)**: `user-{id}/` directories contain system-generated images in PNG format — now supported.
-
-## What's NOT Done (Roadmap)
-
-- [ ] **Custom Instructions Export**: Re-enable and fix `custom_instructions.json` export (currently disabled).
-- [x] **Optional Dependencies**: Visualization deps (`wordcloud`, `nltk`) are now in the optional `[viz]` extra. Markdown-only installs are fast. Runtime guards provide clear install guidance when deps are missing.
-- [ ] **Performance**: Large exports with thousands of images might be slow to copy. Consider async copy.
-- [ ] **Citations**: Parse invisible characters/metadata in ChatGPT exports that denote citations.
-- [ ] **Canvas Support**: Research and implement support for "Canvas" content.
-- [x] **Interactive Tests**: Added tests covering cancellation behavior and prompt flow (`tests/test_interactive.py`).
-- [ ] **Cross-Platform**: Loaders for Claude and Gemini are planned but not started.
-- [x] **Schema Documentation**: Updated spec at `docs/chatgpt-spec-unofficial-v2.md` (Jan 2026).
-- [x] **Reasoning Content**: Support `reasoning_recap` and `thoughts` content types from o1/o3 models.
-- [x] **Selectable Outputs**: Users can choose which outputs to generate (Markdown, Graphs, Wordclouds).
-
-## Meta-Notes
-- This is a working document for brainstorming and info-sharing; it is not a directive.
-- It's the entry point for working/continuing work on the project.
-- Try to keep it updated; complete rewrites are within the realm of possibility.
-- **A GOOD HABIT TO HAVE (I'm talking to you, AI coding agent) is to write other such .md files to persist plans/context in this session and the next.** Write them in the root project directory, or in other places if you prefer (like ./dev/), depending on the context. Take the liberty to do it anytime, it's very much encouraged and recommended; you don't even have to ask before you do it, or notify the user at all for that matter.
-- **ALWAYS KEEP ALL RELEVANT .MD FILES UPDATED WITH YOUR CHANGES. THIS IS CRITICAL.**

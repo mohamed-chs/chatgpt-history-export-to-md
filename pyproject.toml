@@ -2,6 +2,11 @@
 name = "convoviz"
 version = "0.4.4"
 description = "Convert your ChatGPT export (ZIP) into clean Markdown text files with inline media, and generate data visualizations like word clouds and usage graphs."
+readme = "README.md"
+requires-python = ">=3.12"
+authors = [
+  { name = "Mohamed Cheikh Sidiya", email = "mohamedcheikhsidiya77@gmail.com" },
+]
 license = "MIT"
 keywords = [
   "markdown",
@@ -19,11 +24,6 @@ classifiers = [
   "Programming Language :: Python :: 3",
   "Programming Language :: Python :: 3.12",
 ]
-readme = "README.md"
-requires-python = ">=3.12"
-authors = [
-  { name = "Mohamed Cheikh Sidiya", email = "mohamedcheikhsidiya77@gmail.com" },
-]
 dependencies = [
   "orjson>=3.11.5",
   "pydantic>=2.12.5",
@@ -34,37 +34,11 @@ dependencies = [
   "typer>=0.21.0",
 ]
 
-[project.optional-dependencies]
-viz = ["nltk>=3.9.2", "wordcloud>=1.9.5"]
-
 [project.urls]
 Repository = "https://github.com/mohamed-chs/convoviz"
 
-[build-system]
-requires = ["uv_build"]
-build-backend = "uv_build"
-
-[tool.uv.build-backend]
-# Add this line to tell uv your code is in the root, not in src/
-module-root = "."
-
-# Files to exclude from the Source Distribution (sdist)
-source-exclude = [
-  ".github",
-  ".vscode",
-  ".gitattributes",
-  ".gitignore",
-  "dev",
-  "playground.ipynb",
-  "pyproject.toml.bak",
-  "uv.lock",
-  "demo",
-  "js",
-  "tests",
-]
-
-[project.scripts]
-convoviz = "convoviz.cli:main_entry"
+[project.optional-dependencies]
+viz = ["nltk>=3.9.2", "wordcloud>=1.9.5"]
 
 [dependency-groups]
 dev = [
@@ -75,7 +49,19 @@ dev = [
   # Viz extras for testing (wordcloud pulls in matplotlib + pillow)
   "nltk>=3.9.2",
   "wordcloud>=1.9.5",
+  "poethepoet>=0.40.0",
 ]
+
+# run with 'uv run poe <task>' eg. 'uv run poe fmt'
+# or if poe is installed globally, 'poe fmt'
+[tool.poe.tasks]
+lint = "ruff check --fix convoviz tests"
+fmt = "ruff format"
+test = "pytest"
+ty = "ty check convoviz"
+
+[project.scripts]
+convoviz = "convoviz.cli:main_entry"
 
 [tool.ruff]
 target-version = "py312"
@@ -107,3 +93,26 @@ python-version = "3.12"
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 pythonpath = ["."]
+
+[build-system]
+requires = ["uv_build"]
+build-backend = "uv_build"
+
+[tool.uv.build-backend]
+# Add this line to tell uv your code is in the root, not in src/
+module-root = "."
+
+# Files to exclude from the Source Distribution (sdist)
+source-exclude = [
+  ".github",
+  ".vscode",
+  ".gitattributes",
+  ".gitignore",
+  "dev",
+  "playground.ipynb",
+  "pyproject.toml.bak",
+  "uv.lock",
+  "demo",
+  "js",
+  "tests",
+]
