@@ -92,7 +92,7 @@ def run_interactive_config(initial_config: ConvovizConfig | None = None) -> Conv
     input_default = str(config.input_path) if config.input_path else ""
     input_result: str = _ask_or_cancel(
         qst_path(
-            "Enter the path to the export ZIP, conversations JSON, or extracted directory:",
+            "Enter the path to the export ZIP:",  # , conversations JSON, or extracted directory:",
             default=input_default,
             validate=_validate_input_path,
             style=CUSTOM_STYLE,
