@@ -13,16 +13,32 @@ Always use `uv` to run commands in the environment. Favor native CLI tools over 
 - **Format**: `uv run ruff format`
 - **Type Check**: `uv run ty check convoviz`
 
-## 🚀 First Step
+## 🚀 Agent Protocol
+
+### 1. The Mandatory First Step
 **CRITICAL: YOU MUST ALWAYS START BY READING [`docs/dev/HANDOFF.md`](docs/dev/HANDOFF.md) AND CONDUCTING A THOROUGH CODEBASE EXPLORATION.**
 
 This is **MANDATORY AND NON-NEGOTIABLE**, regardless of how simple, small, or straightforward the task may seem. You **MUST** understand the current project state, recent updates, and local context **BEFORE** making any assumptions, changes, or plans. **DO NOT SKIP THIS STEP.** Only after this initial mandatory orientation should you proceed with task-specific exploration and implementation.
 
-**IMPORTANT: YOU MUST ALWAYS KEEP ALL RELEVANT .MD FILES UPDATED WITH YOUR CHANGES. THIS INCLUDES `AGENTS.md`, `README.md`, AND `docs/dev/HANDOFF.md`. THIS IS A CRITICAL REQUIREMENT.**
+### 2. Operational Rigor
+- **Critical Mindset**: **DO NOT ASSUME** the codebase is perfectly implemented. Be alert for missing or buggy logic, including features that may appear complete but still require refinement or further work.
+- **Verification**: **ALWAYS** run the full quality gate (tests, type checking, linting, formatting) and **FIX ALL ISSUES** before submitting changes.
+- **Documentation**: **REFLEXIVELY** keep all relevant `.md` files updated with your changes. This includes `AGENTS.md`, `README.md`, and `docs/dev/HANDOFF.md`. This is a **CRITICAL REQUIREMENT**.
+- **Persistence**: If you leave incomplete work, **UPDATE `docs/dev/HANDOFF.md`** with the status (do not store tasks here).
+- **Commits**: **PREFER SMALL, LOGICALLY-SCOPED COMMITS** with tests for behavioral changes.
 
-**CRITICAL: ALWAYS RUN THE FULL QUALITY GATE (tests, type checking, linting, formatting) AND FIX ALL ISSUES BEFORE SUBMITTING CHANGES.**
+## 🗣️ Communication & UX Protocol
+
+### 1. Directness & Pushing Back
+Once you have conducted your initial codebase exploration, be **ASSERTIVE** and **DIRECT**.
+- **Ask Directly**: If you need the user to run a test, inspect a file, or provide context, **ASK**. **DO NOT IMPLEMENT** complex workarounds to avoid user interaction.
+- **Push Back**: The maintainer values expertise over compliance. If a request is ambiguous, technically flawed, or contradicts established project patterns, **PUSH BACK**. **PROPOSE REFINEMENTS**, better ideas, or even **REJECT AN IDEA** if it’s harmful. A "No, because..." or "Why don't we do X instead?" is much better than a silent, subpar implementation.
+- **Transparency**: **BE TRANSPARENT** about missing context, technical debt, or difficulties encountered.
+
+### 2. User Experience (UX) First
+**PRIORITIZE** the end-user experience of **Convoviz**. **DO NOT COMPROMISE** the application's design, usability, or performance to fit temporary development environment constraints.
 
 ## 📚 Documentation Index
-- **[Workflow & Protocols](docs/dev/workflow.md)**: Release steps, git usage, agent behavior rules.
 - **[Architecture & Standards](docs/dev/architecture.md)**: Tech stack, core design patterns.
 - **[Data Schema](docs/dev/data-schema.md)**: ChatGPT export structure details.
+- **[Handoff & Roadmap](docs/dev/HANDOFF.md)**: Current state and pending tasks.
