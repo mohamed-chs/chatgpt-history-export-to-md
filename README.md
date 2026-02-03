@@ -1,6 +1,5 @@
 <p align="center">
-  <h1 align="center">Convoviz 📊</h1>
-  <p align="center"><strong>Visualize your entire ChatGPT data</strong></p>
+  <h1 align="center">Convoviz</h1>
   <p align="center">
     Convert your ChatGPT history into clean, readable Markdown (text files).
   </p>
@@ -27,6 +26,7 @@
 |---------|-------------|
 | 📝 **Markdown Export** | Clean, well-formatted Markdown with optional YAML headers |
 | 🖼️ **Inline Images** | Media attachments rendered directly in your Markdown files |
+| 🔗 **Citations** | Web search results and source links accurately preserved |
 | ☁️ **Word Clouds** | Visual breakdowns of your most-used words and phrases |
 | 📈 **Usage Graphs** | Bar plots and charts showing your conversation patterns |
 

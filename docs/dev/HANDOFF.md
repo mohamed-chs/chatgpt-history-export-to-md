@@ -116,6 +116,7 @@ uv run ruff check convoviz tests && uv run ty check convoviz && uv run pytest
     - Handled "Ghost" citations where data is hidden in `metadata.search_result_groups`.
     - Implemented `Global Citation Map` in `Conversation` model to resolve citations across message boundaries.
     - Added fallback to strip unresolved citation placeholders.
+    - Updated `README.md` features table to include Citations.
 - **Metadata**: Added `is_starred` and `voice` field support.
 - **Content Filtering**: Improved noise reduction (sonic_webpage, bio, web.run).
 
