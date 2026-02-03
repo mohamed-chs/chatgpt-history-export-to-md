@@ -4,6 +4,8 @@ import logging
 import shutil
 from pathlib import Path
 
+from convoviz.utils import sanitize
+
 logger = logging.getLogger(__name__)
 
 
@@ -83,12 +85,13 @@ def resolve_asset_path(source_dir: Path, asset_id: str) -> Path | None:
     return None
 
 
-def copy_asset(source_path: Path, dest_dir: Path) -> str:
+def copy_asset(source_path: Path, dest_dir: Path, target_name: str | None = None) -> str:
     """Copy an asset to the destination directory.
 
     Args:
         source_path: The source file path
         dest_dir: The root output directory (assets will be in dest_dir/assets)
+        target_name: Optional name to rename the file to
 
     Returns:
         Relative path to the asset (e.g., "assets/image.png")
@@ -96,14 +99,15 @@ def copy_asset(source_path: Path, dest_dir: Path) -> str:
     assets_dir = dest_dir / "assets"
     assets_dir.mkdir(parents=True, exist_ok=True)
 
-    dest_path = assets_dir / source_path.name
+    filename = sanitize(target_name) if target_name else source_path.name
+    dest_path = assets_dir / filename
 
     if not dest_path.exists():
         try:
             shutil.copy2(source_path, dest_path)
-            logger.debug(f"Copied asset: {source_path.name}")
+            logger.debug(f"Copied asset: {source_path.name} -> {filename}")
         except Exception as e:
             logger.warning(f"Failed to copy asset {source_path}: {e}")
 
     # Return forward-slash path for Markdown compatibility even on Windows
-    return f"assets/{source_path.name}"
+    return f"assets/{filename}"

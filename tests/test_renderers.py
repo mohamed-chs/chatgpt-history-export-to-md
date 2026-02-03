@@ -174,7 +174,7 @@ class TestRenderConversation:
             {"content_type": "image_asset_pointer", "asset_pointer": "file-service://file-123"}
         ]
 
-        def mock_resolver(asset_id: str) -> str | None:
+        def mock_resolver(asset_id: str, _name: str | None = None) -> str | None:
             if asset_id == "file-123":
                 return "assets/file-123.png"
             return None

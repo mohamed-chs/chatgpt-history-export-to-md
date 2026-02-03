@@ -49,6 +49,7 @@ class MessageMetadata(BaseModel):
     citations: list[dict[str, Any]] | None = None
     search_result_groups: list[dict[str, Any]] | None = None
     content_references: list[dict[str, Any]] | None = None
+    attachments: list[dict[str, Any]] | None = None
 
     model_config = ConfigDict(protected_namespaces=())
 

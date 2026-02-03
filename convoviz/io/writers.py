@@ -90,7 +90,7 @@ def save_conversation(
         final_path = filepath.with_name(f"{base_name} ({counter}){filepath.suffix}")
 
     # Define asset resolver
-    def asset_resolver(asset_id: str) -> str | None:
+    def asset_resolver(asset_id: str, target_name: str | None = None) -> str | None:
         if not source_path:
             return None
 
@@ -99,7 +99,7 @@ def save_conversation(
             return None
 
         # Copy to output directory (relative to the markdown file's directory)
-        return copy_asset(src_file, final_path.parent)
+        return copy_asset(src_file, final_path.parent, target_name)
 
     # Render and write
     markdown = render_conversation(conversation, config, headers, asset_resolver=asset_resolver)

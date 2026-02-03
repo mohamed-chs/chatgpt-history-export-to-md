@@ -112,6 +112,14 @@ uv run ruff check convoviz tests && uv run ty check convoviz && uv run pytest
 
 ## Recent Updates (February 3, 2026)
 
+- **Attachment Renaming**:
+    - Attachments in the output are now renamed using the `name` field from `metadata.attachments` if available.
+    - Updated `MessageMetadata` model and asset resolution pipeline to support this.
+    - Added `tests/test_attachment_renaming.py`.
+
+## Recent Updates (February 3, 2026 - earlier)
+
+
 - **Citation Rendering**: Implemented robust parsing for both indexed (Tether v4) and inserted/embedded (Unicode) citations.
     - Handled "Ghost" citations where data is hidden in `metadata.search_result_groups`.
     - Implemented `Global Citation Map` in `Conversation` model to resolve citations across message boundaries.

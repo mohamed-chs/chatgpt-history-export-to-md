@@ -3,6 +3,7 @@
 import re
 from collections.abc import Callable
 from typing import Any
+from urllib.parse import quote
 
 from convoviz.config import AuthorHeaders, ConversationConfig
 from convoviz.exceptions import MessageContentError
@@ -212,7 +213,7 @@ def render_node(
     node: Node,
     headers: AuthorHeaders,
     use_dollar_latex: bool = False,
-    asset_resolver: Callable[[str], str | None] | None = None,
+    asset_resolver: Callable[[str, str | None], str | None] | None = None,
     flavor: str = "standard",
     citation_map: dict[str, dict[str, str | None]] | None = None,
 ) -> str:
@@ -222,7 +223,7 @@ def render_node(
         node: The node to render
         headers: Configuration for author headers
         use_dollar_latex: Whether to convert LaTeX delimiters to dollars
-        asset_resolver: Function to resolve asset IDs to paths
+        asset_resolver: Function to resolve asset IDs to paths, optionally renaming them
         flavor: Markdown flavor ("standard" or "obsidian")
         citation_map: Global map of citations
     """
@@ -281,12 +282,25 @@ def render_node(
 
     # Append images if resolver is provided and images exist
     if asset_resolver and node.message.images:
+        # Build map of file-id -> desired name from metadata.attachments
+        attachment_map = {}
+        if node.message.metadata.attachments:
+            for att in node.message.metadata.attachments:
+                if (att_id := att.get("id")) and (name := att.get("name")):
+                    attachment_map[att_id] = name
+
         for image_id in node.message.images:
-            rel_path = asset_resolver(image_id)
+            # Pass the desired name if we have one for this ID
+            target_name = attachment_map.get(image_id)
+            rel_path = asset_resolver(image_id, target_name)
             if rel_path:
+                # URL-encode the path to handle spaces/special characters in Markdown links
+                # We only encode the filename part if we want to be safe, but rel_path is "assets/..."
+                # quote() by default doesn't encode / which is good.
+                encoded_path = quote(rel_path)
                 # Using standard markdown image syntax.
                 # Obsidian handles this well.
-                content += f"\n![Image]({rel_path})\n"
+                content += f"\n![Image]({encoded_path})\n"
 
     return f"\n{header}{content}\n---\n"
 
@@ -325,7 +339,7 @@ def render_conversation(
     conversation: Conversation,
     config: ConversationConfig,
     headers: AuthorHeaders,
-    asset_resolver: Callable[[str], str | None] | None = None,
+    asset_resolver: Callable[[str, str | None], str | None] | None = None,
 ) -> str:
     """Render a complete conversation as markdown.
 
@@ -333,7 +347,7 @@ def render_conversation(
         conversation: The conversation to render
         config: Conversation rendering configuration
         headers: Configuration for author headers
-        asset_resolver: Function to resolve asset IDs to paths
+        asset_resolver: Function to resolve asset IDs to paths, optionally renaming them
 
     Returns:
         Complete markdown document string
