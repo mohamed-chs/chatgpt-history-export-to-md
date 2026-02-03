@@ -110,6 +110,18 @@ uv run ruff check convoviz tests && uv run ty check convoviz && uv run pytest
 - **A GOOD HABIT TO HAVE (I'm talking to you, AI coding agent) is to write other such .md files to persist plans/context in this session and the next.** Write them in the root project directory, or in other places if you prefer (like ./dev/), depending on the context. Take the liberty to do it anytime, it's very much encouraged and recommended; you don't even have to ask before you do it, or notify the user at all for that matter.
 - **ALWAYS KEEP ALL RELEVANT .MD FILES UPDATED WITH YOUR CHANGES. THIS IS CRITICAL.**
 
+## Recent Updates (February 2, 2026)
+
+**Deep Export Inspection & Spec v3**:
+- **Comprehensive Data Audit**: Conducted a thorough semantic inspection of the latest ChatGPT export format (Feb 2026).
+- **Spec v3.0 Published**: Created `docs/chatgpt-spec-unofficial-v3.md` covering:
+    - New content types: `sonic_webpage` (full scraped text), `system_error`.
+    - New tools: `web.search`, `web.run`, `bio` (Memory), `canmore` (Canvas).
+    - `tether_v4` Citation protocol: mapping `start_ix`/`end_ix` to `【...】` placeholders.
+    - Model slugs: `gpt-5-t-mini` confirmed.
+- **Improvement Roadmap**: Drafted `docs/dev/RECS.md` with specific recommendations for filtering tool noise, parsing citations, and supporting Canvas.
+- **Hidden Logic Refinement**: Identified that `tether_quote` from `browser` was accidentally hidden, while `sonic_webpage` (fluff) was shown.
+
 ## Recent Updates (February 1, 2026)
 
 **Interactive CLI Fixes**:
