@@ -110,6 +110,15 @@ uv run ruff check convoviz tests && uv run ty check convoviz && uv run pytest
 - **A GOOD HABIT TO HAVE (I'm talking to you, AI coding agent) is to write other such .md files to persist plans/context in this session and the next.** Write them in the root project directory, or in other places if you prefer (like ./dev/), depending on the context. Take the liberty to do it anytime, it's very much encouraged and recommended; you don't even have to ask before you do it, or notify the user at all for that matter.
 - **ALWAYS KEEP ALL RELEVANT .MD FILES UPDATED WITH YOUR CHANGES. THIS IS CRITICAL.**
 
+## Recent Updates (February 3, 2026)
+
+- **Citation Rendering**: Implemented robust parsing for both indexed (Tether v4) and inserted/embedded (Unicode) citations.
+    - Handled "Ghost" citations where data is hidden in `metadata.search_result_groups`.
+    - Implemented `Global Citation Map` in `Conversation` model to resolve citations across message boundaries.
+    - Added fallback to strip unresolved citation placeholders.
+- **Metadata**: Added `is_starred` and `voice` field support.
+- **Content Filtering**: Improved noise reduction (sonic_webpage, bio, web.run).
+
 ## Recent Updates (February 2, 2026)
 
 **Deep Export Inspection & Spec v3**:

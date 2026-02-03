@@ -2,11 +2,88 @@
 
 import re
 from collections.abc import Callable
+from typing import Any
 
 from convoviz.config import AuthorHeaders, ConversationConfig
 from convoviz.exceptions import MessageContentError
 from convoviz.models import Conversation, Node
 from convoviz.renderers.yaml import render_yaml_header
+
+
+def replace_citations(
+    text: str,
+    citations: list[dict[str, Any]] | None = None,
+    citation_map: dict[str, dict[str, str | None]] | None = None,
+) -> str:
+    """Replace citation placeholders in text with markdown links.
+
+    Supports two formats:
+    1. Tether v4 (metadata.citations): Placed at specific indices (【...】 placeholders).
+    2. Embedded (Tether v3?): Unicode markers citeturnXsearchY.
+
+    Args:
+        text: The original message text
+        citations: List of tether v4 citation objects (start_ix/end_ix)
+        citation_map: Map of internal citation IDs to metadata (turnXsearchY -> {title, url})
+
+    Returns:
+        Text with all placeholders replaced by markdown links
+    """
+    # 1. Handle Tether v4 (Index-based replacements)
+    if citations:
+        # Sort citations by start_ix descending to replace safely from end
+        sorted_citations = sorted(citations, key=lambda c: c.get("start_ix", 0), reverse=True)
+
+        for cit in sorted_citations:
+            start = cit.get("start_ix")
+            end = cit.get("end_ix")
+            meta = cit.get("metadata", {})
+
+            if start is None or end is None:
+                continue
+
+            replacement = _format_link(meta.get("title"), meta.get("url"))
+
+            # Only replace if strictly positive indices and bounds check
+            if 0 <= start < end <= len(text):
+                text = text[:start] + replacement + text[end:]
+
+    # 2. Handle Embedded Citations (Regex-based)
+    # Pattern: cite (key)+ 
+    # Codepoints: \uE200 (Start), \uE202 (Sep), \uE201 (End)
+    if citation_map is not None:
+        pattern = re.compile(r"\uE200cite((?:\uE202[a-zA-Z0-9]+)+)\uE201")
+
+        def replacer(match: re.Match) -> str:
+            # Group 1 contains string like: turn0search18turn0search3
+            # Split by separator \uE202 (first item will be empty string)
+            raw_keys = match.group(1).split("\ue202")
+            keys = [k for k in raw_keys if k]
+
+            links = []
+            for key in keys:
+                if key in citation_map:
+                    data = citation_map[key]
+                    link = _format_link(data.get("title"), data.get("url"))
+                    if link:
+                        links.append(link)
+
+            return "".join(links)
+
+        text = pattern.sub(replacer, text)
+
+    return text
+
+
+def _format_link(title: str | None, url: str | None) -> str:
+    """Format a title and URL into a concise markdown link."""
+    if title and url:
+        return f" [[{title}]({url})]"
+    elif url:
+        return f" [[Source]({url})]"
+    elif title:
+        return f" [{title}]"
+    return ""
 
 
 def close_code_blocks(text: str) -> str:
@@ -137,6 +214,7 @@ def render_node(
     use_dollar_latex: bool = False,
     asset_resolver: Callable[[str], str | None] | None = None,
     flavor: str = "standard",
+    citation_map: dict[str, dict[str, str | None]] | None = None,
 ) -> str:
     """Render a complete node as markdown.
 
@@ -146,9 +224,7 @@ def render_node(
         use_dollar_latex: Whether to convert LaTeX delimiters to dollars
         asset_resolver: Function to resolve asset IDs to paths
         flavor: Markdown flavor ("standard" or "obsidian")
-
-    Returns:
-        Complete markdown string for the node
+        citation_map: Global map of citations
     """
     if node.message is None:
         return ""
@@ -184,6 +260,19 @@ def render_node(
     except MessageContentError:
         # Some message types only contain non-text parts; those still may have images.
         text = ""
+
+    # Process citations if present (Tether v4 metadata or Embedded v3)
+    # Use global citation_map if provided, merging/falling back to local if needed.
+    # Actually, local internal map is subset of global map if we aggregated correctly.
+    # So we prefer the passed global map.
+    effective_map = citation_map or node.message.internal_citation_map
+
+    if node.message.metadata.citations or effective_map:
+        text = replace_citations(
+            text,
+            citations=node.message.metadata.citations,
+            citation_map=effective_map,
+        )
 
     content = close_code_blocks(text)
     content = f"\n{content}\n" if content else ""
@@ -255,6 +344,9 @@ def render_conversation(
     # Start with YAML header
     markdown = render_yaml_header(conversation, config.yaml)
 
+    # Pre-calculate citation map for the conversation
+    citation_map = conversation.citation_map
+
     # Render message nodes in a deterministic traversal order.
     for node in _ordered_nodes(conversation):
         if node.message:
@@ -264,6 +356,7 @@ def render_conversation(
                 use_dollar_latex,
                 asset_resolver=asset_resolver,
                 flavor=flavor,
+                citation_map=citation_map,
             )
 
     return markdown

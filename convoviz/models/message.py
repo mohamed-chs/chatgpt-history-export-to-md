@@ -46,6 +46,9 @@ class MessageMetadata(BaseModel):
     is_user_system_message: bool | None = None
     is_visually_hidden_from_conversation: bool | None = None
     user_context_message_data: dict[str, Any] | None = None
+    citations: list[dict[str, Any]] | None = None
+    search_result_groups: list[dict[str, Any]] | None = None
+    content_references: list[dict[str, Any]] | None = None
 
     model_config = ConfigDict(protected_namespaces=())
 
@@ -179,11 +182,12 @@ class Message(BaseModel):
         1. It is empty (no text, no images).
         2. Explicitly marked as visually hidden.
         3. It is an internal system message (not custom instructions).
-        4. It is a browser tool output (intermediate search steps).
+        4. It is a browser tool output (intermediate search steps) UNLESS it is a tether_quote.
         5. It is an assistant message targeting a tool (internal call).
         6. It is code interpreter input (content_type="code").
-        7. It is browsing status (tether_browsing_display).
-        8. It is internal reasoning (thoughts, reasoning_recap from o1/o3).
+        7. It is browsing status, internal reasoning (o1/o3), or massive web scraps (sonic_webpage).
+        8. It is a redundant DALL-E textual status update.
+        9. It is from internal bio (memory) or web.run orchestration tools.
         """
         if self.is_empty:
             return True
@@ -197,9 +201,28 @@ class Message(BaseModel):
             # Only show if explicitly marked as user system message (Custom Instructions)
             return not self.metadata.is_user_system_message
 
-        # Hide browser tool outputs (intermediate search steps)
-        if self.author.role == "tool" and self.author.name == "browser":
+        # Hide sonic_webpage (massive scraped text) and system_error
+        if self.content.content_type in ("sonic_webpage", "system_error"):
             return True
+
+        if self.author.role == "tool":
+            # Hide memory updates (bio) and internal search orchestration (web.run)
+            if self.author.name in ("bio", "web.run"):
+                return True
+
+            # Hide browser tool outputs (intermediate search steps)
+            # EXCEPTION: tether_quote (citations) should remain visible
+            if self.author.name == "browser":
+                return self.content.content_type != "tether_quote"
+
+            # Hide DALL-E textual status ("DALL·E displayed 1 images...")
+            if (
+                self.author.name == "dalle.text2im"
+                and self.content.content_type == "text"
+                # Check if it doesn't have images (just in case they attach images to text logic)
+                and not self.images
+            ):
+                return True
 
         # Hide assistant messages targeting tools (e.g., search(...), code input)
         # recipient="all" or None means it's for the user; anything else is internal
@@ -216,3 +239,56 @@ class Message(BaseModel):
             "thoughts",
             "reasoning_recap",
         )
+
+    @property
+    def internal_citation_map(self) -> dict[str, dict[str, str | None]]:
+        """Extract a map of citation IDs to metadata from content parts.
+
+        Used for resolving embedded citations (e.g. citeturn0search18).
+        Key format: "turn{turn_index}search{ref_index}"
+        """
+        if not self.content.parts:
+            return {}
+
+        citation_mapping = {}
+
+        # Helper to process a single search result entry
+        def process_entry(entry: dict[str, Any]) -> None:
+            ref_id = entry.get("ref_id")
+            if not ref_id:
+                return
+            # Only care about search results for now
+            if ref_id.get("ref_type") != "search":
+                return
+
+            turn_idx = ref_id.get("turn_index")
+            ref_idx = ref_id.get("ref_index")
+
+            if turn_idx is not None and ref_idx is not None:
+                # turn_idx is int, ref_idx is int
+                key = f"turn{turn_idx}search{ref_idx}"
+                citation_mapping[key] = {
+                    "title": entry.get("title"),
+                    "url": entry.get("url"),
+                }
+
+        # 1. Extract from self.content.parts
+        if self.content and self.content.parts:
+            for part in self.content.parts:
+                if isinstance(part, dict):
+                    if part.get("type") == "search_result":
+                        process_entry(part)
+                    elif part.get("type") == "search_result_group":
+                        for entry in part.get("entries", []):
+                            process_entry(entry)
+
+        # 2. Extract from metadata.search_result_groups (if present)
+        if self.metadata and self.metadata.search_result_groups:
+            for group in self.metadata.search_result_groups:
+                if isinstance(group, dict):
+                    # Groups might have 'entries' or be flat?
+                    # Based on name 'groups', likely similar to part structure
+                    for entry in group.get("entries", []):
+                        process_entry(entry)
+
+        return citation_mapping

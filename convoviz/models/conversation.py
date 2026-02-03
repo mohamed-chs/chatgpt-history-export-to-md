@@ -24,6 +24,8 @@ class Conversation(BaseModel):
     mapping: dict[str, Node]
     moderation_results: list[Any] = Field(default_factory=list)
     current_node: str
+    is_starred: bool | None = None
+    voice: str | dict[str, Any] | None = None
     plugin_ids: list[str] | None = None
     conversation_id: str
     conversation_template_id: str | None = None
@@ -156,3 +158,19 @@ class Conversation(BaseModel):
     def year_start(self) -> datetime:
         """Get January 1st of the year this conversation was created."""
         return self.create_time.replace(month=1, day=1, hour=0, minute=0, second=0, microsecond=0)
+
+    @property
+    def citation_map(self) -> dict[str, dict[str, str | None]]:
+        """Aggregate citation metadata from all messages in the conversation.
+
+        Traverses all nodes (including hidden ones) to collect embedded citation definitions
+        from tool outputs (e.g. search results).
+        """
+        aggregated_map = {}
+        for node in self.all_message_nodes:
+            if not node.message:
+                continue
+            # Extract citations from message parts
+            if hasattr(node.message, "internal_citation_map"):
+                aggregated_map.update(node.message.internal_citation_map)
+        return aggregated_map
