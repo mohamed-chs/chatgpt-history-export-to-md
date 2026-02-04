@@ -2,7 +2,6 @@
 
 import logging
 from pathlib import Path
-from shutil import rmtree
 
 from rich.console import Console
 
@@ -99,15 +98,7 @@ def run_pipeline(config: ConvovizConfig) -> None:
         if output_kind not in selected_outputs:
             continue
         sub_dir = output_folder / dir_name
-        if sub_dir.exists():
-            # Never follow symlinks; just unlink them.
-            if sub_dir.is_symlink():
-                sub_dir.unlink()
-            elif sub_dir.is_dir():
-                rmtree(sub_dir)
-            else:
-                sub_dir.unlink()
-        sub_dir.mkdir(exist_ok=True)
+        sub_dir.mkdir(parents=True, exist_ok=True)
 
     # Save markdown files (if selected)
     if OutputKind.MARKDOWN in selected_outputs:

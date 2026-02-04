@@ -55,7 +55,7 @@ dev = [
 # run with 'uv run poe <task>' eg. 'uv run poe fmt'
 # or if poe is installed globally, 'poe fmt'
 [tool.poe.tasks]
-lint = "ruff check --fix convoviz tests"
+lint = "ruff check convoviz tests"
 fmt = "ruff format"
 test = "pytest"
 ty = "ty check convoviz"

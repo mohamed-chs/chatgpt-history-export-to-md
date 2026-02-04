@@ -108,9 +108,11 @@ def run_interactive_config(initial_config: ConvovizConfig | None = None) -> Conv
     if input_result:
         config.input_path = Path(input_result)
     logger.debug(f"User selected input: {config.input_path}")
-    # Prompt to merge bookmarklet data if detected
+    # Prompt to merge bookmarklet data if detected (and not already selected as primary input)
     bookmarklet = find_latest_bookmarklet_json()
-    if bookmarklet:
+    if bookmarklet and (
+        not config.input_path or bookmarklet.resolve() != config.input_path.resolve()
+    ):
         merge_it: bool = _ask_or_cancel(
             confirm(
                 f"Found recent bookmarklet export: {bookmarklet.name}\n  Merge it with your main input?",

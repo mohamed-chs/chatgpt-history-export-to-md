@@ -62,5 +62,7 @@ def test_safe_directory_management(tmp_path):
 
     assert keeper_file.exists()
     assert keeper_file.read_text() == "I should stay"
-    assert not old_file.exists()
+    # New behavior: additive, so old_file should STILL exist
+    assert old_file.exists()
+    assert old_file.read_text() == "I should be deleted"
     assert (output_dir / "Markdown").exists()

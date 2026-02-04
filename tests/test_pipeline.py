@@ -121,3 +121,28 @@ def test_run_pipeline_no_outputs(mock_zip_file: Path, tmp_path: Path) -> None:
     assert not (output_dir / "Markdown").exists()
     assert not (output_dir / "Graphs").exists()
     assert not (output_dir / "Word-Clouds").exists()
+
+
+def test_run_pipeline_additive_output(mock_zip_file: Path, tmp_path: Path) -> None:
+    """Test that existing files in output directory are preserved."""
+    output_dir = tmp_path / "output"
+    markdown_dir = output_dir / "Markdown"
+    markdown_dir.mkdir(parents=True)
+
+    # Create a "foreign" file that should be preserved
+    preserved_file = markdown_dir / "preserved.txt"
+    preserved_file.write_text("keep me")
+
+    config = get_default_config()
+    config.input_path = mock_zip_file
+    config.output_folder = output_dir
+    config.outputs = {OutputKind.MARKDOWN}
+
+    run_pipeline(config)
+
+    # Check that new files were created
+    assert (markdown_dir / "2023" / "07-July" / "conversation 111.md").exists()
+
+    # Check that the old file still exists
+    assert preserved_file.exists()
+    assert preserved_file.read_text() == "keep me"

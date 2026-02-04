@@ -297,3 +297,41 @@ def test_bookmarklet_merge_prompt_declined(monkeypatch: pytest.MonkeyPatch, tmp_
     config = run_interactive_config(get_default_config())
 
     assert config.bookmarklet_path is None
+
+
+def test_bookmarklet_merge_prompt_skipped_if_manually_selected(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    """Test that the bookmarklet merge prompt is skipped if it's already the input."""
+    import convoviz.interactive as interactive
+
+    # Mock bookmarklet found
+    bookmarklet_path = tmp_path / "chatgpt_bookmarklet_download.json"
+    bookmarklet_path.write_text("[]")
+    monkeypatch.setattr(interactive, "find_latest_bookmarklet_json", lambda: bookmarklet_path)
+    monkeypatch.setattr(interactive, "find_latest_zip", lambda: bookmarklet_path)
+
+    # Mock other prompts
+    # User selects the bookmarklet_path as their main input
+    monkeypatch.setattr(
+        interactive, "qst_path", lambda *_a, **_k: FakePrompt(str(bookmarklet_path))
+    )
+    monkeypatch.setattr(interactive, "checkbox", lambda *_a, **_k: FakePrompt([]))
+
+    # Mock confirm prompt - should NOT be called!
+    # If it is called, it will crash because we haven't mocked it specifically here or we can monitor it
+    confirm_called = [False]
+
+    def fake_confirm(*_a, **_k):
+        confirm_called[0] = True
+        return FakePrompt(True)
+
+    monkeypatch.setattr(interactive, "confirm", fake_confirm)
+
+    config = run_interactive_config(get_default_config())
+
+    # Verify input_path is correct but bookmarklet_path is NOT set (since no prompt happened)
+    # resolve() because we resolve in interactive.py
+    assert config.input_path.resolve() == bookmarklet_path.resolve()
+    assert config.bookmarklet_path is None
+    assert confirm_called[0] is False
