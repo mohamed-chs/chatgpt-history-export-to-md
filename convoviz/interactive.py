@@ -4,12 +4,12 @@ import logging
 from pathlib import Path
 from typing import Literal, Protocol, cast
 
-from questionary import Choice, Style, checkbox, select
+from questionary import Choice, Style, checkbox, confirm, select
 from questionary import path as qst_path
 from questionary import text as qst_text
 
 from convoviz.config import ConvovizConfig, OutputKind, YAMLConfig, get_default_config
-from convoviz.io.loaders import find_latest_zip, validate_zip
+from convoviz.io.loaders import find_latest_bookmarklet_json, find_latest_zip, validate_zip
 from convoviz.utils import colormaps, default_font_path, font_names, font_path, validate_header
 
 OUTPUT_TITLES = {
@@ -108,6 +108,21 @@ def run_interactive_config(initial_config: ConvovizConfig | None = None) -> Conv
     if input_result:
         config.input_path = Path(input_result)
     logger.debug(f"User selected input: {config.input_path}")
+    # Prompt to merge bookmarklet data if detected
+    bookmarklet = find_latest_bookmarklet_json()
+    if bookmarklet:
+        merge_it: bool = _ask_or_cancel(
+            confirm(
+                f"Found recent bookmarklet export: {bookmarklet.name}\n  Merge it with your main input?",
+                default=True,
+                style=CUSTOM_STYLE,
+            )
+        )
+        if merge_it:
+            config.bookmarklet_path = bookmarklet
+            logger.debug(f"User confirmed bookmarklet merge: {bookmarklet}")
+        else:
+            logger.debug("User declined bookmarklet merge")
 
     # Prompt for output folder
     output_result: str = _ask_or_cancel(

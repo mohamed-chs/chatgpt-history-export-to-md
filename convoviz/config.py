@@ -106,6 +106,7 @@ class ConvovizConfig(BaseModel):
     """Main configuration for convoviz."""
 
     input_path: Path | None = None
+    bookmarklet_path: Path | None = None
     output_folder: Path = Field(default_factory=lambda: Path.home() / "Documents" / "ChatGPT-Data")
     folder_organization: FolderOrganization = FolderOrganization.DATE
     outputs: set[OutputKind] = Field(default_factory=lambda: set(ALL_OUTPUTS))

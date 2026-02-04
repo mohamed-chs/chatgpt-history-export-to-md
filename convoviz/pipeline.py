@@ -9,7 +9,6 @@ from rich.console import Console
 from convoviz.config import ConvovizConfig, OutputKind
 from convoviz.exceptions import ConfigurationError, InvalidZipError
 from convoviz.io.loaders import (
-    find_latest_bookmarklet_json,
     load_collection_from_json,
     load_collection_from_zip,
 )
@@ -67,14 +66,16 @@ def run_pipeline(config: ConvovizConfig) -> None:
         collection = load_collection_from_zip(input_path)
     logger.info(f"Loaded collection with {len(collection.conversations)} conversations")
 
-    # Try to merge bookmarklet data if available
-    bookmarklet_json = find_latest_bookmarklet_json()
-    if bookmarklet_json:
-        console.print("Found bookmarklet download, loading [bold yellow]📂[/bold yellow] ...\n")
+    # Try to merge bookmarklet data if explicitly specified
+    if config.bookmarklet_path:
+        bookmarklet_json = config.bookmarklet_path
+        console.print(
+            f"Merging bookmarklet download: [bold yellow]{bookmarklet_json.name}[/bold yellow] ...\n"
+        )
         try:
             bookmarklet_collection = load_collection_from_json(bookmarklet_json)
             collection.update(bookmarklet_collection)
-            logger.info("Merged bookmarklet data")
+            logger.info(f"Merged bookmarklet data from {bookmarklet_json}")
         except Exception as e:
             console.print(
                 f"[bold yellow]Warning:[/bold yellow] Failed to load bookmarklet data: {e}"

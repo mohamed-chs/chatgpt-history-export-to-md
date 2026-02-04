@@ -112,6 +112,12 @@ uv run ruff check convoviz tests && uv run ty check convoviz && uv run pytest
 
 ## Recent Updates (February 4, 2026)
 
+- **Explicit Bookmarklet Merge**: Refactored the integration to be explicit and transparent.
+  - Removed implicit automatic merging from `pipeline.py`.
+  - Added an interactive confirmation prompt in `interactive.py` to ask the user before merging bookmarklet data found in `~/Downloads`.
+  - Added `bookmarklet_path` to `ConvovizConfig` in `config.py` to support explicit merging.
+  - `convoviz` now searches across all merged source directories for assets.
+
 **Bookmarklet Script Update**:
 - **Updated `js/script.js`**: Rewrote the browser bookmarklet script to be more robust and modern.
 - **Asset Naming Fix**: Modified the script to prefix downloaded asset filenames with their Asset ID (e.g. `file-123_budget.csv` or `file-abc.png`).
