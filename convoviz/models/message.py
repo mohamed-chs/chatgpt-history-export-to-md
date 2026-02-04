@@ -92,9 +92,8 @@ class Message(BaseModel):
         # Also check metadata.attachments for images/files that should be rendered
         if self.metadata.attachments:
             for att in self.metadata.attachments:
-                if att_id := att.get("id"):
-                    if att_id not in image_ids:
-                        image_ids.append(att_id)
+                if (att_id := att.get("id")) and att_id not in image_ids:
+                    image_ids.append(att_id)
 
         return image_ids
 
