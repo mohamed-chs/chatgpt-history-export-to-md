@@ -110,6 +110,13 @@ uv run ruff check convoviz tests && uv run ty check convoviz && uv run pytest
 - **A GOOD HABIT TO HAVE (I'm talking to you, AI coding agent) is to write other such .md files to persist plans/context in this session and the next.** Write them in the root project directory, or in other places if you prefer (like ./dev/), depending on the context. Take the liberty to do it anytime, it's very much encouraged and recommended; you don't even have to ask before you do it, or notify the user at all for that matter.
 - **ALWAYS KEEP ALL RELEVANT .MD FILES UPDATED WITH YOUR CHANGES. THIS IS CRITICAL.**
 
+## Recent Updates (February 4, 2026 - later)
+unhide recipient="python" messages
+
+only a SINGLE (1) chat out of ALL is affected !
+new version includes additional msg. checked using:
+git diff --no-index out1/ out2/
+
 ## Recent Updates (February 4, 2026)
 
 - **Explicit Bookmarklet Merge**: Refactored the integration to be explicit and transparent.
