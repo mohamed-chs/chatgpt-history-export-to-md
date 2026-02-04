@@ -225,16 +225,40 @@ class TestSaveConversation:
         assert result.exists()
         assert result == filepath
 
-    def test_save_handles_conflict(self, tmp_path: Path) -> None:
-        """Test that save_conversation handles filename conflicts."""
-        conv = create_conversation("Test Conv", datetime(2024, 1, 5, 10, 0, tzinfo=UTC), "conv1")
+    def test_save_handles_conflict_different_id(self, tmp_path: Path) -> None:
+        """Test that same title but different ID results in increments."""
+        # Save first conversation
+        conv1 = create_conversation("Test Conv", datetime(2024, 1, 5, 10, 0, tzinfo=UTC), "id1")
         filepath = tmp_path / "test.md"
+        save_conversation(conv1, filepath, ConversationConfig(), AuthorHeaders())
 
-        # Create a file with the same name
-        filepath.write_text("existing content")
+        # Save second conversation with SAME title but DIFFERENT id
+        conv2 = create_conversation("Test Conv", datetime(2024, 1, 5, 10, 0, tzinfo=UTC), "id2")
+        result = save_conversation(conv2, filepath, ConversationConfig(), AuthorHeaders())
 
-        result = save_conversation(conv, filepath, ConversationConfig(), AuthorHeaders())
-
-        # Should create a new file with counter
-        assert result.exists()
+        # Should increment
         assert result.name == "test (1).md"
+        assert filepath.exists()
+
+    def test_save_overwrites_same_identity(self, tmp_path: Path) -> None:
+        """Test that same title AND same ID results in overwrite."""
+        # Save first version
+        conv1 = create_conversation("Test Conv", datetime(2024, 1, 5, 10, 0, tzinfo=UTC), "id1")
+        filepath = tmp_path / "test.md"
+        save_conversation(conv1, filepath, ConversationConfig(), AuthorHeaders())
+
+        assert "Hello" in filepath.read_text()
+
+        # Update it (e.g. change content in mock)
+        conv1_updated = create_conversation(
+            "Test Conv", datetime(2024, 1, 5, 10, 0, tzinfo=UTC), "id1"
+        )
+        # Use a completely different content to check overwrite
+        conv1_updated.mapping["user_node"].message.content.parts = ["Something Else"]
+
+        result = save_conversation(conv1_updated, filepath, ConversationConfig(), AuthorHeaders())
+
+        # Should OVERWRITE (same path, no counter)
+        assert result == filepath
+        assert "Something Else" in filepath.read_text()
+        assert "Hello" not in filepath.read_text()

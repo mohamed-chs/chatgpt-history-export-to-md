@@ -115,8 +115,13 @@ uv run ruff check convoviz tests && uv run ty check convoviz && uv run pytest
 - **Explicit Bookmarklet Merge**: Refactored the integration to be explicit and transparent.
   - Removed implicit automatic merging from `pipeline.py`.
   - Added an interactive confirmation prompt in `interactive.py` to ask the user before merging bookmarklet data found in `~/Downloads`.
-  - Added `bookmarklet_path` to `ConvovizConfig` in `config.py` to support explicit merging.
-  - `convoviz` now searches across all merged source directories for assets.
+  - **Refinement**: Prompt is now skipped if the bookmarklet is already the primary input (fully resolved).
+  - Added `bookmarklet_path` to `ConvovizConfig` in `config.py`.
+  - **Identity-Based Upsert**: Implemented identity-aware file saving in `io/writers.py`.
+    - `convoviz` now "peeks" at existing Markdown files to check their `conversation_id`.
+    - If IDs match, it overwrites (updates) the file.
+    - If names match but IDs differ, it increments (`title (1).md`).
+    - This allows for an **additive, non-destructive flow** while avoiding duplicate files across repeated runs.
 
 **Bookmarklet Script Update**:
 - **Updated `js/script.js`**: Rewrote the browser bookmarklet script to be more robust and modern.

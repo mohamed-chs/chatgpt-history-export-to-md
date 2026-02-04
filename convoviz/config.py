@@ -54,10 +54,10 @@ class YAMLConfig(BaseModel):
     used_plugins: bool = False
     message_count: bool = True
     content_types: bool = False
-    content_types: bool = False
     custom_instructions: bool = False
     is_starred: bool = False
     voice: bool = False
+    conversation_id: bool = True
 
 
 class ConversationConfig(BaseModel):

@@ -46,14 +46,12 @@
 <details>
 <summary><strong>Alternative: Use the Bookmarklet Script</strong></summary>
 
-If you want to quickly grab a specific set of recent conversations or bypass the wait for the official export email, you can use our bookmarklet script.
+If you want to grab recent conversations quickly or bypass the official export wait, use the bookmarklet script.
 
-1.  Navigate to the `js/` directory in this repository.
-2.  Follow the instructions in [`js/HOW_TO_USE.md`](js/HOW_TO_USE.md) to run the script in your browser.
-3.  **Run Convoviz normally** on your official `.zip` export.
-4.  **Magic:** Convoviz will automatically detect the `chatgpt_bookmarklet_download.json` in your `Downloads` folder, merge the new conversations, and resolve your newly downloaded images!
-
-**Note:** This is the recommended way to keep your local archive up-to-date without waiting for a full export from OpenAI.
+1.  Follow the instructions in [`js/HOW_TO_USE.md`](https://github.com/mohamed-chs/convoviz/blob/main/js/HOW_TO_USE.md) to download your recent data.
+2.  **Run Convoviz normally.**
+3.  **Smart Discovery:** If you have a bookmarklet export in your `Downloads`, Convoviz will ask to merge it.
+4.  **Additive & Smart:** You can combine multiple runs into the same folder. Convoviz uses identity-based overwriting to update existing chats without creating duplicates!
 </details>
 
 ---
@@ -176,7 +174,7 @@ Whether you're a tech wizard or you're new to all this, I'd love to hear about y
 
 ## 🤝 Contributing
 
-Interested in contributing? Check out the **[Contributing Guide](https://github.com/mohamed-chs/convoviz/tree/main/CONTRIBUTING.md)** for development setup, code style, and how to submit a pull request.
+Interested in contributing? Check out the **[Contributing Guide](https://github.com/mohamed-chs/convoviz/blob/main/CONTRIBUTING.md)** for development setup, code style, and how to submit a pull request.
 
 ---
 

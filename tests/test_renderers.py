@@ -143,6 +143,7 @@ class TestRenderYamlHeader:
             message_count=False,
             content_types=False,
             custom_instructions=False,
+            conversation_id=False,
         )
         yaml = render_yaml_header(mock_conversation, config)
         assert yaml == ""

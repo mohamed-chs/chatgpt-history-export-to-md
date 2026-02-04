@@ -1,6 +1,7 @@
 """Writing functions for conversations and collections."""
 
 import logging
+import re
 from os import utime as os_utime
 from pathlib import Path
 from urllib.parse import quote
@@ -58,6 +59,30 @@ def get_date_folder_path(conversation: Conversation) -> Path:
     return Path(year) / month
 
 
+def _get_conversation_id_from_file(filepath: Path) -> str | None:
+    """Extract conversation_id from an existing markdown file's YAML frontmatter.
+
+    Reads only the first few KB of the file for performance.
+    """
+    try:
+        with filepath.open("r", encoding="utf-8") as f:
+            # Read first 1024 bytes - enough for typical frontmatter
+            content = f.read(1024)
+            # Look for conversation_id: "id"
+            match = re.search(r'^conversation_id:\s*"([^"]+)"', content, re.MULTILINE)
+            if match:
+                return match.group(1)
+            # Fallback: check chat_link
+            match = re.search(
+                r'^chat_link:\s*"https://chatgpt\.com/c/([^"]+)"', content, re.MULTILINE
+            )
+            if match:
+                return match.group(1)
+    except Exception:
+        pass
+    return None
+
+
 def save_conversation(
     conversation: Conversation,
     filepath: Path,
@@ -67,25 +92,22 @@ def save_conversation(
 ) -> Path:
     """Save a conversation to a markdown file.
 
-    Handles filename conflicts by appending a counter. Sets the file's
-    modification time to match the conversation's update time.
-
-    Args:
-        conversation: The conversation to save
-        filepath: Target file path
-        config: Conversation rendering configuration
-        headers: Author header configuration
-        source_paths: List of paths to the source directories containing assets
-
-    Returns:
-        The actual path the file was saved to (may differ if there was a conflict)
+    Handles filename conflicts by appending a counter. If a file with the same
+    title exists, it overwrites it ONLY if it belongs to the same conversation ID.
+    Otherwise, it increments the filename.
     """
-    # Handle filename conflicts
     base_name = sanitize(filepath.stem)
     final_path = filepath
     counter = 0
 
     while final_path.exists():
+        # Check if this existing file is the SAME conversation
+        existing_id = _get_conversation_id_from_file(final_path)
+        if existing_id == conversation.conversation_id:
+            logger.debug(f"Identity match for {final_path.name}, overwriting.")
+            break
+
+        # Different conversation with same title, increment
         counter += 1
         final_path = filepath.with_name(f"{base_name} ({counter}){filepath.suffix}")
 

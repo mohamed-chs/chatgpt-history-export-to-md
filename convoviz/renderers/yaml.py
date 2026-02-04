@@ -115,6 +115,8 @@ def render_yaml_header(conversation: Conversation, config: YAMLConfig) -> str:
         yaml_fields["is_starred"] = conversation.is_starred
     if config.voice:
         yaml_fields["voice"] = conversation.voice
+    if config.conversation_id:
+        yaml_fields["conversation_id"] = conversation.conversation_id
 
     if not yaml_fields:
         return ""
