@@ -42,3 +42,4 @@ Once you have conducted your initial codebase exploration, be **ASSERTIVE** and 
 - **[Architecture & Standards](docs/dev/architecture.md)**: Tech stack, core design patterns.
 - **[Data Schema](docs/dev/data-schema.md)**: ChatGPT export structure details.
 - **[Handoff & Roadmap](docs/dev/HANDOFF.md)**: Current state and pending tasks.
+- **[Changelog (Informal)](docs/dev/CHANGELOG.md)**: Historical project updates and changes.
