@@ -223,16 +223,7 @@ def test_message_visibility_extended() -> None:
     )
     assert msg.is_hidden
 
-    # Case 3: Assistant targeting python (hidden - tool-targeted)
-    msg = Message(
-        author=MessageAuthor(role="assistant"),
-        content=MessageContent(content_type="text", parts=["Run code"]),
-        metadata=MessageMetadata(),
-        **{**base_data, "recipient": "python"},
-    )
-    assert msg.is_hidden
-
-    # Case 4: Tool output (not browser) is visible
+    # Case 3: Tool output (not browser) is visible
     msg = Message(
         author=MessageAuthor(role="tool", name="python"),
         content=MessageContent(content_type="execution_output", result="42"),

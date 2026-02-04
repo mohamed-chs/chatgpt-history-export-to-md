@@ -233,7 +233,8 @@ class Message(BaseModel):
 
         # Hide assistant messages targeting tools (e.g., search(...), code input)
         # recipient="all" or None means it's for the user; anything else is internal
-        if self.author.role == "assistant" and self.recipient not in ("all", None):
+        # recipient="python" : code interpreter code
+        if self.author.role == "assistant" and self.recipient not in ("all", "python", None):
             return True
 
         # Hide code interpreter input (content_type="code")
