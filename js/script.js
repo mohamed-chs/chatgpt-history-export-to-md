@@ -1,180 +1,262 @@
-// --- CSS / UI definitions ---
+/**
+ * convoviz script
+ * A simple tool to grab your ChatGPT chats and media in bulk.
+ */
 
-const styles = {
-  toggleUI: `
-      position: fixed; 
-      bottom: 20px; 
-      right: 20px; 
-      padding: 10px; 
-      background-color: #007BFF; 
-      border: none; 
-      border-radius: 50%; 
-      color: white; 
-      font-weight: bold; 
-      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.25); 
-      cursor: pointer; 
-      z-index: 10000;
-  `,
-  downloadWidget: `
-      position: fixed;
-      bottom: 10px;
-      right: 10px;
-      background: #fff;
-      border: 1px solid #ccc;
-      padding: 20px;
-      border-radius: 10px;
-      z-index: 9999;
-      width: 300px;
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-  `,
-};
+(async () => {
+  // --- 1. SETTINGS ---
+  const CONFIG = {
+    CONCURRENCY: 3, // How many chats to fetch at once
+    BATCH_SIZE: 50, // How many to ask for per page
+    JSON_FILENAME: "chatgpt_bookmarklet_download.json",
+    COLORS: {
+      bg: "rgba(32, 33, 35, 0.95)",
+      accent: "#10a37f",
+      text: "#ececf1",
+      border: "#4d4d4f",
+    },
+  };
 
-const toggleUIHTML = `
-<button id="toggle-openai-ui" style="${styles.toggleUI}">⏬</button>
-`;
+  // --- 2. DATA TRACKING ---
+  const State = {
+    token: "",
+    results: [],
+    totalToFetch: 0,
+    completed: 0,
+    isRunning: false,
+    abortController: null,
+  };
 
-const uiHTML = `
-<div id="openai-download-widget" style="${styles.downloadWidget}">
-  <div style="margin-bottom: 15px">
-    <label for="numConversations" style="display: block; margin-bottom: 5px; font-weight: 600">Number of conversations:</label>
-    <input type="number" id="numConversations" value="50" style="width: 100%; padding: 5px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box;" />
-  </div>
-  <div style="margin-bottom: 15px">
-    <label for="openai-download-progress" style="display: block; margin-bottom: 5px; font-weight: 600">Download Progress:</label>
-    <progress id="openai-download-progress" value="0" max="100" style="width: 100%; height: 15px; border-radius: 5px"></progress>
-  </div>
-  <div style="text-align: left">
-    <button id="openai-start-download" style="padding: 10px 15px; background-color: #007bff; color: #fff; border: none; border-radius: 5px; cursor: pointer;">Start Download</button>
-  </div>
-</div>
-`;
+  // --- 3. INTERFACE (The Popup) ---
+  const UI = {
+    container: null,
 
-// Append UI components
-document.body.insertAdjacentHTML("beforeend", toggleUIHTML + uiHTML);
+    // Put the UI on the screen
+    inject() {
+      if (document.getElementById("convoviz-ui")) return;
 
-// --- Utility functions ---
+      this.container = document.createElement("div");
+      this.container.id = "convoviz-ui";
+      this.container.style = `
+                position: fixed; top: 20px; right: 20px; width: 280px;
+                background: ${CONFIG.COLORS.bg}; color: ${CONFIG.COLORS.text};
+                backdrop-filter: blur(10px); border: 1px solid ${CONFIG.COLORS.border};
+                border-radius: 12px; padding: 16px; z-index: 10000;
+                font-family: -apple-system, Segoe UI, Roboto, sans-serif;
+                box-shadow: 0 12px 24px rgba(0,0,0,0.3); transition: all 0.3s ease;
+            `;
 
-const toggleUIVisibility = () => {
-  const uiWidget = document.getElementById("openai-download-widget");
-  uiWidget.style.display = uiWidget.style.display === "none" ? "block" : "none";
-};
+      this.render("setup");
+      document.body.appendChild(this.container);
+    },
 
-function constructUrlWithParams(baseUrl, params) {
-  const url = new URL(baseUrl);
-  Object.keys(params).forEach((key) =>
-    url.searchParams.append(key, params[key])
-  );
-  return url.toString();
-}
+    // Toggle between "ready" and "working" views
+    render(phase) {
+      const html = {
+        setup: `
+                    <div style="font-weight: 600; margin-bottom: 12px; display: flex; align-items: center;">
+                        <span style="background: ${CONFIG.COLORS.accent}; width: 8px; height: 8px; border-radius: 50%; margin-right: 8px;"></span>
+                        convoviz script
+                    </div>
+                    <div style="display: flex; gap: 8px;">
+                        <input type="number" id="arch-count" value="50" style="flex: 1; background: #343541; border: 1px solid ${CONFIG.COLORS.border}; color: white; padding: 6px; border-radius: 6px; font-size: 13px;">
+                        <button id="arch-start" style="background: ${CONFIG.COLORS.accent}; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 13px;">Start</button>
+                    </div>
+                `,
+        active: `
+                    <div id="arch-status" style="font-size: 12px; margin-bottom: 8px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Starting up...</div>
+                    <div style="width: 100%; background: #343541; height: 6px; border-radius: 3px; overflow: hidden; margin-bottom: 12px;">
+                        <div id="arch-bar" style="width: 0%; height: 100%; background: ${CONFIG.COLORS.accent}; transition: width 0.3s;"></div>
+                    </div>
+                    <button id="arch-stop" style="width: 100%; background: transparent; border: 1px solid #ef4444; color: #ef4444; padding: 4px; border-radius: 6px; cursor: pointer; font-size: 11px;">Stop</button>
+                `,
+      };
 
-// --- Event Listeners ---
+      this.container.innerHTML = html[phase === "active" ? "active" : "setup"];
 
-document
-  .getElementById("toggle-openai-ui")
-  .addEventListener("click", toggleUIVisibility);
-document
-  .getElementById("openai-start-download")
-  .addEventListener("click", async () => {
-    const numConversations = parseInt(
-      document.getElementById("numConversations").value,
-      10
-    );
-
-    if (numConversations && numConversations > 0) {
-      document.getElementById("openai-start-download").disabled = true;
-      try {
-        await downloadConversationsAsJson(numConversations);
-        console.log("Download completed.");
-      } catch (error) {
-        console.error("An error occurred:", error);
+      if (phase === "setup") {
+        this.container.querySelector("#arch-start").onclick = () =>
+          Core.start();
+      } else {
+        this.container.querySelector("#arch-stop").onclick = () =>
+          location.reload();
       }
-      document.getElementById("openai-start-download").disabled = false;
-    } else {
-      alert("Please enter a valid number of conversations.");
-    }
-  });
+    },
 
-// --- Main functionality ---
+    // Update progress bar and text
+    update(msg, progress) {
+      const status = document.getElementById("arch-status");
+      const bar = document.getElementById("arch-bar");
+      if (status) status.innerText = msg;
+      if (bar) bar.style.width = `${progress}%`;
+    },
+  };
 
-const conversationsPerRequest = 50;
-const delay = 63000;
+  // --- 4. DATA FETCHERS ---
+  const Net = {
+    async wait(ms) {
+      return new Promise((r) => setTimeout(r, ms));
+    },
 
-async function fetchData(url, headers = {}) {
-  try {
-    const response = await fetch(url, { headers });
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-    return await response.json();
-  } catch (error) {
-    console.error(`Error fetching data from ${url}:`, error);
-    throw error;
-  }
-}
+    // Wrapper for fetch that handles auth and rate limits
+    async fetchJson(url, options = {}) {
+      const resp = await fetch(url, {
+        ...options,
+        headers: { ...options.headers, Authorization: `Bearer ${State.token}` },
+      });
 
-async function fetchAccessToken() {
-  const data = await fetchData("https://chat.openai.com/api/auth/session");
-  return data.accessToken;
-}
+      // If OpenAI tells us to slow down, wait 10 seconds and try again
+      if (resp.status === 429) {
+        UI.update(
+          "Rate limited. Waiting 10s...",
+          (State.completed / State.totalToFetch) * 100,
+        );
+        await this.wait(10000);
+        return this.fetchJson(url, options);
+      }
 
-async function fetchConversationsData(accessToken, limit, offset) {
-  const baseUrl = "https://chat.openai.com/backend-api/conversations";
-  const url = constructUrlWithParams(baseUrl, {
-    offset: offset,
-    limit: limit,
-    order: "updated",
-  });
-  const data = await fetchData(url, { Authorization: `Bearer ${accessToken}` });
-  return data.items;
-}
+      if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+      return resp.json();
+    },
 
-async function fetchConversationData(accessToken, conversationId) {
-  const url = `https://chat.openai.com/backend-api/conversation/${conversationId}`;
-  return fetchData(url, { Authorization: `Bearer ${accessToken}` });
-}
+    // Trigger a file download in the browser
+    download(blob, name) {
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = name;
+      a.click();
+      URL.revokeObjectURL(url);
+    },
+  };
 
-async function downloadConversationsAsJson(numConversations) {
-  const conversationsArray = [];
-  const accessToken = await fetchAccessToken();
-
-  const numRequests = Math.ceil(numConversations / conversationsPerRequest);
-  for (let i = 0; i < numRequests; i++) {
-    const offset = i * conversationsPerRequest;
-    const limit =
-      i === numRequests - 1
-        ? numConversations - offset
-        : conversationsPerRequest;
-
-    const conversationsData = await fetchConversationsData(
-      accessToken,
-      limit,
-      offset
-    );
-    for (let j = 0; j < conversationsData.length; j++) {
-      const conversation = conversationsData[j];
-      const conversationData = await fetchConversationData(
-        accessToken,
-        conversation.id
+  // --- 5. THE MAIN LOGIC ---
+  const Core = {
+    async start() {
+      if (State.isRunning) return;
+      State.totalToFetch = parseInt(
+        document.getElementById("arch-count").value,
       );
-      conversationsArray.push(conversationData);
+      State.isRunning = true;
+      UI.render("active");
 
-      const progress =
-        ((i * conversationsPerRequest + j + 1) / numConversations) * 100;
-      document.getElementById("openai-download-progress").value = progress;
-    }
+      try {
+        // 1. Get the access token from the current session
+        const session = await Net.fetchJson("/api/auth/session");
+        State.token = session.accessToken;
 
-    if (i < numRequests - 1) {
-      await new Promise((resolve) => setTimeout(resolve, delay));
-    }
-  }
+        // 2. Build a list of conversation IDs
+        UI.update("Scanning history...", 5);
+        const chatList = [];
+        let offset = 0;
 
-  const content = new Blob([JSON.stringify(conversationsArray)], {
-    type: "application/json",
-  });
-  const a = document.createElement("a");
-  a.href = URL.createObjectURL(content);
-  a.download = "chatgpt_bookmarklet_download.json";
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-}
+        while (chatList.length < State.totalToFetch) {
+          const limit = Math.min(
+            CONFIG.BATCH_SIZE,
+            State.totalToFetch - offset,
+          );
+          const data = await Net.fetchJson(
+            `/backend-api/conversations?offset=${offset}&limit=${limit}&order=updated`,
+          );
+          if (!data.items?.length) break;
+          chatList.push(...data.items);
+          offset += data.items.length;
+          if (data.items.length < limit) break;
+        }
+
+        // 3. Download details for each chat using workers for speed
+        const queue = [...chatList];
+        const workers = Array(CONFIG.CONCURRENCY)
+          .fill(null)
+          .map(async () => {
+            while (queue.length > 0) {
+              const item = queue.shift();
+              try {
+                UI.update(
+                  `Saving: ${item.title}`,
+                  (State.completed / chatList.length) * 100,
+                );
+                const detail = await Net.fetchJson(
+                  `/backend-api/conversation/${item.id}`,
+                );
+                State.results.push(detail);
+                await this.processMedia(detail);
+              } catch (e) {
+                console.error(`Failed to grab: ${item.title}`, e);
+              } finally {
+                State.completed++;
+              }
+              await Net.wait(500); // Small pause to be polite to the API
+            }
+          });
+
+        await Promise.all(workers);
+
+        // 4. Wrap it all up into a JSON file
+        UI.update("Generating Final JSON...", 100);
+        Net.download(
+          new Blob([JSON.stringify(State.results)], {
+            type: "application/json",
+          }),
+          CONFIG.JSON_FILENAME,
+        );
+
+        UI.update("✅ Done!", 100);
+        await Net.wait(3000);
+        UI.render("setup");
+        State.isRunning = false;
+      } catch (err) {
+        UI.update("❌ Error: " + err.message, 0);
+        console.error(err);
+        State.isRunning = false;
+      }
+    },
+
+    // Check for images or file attachments and download them too
+    async processMedia(chatJson) {
+      const files = [];
+      Object.values(chatJson.mapping || {}).forEach((node) => {
+        const msg = node.message;
+        if (!msg) return;
+
+        // Find standard attachments
+        msg.metadata?.attachments?.forEach((a) =>
+          files.push({ id: a.id, name: a.name }),
+        );
+
+        // Find DALL-E images or uploaded photos
+        msg.content?.parts?.forEach((p) => {
+          if (p.content_type === "image_asset_pointer") {
+            files.push({
+              id: p.asset_pointer.replace("sediment://", ""),
+              name: null,
+            });
+          }
+        });
+      });
+
+      for (const file of files) {
+        try {
+          const meta = await Net.fetchJson(
+            `/backend-api/files/download/${file.id}`,
+          );
+          if (meta.download_url) {
+            const bResp = await fetch(meta.download_url);
+            const b = await bResp.blob();
+            const ext = b.type.split("/")[1] || "bin";
+            // Convoviz needs the ID in the filename to map it back to the conversation
+            const fileName = file.name
+              ? `${file.id}_${file.name}`
+              : `${file.id}.${ext}`;
+            Net.download(b, fileName);
+            await Net.wait(1000);
+          }
+        } catch (e) {
+          console.warn("Skipping a file, couldn't grab it:", file.id);
+        }
+      }
+    },
+  };
+
+  UI.inject();
+})();

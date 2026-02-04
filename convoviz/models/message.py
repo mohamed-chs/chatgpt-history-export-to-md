@@ -74,21 +74,28 @@ class Message(BaseModel):
     @property
     def images(self) -> list[str]:
         """Extract image asset pointers from the message content."""
-        if not self.content.parts:
-            return []
-
         image_ids = []
-        for part in self.content.parts:
-            if isinstance(part, dict) and part.get("content_type") == "image_asset_pointer":
-                pointer = part.get("asset_pointer", "")
-                # Strip prefixes like "file-service://" or "sediment://"
-                if pointer.startswith("file-service://"):
-                    pointer = pointer[len("file-service://") :]
-                elif pointer.startswith("sediment://"):
-                    pointer = pointer[len("sediment://") :]
 
-                if pointer:
-                    image_ids.append(pointer)
+        if self.content.parts:
+            for part in self.content.parts:
+                if isinstance(part, dict) and part.get("content_type") == "image_asset_pointer":
+                    pointer = part.get("asset_pointer", "")
+                    # Strip prefixes like "file-service://" or "sediment://"
+                    if pointer.startswith("file-service://"):
+                        pointer = pointer[len("file-service://") :]
+                    elif pointer.startswith("sediment://"):
+                        pointer = pointer[len("sediment://") :]
+
+                    if pointer:
+                        image_ids.append(pointer)
+
+        # Also check metadata.attachments for images/files that should be rendered
+        if self.metadata.attachments:
+            for att in self.metadata.attachments:
+                if att_id := att.get("id"):
+                    if att_id not in image_ids:
+                        image_ids.append(att_id)
+
         return image_ids
 
     @property

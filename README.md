@@ -43,6 +43,19 @@
 3. Click **Confirm export**
 4. Wait for the email from OpenAI, then download the `.zip` file
 
+<details>
+<summary><strong>Alternative: Use the Bookmarklet Script</strong></summary>
+
+If you want to quickly grab a specific set of recent conversations or bypass the wait for the official export email, you can use our bookmarklet script.
+
+1.  Navigate to the `js/` directory in this repository.
+2.  Follow the instructions in [`js/HOW_TO_USE.md`](js/HOW_TO_USE.md) to run the script in your browser.
+3.  **Run Convoviz normally** on your official `.zip` export.
+4.  **Magic:** Convoviz will automatically detect the `chatgpt_bookmarklet_download.json` in your `Downloads` folder, merge the new conversations, and resolve your newly downloaded images!
+
+**Note:** This is the recommended way to keep your local archive up-to-date without waiting for a full export from OpenAI.
+</details>
+
 ---
 
 ### Step 2: Install Convoviz

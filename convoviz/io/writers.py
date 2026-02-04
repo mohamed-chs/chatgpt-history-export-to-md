@@ -63,7 +63,7 @@ def save_conversation(
     filepath: Path,
     config: ConversationConfig,
     headers: AuthorHeaders,
-    source_path: Path | None = None,
+    source_paths: list[Path] | None = None,
 ) -> Path:
     """Save a conversation to a markdown file.
 
@@ -75,7 +75,7 @@ def save_conversation(
         filepath: Target file path
         config: Conversation rendering configuration
         headers: Author header configuration
-        source_path: Path to the source directory containing assets
+        source_paths: List of paths to the source directories containing assets
 
     Returns:
         The actual path the file was saved to (may differ if there was a conflict)
@@ -91,15 +91,16 @@ def save_conversation(
 
     # Define asset resolver
     def asset_resolver(asset_id: str, target_name: str | None = None) -> str | None:
-        if not source_path:
+        if not source_paths:
             return None
 
-        src_file = resolve_asset_path(source_path, asset_id)
-        if not src_file:
-            return None
+        for source_path in source_paths:
+            src_file = resolve_asset_path(source_path, asset_id)
+            if src_file:
+                # Copy to output directory (relative to the markdown file's directory)
+                return copy_asset(src_file, final_path.parent, target_name)
 
-        # Copy to output directory (relative to the markdown file's directory)
-        return copy_asset(src_file, final_path.parent, target_name)
+        return None
 
     # Render and write
     markdown = render_conversation(conversation, config, headers, asset_resolver=asset_resolver)
@@ -204,7 +205,7 @@ def save_collection(
             target_dir = directory
 
         filepath = target_dir / f"{sanitize(conv.title)}.md"
-        save_conversation(conv, filepath, config, headers, source_path=collection.source_path)
+        save_conversation(conv, filepath, config, headers, source_paths=collection.source_paths)
 
     # Generate index files for date organization
     if folder_organization == FolderOrganization.DATE:

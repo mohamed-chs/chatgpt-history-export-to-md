@@ -20,7 +20,12 @@ class ConversationCollection(BaseModel):
     """
 
     conversations: list[Conversation] = Field(default_factory=list)
-    source_path: Path | None = None
+    source_paths: list[Path] = Field(default_factory=list)
+
+    @property
+    def source_path(self) -> Path | None:
+        """Get the primary source path (first one added)."""
+        return self.source_paths[0] if self.source_paths else None
 
     @property
     def index(self) -> dict[str, Conversation]:
@@ -51,6 +56,11 @@ class ConversationCollection(BaseModel):
                 merged[conv_id] = incoming
 
         self.conversations = list(merged.values())
+
+        # Merge source paths
+        for path in other.source_paths:
+            if path not in self.source_paths:
+                self.source_paths.append(path)
 
     def add(self, conversation: Conversation) -> None:
         """Add a conversation to the collection."""

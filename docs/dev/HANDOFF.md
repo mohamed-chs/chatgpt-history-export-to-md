@@ -110,6 +110,20 @@ uv run ruff check convoviz tests && uv run ty check convoviz && uv run pytest
 - **A GOOD HABIT TO HAVE (I'm talking to you, AI coding agent) is to write other such .md files to persist plans/context in this session and the next.** Write them in the root project directory, or in other places if you prefer (like ./dev/), depending on the context. Take the liberty to do it anytime, it's very much encouraged and recommended; you don't even have to ask before you do it, or notify the user at all for that matter.
 - **ALWAYS KEEP ALL RELEVANT .MD FILES UPDATED WITH YOUR CHANGES. THIS IS CRITICAL.**
 
+## Recent Updates (February 4, 2026)
+
+**Bookmarklet Script Update**:
+- **Updated `js/script.js`**: Rewrote the browser bookmarklet script to be more robust and modern.
+- **Asset Naming Fix**: Modified the script to prefix downloaded asset filenames with their Asset ID (e.g. `file-123_budget.csv` or `file-abc.png`).
+  - This ensures `convoviz` can correctly resolve assets when the bookmarklet output (flat JSON + flat files) is used as input.
+  - Matches `convoviz/io/assets.py` logic which searches for files starting with the Asset ID.
+- **Asset Rendering Fix**: Updated `Message.images` property in `models/message.py` to include `metadata.attachments`.
+  - Previously, only inline `image_asset_pointer` parts were rendered.
+  - Now, files listed in `attachments` (common in bookmarklet exports) are also detected and linked in the Markdown.
+- **Multiple Source Paths Support**: Refactored `ConversationCollection` and asset resolution logic to support multiple source paths.
+  - Fixed a bug where merging a bookmarklet export into a ZIP export would lose the bookmarklet's source path, causing image resolution to fail.
+  - `convoviz` now searches across all merged source directories for assets.
+
 ## Recent Updates (February 3, 2026)
 
 - **Attachment Renaming**:
