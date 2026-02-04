@@ -153,8 +153,9 @@ def run_interactive_config(initial_config: ConvovizConfig | None = None) -> Conv
                 qst_text(
                     f"Enter the message header for '{role}':",
                     default=current,
-                    validate=lambda t: validate_header(t)
-                    or "Must be a valid markdown header (e.g., # Title)",
+                    validate=lambda t: (
+                        validate_header(t) or "Must be a valid markdown header (e.g., # Title)"
+                    ),
                     style=CUSTOM_STYLE,
                 )
             )

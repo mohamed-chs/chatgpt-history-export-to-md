@@ -1,20 +1,20 @@
 """Configuration models using Pydantic v2."""
 
-from enum import Enum
+from enum import StrEnum
 from pathlib import Path
 from typing import Literal
 
 from pydantic import BaseModel, Field
 
 
-class FolderOrganization(str, Enum):
+class FolderOrganization(StrEnum):
     """How to organize markdown output files in folders."""
 
     FLAT = "flat"  # All files in one directory
     DATE = "date"  # Nested by year/month (default)
 
 
-class OutputKind(str, Enum):
+class OutputKind(StrEnum):
     """Types of outputs that can be generated."""
 
     MARKDOWN = "markdown"  # Conversation markdown files
