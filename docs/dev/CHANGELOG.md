@@ -24,7 +24,7 @@
 
 **Deep Export Inspection & Spec v3**:
 - **Comprehensive Data Audit**: Conducted a thorough semantic inspection of the latest ChatGPT export format (Feb 2026).
-- **Spec v3.0 Published**: Created `docs/chatgpt-spec-unofficial-v3.md` covering:
+- **Spec v3.0 Published**: Created `chatgpt-spec.md` covering:
     - New content types: `sonic_webpage` (full scraped text), `system_error`.
     - New tools: `web.search`, `web.run`, `bio` (Memory), `canmore` (Canvas).
     - `tether_v4` Citation protocol: mapping `start_ix`/`end_ix` to `【...】` placeholders.

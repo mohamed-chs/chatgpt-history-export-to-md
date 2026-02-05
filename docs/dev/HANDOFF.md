@@ -93,13 +93,11 @@ uv run ruff check convoviz tests && uv run ty check convoviz && uv run pytest
 ## What's NOT Done (Roadmap)
 
 - [ ] **Custom Instructions Export**: Re-enable and fix `custom_instructions.json` export (currently disabled).
-- [x] **Optional Dependencies**: Visualization deps (`wordcloud`, `nltk`) are now in the optional `[viz]` extra. Markdown-only installs are fast. Runtime guards provide clear install guidance when deps are missing.
 - [ ] **Performance**: Large exports with thousands of images might be slow to copy. Consider async copy.
-- [ ] **Citations**: Parse invisible characters/metadata in ChatGPT exports that denote citations.
-- [ ] **Canvas Support**: Research and implement support for "Canvas" content.
-- [x] **Interactive Tests**: Added tests covering cancellation behavior and prompt flow (`tests/test_interactive.py`).
+- [ ] **Canvas Support**: Research and implement support for "Canvas" content (extracting from `conversations.json` as `textdocs/` might be missing).
 - [ ] **Cross-Platform**: Loaders for Claude and Gemini are planned but not started.
-- [x] **Schema Documentation**: Updated spec at `docs/chatgpt-spec-unofficial-v2.md` (Jan 2026).
+- [x] **Schema Documentation**: Updated spec at `chatgpt-spec.md` (Feb 2026).
+- [x] **Citations**: Implemented robust parsing for both indexed (Tether v4) and inserted/embedded (Unicode) citations.
 - [x] **Reasoning Content**: Support `reasoning_recap` and `thoughts` content types from o1/o3 models.
 - [x] **Selectable Outputs**: Users can choose which outputs to generate (Markdown, Graphs, Wordclouds).
 
@@ -110,37 +108,13 @@ uv run ruff check convoviz tests && uv run ty check convoviz && uv run pytest
 - **A GOOD HABIT TO HAVE (I'm talking to you, AI coding agent) is to write other such .md files to persist plans/context in this session and the next.** Write them in the root project directory, or in other places if you prefer (like ./dev/), depending on the context. Take the liberty to do it anytime, it's very much encouraged and recommended; you don't even have to ask before you do it, or notify the user at all for that matter.
 - **ALWAYS KEEP ALL RELEVANT .MD FILES UPDATED WITH YOUR CHANGES. THIS IS CRITICAL.**
 
-## Recent Updates (February 4, 2026 - later)
-unhide recipient="python" messages
-
-only a SINGLE (1) chat out of ALL is affected !
-new version includes additional msg. checked using:
-git diff --no-index out1/ out2/
-
 > [!TIP]
-> Older updates have been moved to [**`docs/dev/CHANGELOG.md`**](CHANGELOG.md).
+> Historical updates have been moved to [**`docs/dev/CHANGELOG.md`**](CHANGELOG.md).
 
-## Recent Updates (February 4, 2026)
+## Recent Updates (February 4-5, 2026)
 
 - **Explicit Bookmarklet Merge**: Refactored the integration to be explicit and transparent.
-  - Removed implicit automatic merging from `pipeline.py`.
   - Added an interactive confirmation prompt in `interactive.py` to ask the user before merging bookmarklet data found in `~/Downloads`.
-  - **Refinement**: Prompt is now skipped if the bookmarklet is already the primary input (fully resolved).
-  - Added `bookmarklet_path` to `ConvovizConfig` in `config.py`.
-  - **Identity-Based Upsert**: Implemented identity-aware file saving in `io/writers.py`.
-    - `convoviz` now "peeks" at existing Markdown files to check their `conversation_id`.
-    - If IDs match, it overwrites (updates) the file.
-    - If names match but IDs differ, it increments (`title (1).md`).
-    - This allows for an **additive, non-destructive flow** while avoiding duplicate files across repeated runs.
-
-**Bookmarklet Script Update**:
-- **Updated `js/script.js`**: Rewrote the browser bookmarklet script to be more robust and modern.
-- **Asset Naming Fix**: Modified the script to prefix downloaded asset filenames with their Asset ID (e.g. `file-123_budget.csv` or `file-abc.png`).
-  - This ensures `convoviz` can correctly resolve assets when the bookmarklet output (flat JSON + flat files) is used as input.
-  - Matches `convoviz/io/assets.py` logic which searches for files starting with the Asset ID.
-- **Asset Rendering Fix**: Updated `Message.images` property in `models/message.py` to include `metadata.attachments`.
-  - Previously, only inline `image_asset_pointer` parts were rendered.
-  - Now, files listed in `attachments` (common in bookmarklet exports) are also detected and linked in the Markdown.
-- **Multiple Source Paths Support**: Refactored `ConversationCollection` and asset resolution logic to support multiple source paths.
-  - Fixed a bug where merging a bookmarklet export into a ZIP export would lose the bookmarklet's source path, causing image resolution to fail.
-  - `convoviz` now searches across all merged source directories for assets.
+  - Implemented identity-aware file saving in `io/writers.py` to avoid duplicates across repeated runs.
+- **Bookmarklet Script Update**: Rewrote `js/script.js` to be more robust and modern, including asset naming fixes (prefixing with Asset ID).
+- **Multiple Source Paths Support**: `convoviz` now searches across all merged source directories for assets.

@@ -84,7 +84,7 @@ When adding features, include tests for happy path, error cases, and edge cases.
 
 While automated tests cover core logic, it's often helpful to manually verify the final Markdown output, especially when refactoring renderers or data models. 
 
-**Finding Test Candidates**: If you need to find specific edge cases (like DALL-E images, reasoning chains, or complex branching) within your own export to test against, follow the [ChatGPT Export Discovery Guide](docs/dev/chatgpt_export_discovery.md).
+**Finding Test Candidates**: If you need to find specific edge cases (like DALL-E images, reasoning chains, or complex branching) within your own export to test against, follow the [ChatGPT Export Discovery Guide](docs/dev/chatgpt-export-discovery.md).
 
 #### 1. Generate Baseline and Current Outputs
 

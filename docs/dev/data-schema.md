@@ -14,4 +14,4 @@
     - assistant internal tool calls (e.g. `recipient="browser"` or `content_type="code"`)
 
 ## References
-See `docs/chatgpt-spec-unofficial-v2.md` for comprehensive ChatGPT export schema (v2, Jan 2026).
+See `chatgpt-spec.md` for comprehensive ChatGPT export schema (Feb 2026).
