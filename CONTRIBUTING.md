@@ -80,6 +80,53 @@ uv run pytest -v       # Verbose
 
 When adding features, include tests for happy path, error cases, and edge cases.
 
+### Regression Testing (Markdown Output)
+
+While automated tests cover core logic, it's often helpful to manually verify the final Markdown output, especially when refactoring renderers or data models. 
+
+**Finding Test Candidates**: If you need to find specific edge cases (like DALL-E images, reasoning chains, or complex branching) within your own export to test against, follow the [ChatGPT Export Discovery Guide](docs/dev/chatgpt_export_discovery.md).
+
+#### 1. Generate Baseline and Current Outputs
+
+Create a temporary directory to store and compare the results:
+
+```bash
+mkdir -p ./test-output
+
+# Generate the baseline using the latest released version (via uvx)
+rm -rf ./test-output/out1
+uvx convoviz -z path/to/export.zip -o ./test-output/out1 --outputs markdown
+
+# Generate the output from your local development environment
+rm -rf ./test-output/out2
+uv run convoviz -z path/to/export.zip -o ./test-output/out2 --outputs markdown
+```
+
+#### 2. Compare the Results
+
+Use `git diff` to compare the two directories. The `--no-index` flag allows you to compare two paths on the filesystem even if they aren't part of a git repository.
+
+```bash
+# View a summary of which files changed and the extent of the changes
+git diff --no-index --stat ./test-output/out1 ./test-output/out2
+
+# Review the full diff of all changes
+git diff --no-index ./test-output/out1 ./test-output/out2
+```
+
+#### 3. Targeted Testing
+
+If you are investigating a specific issue, you may want to focus on a handful of noteworthy conversations. List the relative paths to these files (e.g., `Markdown/2023/07-July/My Chat.md`) in a text file named `conversation_list.txt`, then run a loop to diff them individually:
+
+```bash
+while read p; do
+    git diff --no-index "./test-output/out1/$p" "./test-output/out2/$p"
+done < conversation_list.txt
+```
+
+> [!TIP]
+> For a much more readable and colorful diff experience, consider using [delta](https://github.com/dandavison/delta).
+
 ---
 
 ## Submitting Changes
