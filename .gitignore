@@ -1,11 +1,13 @@
 __pycache__/
-node_modules/
 .venv/
 dist/
 .env
 
-poetry.lock
-
-# testing models and visualizations on personal data
-data/
-output/
+# testing on personal data
+conversations.json
+conversations_formatted.json
+*.zip
+conversation_list.json
+conversation_list.txt
+test-output/
+# etc..
