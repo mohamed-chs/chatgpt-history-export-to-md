@@ -29,7 +29,12 @@ convoviz/
 │   ├── writers.py       # File writing
 │   └── assets.py        # Asset management (New)
 └── analysis/            # Visualizations
-    ├── graphs.py        # Bar plots
+    ├── graphs/          # Graph generation (modular)
+    │   ├── common.py    # Shared utilities
+    │   ├── timeseries.py # Activity charts
+    │   ├── distributions.py # Histograms
+    │   ├── heatmaps.py  # Heatmap charts
+    │   └── dashboard.py # Summary dashboard
     └── wordcloud.py     # Word clouds
 ```
 
@@ -111,7 +116,20 @@ uv run ruff check convoviz tests && uv run ty check convoviz && uv run pytest
 > [!TIP]
 > Historical updates have been moved to [**`docs/dev/CHANGELOG.md`**](CHANGELOG.md).
 
-## Recent Updates (February 4-5, 2026)
+## Recent Updates (February 5, 2026)
+
+- **Graphs Module Refactor**: Split 880-line `graphs.py` into focused submodules:
+  - `graphs/common.py` - Shared utilities (font loading, styling, time conversions)
+  - `graphs/timeseries.py` - Weekday, hourly, monthly, daily activity charts
+  - `graphs/distributions.py` - Model usage, conversation length histograms
+  - `graphs/heatmaps.py` - Activity heatmaps
+  - `graphs/dashboard.py` - Summary dashboard and orchestration
+- **Wordcloud Fix**: Fixed `DeprecationWarning` about fork in multi-threaded processes by using `spawn` context in `ProcessPoolExecutor`.
+- **Minor Fixes**:
+  - Fixed `has_content` property to include `reasoning_recap` and `thoughts` content types.
+  - Renamed `FileNotFoundError` to `ConvovizFileNotFoundError` to avoid shadowing Python builtin.
+
+## Earlier Updates (February 4, 2026)
 
 - **Explicit Bookmarklet Merge**: Refactored the integration to be explicit and transparent.
   - Added an interactive confirmation prompt in `interactive.py` to ask the user before merging bookmarklet data found in `~/Downloads`.

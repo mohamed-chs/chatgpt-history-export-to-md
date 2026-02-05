@@ -38,7 +38,7 @@ class MessageContentError(ConvovizError):
         super().__init__(f"No valid content found in message: {message_id}")
 
 
-class FileNotFoundError(ConvovizError):
+class ConvovizFileNotFoundError(ConvovizError):
     """Raised when a required file is not found."""
 
     def __init__(self, path: str, file_type: str = "file") -> None:

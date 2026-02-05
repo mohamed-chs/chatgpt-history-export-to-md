@@ -170,7 +170,11 @@ class Message(BaseModel):
     def has_content(self) -> bool:
         """Check if the message has extractable content."""
         return bool(
-            self.content.parts or self.content.text is not None or self.content.result is not None
+            self.content.parts
+            or self.content.text is not None
+            or self.content.result is not None
+            or self.content.content is not None  # reasoning_recap
+            or self.content.thoughts is not None  # o1/o3 thoughts
         )
 
     @property

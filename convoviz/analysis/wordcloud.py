@@ -191,9 +191,13 @@ def generate_wordclouds(
         cpu_count = os.cpu_count() or 2
         max_workers = max(1, cpu_count // 2)
 
-    # Use parallel processing for speedup on multi-core systems
+    # Use parallel processing for speedup on multi-core systems.
+    # Use 'spawn' context to avoid DeprecationWarning about fork in multi-threaded processes.
+    import multiprocessing
+
+    mp_context = multiprocessing.get_context("spawn")
     logger.debug(f"Starting wordcloud generation with {max_workers} workers for {len(tasks)} tasks")
-    with ProcessPoolExecutor(max_workers=max_workers) as executor:
+    with ProcessPoolExecutor(max_workers=max_workers, mp_context=mp_context) as executor:
         list(
             tqdm(
                 executor.map(_generate_and_save_wordcloud, tasks),
