@@ -50,11 +50,11 @@ class YAMLConfig(BaseModel):
     chat_link: bool = True
     create_time: bool = True
     update_time: bool = True
+    custom_instructions: bool = False
     model: bool = True
     used_plugins: bool = False
     message_count: bool = True
     content_types: bool = False
-    custom_instructions: bool = False
     is_starred: bool = False
     voice: bool = False
     conversation_id: bool = True
@@ -110,6 +110,11 @@ class ConvovizConfig(BaseModel):
     output_folder: Path = Field(default_factory=lambda: Path.home() / "Documents" / "ChatGPT-Data")
     folder_organization: FolderOrganization = FolderOrganization.DATE
     outputs: set[OutputKind] = Field(default_factory=lambda: set(ALL_OUTPUTS))
+
+    # Export flags
+    export_canvas: bool = True
+    export_custom_instructions: bool = True
+
     message: MessageConfig = Field(default_factory=MessageConfig)
     conversation: ConversationConfig = Field(default_factory=ConversationConfig)
     wordcloud: WordCloudConfig = Field(default_factory=WordCloudConfig)

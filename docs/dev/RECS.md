@@ -2,11 +2,11 @@
 
 Future improvements and features to consider.
 
-## 1. Canvas (Canmore) Support
-Canvas documents are becoming a primary way of interacting with code/text.
-- **Action**: Support extracting `canmore.create_textdoc` and `canmore.update_textdoc` messages.
-    - Since `textdocs/` folder might be missing, the only source is `conversations.json`.
-    - Idea: Render the "final" state of a Canvas document at the end of the conversation or as a separate file.
+## 1. Canvas (Canmore) Support [IMPLEMENTED]
+Canvas documents are now extracted from `conversations.json` and saved as standalone files in the `canvas/` folder.
+- **Action**: Extracted `canmore.create_textdoc` messages.
+    - Processed inline JSON content (name, type, content).
+    - Prefixed filenames with conversation ID to avoid collisions.
 
 ## 2. Citations Refinement
 - **Action**: Improve the visual style of citations. Consider using numeric footnotes `[1](URL)` instead of `[[Source Title](URL)]` for cleaner text flow in long research-heavy chats.

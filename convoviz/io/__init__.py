@@ -1,9 +1,10 @@
-"""I/O operations for convoviz."""
+"""I/O package for convoviz."""
 
+from convoviz.io.assets import copy_asset
+from convoviz.io.canvas import save_canvas_documents
 from convoviz.io.loaders import (
     load_collection_from_json,
     load_collection_from_zip,
-    load_conversation_from_json,
 )
 from convoviz.io.writers import (
     save_collection,
@@ -14,8 +15,9 @@ from convoviz.io.writers import (
 __all__ = [
     "load_collection_from_json",
     "load_collection_from_zip",
-    "load_conversation_from_json",
-    "save_collection",
     "save_conversation",
+    "save_collection",
     "save_custom_instructions",
+    "save_canvas_documents",
+    "copy_asset",
 ]

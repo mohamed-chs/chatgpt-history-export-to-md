@@ -37,6 +37,17 @@ class Conversation(BaseModel):
         return build_node_tree(self.mapping)
 
     @property
+    def ordered_nodes(self) -> list[Node]:
+        """Get the nodes in the current active branch in chronological order."""
+        nodes = []
+        mapping = self.node_mapping
+        current = mapping.get(self.current_node)
+        while current:
+            nodes.append(current)
+            current = current.parent_node
+        return list(reversed(nodes))
+
+    @property
     def all_message_nodes(self) -> list[Node]:
         """Get all nodes that have messages (including hidden/internal ones)."""
         return [node for node in self.node_mapping.values() if node.has_message]
@@ -110,12 +121,35 @@ class Conversation(BaseModel):
     @property
     def custom_instructions(self) -> dict[str, str]:
         """Get custom instructions used for this conversation."""
-        system_nodes = self.nodes_by_author("system")
+        # Custom instructions are often hidden system messages, so we must include hidden nodes.
+        system_nodes = self.nodes_by_author("system", include_hidden=True)
         for node in system_nodes:
             context_message = node.message
             if context_message and context_message.metadata.is_user_system_message:
                 return context_message.metadata.user_context_message_data or {}
         return {}
+
+    @property
+    def canvas_documents(self) -> list[dict[str, Any]]:
+        """Get all Canvas documents created in this conversation's active branch.
+
+        Returns:
+            List of dicts with {name, type, content, conversation_id, conversation_title}
+        """
+        docs: list[dict[str, Any]] = []
+        for node in self.ordered_nodes:
+            if not node.message:
+                continue
+            doc = node.message.canvas_document
+            if doc:
+                docs.append(
+                    {
+                        **doc,
+                        "conversation_id": self.conversation_id,
+                        "conversation_title": self.title or "Untitled",
+                    }
+                )
+        return docs
 
     def timestamps(self, *authors: AuthorRole) -> list[float]:
         """Get message timestamps from specified authors.

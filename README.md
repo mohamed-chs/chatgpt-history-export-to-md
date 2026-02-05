@@ -29,6 +29,8 @@
 | 🔗 **Citations** | Web search results and source links accurately preserved |
 | ☁️ **Word Clouds** | Visual breakdowns of your most-used words and phrases |
 | 📈 **Usage Graphs** | Bar plots and charts showing your conversation patterns |
+| 🎨 **Canvas Support** | OpenAI "Canvas" documents extracted as standalone files (`.py`, `.html`, etc.) |
+| 🛡️ **Custom Instructions** | User/Model system messages exported to `custom_instructions.json` |
 
 > 💡 **See examples in the [`demo/`](https://github.com/mohamed-chs/convoviz/tree/main/demo) folder!**
 
@@ -155,6 +157,8 @@ convoviz --help
 After running the script, head to your output folder (defaults to `Documents/ChatGPT-Data` if you didn't change it) to see:
 - 📝 Neatly formatted Markdown files
 - 📊 Visualizations and graphs
+- 🎨 Extracted Canvas documents (if any)
+- 🛡️ User "Custom Instructions" (`custom_instructions.json`)
 
 If you've had a great experience, consider giving the project a ⭐ **star**! It keeps me motivated and helps others discover it!
 

@@ -21,14 +21,16 @@ convoviz/
 │   ├── node.py          # Node (tree structure)
 │   ├── conversation.py  # Conversation logic
 │   └── collection.py    # ConversationCollection
-├── renderers/           # Rendering logic
+├── renderers/           # Markdown & YAML templates
 │   ├── markdown.py      # Markdown generation
 │   └── yaml.py          # YAML frontmatter
 ├── io/                  # File I/O
-│   ├── loaders.py       # ZIP/JSON loading
-│   ├── writers.py       # File writing
-│   └── assets.py        # Asset management (New)
-└── analysis/            # Visualizations
+│   ├── __init__.py      # I/O package entry
+│   ├── assets.py        # Attachment handling
+│   ├── loaders.py       # ZIP/JSON loaders
+│   ├── writers.py       # Markdown/JSON writers
+│   └── canvas.py        # Canvas document extraction
+├── analysis/            # Visualizations
     ├── graphs/          # Graph generation (modular)
     │   ├── common.py    # Shared utilities
     │   ├── timeseries.py # Activity charts
@@ -36,6 +38,7 @@ convoviz/
     │   ├── heatmaps.py  # Heatmap charts
     │   └── dashboard.py # Summary dashboard
     └── wordcloud.py     # Word clouds
+└── utils.py             # Shared helpers
 ```
 
 ### Important Patterns
@@ -97,10 +100,10 @@ uv run ruff check convoviz tests && uv run ty check convoviz && uv run pytest
 
 ## What's NOT Done (Roadmap)
 
-- [ ] **Custom Instructions Export**: Re-enable and fix `custom_instructions.json` export (currently disabled).
 - [ ] **Performance**: Large exports with thousands of images might be slow to copy. Consider async copy.
-- [ ] **Canvas Support**: Research and implement support for "Canvas" content (extracting from `conversations.json` as `textdocs/` might be missing).
 - [ ] **Cross-Platform**: Loaders for Claude and Gemini are planned but not started.
+- [x] **Custom Instructions Export**: Fixed and re-enabled extraction of user/model system messages into `custom_instructions.json`.
+- [x] **Canvas Support**: Implemented extraction of `canmore` documents (text/code) into standalone files with auto-extensions.
 - [x] **Schema Documentation**: Updated spec at `chatgpt-spec.md` (Feb 2026).
 - [x] **Citations**: Implemented robust parsing for both indexed (Tether v4) and inserted/embedded (Unicode) citations.
 - [x] **Reasoning Content**: Support `reasoning_recap` and `thoughts` content types from o1/o3 models.
@@ -118,6 +121,10 @@ uv run ruff check convoviz tests && uv run ty check convoviz && uv run pytest
 
 ## Recent Updates (February 5, 2026)
 
+- **Custom Instructions & Canvas Support**:
+  - Fixed extraction of **Custom Instructions**: Now properly includes hidden system messages. Enabled export to `custom_instructions.json`.
+  - Added **Canvas (Canmore) Support**: Extracted documents from `conversations.json` are saved to a `canvas/` folder with appropriate extensions (`.html`, `.py`, `.md`).
+  - Improved `Message.text` extraction to handle and render embedded Canvas documents in the conversation history.
 - **Graphs Module Refactor**: Split 880-line `graphs.py` into focused submodules:
   - `graphs/common.py` - Shared utilities (font loading, styling, time conversions)
   - `graphs/timeseries.py` - Weekday, hourly, monthly, daily activity charts

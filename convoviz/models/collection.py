@@ -34,10 +34,18 @@ class ConversationCollection(BaseModel):
 
     @property
     def last_updated(self) -> datetime:
-        """Get the most recent update time across all conversations."""
+        """Get the latest update time in the collection."""
         if not self.conversations:
             return datetime.min
-        return max(conv.update_time for conv in self.conversations)
+        return max(c.update_time for c in self.conversations)
+
+    @property
+    def all_canvas_documents(self) -> list[dict[str, Any]]:
+        """Get all Canvas documents from all conversations in the collection."""
+        all_docs: list[dict[str, Any]] = []
+        for conv in self.conversations:
+            all_docs.extend(conv.canvas_documents)
+        return all_docs
 
     def update(self, other: "ConversationCollection") -> None:
         """Merge another collection into this one.

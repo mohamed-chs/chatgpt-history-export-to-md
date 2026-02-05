@@ -25,14 +25,12 @@ class MessageContent(BaseModel):
     """Content of a message."""
 
     content_type: str
-    parts: list[Any] | None = None
+    parts: list[str | dict[str, Any]] | None = None
     text: str | None = None
     result: str | None = None
-    # reasoning_recap content type
-    content: str | None = None
-    # thoughts content type (list of thought objects with summary/content/finished)
-    thoughts: list[Any] | None = None
-    # tether_quote content type
+    name: str | None = None  # For Canvas/canmore
+    content: str | Any | None = None  # for reasoning_recap or Canvas
+    thoughts: list[dict[str, Any]] | None = None  # for o1/o3 reasoning
     url: str | None = None
     domain: str | None = None
     title: str | None = None
@@ -105,30 +103,52 @@ class Message(BaseModel):
             text_parts = []
             for part in self.content.parts:
                 if isinstance(part, str):
+                    # Check if this string is actually a JSON-encoded Canvas document
+                    if self.recipient == "canmore.create_textdoc":
+                        import json
+
+                        try:
+                            data = json.loads(part)
+                            if isinstance(data, dict) and "content" in data and "name" in data:
+                                text_parts.append(
+                                    f"### Canvas: {data['name']}\n\n{data['content']}"
+                                )
+                                continue
+                        except (json.JSONDecodeError, TypeError):
+                            pass
                     text_parts.append(part)
-                elif isinstance(part, dict) and "text" in part:
-                    # Some parts might be dicts wrapping text (e.g. code interpreter?)
-                    # But based on spec, usually text is just a string in the list.
-                    # We'll stick to string extraction for now.
-                    pass
+                elif isinstance(part, dict):
+                    # Handle Canvas/canmore documents embedded in parts
+                    if part.get("content") and part.get("name"):
+                        text_parts.append(f"### Canvas: {part['name']}\n\n{part['content']}")
+                    elif "text" in part:
+                        # Some parts might be dicts wrapping text
+                        text_parts.append(str(part["text"]))
 
             # If we found string parts, join them.
-            # If parts existed but no strings (e.g. only images), return empty string?
-            # Or should we return a placeholder? For now, let's return joined text.
             if text_parts:
                 return "".join(text_parts)
 
-            # If parts list is not empty but contains no strings, we might want to fall through
-            # or return empty string if we consider it "handled".
-            # The original code returned "" if parts was empty list.
             if self.content.parts:
                 return ""
 
         # tether_quote: render as a blockquote with attribution (check before .text)
         if self.content.content_type == "tether_quote":
             return self._render_tether_quote()
+
+        # Check if text itself is a JSON-encoded Canvas document
         if self.content.text is not None:
+            if self.recipient == "canmore.create_textdoc":
+                import json
+
+                try:
+                    data = json.loads(self.content.text)
+                    if isinstance(data, dict) and "content" in data and "name" in data:
+                        return f"### Canvas: {data['name']}\n\n{data['content']}"
+                except (json.JSONDecodeError, TypeError):
+                    pass
             return self.content.text
+
         if self.content.result is not None:
             return self.content.result
         # reasoning_recap content type uses 'content' field
@@ -186,6 +206,46 @@ class Message(BaseModel):
             return True
 
     @property
+    def canvas_document(self) -> dict[str, Any] | None:
+        """Extract Canvas document if this message created one."""
+        if self.recipient != "canmore.create_textdoc":
+            return None
+
+        import json
+
+        def try_parse_canvas(val: Any) -> dict[str, Any] | None:
+            data = None
+            if isinstance(val, dict):
+                data = val
+            elif isinstance(val, str):
+                try:
+                    data = json.loads(val)
+                except (json.JSONDecodeError, TypeError):
+                    return None
+
+            if isinstance(data, dict) and "content" in data and "name" in data:
+                return {
+                    "name": data["name"],
+                    "type": data.get("type", "unknown"),
+                    "content": data["content"],
+                }
+            return None
+
+        # Try parts[0]
+        if self.content.parts:
+            doc = try_parse_canvas(self.content.parts[0])
+            if doc:
+                return doc
+
+        # Try content.text
+        if self.content.text:
+            doc = try_parse_canvas(self.content.text)
+            if doc:
+                return doc
+
+        return None
+
+    @property
     def is_hidden(self) -> bool:
         """Check if message should be hidden in export.
 
@@ -193,12 +253,11 @@ class Message(BaseModel):
         1. It is empty (no text, no images).
         2. Explicitly marked as visually hidden.
         3. It is an internal system message (not custom instructions).
-        4. It is a browser tool output (intermediate search steps) UNLESS it is a tether_quote.
-        5. It is an assistant message targeting a tool (internal call).
-        6. It is code interpreter input (content_type="code").
-        7. It is browsing status, internal reasoning (o1/o3), or massive web scraps (sonic_webpage).
-        8. It is a redundant DALL-E textual status update.
-        9. It is from internal bio (memory) or web.run orchestration tools.
+        4. It is a tool output (unless explicitly requested).
+        5. It is a redundant DALL-E textual status update.
+        6. It is from internal bio (memory) or web.run orchestration tools.
+        7. It is code interpreter input (content_type="code").
+        8. It is browsing status, internal reasoning (o1/o3), or massive web scraps (sonic_webpage).
         """
         if self.is_empty:
             return True

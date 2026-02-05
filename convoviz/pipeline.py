@@ -111,6 +111,22 @@ def run_pipeline(config: ConvovizConfig) -> None:
             folder_organization=config.folder_organization,
             progress_bar=True,
         )
+
+        # Save collection-level metadata if requested
+        if config.export_custom_instructions:
+            from convoviz.io import save_custom_instructions
+
+            save_custom_instructions(collection, output_folder / "custom_instructions.json")
+            logger.info("Custom instructions exported")
+
+        # Extract Canvas documents if requested
+        if config.export_canvas:
+            from convoviz.io import save_canvas_documents
+
+            count = save_canvas_documents(collection, output_folder)
+            if count > 0:
+                logger.info(f"Extracted {count} Canvas documents")
+
         logger.info("Markdown generation complete")
         console.print(
             f"\nDone [bold green]✅[/bold green] ! "
@@ -171,6 +187,6 @@ def run_pipeline(config: ConvovizConfig) -> None:
         "ALL DONE [bold green]🎉🎉🎉[/bold green] !\n\n"
         f"Explore the full gallery [bold yellow]🖼️[/bold yellow] at: {_safe_uri(output_folder)} 🔗\n\n"
         "I hope you enjoy the outcome 🤞.\n\n"
-        "If you appreciate it, kindly give the project a star 🌟 on GitHub:\n\n"
+        "If you appreciate it, kindly give the project a star ⭐ on GitHub:\n\n"
         "➡️ https://github.com/mohamed-chs/convoviz 🔗\n\n"
     )
