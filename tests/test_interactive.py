@@ -24,7 +24,7 @@ def test_ctrl_c_on_first_prompt_aborts_interactive(monkeypatch: pytest.MonkeyPat
     import convoviz.interactive as interactive
 
     monkeypatch.setattr(interactive, "find_latest_zip", lambda: None)
-    monkeypatch.setattr(interactive, "find_latest_bookmarklet_json", lambda: None)
+    monkeypatch.setattr(interactive, "find_script_export", lambda: None)
     monkeypatch.setattr(interactive, "qst_path", lambda *_a, **_k: FakePrompt(None))
 
     with pytest.raises(KeyboardInterrupt):
@@ -37,7 +37,7 @@ def test_ctrl_c_mid_flow_aborts_interactive(
     import convoviz.interactive as interactive
 
     monkeypatch.setattr(interactive, "find_latest_zip", lambda: None)
-    monkeypatch.setattr(interactive, "find_latest_bookmarklet_json", lambda: None)
+    monkeypatch.setattr(interactive, "find_script_export", lambda: None)
 
     path_answers = iter(["dummy.zip", str(tmp_path / "out")])
 
@@ -59,7 +59,7 @@ def test_ctrl_c_on_outputs_checkbox_aborts_interactive(
     import convoviz.interactive as interactive
 
     monkeypatch.setattr(interactive, "find_latest_zip", lambda: None)
-    monkeypatch.setattr(interactive, "find_latest_bookmarklet_json", lambda: None)
+    monkeypatch.setattr(interactive, "find_script_export", lambda: None)
 
     path_answers = iter(["dummy.zip", str(tmp_path / "out")])
 
@@ -78,7 +78,7 @@ def test_outputs_selection_sets_config(monkeypatch: pytest.MonkeyPatch, tmp_path
     import convoviz.interactive as interactive
 
     monkeypatch.setattr(interactive, "find_latest_zip", lambda: None)
-    monkeypatch.setattr(interactive, "find_latest_bookmarklet_json", lambda: None)
+    monkeypatch.setattr(interactive, "find_script_export", lambda: None)
 
     path_answers = iter(["dummy.zip", str(tmp_path / "out")])
 
@@ -114,7 +114,7 @@ def test_wordcloud_prompts_skipped_when_not_selected(
     import convoviz.interactive as interactive
 
     monkeypatch.setattr(interactive, "find_latest_zip", lambda: None)
-    monkeypatch.setattr(interactive, "find_latest_bookmarklet_json", lambda: None)
+    monkeypatch.setattr(interactive, "find_script_export", lambda: None)
     monkeypatch.setattr(interactive, "font_names", lambda: ["Font1", "Font2"])
     monkeypatch.setattr(interactive, "colormaps", lambda: ["cmap1", "cmap2"])
 
@@ -167,7 +167,7 @@ def test_markdown_prompts_skipped_when_not_selected(
     import convoviz.interactive as interactive
 
     monkeypatch.setattr(interactive, "find_latest_zip", lambda: None)
-    monkeypatch.setattr(interactive, "find_latest_bookmarklet_json", lambda: None)
+    monkeypatch.setattr(interactive, "find_script_export", lambda: None)
     monkeypatch.setattr(interactive, "font_names", lambda: ["Font1", "Font2"])
     monkeypatch.setattr(interactive, "colormaps", lambda: ["cmap1", "cmap2"])
 
@@ -218,7 +218,7 @@ def test_outputs_prompt_respects_existing_config(monkeypatch: pytest.MonkeyPatch
 
     # Setup mocks
     monkeypatch.setattr(interactive, "find_latest_zip", lambda: None)
-    monkeypatch.setattr(interactive, "find_latest_bookmarklet_json", lambda: None)
+    monkeypatch.setattr(interactive, "find_script_export", lambda: None)
 
     captured_choices = []
 
@@ -253,14 +253,14 @@ def test_outputs_prompt_respects_existing_config(monkeypatch: pytest.MonkeyPatch
     assert graphs_choice.checked is False
 
 
-def test_bookmarklet_merge_prompt(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
-    """Test that the bookmarklet merge prompt appears and sets config."""
+def test_script_export_merge_prompt(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+    """Test that the script export merge prompt appears and sets config."""
     import convoviz.interactive as interactive
 
-    # Mock bookmarklet found
-    bookmarklet_path = tmp_path / "chatgpt_bookmarklet_download.json"
-    bookmarklet_path.write_text("[]")
-    monkeypatch.setattr(interactive, "find_latest_bookmarklet_json", lambda: bookmarklet_path)
+    # Mock script export found
+    export_path = tmp_path / "convoviz_export.json"
+    export_path.write_text("[]")
+    monkeypatch.setattr(interactive, "find_script_export", lambda: export_path)
     monkeypatch.setattr(interactive, "find_latest_zip", lambda: None)
 
     # Mock other prompts
@@ -273,17 +273,19 @@ def test_bookmarklet_merge_prompt(monkeypatch: pytest.MonkeyPatch, tmp_path: Pat
 
     config = run_interactive_config(get_default_config())
 
-    assert config.bookmarklet_path == bookmarklet_path
+    assert config.bookmarklet_path == export_path
 
 
-def test_bookmarklet_merge_prompt_declined(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
-    """Test that declining the bookmarklet merge prompt does not set config."""
+def test_script_export_merge_prompt_declined(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    """Test that declining the script export merge prompt does not set config."""
     import convoviz.interactive as interactive
 
-    # Mock bookmarklet found
-    bookmarklet_path = tmp_path / "chatgpt_bookmarklet_download.json"
-    bookmarklet_path.write_text("[]")
-    monkeypatch.setattr(interactive, "find_latest_bookmarklet_json", lambda: bookmarklet_path)
+    # Mock script export found
+    export_path = tmp_path / "convoviz_export.json"
+    export_path.write_text("[]")
+    monkeypatch.setattr(interactive, "find_script_export", lambda: export_path)
     monkeypatch.setattr(interactive, "find_latest_zip", lambda: None)
 
     # Mock other prompts
@@ -299,23 +301,21 @@ def test_bookmarklet_merge_prompt_declined(monkeypatch: pytest.MonkeyPatch, tmp_
     assert config.bookmarklet_path is None
 
 
-def test_bookmarklet_merge_prompt_skipped_if_manually_selected(
+def test_script_export_merge_prompt_skipped_if_manually_selected(
     monkeypatch: pytest.MonkeyPatch, tmp_path: Path
 ) -> None:
-    """Test that the bookmarklet merge prompt is skipped if it's already the input."""
+    """Test that the script export merge prompt is skipped if it's already the input."""
     import convoviz.interactive as interactive
 
-    # Mock bookmarklet found
-    bookmarklet_path = tmp_path / "chatgpt_bookmarklet_download.json"
-    bookmarklet_path.write_text("[]")
-    monkeypatch.setattr(interactive, "find_latest_bookmarklet_json", lambda: bookmarklet_path)
-    monkeypatch.setattr(interactive, "find_latest_zip", lambda: bookmarklet_path)
+    # Mock script export found
+    export_path = tmp_path / "convoviz_export.json"
+    export_path.write_text("[]")
+    monkeypatch.setattr(interactive, "find_script_export", lambda: export_path)
+    monkeypatch.setattr(interactive, "find_latest_zip", lambda: export_path)
 
     # Mock other prompts
-    # User selects the bookmarklet_path as their main input
-    monkeypatch.setattr(
-        interactive, "qst_path", lambda *_a, **_k: FakePrompt(str(bookmarklet_path))
-    )
+    # User selects the export_path as their main input
+    monkeypatch.setattr(interactive, "qst_path", lambda *_a, **_k: FakePrompt(str(export_path)))
     monkeypatch.setattr(interactive, "checkbox", lambda *_a, **_k: FakePrompt([]))
 
     # Mock confirm prompt - should NOT be called!
@@ -332,6 +332,6 @@ def test_bookmarklet_merge_prompt_skipped_if_manually_selected(
 
     # Verify input_path is correct but bookmarklet_path is NOT set (since no prompt happened)
     # resolve() because we resolve in interactive.py
-    assert config.input_path.resolve() == bookmarklet_path.resolve()
+    assert config.input_path.resolve() == export_path.resolve()
     assert config.bookmarklet_path is None
     assert confirm_called[0] is False

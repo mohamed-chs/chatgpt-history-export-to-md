@@ -46,13 +46,13 @@
 4. Wait for the email from OpenAI, then download the `.zip` file
 
 <details>
-<summary><strong>Alternative: Use the Bookmarklet Script</strong></summary>
+<summary><strong>Alternative: Use the Direct Export Script</strong></summary>
 
-If you want to grab recent conversations quickly or bypass the official export wait, use the bookmarklet script.
+If you want to grab recent conversations quickly or bypass the official export wait, use the direct export script.
 
-1.  Follow the instructions in [`js/HOW_TO_USE.md`](https://github.com/mohamed-chs/convoviz/blob/main/js/HOW_TO_USE.md) to download your recent data.
+1.  Follow the instructions in [`js/HOW_TO_USE.md`](https://github.com/mohamed-chs/convoviz/blob/main/js/HOW_TO_USE.md) to download your recent data as a `.zip` file.
 2.  **Run Convoviz normally.**
-3.  **Smart Discovery:** If you have a bookmarklet export in your `Downloads`, Convoviz will ask to merge it.
+3.  **Smart Discovery:** If you have a `convoviz_export.zip` in your `Downloads`, Convoviz will ask to merge it.
 4.  **Additive & Smart:** You can combine multiple runs into the same folder. Convoviz uses identity-based overwriting to update existing chats without creating duplicates!
 </details>
 
@@ -217,8 +217,8 @@ It should also work as a library, so you can import and use the models and funct
 </details>
 
 <details>
-<summary><strong>Bookmarklet (Experimental)</strong></summary>
+<summary><strong>Direct Export (Experimental)</strong></summary>
 
-There's also a JavaScript bookmarklet flow under `js/` for exporting additional conversation data outside the official ZIP export. This is experimental.
+There's also a JavaScript export flow under `js/` for grabbing additional conversation data directly from the browser outside the official ZIP export. This is experimental.
 
 </details>

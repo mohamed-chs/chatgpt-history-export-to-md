@@ -9,8 +9,8 @@ import pytest
 
 from convoviz.exceptions import InvalidZipError
 from convoviz.io.loaders import (
-    find_latest_bookmarklet_json,
     find_latest_zip,
+    find_script_export,
     load_collection_from_json,
     load_collection_from_zip,
     validate_zip,
@@ -147,48 +147,56 @@ class TestFindLatestZip:
         assert result is None
 
 
-class TestFindLatestBookmarkletJson:
-    """Tests for the find_latest_bookmarklet_json function."""
+class TestFindScriptExport:
+    """Tests for the find_script_export function."""
 
-    def test_finds_bookmarklet_file(self, tmp_path: Path) -> None:
-        """Test finding a bookmarklet JSON file."""
-        bookmarklet = tmp_path / "chatgpt-bookmarklet-data.json"
-        bookmarklet.write_text("[]")
+    def test_finds_script_export_json(self, tmp_path: Path) -> None:
+        """Test finding a script export JSON file."""
+        export = tmp_path / "convoviz_export.json"
+        export.write_text("[]")
 
-        result = find_latest_bookmarklet_json(tmp_path)
-        assert result == bookmarklet
+        result = find_script_export(tmp_path)
+        assert result == export
 
-    def test_finds_most_recent_bookmarklet(self, tmp_path: Path) -> None:
-        """Test that the most recent bookmarklet file is found."""
-        old_file = tmp_path / "old-bookmarklet.json"
+    def test_finds_script_export_zip(self, tmp_path: Path) -> None:
+        """Test finding a script export ZIP file."""
+        export = tmp_path / "convoviz_export.zip"
+        export.write_text("[]")
+
+        result = find_script_export(tmp_path)
+        assert result == export
+
+    def test_finds_most_recent_export(self, tmp_path: Path) -> None:
+        """Test that the most recent export file is found."""
+        old_file = tmp_path / "convoviz_export_old.json"
         old_file.write_text("[]")
 
         time.sleep(0.01)
 
-        new_file = tmp_path / "new-bookmarklet.json"
+        new_file = tmp_path / "convoviz_export_new.zip"
         new_file.write_text("[]")
 
-        result = find_latest_bookmarklet_json(tmp_path)
+        result = find_script_export(tmp_path)
         assert result == new_file
 
-    def test_ignores_non_bookmarklet_json(self, tmp_path: Path) -> None:
-        """Test that non-bookmarklet JSON files are ignored."""
-        # Regular JSON file (not bookmarklet)
-        regular = tmp_path / "conversations.json"
-        regular.write_text("[]")
+    def test_ignores_non_export_convoviz_files(self, tmp_path: Path) -> None:
+        """Test that files with 'convoviz' but not starting with 'convoviz_export' are ignored."""
+        # Contains convoviz but doesn't start with convoviz_export
+        wrong_name = tmp_path / "my_convoviz.zip"
+        wrong_name.write_text("[]")
 
-        result = find_latest_bookmarklet_json(tmp_path)
+        result = find_script_export(tmp_path)
         assert result is None
 
     def test_returns_none_when_none_found(self, tmp_path: Path) -> None:
-        """Test that None is returned when no bookmarklet files exist."""
-        result = find_latest_bookmarklet_json(tmp_path)
+        """Test that None is returned when no export files exist."""
+        result = find_script_export(tmp_path)
         assert result is None
 
     def test_case_insensitive_matching(self, tmp_path: Path) -> None:
-        """Test that bookmarklet matching is case-insensitive."""
-        upper = tmp_path / "ChatGPT-BOOKMARKLET.json"
+        """Test that matching is case-insensitive."""
+        upper = tmp_path / "CONVOVIZ_EXPORT.json"
         upper.write_text("[]")
 
-        result = find_latest_bookmarklet_json(tmp_path)
+        result = find_script_export(tmp_path)
         assert result == upper

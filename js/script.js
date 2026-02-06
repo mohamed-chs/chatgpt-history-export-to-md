@@ -8,7 +8,8 @@
   const CONFIG = {
     CONCURRENCY: 3, // How many chats to fetch at once
     BATCH_SIZE: 50, // How many to ask for per page
-    JSON_FILENAME: "chatgpt_bookmarklet_download.json",
+    JSON_FILENAME: "conversations.json",
+    ZIP_FILENAME: "convoviz_export.zip",
     COLORS: {
       bg: "rgba(32, 33, 35, 0.95)",
       accent: "#10a37f",
@@ -21,6 +22,7 @@
   const State = {
     token: "",
     results: [],
+    zip: null,
     totalToFetch: 0,
     completed: 0,
     isRunning: false,
@@ -138,6 +140,7 @@
         document.getElementById("arch-count").value,
       );
       State.isRunning = true;
+      State.zip = new JSZip();
       UI.render("active");
 
       try {
@@ -192,14 +195,11 @@
 
         await Promise.all(workers);
 
-        // 4. Wrap it all up into a JSON file
-        UI.update("Generating Final JSON...", 100);
-        Net.download(
-          new Blob([JSON.stringify(State.results)], {
-            type: "application/json",
-          }),
-          CONFIG.JSON_FILENAME,
-        );
+        // 4. Wrap it all up into a ZIP file
+        UI.update("Generating Final ZIP...", 100);
+        State.zip.file(CONFIG.JSON_FILENAME, JSON.stringify(State.results));
+        const zipBlob = await State.zip.generateAsync({ type: "blob" });
+        Net.download(zipBlob, CONFIG.ZIP_FILENAME);
 
         UI.update("✅ Done!", 100);
         await Net.wait(3000);
@@ -248,7 +248,7 @@
             const fileName = file.name
               ? `${file.id}_${file.name}`
               : `${file.id}.${ext}`;
-            Net.download(b, fileName);
+            State.zip.file(fileName, b);
             await Net.wait(1000);
           }
         } catch (e) {

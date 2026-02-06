@@ -65,19 +65,23 @@ def run_pipeline(config: ConvovizConfig) -> None:
         collection = load_collection_from_zip(input_path)
     logger.info(f"Loaded collection with {len(collection.conversations)} conversations")
 
-    # Try to merge bookmarklet data if explicitly specified
+    # Try to merge script export if explicitly specified
     if config.bookmarklet_path:
-        bookmarklet_json = config.bookmarklet_path
+        script_path = config.bookmarklet_path
         console.print(
-            f"Merging bookmarklet download: [bold yellow]{bookmarklet_json.name}[/bold yellow] ...\n"
+            f"Merging convoviz script export: [bold yellow]{script_path}[/bold yellow] ...\n"
         )
         try:
-            bookmarklet_collection = load_collection_from_json(bookmarklet_json)
-            collection.update(bookmarklet_collection)
-            logger.info(f"Merged bookmarklet data from {bookmarklet_json}")
+            if script_path.suffix.lower() == ".json":
+                script_collection = load_collection_from_json(script_path)
+            else:
+                script_collection = load_collection_from_zip(script_path)
+
+            collection.update(script_collection)
+            logger.info(f"Merged script data from {script_path}")
         except Exception as e:
             console.print(
-                f"[bold yellow]Warning:[/bold yellow] Failed to load bookmarklet data: {e}"
+                f"[bold yellow]Warning:[/bold yellow] Failed to load script export data: {e}"
             )
 
     output_folder = config.output_folder

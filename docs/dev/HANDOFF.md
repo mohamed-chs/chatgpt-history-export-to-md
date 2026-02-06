@@ -121,6 +121,11 @@ uv run ruff check convoviz tests && uv run ty check convoviz && uv run pytest
 
 ## Recent Updates (February 6, 2026)
 
+- **Direct Export (formerly Bookmarklet) Enhancements**:
+  - Updated `js/script.js` to package conversations and assets into a single `convoviz_export.zip` file using **JSZip**.
+  - Renamed internal discovery logic to `find_script_export`.
+  - Updated `pipeline.py` and `interactive.py` to support merging both JSON and ZIP external exports.
+  - Updated `js/HOW_TO_USE.md` with instructions for loading JSZip in the browser console.
 - **Timestamp Enhancements**:
   - Implemented **Filename Timestamps**: New `--timestamp` (`-t`) flag to prepend `YYYY-MM-DD_HH-MM-SS` to filenames for chronological sorting.
   - Implemented **Message Timestamps**: Added *italics* timestamps after author headers. Uses a smart date display (full date only on date change, otherwise just time).
@@ -145,8 +150,8 @@ uv run ruff check convoviz tests && uv run ty check convoviz && uv run pytest
 
 ## Earlier Updates (February 4, 2026)
 
-- **Explicit Bookmarklet Merge**: Refactored the integration to be explicit and transparent.
-  - Added an interactive confirmation prompt in `interactive.py` to ask the user before merging bookmarklet data found in `~/Downloads`.
+- **Explicit Direct Export Merge**: Refactored the integration to be explicit and transparent.
+  - Added an interactive confirmation prompt in `interactive.py` to ask the user before merging direct export data found in `~/Downloads`.
   - Implemented identity-aware file saving in `io/writers.py` to avoid duplicates across repeated runs.
-- **Bookmarklet Script Update**: Rewrote `js/script.js` to be more robust and modern, including asset naming fixes (prefixing with Asset ID).
+- **Direct Export Script Update**: Rewrote `js/script.js` to be more robust and modern, including asset naming fixes (prefixing with Asset ID).
 - **Multiple Source Paths Support**: `convoviz` now searches across all merged source directories for assets.

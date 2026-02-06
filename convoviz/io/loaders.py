@@ -172,20 +172,29 @@ def find_latest_zip(directory: Path | None = None) -> Path | None:
     return max(zip_files, key=lambda p: p.stat().st_ctime)
 
 
-def find_latest_bookmarklet_json(directory: Path | None = None) -> Path | None:
-    """Find the most recent bookmarklet JSON file in a directory.
+def find_script_export(directory: Path | None = None) -> Path | None:
+    """Find the most recent script-generated export in a directory.
+
+    Looks for files with 'convoviz' in the name and .json or .zip extension.
 
     Args:
         directory: Directory to search (defaults to ~/Downloads)
 
     Returns:
-        Path to the most recent bookmarklet JSON, or None if none found
+        Path to the most recent export, or None if none found
     """
     if directory is None:
         directory = Path.home() / "Downloads"
 
-    bookmarklet_files = [f for f in directory.glob("*.json") if "bookmarklet" in f.name.lower()]
-    if not bookmarklet_files:
+    export_files = [
+        f
+        for f in directory.iterdir()
+        if f.is_file()
+        and f.name.lower().startswith("convoviz_export")
+        and f.suffix.lower() in (".json", ".zip")
+    ]
+
+    if not export_files:
         return None
 
-    return max(bookmarklet_files, key=lambda p: p.stat().st_ctime)
+    return max(export_files, key=lambda p: p.stat().st_ctime)

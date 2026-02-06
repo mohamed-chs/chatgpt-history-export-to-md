@@ -9,7 +9,7 @@ from questionary import path as qst_path
 from questionary import text as qst_text
 
 from convoviz.config import ConvovizConfig, OutputKind, YAMLConfig, get_default_config
-from convoviz.io.loaders import find_latest_bookmarklet_json, find_latest_zip, validate_zip
+from convoviz.io.loaders import find_latest_zip, find_script_export, validate_zip
 from convoviz.utils import colormaps, default_font_path, font_names, font_path, validate_header
 
 OUTPUT_TITLES = {
@@ -108,23 +108,23 @@ def run_interactive_config(initial_config: ConvovizConfig | None = None) -> Conv
     if input_result:
         config.input_path = Path(input_result)
     logger.debug(f"User selected input: {config.input_path}")
-    # Prompt to merge bookmarklet data if detected (and not already selected as primary input)
-    bookmarklet = find_latest_bookmarklet_json()
-    if bookmarklet and (
-        not config.input_path or bookmarklet.resolve() != config.input_path.resolve()
+    # Prompt to merge script export if detected (and not already selected as primary input)
+    script_export = find_script_export()
+    if script_export and (
+        not config.input_path or script_export.resolve() != config.input_path.resolve()
     ):
         merge_it: bool = _ask_or_cancel(
             confirm(
-                f"Found recent bookmarklet export: {bookmarklet.name}\n  Merge it with your main input?",
+                f"Found recent convoviz script export: {script_export.name}\n  Merge it with your main input?",
                 default=True,
                 style=CUSTOM_STYLE,
             )
         )
         if merge_it:
-            config.bookmarklet_path = bookmarklet
-            logger.debug(f"User confirmed bookmarklet merge: {bookmarklet}")
+            config.bookmarklet_path = script_export
+            logger.debug(f"User confirmed script export merge: {script_export}")
         else:
-            logger.debug("User declined bookmarklet merge")
+            logger.debug("User declined script export merge")
 
     # Prompt for output folder
     output_result: str = _ask_or_cancel(
