@@ -4,12 +4,42 @@
 
 ## Recent Updates (February 6, 2026)
 
+- **Direct Export (formerly Bookmarklet) Enhancements**:
+    - Updated `js/script.js` to package conversations and assets into a single `convoviz_export.zip` file using **JSZip**.
+    - Renamed internal discovery logic to `find_script_export`.
+    - Updated `pipeline.py` and `interactive.py` to support merging both JSON and ZIP external exports.
+    - Updated `js/HOW_TO_USE.md` with instructions for loading JSZip in the browser console.
 - **Timestamp Enhancements**:
     - **Filename Timestamps**: Added optional prepending of conversation timestamps to markdown filenames (`YYYY-MM-DD_HH-MM-SS - Title.md`). Controlled via `--timestamp` (`-t`) CLI flag or `prepend_timestamp_to_filename` config.
     - **Message Timestamps**: Added timestamps to message headers in markdown output (enabled by default).
     - **Smart Date Display**: Message timestamps show full date (`YYYY-MM-DD HH:MM:SS`) for the first message and when the date changes; otherwise, only the time (`HH:MM:SS`) is shown.
     - **Configuration**: Added `show_timestamp` to `MarkdownConfig` (default: True) and `prepend_timestamp_to_filename` to `ConvovizConfig` (default: False).
     - **Identity Protection**: Maintained identity-based overwriting logic; conversations are still correctly identified even if filenames change due to timestamp flags.
+
+## Recent Updates (February 5, 2026)
+
+- **Custom Instructions & Canvas Support**:
+    - Fixed extraction of **Custom Instructions**: Now properly includes hidden system messages. Enabled export to `custom_instructions.json`.
+    - Added **Canvas (Canmore) Support**: Extracted documents from `conversations.json` are saved to a `canvas/` folder with appropriate extensions (`.html`, `.py`, `.md`).
+    - Improved `Message.text` extraction to handle and render embedded Canvas documents in the conversation history.
+- **Graphs Module Refactor**: Split 880-line `graphs.py` into focused submodules:
+    - `graphs/common.py` - Shared utilities (font loading, styling, time conversions)
+    - `graphs/timeseries.py` - Weekday, hourly, monthly, daily activity charts
+    - `graphs/distributions.py` - Model usage, conversation length histograms
+    - `graphs/heatmaps.py` - Activity heatmaps
+    - `graphs/dashboard.py` - Summary dashboard and orchestration
+- **Wordcloud Fix**: Fixed `DeprecationWarning` about fork in multi-threaded processes by using `spawn` context in `ProcessPoolExecutor`.
+- **Minor Fixes**:
+    - Fixed `has_content` property to include `reasoning_recap` and `thoughts` content types.
+    - Renamed `FileNotFoundError` to `ConvovizFileNotFoundError` to avoid shadowing Python builtin.
+
+## Recent Updates (February 4, 2026)
+
+- **Explicit Direct Export Merge**: Refactored the integration to be explicit and transparent.
+    - Added an interactive confirmation prompt in `interactive.py` to ask the user before merging direct export data found in `~/Downloads`.
+    - Implemented identity-aware file saving in `io/writers.py` to avoid duplicates across repeated runs.
+- **Direct Export Script Update**: Rewrote `js/script.js` to be more robust and modern, including asset naming fixes (prefixing with Asset ID).
+- **Multiple Source Paths Support**: `convoviz` now searches across all merged source directories for assets.
 
 ## Recent Updates (February 3, 2026)
 
