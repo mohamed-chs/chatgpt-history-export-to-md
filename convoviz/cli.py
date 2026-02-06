@@ -61,6 +61,12 @@ def run(
         "-f",
         help="Put all markdown files in a single folder (disables date organization).",
     ),
+    timestamp: bool = typer.Option(
+        False,
+        "--timestamp",
+        "-t",
+        help="Prepend conversation timestamp to the filename (e.g., 2024-03-21_15-30-05 - Title.md).",
+    ),
     interactive: bool | None = typer.Option(
         None,
         "--interactive/--no-interactive",
@@ -110,6 +116,8 @@ def run(
         config.outputs = set(outputs)
     if flat:
         config.folder_organization = FolderOrganization.FLAT
+    if timestamp:
+        config.prepend_timestamp_to_filename = True
 
     # Determine mode: interactive if explicitly requested or no input provided
     use_interactive = interactive if interactive is not None else (input_path is None)

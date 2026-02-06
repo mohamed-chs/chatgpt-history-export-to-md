@@ -137,6 +137,7 @@ Available options: `markdown`, `graphs`, `wordclouds`
 | Flag | Description |
 |------|-------------|
 | `--zip` / `-z` | Alias for `--input` (for convenience) |
+| `--timestamp` / `-t` | Prepend conversation timestamp to the filename (e.g., `2024-03-21_15-30-05 - Title.md`) |
 | `--no-interactive` | Force non-interactive mode |
 | `--flat` | Put all Markdown files in a single folder (instead of organizing by date) |
 | `--verbose` / `-v` | Enable detailed logging (use `-vv` for debug logs) |

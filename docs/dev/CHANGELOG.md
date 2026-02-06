@@ -2,6 +2,15 @@
 
 > **Note**: This changelog is informal and incomplete. It is a collection of recent updates moved from `HANDOFF.md`.
 
+## Recent Updates (February 6, 2026)
+
+- **Timestamp Enhancements**:
+    - **Filename Timestamps**: Added optional prepending of conversation timestamps to markdown filenames (`YYYY-MM-DD_HH-MM-SS - Title.md`). Controlled via `--timestamp` (`-t`) CLI flag or `prepend_timestamp_to_filename` config.
+    - **Message Timestamps**: Added timestamps to message headers in markdown output (enabled by default).
+    - **Smart Date Display**: Message timestamps show full date (`YYYY-MM-DD HH:MM:SS`) for the first message and when the date changes; otherwise, only the time (`HH:MM:SS`) is shown.
+    - **Configuration**: Added `show_timestamp` to `MarkdownConfig` (default: True) and `prepend_timestamp_to_filename` to `ConvovizConfig` (default: False).
+    - **Identity Protection**: Maintained identity-based overwriting logic; conversations are still correctly identified even if filenames change due to timestamp flags.
+
 ## Recent Updates (February 3, 2026)
 
 - **Attachment Renaming**:

@@ -1,5 +1,7 @@
 """Tests for the renderers module."""
 
+from datetime import timedelta
+
 from convoviz.config import AuthorHeaders, ConversationConfig, YAMLConfig
 from convoviz.models import Conversation
 from convoviz.renderers import render_conversation
@@ -185,3 +187,54 @@ class TestRenderConversation:
         )
 
         assert "![Image](assets/file-123.png)" in markdown
+
+    def test_render_conversation_timestamps(self, mock_conversation: Conversation) -> None:
+        """Test timestamp rendering in conversation."""
+        config = ConversationConfig()
+        headers = AuthorHeaders()
+        markdown = render_conversation(mock_conversation, config, headers)
+
+        # Messages in mock_conversation:
+        # 1. System (hidden)
+        # 2. User (2023-07-29 08:00:00)
+        # 3. Assistant (2023-07-29 08:05:00)
+
+        # First visible message (user) should have full date
+        assert "*2023-07-29 08:00:00*" in markdown
+
+        # Second visible message (assistant) on same day should only have time
+        assert "*08:05:00*" in markdown
+        # It should NOT have the full date again if it's the same day
+        # But wait, our current mock has only one assistant message at 08:05:00.
+        # Let's verify the string count.
+        assert (
+            markdown.count("2023-07-29") == 3
+        )  # Twice in YAML (create/update), once in User message
+
+    def test_render_conversation_no_timestamps(self, mock_conversation: Conversation) -> None:
+        """Test that timestamps can be disabled."""
+        config = ConversationConfig()
+        config.markdown.show_timestamp = False
+        headers = AuthorHeaders()
+        markdown = render_conversation(mock_conversation, config, headers)
+
+        assert "*2023-07-29 08:00:00*" not in markdown
+        assert "*08:05:00*" not in markdown
+
+    def test_render_conversation_date_change(self, mock_conversation: Conversation) -> None:
+        """Test that full date is shown when it changes between messages."""
+        # Modify assistant message to be on the next day
+        assistant_node = mock_conversation.mapping["assistant_node_111"]
+        original_ts = assistant_node.message.create_time
+        next_day_ts = original_ts + timedelta(days=1)
+        assistant_node.message.create_time = next_day_ts
+
+        config = ConversationConfig()
+        headers = AuthorHeaders()
+        markdown = render_conversation(mock_conversation, config, headers)
+
+        # User message
+        assert "*2023-07-29 08:00:00*" in markdown
+        # Assistant message (next day) should have full date
+        expected_date = next_day_ts.strftime("%Y-%m-%d")
+        assert f"*{expected_date} 08:05:00*" in markdown

@@ -200,6 +200,7 @@ def save_collection(
     headers: AuthorHeaders,
     *,
     folder_organization: FolderOrganization = FolderOrganization.FLAT,
+    prepend_timestamp: bool = False,
     progress_bar: bool = False,
 ) -> None:
     """Save all conversations in a collection to markdown files.
@@ -210,6 +211,7 @@ def save_collection(
         config: Conversation rendering configuration
         headers: Author header configuration
         folder_organization: How to organize files in folders (flat or by date)
+        prepend_timestamp: Whether to prepend the conversation timestamp to the filename
         progress_bar: Whether to show a progress bar
     """
     directory.mkdir(parents=True, exist_ok=True)
@@ -226,7 +228,15 @@ def save_collection(
         else:
             target_dir = directory
 
-        filepath = target_dir / f"{sanitize(conv.title)}.md"
+        # Determine filename
+        sanitized_title = sanitize(conv.title)
+        if prepend_timestamp:
+            timestamp_prefix = conv.create_time.strftime("%Y-%m-%d_%H-%M-%S")
+            filename = f"{timestamp_prefix} - {sanitized_title}.md"
+        else:
+            filename = f"{sanitized_title}.md"
+
+        filepath = target_dir / filename
         save_conversation(conv, filepath, config, headers, source_paths=collection.source_paths)
 
     # Generate index files for date organization

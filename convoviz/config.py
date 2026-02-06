@@ -40,6 +40,7 @@ class MarkdownConfig(BaseModel):
 
     latex_delimiters: Literal["default", "dollars"] = "dollars"
     flavor: Literal["standard", "obsidian"] = "standard"
+    show_timestamp: bool = True
 
 
 class YAMLConfig(BaseModel):
@@ -110,6 +111,7 @@ class ConvovizConfig(BaseModel):
     output_folder: Path = Field(default_factory=lambda: Path.home() / "Documents" / "ChatGPT-Data")
     folder_organization: FolderOrganization = FolderOrganization.DATE
     outputs: set[OutputKind] = Field(default_factory=lambda: set(ALL_OUTPUTS))
+    prepend_timestamp_to_filename: bool = False
 
     # Export flags
     export_canvas: bool = True

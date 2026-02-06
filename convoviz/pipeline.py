@@ -109,6 +109,7 @@ def run_pipeline(config: ConvovizConfig) -> None:
             config.conversation,
             config.message.author_headers,
             folder_organization=config.folder_organization,
+            prepend_timestamp=config.prepend_timestamp_to_filename,
             progress_bar=True,
         )
 

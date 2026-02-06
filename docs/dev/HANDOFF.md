@@ -119,6 +119,13 @@ uv run ruff check convoviz tests && uv run ty check convoviz && uv run pytest
 > [!TIP]
 > Historical updates have been moved to [**`docs/dev/CHANGELOG.md`**](CHANGELOG.md).
 
+## Recent Updates (February 6, 2026)
+
+- **Timestamp Enhancements**:
+  - Implemented **Filename Timestamps**: New `--timestamp` (`-t`) flag to prepend `YYYY-MM-DD_HH-MM-SS` to filenames for chronological sorting.
+  - Implemented **Message Timestamps**: Added *italics* timestamps after author headers. Uses a smart date display (full date only on date change, otherwise just time).
+  - Configurable: `config.markdown.show_timestamp` (on by default) and `config.prepend_timestamp_to_filename` (off by default).
+
 ## Recent Updates (February 5, 2026)
 
 - **Custom Instructions & Canvas Support**:

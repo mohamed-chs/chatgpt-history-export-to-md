@@ -131,3 +131,25 @@ def test_outputs_flag_default_all(mock_zip_file: Path, tmp_path: Path) -> None:
         mock_run.assert_called_once()
         config = mock_run.call_args[0][0]
         assert config.outputs == {OutputKind.MARKDOWN, OutputKind.GRAPHS, OutputKind.WORDCLOUDS}
+
+
+def test_timestamp_flag(mock_zip_file: Path, tmp_path: Path) -> None:
+    """Test --timestamp flag sets prepend_timestamp_to_filename."""
+    output_dir = tmp_path / "output"
+
+    with patch("convoviz.cli.run_pipeline") as mock_run:
+        result = runner.invoke(
+            app,
+            [
+                "--zip",
+                str(mock_zip_file),
+                "--output",
+                str(output_dir),
+                "--timestamp",
+            ],
+        )
+
+        assert result.exit_code == 0
+        mock_run.assert_called_once()
+        config = mock_run.call_args[0][0]
+        assert config.prepend_timestamp_to_filename is True

@@ -2,6 +2,7 @@
 
 import re
 from collections.abc import Callable
+from datetime import datetime
 from typing import Any
 from urllib.parse import quote
 
@@ -216,6 +217,8 @@ def render_node(
     asset_resolver: Callable[[str, str | None], str | None] | None = None,
     flavor: str = "standard",
     citation_map: dict[str, dict[str, str | None]] | None = None,
+    show_timestamp: bool = True,
+    last_timestamp: datetime | None = None,
 ) -> str:
     """Render a complete node as markdown.
 
@@ -226,6 +229,8 @@ def render_node(
         asset_resolver: Function to resolve asset IDs to paths, optionally renaming them
         flavor: Markdown flavor ("standard" or "obsidian")
         citation_map: Global map of citations
+        show_timestamp: Whether to show the message timestamp
+        last_timestamp: The timestamp of the previous message (for conditional date display)
     """
     if node.message is None:
         return ""
@@ -254,6 +259,16 @@ def render_node(
         return ""
 
     header = render_node_header(node, headers)
+
+    # Add timestamp if enabled and available
+    timestamp_str = ""
+    if show_timestamp and node.message.create_time:
+        curr_time = node.message.create_time
+        # Show full date if it's the first message or if the date has changed
+        if last_timestamp is None or curr_time.date() != last_timestamp.date():
+            timestamp_str = f"*{curr_time.strftime('%Y-%m-%d %H:%M:%S')}*\n"
+        else:
+            timestamp_str = f"*{curr_time.strftime('%H:%M:%S')}*\n"
 
     # Get and process content
     try:
@@ -302,7 +317,7 @@ def render_node(
                 # Obsidian handles this well.
                 content += f"\n![Image]({encoded_path})\n"
 
-    return f"\n{header}{content}\n---\n"
+    return f"\n{header}{timestamp_str}{content}\n---\n"
 
 
 def _ordered_nodes(conversation: Conversation) -> list[Node]:
@@ -354,6 +369,7 @@ def render_conversation(
     """
     use_dollar_latex = config.markdown.latex_delimiters == "dollars"
     flavor = config.markdown.flavor
+    show_timestamp = config.markdown.show_timestamp
 
     # Start with YAML header
     markdown = render_yaml_header(conversation, config.yaml)
@@ -362,6 +378,7 @@ def render_conversation(
     citation_map = conversation.citation_map
 
     # Render message nodes in a deterministic traversal order.
+    last_timestamp = None
     for node in _ordered_nodes(conversation):
         if node.message:
             markdown += render_node(
@@ -371,6 +388,10 @@ def render_conversation(
                 asset_resolver=asset_resolver,
                 flavor=flavor,
                 citation_map=citation_map,
+                show_timestamp=show_timestamp,
+                last_timestamp=last_timestamp,
             )
+            if node.message.create_time and not node.message.is_hidden:
+                last_timestamp = node.message.create_time
 
     return markdown

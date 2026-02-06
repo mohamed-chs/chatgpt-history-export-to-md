@@ -211,6 +211,23 @@ class TestSaveCollectionWithDateOrganization:
         assert not (tmp_path / "_index.md").exists()
         assert not list(tmp_path.glob("**/_index.md"))
 
+    def test_prepend_timestamp_to_filename(self, tmp_path: Path) -> None:
+        """Test that timestamps are prepended to filenames when requested."""
+        conv = create_conversation("My Chat", datetime(2024, 3, 21, 15, 30, 5, tzinfo=UTC), "conv1")
+        collection = ConversationCollection(conversations=[conv])
+
+        save_collection(
+            collection,
+            tmp_path,
+            ConversationConfig(),
+            AuthorHeaders(),
+            folder_organization=FolderOrganization.FLAT,
+            prepend_timestamp=True,
+        )
+
+        expected_filename = "2024-03-21_15-30-05 - My Chat.md"
+        assert (tmp_path / expected_filename).exists()
+
 
 class TestSaveConversation:
     """Tests for save_conversation function."""
