@@ -51,7 +51,7 @@ class MarkdownConfig(BaseModel):
     """Configuration for markdown output."""
 
     latex_delimiters: Literal["default", "dollars"] = "dollars"
-    flavor: Literal["standard", "obsidian"] = "standard"
+    flavor: Literal["standard", "obsidian", "pandoc"] = "standard"
     show_timestamp: bool = True
 
 
@@ -59,6 +59,7 @@ class YAMLConfig(BaseModel):
     """Configuration for YAML frontmatter in markdown files."""
 
     title: bool = True
+    aliases: bool = True
     tags: bool = False
     chat_link: bool = True
     create_time: bool = True

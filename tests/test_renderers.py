@@ -1,6 +1,6 @@
 """Tests for the renderers module."""
 
-from datetime import timedelta
+from datetime import datetime, timedelta
 
 from convoviz.config import AuthorHeaders, ConversationConfig, YAMLConfig
 from convoviz.models import Conversation
@@ -161,6 +161,7 @@ class TestRenderYamlHeader:
         """Test YAML header with no fields enabled."""
         config = YAMLConfig(
             title=False,
+            aliases=False,
             tags=False,
             chat_link=False,
             create_time=False,
@@ -174,6 +175,22 @@ class TestRenderYamlHeader:
         )
         yaml = render_yaml_header(mock_conversation, config)
         assert yaml == ""
+
+    def test_title_sanitized_and_alias_added(self) -> None:
+        """Test that title is sanitized and original appears in aliases."""
+        conv = Conversation(
+            title="My @Title: With/Chars",
+            create_time=datetime(2026, 2, 3),
+            update_time=datetime(2026, 2, 3),
+            mapping={},
+            current_node="node1",
+            conversation_id="conv1",
+        )
+        config = YAMLConfig(title=True, aliases=True, chat_link=False)
+        yaml = render_yaml_header(conv, config)
+        assert 'title: "My Title WithChars"' in yaml
+        assert "aliases:" in yaml
+        assert '- "My @Title: With/Chars"' in yaml
 
 
 class TestRenderConversation:

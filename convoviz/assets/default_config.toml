@@ -24,11 +24,12 @@ tool = "### Tool output"
 
 [conversation.markdown]
 latex_delimiters = "dollars" # "default" or "dollars"
-flavor = "standard" # "standard" or "obsidian"
+flavor = "standard" # "standard", "obsidian", or "pandoc"
 show_timestamp = true
 
 [conversation.yaml]
 title = true
+aliases = true
 tags = false
 chat_link = true
 create_time = true

@@ -122,6 +122,20 @@ class TestCitationParsing:
         # Expected: "Sources:  [[S1](http://s1.com)] [[S2](http://s2.com)]"
         assert "[[S1](http://s1.com)][[S2](http://s2.com)]" in result.replace(" ", "")
 
+    def test_replace_citations_pandoc_format(self):
+        text = "Claim 【1†source】."
+        citations = [
+            {
+                "start_ix": 6,
+                "end_ix": 16,
+                "metadata": {"title": "Source 1", "url": "http://example.com/1"},
+            }
+        ]
+
+        result = replace_citations(text, citations, flavor="pandoc")
+        assert "[Source 1](http://example.com/1)" in result
+        assert "[[Source 1](http://example.com/1)]" not in result
+
 
 class TestMetadataEnrichment:
     def test_render_yaml_header_new_fields(self):

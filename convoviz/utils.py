@@ -63,6 +63,17 @@ def sanitize(filename: str) -> str:
     return result or "untitled"
 
 
+def sanitize_title(title: str) -> str:
+    """Sanitize a title for YAML frontmatter.
+
+    Keeps only letters, digits, space, hyphen, underscore.
+    Collapses repeated spaces and trims. Returns "untitled" if empty.
+    """
+    cleaned = re.sub(r"[^A-Za-z0-9 _-]+", "", title)
+    cleaned = re.sub(r"\s+", " ", cleaned).strip()
+    return cleaned or "untitled"
+
+
 def validate_header(text: str) -> bool:
     """Check if text is a valid markdown header.
 

@@ -16,6 +16,7 @@ def replace_citations(
     text: str,
     citations: list[dict[str, Any]] | None = None,
     citation_map: dict[str, dict[str, str | None]] | None = None,
+    flavor: str = "standard",
 ) -> str:
     """Replace citation placeholders in text with markdown links.
 
@@ -27,6 +28,7 @@ def replace_citations(
         text: The original message text
         citations: List of tether v4 citation objects (start_ix/end_ix)
         citation_map: Map of internal citation IDs to metadata (turnXsearchY -> {title, url})
+        flavor: Markdown flavor for link formatting ("standard", "obsidian", "pandoc")
 
     Returns:
         Text with all placeholders replaced by markdown links
@@ -44,7 +46,7 @@ def replace_citations(
             if start is None or end is None:
                 continue
 
-            replacement = _format_link(meta.get("title"), meta.get("url"))
+            replacement = _format_link(meta.get("title"), meta.get("url"), flavor)
 
             # Only replace if strictly positive indices and bounds check
             if 0 <= start < end <= len(text):
@@ -66,7 +68,7 @@ def replace_citations(
             for key in keys:
                 if key in citation_map:
                     data = citation_map[key]
-                    link = _format_link(data.get("title"), data.get("url"))
+                    link = _format_link(data.get("title"), data.get("url"), flavor)
                     if link:
                         links.append(link)
 
@@ -77,13 +79,22 @@ def replace_citations(
     return text
 
 
-def _format_link(title: str | None, url: str | None) -> str:
+def _format_link(title: str | None, url: str | None, flavor: str = "standard") -> str:
     """Format a title and URL into a concise markdown link."""
+    if flavor == "pandoc":
+        if title and url:
+            return f" [{title}]({url})"
+        if url:
+            return f" [Source]({url})"
+        if title:
+            return f" {title}"
+        return ""
+
     if title and url:
         return f" [[{title}]({url})]"
-    elif url:
+    if url:
         return f" [[Source]({url})]"
-    elif title:
+    if title:
         return f" [{title}]"
     return ""
 
@@ -301,6 +312,7 @@ def render_node(
             text,
             citations=node.message.metadata.citations,
             citation_map=effective_map,
+            flavor=flavor,
         )
 
     content = close_code_blocks(text)

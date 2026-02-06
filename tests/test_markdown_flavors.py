@@ -45,6 +45,23 @@ def test_standard_flavor_rendering(mock_conversation: Conversation) -> None:
     assert "# ChatGPT" in markdown
 
 
+def test_pandoc_flavor_rendering(mock_conversation: Conversation) -> None:
+    """Test rendering with pandoc flavor."""
+    config = ConversationConfig(markdown=MarkdownConfig(flavor="pandoc"))
+    headers = AuthorHeaders()
+
+    markdown = render_conversation(mock_conversation, config, headers)
+
+    # Should NOT have block IDs or links
+    assert "^" not in markdown
+    assert "[⬆️]" not in markdown
+    assert "[⬇️]" not in markdown
+
+    # Should still have author headers
+    assert "# Me" in markdown
+    assert "# ChatGPT" in markdown
+
+
 def test_flavor_default_is_standard() -> None:
     """Test that standard is the default flavor."""
     config = MarkdownConfig()
@@ -211,4 +228,16 @@ class TestObsidianReasoningContent:
 
         # Should NOT contain the thoughts content
         assert "Let me think" not in markdown
+        assert "[!NOTE]" not in markdown
+
+    def test_pandoc_hides_reasoning_recap(self) -> None:
+        """Test that pandoc flavor hides reasoning_recap (standard behavior)."""
+        conv = self._make_conversation_with_reasoning("reasoning_recap", "I analyzed the problem.")
+        config = ConversationConfig(markdown=MarkdownConfig(flavor="pandoc"))
+        headers = AuthorHeaders()
+
+        markdown = render_conversation(conv, config, headers)
+
+        # Should NOT contain the reasoning content
+        assert "I analyzed the problem" not in markdown
         assert "[!NOTE]" not in markdown

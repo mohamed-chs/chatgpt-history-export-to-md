@@ -7,6 +7,7 @@ from datetime import datetime
 
 from convoviz.config import YAMLConfig
 from convoviz.models import Conversation
+from convoviz.utils import sanitize_title
 
 _TAG_SAFE_RE = re.compile(r"[^a-z0-9/_\-]+")
 
@@ -92,7 +93,10 @@ def render_yaml_header(conversation: Conversation, config: YAMLConfig) -> str:
     yaml_fields: dict[str, object] = {}
 
     if config.title:
-        yaml_fields["title"] = conversation.title
+        sanitized_title = sanitize_title(conversation.title)
+        yaml_fields["title"] = sanitized_title
+        if config.aliases and sanitized_title != conversation.title:
+            yaml_fields["aliases"] = [conversation.title]
     if config.tags:
         yaml_fields["tags"] = _default_tags(conversation)
     if config.chat_link:

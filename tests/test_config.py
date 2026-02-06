@@ -46,6 +46,7 @@ def test_yaml_config_defaults() -> None:
     """Test YAMLConfig default values."""
     yaml = YAMLConfig()
     assert yaml.title is True
+    assert yaml.aliases is True
     assert yaml.tags is False
     assert yaml.chat_link is True
 

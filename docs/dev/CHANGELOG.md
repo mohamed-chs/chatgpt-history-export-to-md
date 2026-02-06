@@ -133,6 +133,14 @@
 - Bar plot graphs showing usage patterns
 - JSON export of custom instructions
 
+## Recent Updates (February 6, 2026)
+
+**Pandoc/Quarto Markdown Flavor**:
+- Added `pandoc` markdown flavor to emit standard citation links (`[Title](URL)`) for better Pandoc/Quarto compatibility.
+- Added Quarto/Pandoc PDF guide at `docs/quarto-guide.md`.
+- Tests updated to cover the new flavor behavior.
+- YAML frontmatter now sanitizes `title` and stores the original in `aliases` when changed.
+
 ## Recent Updates (January 26, 2026)
 
 **CI/CD Pipeline Automation**:

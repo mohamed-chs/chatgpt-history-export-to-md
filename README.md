@@ -176,6 +176,13 @@ Use a custom config path:
 convoviz --config path/to/config.toml
 ```
 
+Markdown flavor options in config:
+1. `standard` (default)
+2. `obsidian` (collapsible callouts for reasoning content)
+3. `pandoc` (Pandoc/Quarto-friendly citation links)
+
+YAML frontmatter titles are sanitized; the original title is preserved in `aliases` when it changes.
+
 </details>
 
 ---

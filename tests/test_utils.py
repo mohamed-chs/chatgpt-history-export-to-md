@@ -2,6 +2,7 @@
 
 from convoviz.utils import (
     sanitize,
+    sanitize_title,
     validate_header,
 )
 
@@ -72,3 +73,19 @@ class TestValidateHeader:
     def test_invalid_hash_only(self) -> None:
         """Test hash-only string is invalid."""
         assert validate_header("#") is False
+
+
+class TestSanitizeTitle:
+    """Tests for the sanitize_title function."""
+
+    def test_sanitize_title_strips_problem_chars(self) -> None:
+        """Test sanitizing a title with problematic characters."""
+        assert sanitize_title("My @Title: (Hello)") == "My Title Hello"
+
+    def test_sanitize_title_preserves_valid_chars(self) -> None:
+        """Test sanitize_title preserves allowed characters."""
+        assert sanitize_title("Weird---Title__") == "Weird---Title__"
+
+    def test_sanitize_title_empty(self) -> None:
+        """Test sanitize_title returns untitled on empty result."""
+        assert sanitize_title("$$$") == "untitled"
