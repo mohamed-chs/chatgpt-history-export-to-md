@@ -1,7 +1,12 @@
 """Utility functions for convoviz."""
 
+from __future__ import annotations
+
+import os
 import re
+from collections.abc import Mapping
 from pathlib import Path
+from typing import Any
 
 
 def sanitize(filename: str) -> str:
@@ -153,3 +158,32 @@ def colormaps() -> list[str]:
         return []
     with colormaps_path.open(encoding="utf-8") as f:
         return f.read().splitlines()
+
+
+def expand_path(value: str) -> Path:
+    """Expand environment variables and user home in a path string."""
+    expanded = os.path.expandvars(os.path.expanduser(value))
+    return Path(expanded)
+
+
+def normalize_optional_path(value: str | Path | None) -> Path | None:
+    """Normalize optional path-like values, treating empty strings as None."""
+    if value is None:
+        return None
+    if isinstance(value, Path):
+        return value
+    stripped = value.strip()
+    if not stripped:
+        return None
+    return expand_path(stripped)
+
+
+def deep_merge_dicts(base: Mapping[str, Any], override: Mapping[str, Any]) -> dict[str, Any]:
+    """Deep-merge mapping values, preferring values from override."""
+    merged: dict[str, Any] = dict(base)
+    for key, value in override.items():
+        if isinstance(value, Mapping) and isinstance(base.get(key), Mapping):
+            merged[key] = deep_merge_dicts(base[key], value)
+        else:
+            merged[key] = value
+    return merged

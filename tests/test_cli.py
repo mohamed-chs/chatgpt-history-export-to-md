@@ -3,12 +3,18 @@
 from pathlib import Path
 from unittest.mock import patch
 
+import pytest
 from typer.testing import CliRunner
 
 from convoviz.cli import app
 from convoviz.config import OutputKind
 
 runner = CliRunner()
+
+
+@pytest.fixture(autouse=True)
+def _isolate_user_config(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+    monkeypatch.setattr("convoviz.config.get_user_config_path", lambda: tmp_path / "convoviz.toml")
 
 
 def test_main_with_args(mock_zip_file: Path, tmp_path: Path) -> None:
@@ -153,3 +159,18 @@ def test_timestamp_flag(mock_zip_file: Path, tmp_path: Path) -> None:
         mock_run.assert_called_once()
         config = mock_run.call_args[0][0]
         assert config.prepend_timestamp_to_filename is True
+
+
+def test_config_init_writes_default(tmp_path: Path) -> None:
+    path = tmp_path / "config.toml"
+    result = runner.invoke(app, ["config", "init", "--path", str(path)])
+    assert result.exit_code == 0
+    assert path.exists()
+    assert "Convoviz default configuration" in path.read_text(encoding="utf-8")
+
+
+def test_config_init_refuses_overwrite(tmp_path: Path) -> None:
+    path = tmp_path / "config.toml"
+    path.write_text("test", encoding="utf-8")
+    result = runner.invoke(app, ["config", "init", "--path", str(path)])
+    assert result.exit_code == 1

@@ -4,6 +4,14 @@
 
 ## Recent Updates (February 6, 2026)
 
+- **TOML Configuration Support**:
+    - Added bundled TOML defaults (`convoviz/assets/default_config.toml`) as the source of truth.
+    - User config now loads from OS-native config paths and merges over defaults.
+    - New CLI command: `convoviz config init` to generate a user config.
+    - New CLI flag: `--config PATH` to load an explicit config file.
+- **Docs & Utilities Cleanup**:
+    - Collapsed less critical README sections into `<details>` blocks for a cleaner front page.
+    - Moved generic helpers (path normalization and deep-merge) into `convoviz/utils.py`.
 - **Direct Export (formerly Bookmarklet) Enhancements**:
     - Updated `js/script.js` to package conversations and assets into a single `convoviz_export.zip` file using **JSZip**.
     - Renamed internal discovery logic to `find_script_export`.

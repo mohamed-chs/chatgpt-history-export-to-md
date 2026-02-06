@@ -14,6 +14,7 @@ from convoviz.config import (
     WordCloudConfig,
     YAMLConfig,
     get_default_config,
+    load_config_from_path,
 )
 
 
@@ -111,3 +112,24 @@ def test_outputs_can_be_modified() -> None:
     config = get_default_config()
     config.outputs = {OutputKind.MARKDOWN}
     assert config.outputs == {OutputKind.MARKDOWN}
+
+
+def test_load_config_from_path_overrides_defaults(tmp_path: Path) -> None:
+    config_path = tmp_path / "config.toml"
+    config_path.write_text(
+        """
+folder_organization = "flat"
+outputs = ["markdown"]
+
+[wordcloud]
+colormap = "viridis"
+font_path = ""
+""".strip(),
+        encoding="utf-8",
+    )
+
+    config = load_config_from_path(config_path)
+    assert config.folder_organization.value == "flat"
+    assert config.outputs == {OutputKind.MARKDOWN}
+    assert config.wordcloud.colormap == "viridis"
+    assert config.wordcloud.font_path is None

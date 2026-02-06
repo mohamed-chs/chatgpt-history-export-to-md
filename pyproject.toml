@@ -26,6 +26,7 @@ classifiers = [
 ]
 dependencies = [
   "orjson>=3.11.5",
+  "platformdirs>=4.5.1",
   "pydantic>=2.12.5",
   "pydantic-settings>=2.7.0",
   "questionary>=2.1.1",

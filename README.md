@@ -140,6 +140,7 @@ Available options: `markdown`, `graphs`, `wordclouds`
 | `--timestamp` / `-t` | Prepend conversation timestamp to the filename (e.g., `2024-03-21_15-30-05 - Title.md`) |
 | `--no-interactive` | Force non-interactive mode |
 | `--flat` | Put all Markdown files in a single folder (instead of organizing by date) |
+| `--config PATH` | Use a specific TOML config file (otherwise the user config is used if present) |
 | `--verbose` / `-v` | Enable detailed logging (use `-vv` for debug logs) |
 | `--log-file PATH` | Specify a custom log file location |
 
@@ -147,6 +148,32 @@ For a complete list of options:
 
 ```bash
 convoviz --help
+```
+
+</details>
+
+---
+
+<details>
+<summary><strong>⚙️ Configuration</strong></summary>
+
+Convoviz supports a TOML config file. Defaults are bundled with the package and can be copied into your user config directory.
+
+Generate a user config file:
+
+```bash
+convoviz config init
+```
+
+Default user config locations:
+1. Linux: `~/.config/convoviz/config.toml`
+2. macOS: `~/Library/Application Support/convoviz/config.toml`
+3. Windows: `%APPDATA%\\convoviz\\config.toml`
+
+Use a custom config path:
+
+```bash
+convoviz --config path/to/config.toml
 ```
 
 </details>

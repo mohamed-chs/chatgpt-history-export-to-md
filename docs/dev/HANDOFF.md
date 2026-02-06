@@ -46,6 +46,9 @@ convoviz/
 #### Configuration Flow
 ```
 get_default_config() → ConvovizConfig
+    └── Loaded from bundled TOML defaults
+    └── User config (OS-native path) merges over defaults
+    └── CLI flags override merged config
     └── Can be modified directly or via interactive prompts
     └── Passed to run_pipeline(config)
 ```
@@ -70,6 +73,7 @@ Conversation + Config → render_conversation() → Markdown string
 | File | Purpose |
 |------|---------|
 | `convoviz/config.py` | All configuration models (ConvovizConfig is the main one) |
+| `convoviz/assets/default_config.toml` | Bundled TOML defaults (source of truth for defaults) |
 | `convoviz/pipeline.py` | Main processing flow - start here to understand the app |
 | `convoviz/io/assets.py`| Logic for finding and copying image assets |
 | `AGENTS.md` | Context and operational guidelines for AI agents |
@@ -117,4 +121,3 @@ uv run ruff check convoviz tests && uv run ty check convoviz && uv run pytest
 - **ALWAYS KEEP ALL RELEVANT .MD FILES UPDATED WITH YOUR CHANGES. THIS IS CRITICAL.**
 
 Codebase updates are recorded in [**`docs/dev/CHANGELOG.md`**](CHANGELOG.md) — **check them out!**
-

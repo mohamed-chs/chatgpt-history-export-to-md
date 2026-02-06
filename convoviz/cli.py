@@ -8,7 +8,13 @@ import typer
 from rich.console import Console
 from rich.markup import escape
 
-from convoviz.config import FolderOrganization, OutputKind, get_default_config
+from convoviz.config import (
+    FolderOrganization,
+    OutputKind,
+    get_user_config_path,
+    load_config,
+    write_default_config,
+)
 from convoviz.exceptions import ConfigurationError, InvalidZipError
 from convoviz.interactive import run_interactive_config
 from convoviz.io.loaders import find_latest_zip
@@ -21,6 +27,8 @@ app = typer.Typer(
     help="ChatGPT Data Visualizer 📊 - Convert and visualize your ChatGPT history",
 )
 console = Console()
+config_app = typer.Typer(help="Manage convoviz configuration.")
+app.add_typer(config_app, name="config")
 
 
 def _version_callback(value: bool) -> None:
@@ -85,6 +93,14 @@ def run(
         "--log-file",
         help="Path to log file. Defaults to a temporary file.",
     ),
+    config_path: Path | None = typer.Option(
+        None,
+        "--config",
+        help="Path to a TOML config file. Defaults to the user config if present.",
+        exists=True,
+        file_okay=True,
+        dir_okay=False,
+    ),
     _version: bool = typer.Option(
         False,
         "--version",
@@ -104,8 +120,11 @@ def run(
     if ctx.invoked_subcommand is not None:
         return
 
-    # Start with default config
-    config = get_default_config()
+    try:
+        config = load_config(config_path)
+    except ConfigurationError as e:
+        console.print(f"[bold red]Error:[/bold red] {escape(str(e))}")
+        raise typer.Exit(code=1) from None
 
     # Override with CLI args
     if input_path:
@@ -171,3 +190,30 @@ def run(
 def main_entry() -> None:
     """Entry point for the CLI."""
     app()
+
+
+@config_app.command("init")
+def init_config(
+    path: Path | None = typer.Option(
+        None,
+        "--path",
+        "-p",
+        help="Write config to a custom path instead of the user config path.",
+        dir_okay=False,
+    ),
+    force: bool = typer.Option(
+        False,
+        "--force",
+        "-f",
+        help="Overwrite the config file if it already exists.",
+    ),
+) -> None:
+    """Write the default config file to the user config location."""
+    destination = path or get_user_config_path()
+    try:
+        written = write_default_config(destination, overwrite=force)
+    except ConfigurationError as e:
+        console.print(f"[bold red]Error:[/bold red] {escape(str(e))}")
+        raise typer.Exit(code=1) from None
+
+    console.print(f"[green]Wrote config:[/green] {written}")
