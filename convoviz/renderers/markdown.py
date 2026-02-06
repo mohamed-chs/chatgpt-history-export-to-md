@@ -97,18 +97,31 @@ def close_code_blocks(text: str) -> str:
     Returns:
         Text with all code blocks properly closed
     """
-    open_code_block = False
+    open_fences: list[tuple[str, int]] = []
     lines = text.split("\n")
+    fence_pattern = re.compile(r"^[ \t]{0,3}(`{3,}|~{3,})(.*)$")
 
     for line in lines:
-        if line.startswith("```") and not open_code_block:
-            open_code_block = True
+        match = fence_pattern.match(line)
+        if not match:
             continue
-        if line == "```" and open_code_block:
-            open_code_block = False
 
-    if open_code_block:
-        text += "\n```"
+        fence = match.group(1)
+        rest = match.group(2)
+        fence_char = fence[0]
+        fence_len = len(fence)
+
+        if open_fences:
+            open_char, open_len = open_fences[-1]
+            if fence_char == open_char and fence_len >= open_len and rest.strip() == "":
+                open_fences.pop()
+            continue
+
+        open_fences.append((fence_char, fence_len))
+
+    if open_fences:
+        closures = "\n".join(f"{char * length}" for char, length in reversed(open_fences))
+        text += f"\n{closures}"
 
     return text
 

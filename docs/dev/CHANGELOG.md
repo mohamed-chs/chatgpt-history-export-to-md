@@ -4,6 +4,9 @@
 
 ## Recent Updates (February 6, 2026)
 
+- **Markdown Code Fences**:
+    - Improved auto-closure logic to handle backtick and tilde fences.
+    - Accepts trailing whitespace on closing fences and closes multiple unclosed blocks.
 - **TOML Configuration Support**:
     - Added bundled TOML defaults (`convoviz/assets/default_config.toml`) as the source of truth.
     - User config now loads from OS-native config paths and merges over defaults.

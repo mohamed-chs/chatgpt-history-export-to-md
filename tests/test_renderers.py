@@ -32,6 +32,31 @@ class TestCloseCodeBlocks:
         text = "```python\ncode\n```\n```js\nmore\n```"
         assert close_code_blocks(text) == text
 
+    def test_closes_backtick_with_trailing_space(self) -> None:
+        """Test closing fence with trailing whitespace."""
+        text = "```python\ncode\n```   "
+        assert close_code_blocks(text) == text
+
+    def test_closes_backtick_with_language_on_close(self) -> None:
+        """Test closing fence with language tag gets normalized."""
+        text = "```python\ncode\n```python"
+        assert close_code_blocks(text) == "```python\ncode\n```python\n```"
+
+    def test_unclosed_tilde_block(self) -> None:
+        """Test unclosed tilde block gets closed."""
+        text = "~~~python\ncode"
+        assert close_code_blocks(text) == "~~~python\ncode\n~~~"
+
+    def test_tilde_block_closes_with_whitespace(self) -> None:
+        """Test tilde closing fence with trailing whitespace."""
+        text = "~~~\ncode\n~~~   "
+        assert close_code_blocks(text) == text
+
+    def test_inner_fence_ignored_while_open(self) -> None:
+        """Test inner fences are ignored while a block is open."""
+        text = "```python\ncode\n~~~js\nmore"
+        assert close_code_blocks(text) == "```python\ncode\n~~~js\nmore\n```"
+
 
 class TestReplaceLatexDelimiters:
     """Tests for the replace_latex_delimiters function."""
