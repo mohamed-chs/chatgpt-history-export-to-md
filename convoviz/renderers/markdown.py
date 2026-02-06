@@ -251,7 +251,7 @@ def render_node(
     content_type = node.message.content.content_type
 
     # For Obsidian flavor, render certain hidden types as collapsible callouts
-    # No separator (---) since these are visually distinct and may appear consecutively
+    # No separator (***) since these are visually distinct and may appear consecutively
     if flavor == "obsidian" and content_type in OBSIDIAN_COLLAPSIBLE_TYPES:
         try:
             text = node.message.text
@@ -330,7 +330,7 @@ def render_node(
                 # Obsidian handles this well.
                 content += f"\n![Image]({encoded_path})\n"
 
-    return f"\n{header}{timestamp_str}{content}\n---\n"
+    return f"\n{header}{timestamp_str}{content}\n***\n"
 
 
 def _ordered_nodes(conversation: Conversation) -> list[Node]:

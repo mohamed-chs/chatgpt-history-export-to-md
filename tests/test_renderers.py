@@ -185,7 +185,7 @@ class TestRenderConversation:
         headers = AuthorHeaders()
         markdown = render_conversation(mock_conversation, config, headers)
 
-        assert "---" in markdown
+        assert "***" in markdown
         assert "# Me" in markdown
         assert "user message 111" in markdown
         assert "# ChatGPT" in markdown

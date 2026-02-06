@@ -4,6 +4,7 @@
 
 ## Recent Updates (February 6, 2026)
 
+- **Markdown Separators**: Section separators between messages now use `***` instead of `---` (YAML frontmatter still uses `---`).
 - **Markdown Code Fences**:
     - Improved auto-closure logic to handle backtick and tilde fences.
     - Accepts trailing whitespace on closing fences and closes multiple unclosed blocks.
