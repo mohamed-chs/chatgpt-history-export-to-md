@@ -48,7 +48,7 @@ conversation_id = true
 [wordcloud]
 font_path = "" # Leave empty for auto
 colormap = "RdYlBu"
-custom_stopwords = ""
+custom_stopwords = "use, file"
 exclude_programming_keywords = true
 include_assistant_text = true
 background_color = "" # Empty means transparent

@@ -5,6 +5,10 @@
 
 ## Recent Updates (February 7, 2026)
 
+- **Wordcloud Defaults**: Added `use` and `file` to the default `wordcloud.custom_stopwords` list to reduce noise.
+
+## Recent Updates (February 7, 2026)
+
 - **Deterministic Wordclouds**: Added `wordcloud.random_state` (default `42`) so word cloud layouts are reproducible by default; set to empty to restore non-deterministic behavior.
 
 ## Recent Updates (February 7, 2026)

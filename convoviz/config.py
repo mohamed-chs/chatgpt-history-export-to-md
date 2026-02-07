@@ -98,7 +98,7 @@ class WordCloudConfig(BaseModel):
 
     font_path: Path | None = None
     colormap: str = "RdYlBu"
-    custom_stopwords: str = ""
+    custom_stopwords: str = "use, file"
     exclude_programming_keywords: bool = True
     include_assistant_text: bool = True
     background_color: str | None = None
