@@ -62,6 +62,51 @@ def test_pandoc_flavor_rendering(mock_conversation: Conversation) -> None:
     assert "# ChatGPT" in markdown
 
 
+def test_pandoc_indents_yaml_separators_after_frontmatter() -> None:
+    """Test that pandoc flavor indents '---' lines after frontmatter."""
+    ts = datetime(2024, 1, 2, tzinfo=UTC)
+    conversation = Conversation(
+        title="Pandoc Separator Test",
+        create_time=ts,
+        update_time=ts,
+        mapping={
+            "root": {"id": "root", "message": None, "parent": None, "children": ["user"]},
+            "user": {
+                "id": "user",
+                "message": {
+                    "id": "user",
+                    "author": {"role": "user", "metadata": {}},
+                    "create_time": ts.timestamp(),
+                    "update_time": ts.timestamp(),
+                    "content": {"content_type": "text", "parts": ["Line 1\n---\nLine 2"]},
+                    "status": "finished_successfully",
+                    "end_turn": True,
+                    "weight": 1.0,
+                    "metadata": {"model_slug": "gpt-4"},
+                    "recipient": "all",
+                },
+                "parent": "root",
+                "children": [],
+            },
+        },
+        current_node="user",
+        conversation_id="conv-pandoc-1",
+    )
+
+    config = ConversationConfig(markdown=MarkdownConfig(flavor="pandoc"))
+    headers = AuthorHeaders()
+
+    markdown = render_conversation(conversation, config, headers)
+
+    header_end = markdown.find("\n---\n", 4)
+    assert header_end != -1
+    after_header = markdown[header_end + len("\n---\n") :]
+    lines_after_header = after_header.splitlines()
+
+    assert " ---" in lines_after_header
+    assert all(not line.startswith("---") for line in lines_after_header)
+
+
 def test_flavor_default_is_standard() -> None:
     """Test that standard is the default flavor."""
     config = MarkdownConfig()

@@ -41,6 +41,12 @@ enabled = true
 
 This frontmatter is only injected when the markdown flavor is `pandoc`.
 
+## YAML Separator Safety
+
+When using the `pandoc` markdown flavor, Convoviz indents any line that starts with
+`---` after the YAML frontmatter header. This prevents Quarto/Pandoc from treating
+content separators as a second metadata block while preserving horizontal rules.
+
 ## WebP Assets
 
 When using the `pandoc` markdown flavor, Convoviz will attempt to convert WebP

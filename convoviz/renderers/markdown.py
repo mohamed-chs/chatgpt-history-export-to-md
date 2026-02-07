@@ -419,12 +419,13 @@ def render_conversation(
     show_timestamp = config.markdown.show_timestamp
 
     # Start with YAML header
-    markdown = render_yaml_header(
+    yaml_header = render_yaml_header(
         conversation,
         config.yaml,
         pandoc_pdf=config.pandoc_pdf,
         markdown_flavor=flavor,
     )
+    markdown = yaml_header
     markdown += f"<!-- conversation_id={conversation.conversation_id} -->\n"
 
     # Pre-calculate citation map for the conversation
@@ -451,5 +452,10 @@ def render_conversation(
             )
             if node.message.create_time and not node.message.is_hidden:
                 last_timestamp = node.message.create_time
+
+    if flavor == "pandoc" and yaml_header:
+        after_header = markdown[len(yaml_header) :]
+        after_header = re.sub(r"(?m)^---", " ---", after_header)
+        markdown = f"{yaml_header}{after_header}"
 
     return markdown
