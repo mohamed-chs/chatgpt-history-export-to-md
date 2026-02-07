@@ -48,6 +48,7 @@ def test_generate_wordcloud_no_programming_stopwords(mock_wc):
     assert "python" in passed_stopwords  # From custom
     assert "def" not in passed_stopwords  # Should NOT be there
     assert "class" not in passed_stopwords  # Should NOT be there
+    assert kwargs.get("random_state") == config.random_state
 
 
 def test_generate_and_save_wordcloud_skips_empty_text(tmp_path: Path):
@@ -148,3 +149,10 @@ def test_wordcloud_config_max_workers(max_workers):
     """Test that max_workers config option is accepted."""
     config = WordCloudConfig(max_workers=max_workers)
     assert config.max_workers == max_workers
+
+
+@pytest.mark.parametrize("random_state", [None, 0, 42, 1337])
+def test_wordcloud_config_random_state(random_state):
+    """Test that random_state config option is accepted."""
+    config = WordCloudConfig(random_state=random_state)
+    assert config.random_state == random_state

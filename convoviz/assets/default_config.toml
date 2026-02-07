@@ -57,6 +57,7 @@ include_numbers = false
 width = 600
 height = 600
 max_workers = "" # Empty means auto
+random_state = 42 # Set to empty for non-deterministic layouts
 
 [graph]
 color = "#4A90E2"

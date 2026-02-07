@@ -188,6 +188,7 @@ Markdown render order (config):
 Markdown timestamps can be toggled with `conversation.markdown.show_timestamp`.
 
 Word clouds can be limited to your messages by setting `wordcloud.include_assistant_text = false`.
+Word cloud layouts are deterministic by default; set `wordcloud.random_state = ""` to disable.
 
 YAML frontmatter titles are sanitized; the original title is preserved in `aliases` when it changes.
 

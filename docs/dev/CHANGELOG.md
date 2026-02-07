@@ -5,6 +5,10 @@
 
 ## Recent Updates (February 7, 2026)
 
+- **Deterministic Wordclouds**: Added `wordcloud.random_state` (default `42`) so word cloud layouts are reproducible by default; set to empty to restore non-deterministic behavior.
+
+## Recent Updates (February 7, 2026)
+
 - **Pandoc Features Removed**: Dropped the `pandoc` markdown flavor and the `conversation.pandoc_pdf` config block, including YAML separator guard logic and PDF frontmatter injection.
 - **Asset Pipeline Simplification**: Removed best-effort WebP-to-PNG conversion that only applied to pandoc exports.
 - **Docs Cleanup**: Removed the Pandoc PDF guide and references to pandoc-specific configuration from user docs.

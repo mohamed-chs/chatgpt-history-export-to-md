@@ -20,6 +20,7 @@ PATH_KEYS = {"input_path", "bookmarklet_path", "output_folder", "font_path"}
 NONE_IF_EMPTY_KEYS = {
     "background_color",
     "max_workers",
+    "random_state",
 }
 
 
@@ -106,6 +107,7 @@ class WordCloudConfig(BaseModel):
     width: int = 600
     height: int = 600
     max_workers: int | None = None  # None = use half CPU count
+    random_state: int | None = 42  # None = non-deterministic layouts
 
 
 class GraphConfig(BaseModel):

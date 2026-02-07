@@ -108,6 +108,7 @@ def generate_wordcloud(text: str, config: WordCloudConfig) -> Image:
         mode=config.mode,
         colormap=config.colormap,
         include_numbers=config.include_numbers,
+        random_state=config.random_state,
     )
 
     wc.generate(text)
