@@ -23,6 +23,12 @@ def _cleanup_temp_dirs() -> None:
             shutil.rmtree(path, ignore_errors=True)
         except Exception:
             continue
+    _TEMP_DIRS.clear()
+
+
+def cleanup_temp_dirs() -> None:
+    """Clean up any temp dirs created by ZIP extraction."""
+    _cleanup_temp_dirs()
 
 
 def _register_temp_dir(path: Path) -> None:
@@ -190,7 +196,7 @@ def find_latest_zip(directory: Path | None = None) -> Path | None:
     if not zip_files:
         return None
 
-    return max(zip_files, key=lambda p: p.stat().st_ctime)
+    return max(zip_files, key=lambda p: p.stat().st_mtime)
 
 
 def find_script_export(directory: Path | None = None) -> Path | None:

@@ -81,7 +81,7 @@ def replace_citations(
 
 def _format_link(title: str | None, url: str | None, flavor: str = "standard") -> str:
     """Format a title and URL into a concise markdown link."""
-    if flavor == "pandoc":
+    if flavor in ("pandoc", "standard"):
         if title and url:
             return f" [{title}]({url})"
         if url:
@@ -90,6 +90,7 @@ def _format_link(title: str | None, url: str | None, flavor: str = "standard") -
             return f" {title}"
         return ""
 
+    # Obsidian/wiki-style link variant
     if title and url:
         return f" [[{title}]({url})]"
     if url:

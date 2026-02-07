@@ -18,6 +18,9 @@ class AssetIndex:
     root_files: tuple[Path, ...]
     dalle_files: tuple[Path, ...]
     user_files_by_dir: dict[Path, tuple[Path, ...]]
+    root_prefix_map: dict[str, Path]
+    dalle_prefix_map: dict[str, Path]
+    user_prefix_map_by_dir: dict[Path, dict[str, Path]]
 
 
 def build_asset_index(source_dir: Path) -> AssetIndex:
@@ -25,9 +28,12 @@ def build_asset_index(source_dir: Path) -> AssetIndex:
     root_files: list[Path] = []
     dalle_files: list[Path] = []
     user_files_by_dir: dict[Path, tuple[Path, ...]] = {}
+    root_prefix_map: dict[str, Path] = {}
+    dalle_prefix_map: dict[str, Path] = {}
+    user_prefix_map_by_dir: dict[Path, dict[str, Path]] = {}
 
     if not source_dir.exists():
-        return AssetIndex((), (), {})
+        return AssetIndex((), (), {}, {}, {}, {})
 
     source_dir = source_dir.resolve()
 
@@ -49,12 +55,47 @@ def build_asset_index(source_dir: Path) -> AssetIndex:
                 try:
                     files = tuple(p.resolve() for p in user_dir.iterdir() if p.is_file())
                     user_files_by_dir[user_dir.resolve()] = files
+                    user_prefix_map_by_dir[user_dir.resolve()] = _build_prefix_map(files)
                 except Exception:
                     continue
     except Exception:
         user_files_by_dir = {}
+        user_prefix_map_by_dir = {}
 
-    return AssetIndex(tuple(root_files), tuple(dalle_files), user_files_by_dir)
+    root_prefix_map = _build_prefix_map(root_files)
+    dalle_prefix_map = _build_prefix_map(dalle_files)
+
+    return AssetIndex(
+        tuple(root_files),
+        tuple(dalle_files),
+        user_files_by_dir,
+        root_prefix_map,
+        dalle_prefix_map,
+        user_prefix_map_by_dir,
+    )
+
+
+def _extract_prefix(name: str) -> str | None:
+    """Extract a stable asset prefix from a filename."""
+    if not name:
+        return None
+    base = name
+    if "_" in base:
+        base = base.split("_", 1)[0]
+    if "." in base:
+        base = base.split(".", 1)[0]
+    return base or None
+
+
+def _build_prefix_map(files: list[Path] | tuple[Path, ...]) -> dict[str, Path]:
+    """Build a prefix -> path map for fast asset lookups."""
+    prefix_map: dict[str, Path] = {}
+    for path in sorted(files, key=lambda p: p.name):
+        prefix = _extract_prefix(path.name)
+        if not prefix:
+            continue
+        prefix_map.setdefault(prefix, path)
+    return prefix_map
 
 
 def _prefix_match(files: tuple[Path, ...], asset_id: str, root: Path) -> Path | None:
@@ -96,7 +137,9 @@ def resolve_asset_path(
 
     # 2. Try prefix match in root
     if index:
-        match = _prefix_match(index.root_files, asset_id, source_dir)
+        match = index.root_prefix_map.get(asset_id)
+        if not match:
+            match = _prefix_match(index.root_files, asset_id, source_dir)
         if match:
             logger.debug(f"Resolved asset (prefix root): {asset_id} -> {match}")
             return match
@@ -119,7 +162,9 @@ def resolve_asset_path(
     if dalle_dir.exists() and dalle_dir.is_dir():
         dalle_dir = dalle_dir.resolve()
         if index:
-            match = _prefix_match(index.dalle_files, asset_id, dalle_dir)
+            match = index.dalle_prefix_map.get(asset_id)
+            if not match:
+                match = _prefix_match(index.dalle_files, asset_id, dalle_dir)
             if match:
                 logger.debug(f"Resolved asset (dalle): {asset_id} -> {match}")
                 return match
@@ -140,7 +185,10 @@ def resolve_asset_path(
     # 4. Try prefix match in user-* directories (new 2025 format)
     if index:
         for user_dir, files in index.user_files_by_dir.items():
-            match = _prefix_match(files, asset_id, user_dir)
+            user_map = index.user_prefix_map_by_dir.get(user_dir, {})
+            match = user_map.get(asset_id)
+            if not match:
+                match = _prefix_match(files, asset_id, user_dir)
             if match:
                 logger.debug(f"Resolved asset (user dir): {asset_id} -> {match}")
                 return match

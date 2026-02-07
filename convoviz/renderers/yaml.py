@@ -4,6 +4,9 @@ from __future__ import annotations
 
 import re
 from datetime import datetime
+from typing import Any
+
+import yaml
 
 from convoviz.config import PandocPdfConfig, YAMLConfig
 from convoviz.models import Conversation
@@ -12,60 +15,49 @@ from convoviz.utils import sanitize_title
 _TAG_SAFE_RE = re.compile(r"[^a-z0-9/_\-]+")
 
 
-def _to_yaml_scalar(value: object) -> str:
-    if value is None:
-        return "null"
-    if isinstance(value, bool):
-        return "true" if value else "false"
-    if isinstance(value, (int, float)):
-        return str(value)
+def _normalize_yaml_value(value: Any) -> Any:
     if isinstance(value, datetime):
-        # Frontmatter consumers generally expect ISO 8601 strings
-        return f'"{value.isoformat()}"'
-    if isinstance(value, str):
-        if "\n" in value:
-            # Multiline: use a block scalar
-            indented = "\n".join(f"  {line}" for line in value.splitlines())
-            return f"|-\n{indented}"
-        escaped = value.replace("\\", "\\\\").replace('"', '\\"')
-        return f'"{escaped}"'
-
-    # Fallback: stringify and quote
-    escaped = str(value).replace("\\", "\\\\").replace('"', '\\"')
-    return f'"{escaped}"'
-
-
-def _to_yaml(value: object, indent: int = 0) -> str:
-    pad = " " * indent
-
+        return value.isoformat()
     if isinstance(value, dict):
-        lines: list[str] = []
-        for k, v in value.items():
-            key = str(k)
-            if isinstance(v, (dict, list)):
-                lines.append(f"{pad}{key}:")
-                lines.append(_to_yaml(v, indent=indent + 2))
-            else:
-                scalar = _to_yaml_scalar(v)
-                # Block scalars already include newline + indentation
-                if scalar.startswith("|-"):
-                    lines.append(f"{pad}{key}: {scalar.splitlines()[0]}")
-                    lines.extend(f"{pad}{line}" for line in scalar.splitlines()[1:])
-                else:
-                    lines.append(f"{pad}{key}: {scalar}")
-        return "\n".join(lines)
-
+        return {k: _normalize_yaml_value(v) for k, v in value.items()}
     if isinstance(value, list):
-        lines = []
-        for item in value:
-            if isinstance(item, (dict, list)):
-                lines.append(f"{pad}-")
-                lines.append(_to_yaml(item, indent=indent + 2))
-            else:
-                lines.append(f"{pad}- {_to_yaml_scalar(item)}")
-        return "\n".join(lines)
+        return [_normalize_yaml_value(item) for item in value]
+    return value
 
-    return f"{pad}{_to_yaml_scalar(value)}"
+
+class _YamlDumper(yaml.SafeDumper):
+    _in_key = False
+
+    def represent_mapping(self, tag, mapping, flow_style=None):
+        value = []
+        node = yaml.nodes.MappingNode(tag, value, flow_style=flow_style)
+        if self.alias_key is not None:
+            self.represented_objects[self.alias_key] = node
+        best_style = True
+        for item_key, item_value in mapping.items():
+            self._in_key = True
+            node_key = self.represent_data(item_key)
+            self._in_key = False
+            node_value = self.represent_data(item_value)
+            if not (isinstance(node_key, yaml.nodes.ScalarNode) and node_key.style is None):
+                best_style = False
+            if not (isinstance(node_value, yaml.nodes.ScalarNode) and node_value.style is None):
+                best_style = False
+            value.append((node_key, node_value))
+        if flow_style is None:
+            if self.default_flow_style is not None:
+                node.flow_style = self.default_flow_style
+            else:
+                node.flow_style = best_style
+        return node
+
+
+def _represent_str(dumper: _YamlDumper, data: str) -> yaml.nodes.ScalarNode:
+    if getattr(dumper, "_in_key", False):
+        return dumper.represent_scalar("tag:yaml.org,2002:str", data, style=None)
+    if "\n" in data:
+        return dumper.represent_scalar("tag:yaml.org,2002:str", data, style="|")
+    return dumper.represent_scalar("tag:yaml.org,2002:str", data, style='"')
 
 
 def _default_tags(conversation: Conversation) -> list[str]:
@@ -144,5 +136,13 @@ def render_yaml_header(
     if not yaml_fields:
         return ""
 
-    body = _to_yaml(yaml_fields)
+    normalized = _normalize_yaml_value(yaml_fields)
+    _YamlDumper.add_representer(str, _represent_str)
+    body = yaml.dump(
+        normalized,
+        Dumper=_YamlDumper,
+        sort_keys=False,
+        default_flow_style=False,
+        allow_unicode=True,
+    ).rstrip()
     return f"---\n{body}\n---\n"

@@ -7,7 +7,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, PrivateAttr
 
 from convoviz.models.conversation import Conversation
 from convoviz.models.message import AuthorRole
@@ -21,6 +21,7 @@ class ConversationCollection(BaseModel):
 
     conversations: list[Conversation] = Field(default_factory=list)
     source_paths: list[Path] = Field(default_factory=list)
+    _index_cache: dict[str, Conversation] | None = PrivateAttr(default=None)
 
     @property
     def source_path(self) -> Path | None:
@@ -30,7 +31,9 @@ class ConversationCollection(BaseModel):
     @property
     def index(self) -> dict[str, Conversation]:
         """Get conversations indexed by conversation_id."""
-        return {conv.conversation_id: conv for conv in self.conversations}
+        if self._index_cache is None:
+            self._index_cache = {conv.conversation_id: conv for conv in self.conversations}
+        return self._index_cache
 
     @property
     def last_updated(self) -> datetime:
@@ -64,6 +67,7 @@ class ConversationCollection(BaseModel):
                 merged[conv_id] = incoming
 
         self.conversations = list(merged.values())
+        self._index_cache = None
 
         # Merge source paths
         for path in other.source_paths:
@@ -73,6 +77,7 @@ class ConversationCollection(BaseModel):
     def add(self, conversation: Conversation) -> None:
         """Add a conversation to the collection."""
         self.conversations.append(conversation)
+        self._index_cache = None
 
     @property
     def custom_instructions(self) -> list[dict[str, Any]]:

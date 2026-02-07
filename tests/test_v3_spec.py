@@ -92,9 +92,9 @@ class TestCitationParsing:
         ]
 
         result = replace_citations(text, citations)
-        # Expected: "This is a claim [[Source 1](http://example.com/1)] and another [[Source](http://example.com/2)]."
-        assert "[[Source 1](http://example.com/1)]" in result
-        assert "[[Source](http://example.com/2)]" in result
+        # Expected: "This is a claim [Source 1](http://example.com/1) and another [Source](http://example.com/2)."
+        assert "[Source 1](http://example.com/1)" in result
+        assert "[Source](http://example.com/2)" in result
         assert "【172†source】" not in result
 
     def test_replace_embedded_citations(self):
@@ -105,7 +105,7 @@ class TestCitationParsing:
         }
 
         result = replace_citations(text, citation_map=citation_map)
-        assert "[[My Source](http://example.com/embedded)]" in result
+        assert "[My Source](http://example.com/embedded)" in result
         assert "\ue200" not in result
 
     def test_replace_embedded_citations_multiple(self):
@@ -116,11 +116,11 @@ class TestCitationParsing:
             "key2": {"title": "S2", "url": "http://s2.com"},
         }
         result = replace_citations(text, citation_map=citation_map)
-        assert "[[S1](http://s1.com)]" in result
-        assert "[[S2](http://s2.com)]" in result
+        assert "[S1](http://s1.com)" in result
+        assert "[S2](http://s2.com)" in result
         # Check adjacent spacing/concatenation
-        # Expected: "Sources:  [[S1](http://s1.com)] [[S2](http://s2.com)]"
-        assert "[[S1](http://s1.com)][[S2](http://s2.com)]" in result.replace(" ", "")
+        # Expected: "Sources:  [S1](http://s1.com) [S2](http://s2.com)"
+        assert "[S1](http://s1.com)[S2](http://s2.com)" in result.replace(" ", "")
 
     def test_replace_citations_pandoc_format(self):
         text = "Claim 【1†source】."

@@ -2,6 +2,15 @@
 
 > **Note**: This changelog is informal and incomplete. It tracks the primary record of all functional and behavioral updates to Convoviz.
 
+## Recent Updates (February 7, 2026)
+
+- **YAML Frontmatter**: Switched to PyYAML for frontmatter rendering with explicit string quoting and multiline literal blocks for correctness.
+- **Citations (Standard Markdown)**: Standard flavor now emits `[Title](URL)` links (Pandoc and Standard aligned); Obsidian keeps wiki-style formatting.
+- **ZIP Temp Cleanup**: ZIP extraction temp folders are now explicitly cleaned after pipeline completion (in addition to atexit cleanup).
+- **Asset Resolution Performance**: Asset indexing now builds prefix maps to avoid repeated linear scans, while preserving fallback matching.
+- **Latest ZIP Detection**: Latest ZIP search uses `st_mtime` for more accurate “last downloaded” behavior on Linux.
+- **Collection Index Cache**: `ConversationCollection.index` now caches results and invalidates on updates/adds.
+
 ## Recent Updates (February 6, 2026)
 
 - **Markdown Separators**: Section separators between messages now use `***` instead of `---` (YAML frontmatter still uses `---`).

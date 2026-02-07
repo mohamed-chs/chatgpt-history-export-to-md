@@ -42,7 +42,7 @@ def setup_logging(
         show_path=False,
     )
     console_handler.setLevel(console_level)
-    setattr(console_handler, "_convoviz_handler", True)
+    setattr(console_handler, "_convoviz_handler", True)  # noqa: B010
 
     # File handler
     if log_file is None:
@@ -58,7 +58,7 @@ def setup_logging(
     file_handler.setLevel(logging.DEBUG)  # Always log DEBUG to file
     file_formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
     file_handler.setFormatter(file_formatter)
-    setattr(file_handler, "_convoviz_handler", True)
+    setattr(file_handler, "_convoviz_handler", True)  # noqa: B010
 
     # Configure root logger
     # We set root level to DEBUG so that the handlers can filter as they please
