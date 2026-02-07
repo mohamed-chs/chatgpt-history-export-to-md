@@ -5,6 +5,7 @@
 ## Recent Updates (February 7, 2026)
 
 - **Citation Map Hardening**: Robustly ignore malformed citation entries (non-dict `ref_id`) instead of raising errors.
+- **Interactive Output Validation**: Output path validation no longer creates directories during interactive typing.
 - **Canvas Extraction**: Canvas document detection now scans all parts, not just the first part.
 - **Deterministic Metadata**: Plugin namespaces and content types are sorted to produce stable YAML output.
 - **Conversation Identity Scan**: Markdown overwrite detection now scans a larger frontmatter prefix for conversation IDs.

@@ -222,3 +222,35 @@ def ensure_writable_dir(path: Path) -> None:
             pass
     except OSError as exc:
         raise ConfigurationError(f"Cannot write to output directory: {path}") from exc
+
+
+def validate_writable_dir(path: Path) -> None:
+    """Validate that a directory is writable without creating it.
+
+    Raises:
+        ConfigurationError: If the directory cannot be created or written to.
+    """
+    if path.exists():
+        if not path.is_dir():
+            raise ConfigurationError(f"Output path must be a directory: {path}")
+        try:
+            with tempfile.NamedTemporaryFile(dir=path, prefix=".convoviz_write_test_", delete=True):
+                pass
+        except OSError as exc:
+            raise ConfigurationError(f"Cannot write to output directory: {path}") from exc
+        return
+
+    for parent in path.parents:
+        if parent.exists():
+            if not parent.is_dir():
+                raise ConfigurationError(f"Output path must be a directory: {parent}")
+            try:
+                with tempfile.NamedTemporaryFile(
+                    dir=parent, prefix=".convoviz_write_test_", delete=True
+                ):
+                    pass
+            except OSError as exc:
+                raise ConfigurationError(
+                    f"Cannot write to output directory parent: {parent}"
+                ) from exc
+            return

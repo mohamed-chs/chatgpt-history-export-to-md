@@ -369,3 +369,18 @@ def test_script_export_merge_prompt_skipped_if_manually_selected(
     assert config.input_path.resolve() == export_path.resolve()
     assert config.bookmarklet_path is None
     assert confirm_called[0] is False
+
+
+def test_output_validation_does_not_create_directories(tmp_path: Path) -> None:
+    """Validation should not create output directories during typing."""
+    import convoviz.interactive as interactive
+
+    target = tmp_path / "new" / "output"
+    assert not target.exists()
+    assert not (tmp_path / "new").exists()
+
+    result = interactive._validate_output_path(str(target))
+
+    assert result is True
+    assert not target.exists()
+    assert not (tmp_path / "new").exists()

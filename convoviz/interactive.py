@@ -13,11 +13,11 @@ from convoviz.io.loaders import find_latest_valid_zip, find_script_export, valid
 from convoviz.utils import (
     colormaps,
     default_font_path,
-    ensure_writable_dir,
     expand_path,
     font_names,
     font_path,
     validate_header,
+    validate_writable_dir,
 )
 
 OUTPUT_TITLES = {
@@ -84,7 +84,7 @@ def _validate_input_path(raw: str) -> bool | str:
 def _validate_output_path(raw: str) -> bool | str:
     path = expand_path(raw)
     try:
-        ensure_writable_dir(path)
+        validate_writable_dir(path)
     except ConfigurationError as exc:
         return str(exc)
     return True
