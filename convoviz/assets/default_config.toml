@@ -25,12 +25,9 @@ tool = "### Tool output"
 
 [conversation.markdown]
 latex_delimiters = "dollars" # "default" or "dollars"
-flavor = "standard" # "standard", "obsidian", or "pandoc"
+flavor = "standard" # "standard" or "obsidian"
 show_timestamp = true
 render_order = "active" # "active" (current branch) or "full" (all nodes)
-
-[conversation.pandoc_pdf]
-enabled = true
 
 [conversation.yaml]
 title = true

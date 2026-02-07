@@ -166,7 +166,6 @@ def save_conversation(
                     src_file,
                     final_path.parent,
                     target_name,
-                    convert_webp_to_png=config.markdown.flavor == "pandoc",
                 )
 
         return None

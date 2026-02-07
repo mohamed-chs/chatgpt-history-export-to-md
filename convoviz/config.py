@@ -55,15 +55,9 @@ class MarkdownConfig(BaseModel):
     """Configuration for markdown output."""
 
     latex_delimiters: Literal["default", "dollars"] = "dollars"
-    flavor: Literal["standard", "obsidian", "pandoc"] = "standard"
+    flavor: Literal["standard", "obsidian"] = "standard"
     show_timestamp: bool = True
     render_order: Literal["active", "full"] = "active"
-
-
-class PandocPdfConfig(BaseModel):
-    """Configuration for Pandoc-friendly PDF frontmatter (Typst)."""
-
-    enabled: bool = True
 
 
 class YAMLConfig(BaseModel):
@@ -90,7 +84,6 @@ class ConversationConfig(BaseModel):
 
     markdown: MarkdownConfig = Field(default_factory=MarkdownConfig)
     yaml: YAMLConfig = Field(default_factory=YAMLConfig)
-    pandoc_pdf: PandocPdfConfig = Field(default_factory=PandocPdfConfig)
 
 
 class MessageConfig(BaseModel):

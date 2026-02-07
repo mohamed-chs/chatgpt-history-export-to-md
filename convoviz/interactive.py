@@ -238,11 +238,11 @@ def run_interactive_config(initial_config: ConvovizConfig | None = None) -> Conv
 
         # Prompt for markdown flavor
         flavor_result = cast(
-            Literal["standard", "obsidian", "pandoc"],
+            Literal["standard", "obsidian"],
             _ask_or_cancel(
                 select(
                     "Select the markdown flavor:",
-                    choices=["standard", "obsidian", "pandoc"],
+                    choices=["standard", "obsidian"],
                     default=config.conversation.markdown.flavor,
                     style=CUSTOM_STYLE,
                 )
@@ -280,17 +280,6 @@ def run_interactive_config(initial_config: ConvovizConfig | None = None) -> Conv
         )
         config.conversation.markdown.show_timestamp = show_timestamps
         logger.debug(f"User selected show_timestamp: {show_timestamps}")
-
-        if config.conversation.markdown.flavor == "pandoc":
-            enable_pdf: bool = _ask_or_cancel(
-                confirm(
-                    "Inject PDF frontmatter (Typst) for pandoc flavor?",
-                    default=config.conversation.pandoc_pdf.enabled,
-                    style=CUSTOM_STYLE,
-                )
-            )
-            config.conversation.pandoc_pdf.enabled = enable_pdf
-            logger.debug(f"User selected Pandoc PDF frontmatter: {enable_pdf}")
 
         # Prompt for YAML headers
         yaml_config = config.conversation.yaml

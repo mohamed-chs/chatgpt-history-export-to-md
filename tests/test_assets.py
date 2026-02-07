@@ -2,8 +2,6 @@
 
 from pathlib import Path
 
-import pytest
-
 from convoviz.io.assets import build_asset_index, copy_asset, resolve_asset_path
 
 
@@ -191,23 +189,3 @@ class TestBuildAssetIndex:
         # Should use forward slashes regardless of OS
         assert "/" in rel_path
         assert "\\" not in rel_path
-
-    def test_converts_webp_to_png_for_pandoc(self, tmp_path: Path) -> None:
-        """Test converting WebP assets to PNG when requested."""
-        pytest.importorskip("PIL")
-        from PIL import Image, features
-
-        if not features.check("webp"):
-            pytest.skip("Pillow WebP support not available")
-
-        src_file = tmp_path / "source.webp"
-        image = Image.new("RGB", (2, 2), color=(255, 0, 0))
-        image.save(src_file, format="WEBP")
-
-        dest_dir = tmp_path / "output"
-        dest_dir.mkdir()
-
-        rel_path = copy_asset(src_file, dest_dir, convert_webp_to_png=True)
-
-        assert rel_path == "assets/source.png"
-        assert (dest_dir / "assets" / "source.png").exists()

@@ -5,6 +5,12 @@
 
 ## Recent Updates (February 7, 2026)
 
+- **Pandoc Features Removed**: Dropped the `pandoc` markdown flavor and the `conversation.pandoc_pdf` config block, including YAML separator guard logic and PDF frontmatter injection.
+- **Asset Pipeline Simplification**: Removed best-effort WebP-to-PNG conversion that only applied to pandoc exports.
+- **Docs Cleanup**: Removed the Pandoc PDF guide and references to pandoc-specific configuration from user docs.
+
+## Recent Updates (February 7, 2026)
+
 - **Pandoc YAML Separator Guard**: Pandoc flavor now indents any `---` line after the YAML frontmatter header to prevent Quarto/Pandoc from mis-parsing content as a second metadata block.
 - **Test Coverage Expansion**: Added tests for config path normalization and TOML errors, utils path/writable checks, logging setup, ZIP traversal cases, asset indexing, renderer full-DAG/orphan nodes, citation aggregation/edge cases, pipeline extras and missing dependency handling, and additional Canvas/loader validations.
 - **Citation Map Coverage**: Embedded citation metadata is now aggregated even when message parts are empty (uses `search_result_groups` only).

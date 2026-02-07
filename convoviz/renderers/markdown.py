@@ -28,7 +28,7 @@ def replace_citations(
         text: The original message text
         citations: List of tether v4 citation objects (start_ix/end_ix)
         citation_map: Map of internal citation IDs to metadata (turnXsearchY -> {title, url})
-        flavor: Markdown flavor for link formatting ("standard", "obsidian", "pandoc")
+        flavor: Markdown flavor for link formatting ("standard", "obsidian")
 
     Returns:
         Text with all placeholders replaced by markdown links
@@ -93,7 +93,7 @@ def replace_citations(
 
 def _format_link(title: str | None, url: str | None, flavor: str = "standard") -> str:
     """Format a title and URL into a concise markdown link."""
-    if flavor in ("pandoc", "standard", "obsidian"):
+    if flavor in ("standard", "obsidian"):
         if title and url:
             return f"[{title}]({url})"
         if url:
@@ -257,7 +257,7 @@ def render_node(
         headers: Configuration for author headers
         use_dollar_latex: Whether to convert LaTeX delimiters to dollars
         asset_resolver: Function to resolve asset IDs to paths, optionally renaming them
-        flavor: Markdown flavor ("standard", "obsidian", or "pandoc")
+        flavor: Markdown flavor ("standard" or "obsidian")
         citation_map: Global map of citations
         show_timestamp: Whether to show the message timestamp
         last_timestamp: The timestamp of the previous message (for conditional date display)
@@ -419,12 +419,7 @@ def render_conversation(
     show_timestamp = config.markdown.show_timestamp
 
     # Start with YAML header
-    yaml_header = render_yaml_header(
-        conversation,
-        config.yaml,
-        pandoc_pdf=config.pandoc_pdf,
-        markdown_flavor=flavor,
-    )
+    yaml_header = render_yaml_header(conversation, config.yaml)
     markdown = yaml_header
     markdown += f"<!-- conversation_id={conversation.conversation_id} -->\n"
 
@@ -452,10 +447,5 @@ def render_conversation(
             )
             if node.message.create_time and not node.message.is_hidden:
                 last_timestamp = node.message.create_time
-
-    if flavor == "pandoc" and yaml_header:
-        after_header = markdown[len(yaml_header) :]
-        after_header = re.sub(r"(?m)^---", " ---", after_header)
-        markdown = f"{yaml_header}{after_header}"
 
     return markdown
