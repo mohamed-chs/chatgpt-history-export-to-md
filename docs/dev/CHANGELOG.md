@@ -1,6 +1,6 @@
 # Changelog
 
-> **Note**: This changelog is informal and incomplete. It is a collection of recent updates moved from `HANDOFF.md`.
+> **Note**: This changelog is informal and incomplete. It tracks the primary record of all functional and behavioral updates to Convoviz.
 
 ## Recent Updates (February 6, 2026)
 

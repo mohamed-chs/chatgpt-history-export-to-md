@@ -118,6 +118,6 @@ uv run ruff check convoviz tests && uv run ty check convoviz && uv run pytest
 - It's the entry point for working/continuing work on the project.
 - Try to keep it updated; complete rewrites are within the realm of possibility.
 - **A GOOD HABIT TO HAVE (I'm talking to you, AI coding agent) is to write other such .md files to persist plans/context in this session and the next.** Write them in the root project directory, or in other places if you prefer (like ./dev/), depending on the context. Take the liberty to do it anytime, it's very much encouraged and recommended; you don't even have to ask before you do it, or notify the user at all for that matter.
-- **ALWAYS KEEP ALL RELEVANT .MD FILES UPDATED WITH YOUR CHANGES. THIS IS CRITICAL.**
+- **KEEP `HANDOFF.md` FOCUSED ON CURRENT STATE.** Use `CHANGELOG.md` for recording recent updates. This file should always reflect the *now*.
 
 Codebase updates are recorded in [**`docs/dev/CHANGELOG.md`**](CHANGELOG.md) — **check them out!**
