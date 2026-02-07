@@ -168,7 +168,8 @@ def generate_wordclouds(
     for week, group in week_groups.items():
         text = group.plaintext(*authors)
         # Format: 2024-W15.png (ISO week format)
-        filename = f"{week.strftime('%Y-W%W')}.png"
+        iso_year, iso_week, _ = week.isocalendar()
+        filename = f"{iso_year}-W{iso_week:02d}.png"
         tasks.append((text, filename, output_dir, config))
 
     for month, group in month_groups.items():

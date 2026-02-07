@@ -104,6 +104,8 @@ uv run ruff check convoviz tests && uv run ty check convoviz && uv run pytest
 5.  **New Content Types (2025)**: `reasoning_recap`, `thoughts`, `tether_quote` for o1/o3 reasoning models — now supported.
 6.  **New Asset Folders (2025)**: `user-{id}/` directories contain system-generated images in PNG format — now supported.
 7.  **Render Order**: Markdown output defaults to active-branch traversal; `conversation.markdown.render_order = "full"` renders all DAG nodes.
+8.  **Identity Matching**: Markdown overwrite detection scans the first ~128KB for the hidden conversation ID marker/frontmatter.
+9.  **Wordcloud Weeks**: Weekly wordcloud filenames use ISO week year/number (week starts Monday).
 
 ## What's NOT Done (Roadmap)
 

@@ -95,7 +95,11 @@ def extract_message_text(message: Any) -> str:
                 text_parts.append(part)
             elif isinstance(part, dict):
                 # Handle Canvas/canmore documents embedded in parts
-                if part.get("content") and part.get("name"):
+                if (
+                    message.recipient == "canmore.create_textdoc"
+                    and part.get("content")
+                    and part.get("name")
+                ):
                     text_parts.append(f"### Canvas: {part['name']}\n\n{part['content']}")
                 elif "text" in part:
                     # Some parts might be dicts wrapping text
@@ -180,11 +184,12 @@ def extract_canvas_document(message: Any) -> dict[str, Any] | None:
             }
         return None
 
-    # Try parts[0]
+    # Try all parts in order
     if message.content.parts:
-        doc = try_parse_canvas(message.content.parts[0])
-        if doc:
-            return doc
+        for part in message.content.parts:
+            doc = try_parse_canvas(part)
+            if doc:
+                return doc
 
     # Try content.text
     if message.content.text:
@@ -256,9 +261,11 @@ def extract_internal_citation_map(message: Any) -> dict[str, dict[str, str | Non
 
     citation_mapping: dict[str, dict[str, str | None]] = {}
 
-    def process_entry(entry: dict[str, Any]) -> None:
+    def process_entry(entry: Any) -> None:
+        if not isinstance(entry, dict):
+            return
         ref_id = entry.get("ref_id")
-        if not ref_id:
+        if not isinstance(ref_id, dict):
             return
         if ref_id.get("ref_type") != "search":
             return

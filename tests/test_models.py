@@ -51,6 +51,96 @@ def test_plugins(mock_conversation: Conversation) -> None:
     assert len(mock_conversation.plugins) == 0
 
 
+def test_plugins_sorted_and_safe_namespace() -> None:
+    """Test plugin namespaces are sorted and missing namespaces are ignored."""
+    ts = datetime(2024, 1, 1, tzinfo=UTC).timestamp()
+    conv = Conversation(
+        title="Plugin Test",
+        create_time=ts,
+        update_time=ts,
+        mapping={
+            "root": {"id": "root", "message": None, "parent": None, "children": ["tool_a"]},
+            "tool_a": {
+                "id": "tool_a",
+                "message": {
+                    "id": "tool_a",
+                    "author": {"role": "tool", "metadata": {}},
+                    "create_time": ts,
+                    "update_time": ts,
+                    "content": {"content_type": "text", "parts": ["a"]},
+                    "status": "finished_successfully",
+                    "end_turn": True,
+                    "weight": 1.0,
+                    "metadata": {"invoked_plugin": {"namespace": "zeta"}},
+                    "recipient": "all",
+                },
+                "parent": "root",
+                "children": ["tool_b"],
+            },
+            "tool_b": {
+                "id": "tool_b",
+                "message": {
+                    "id": "tool_b",
+                    "author": {"role": "tool", "metadata": {}},
+                    "create_time": ts + 1,
+                    "update_time": ts + 1,
+                    "content": {"content_type": "text", "parts": ["b"]},
+                    "status": "finished_successfully",
+                    "end_turn": True,
+                    "weight": 1.0,
+                    "metadata": {"invoked_plugin": {"namespace": "alpha"}},
+                    "recipient": "all",
+                },
+                "parent": "tool_a",
+                "children": ["tool_missing"],
+            },
+            "tool_missing": {
+                "id": "tool_missing",
+                "message": {
+                    "id": "tool_missing",
+                    "author": {"role": "tool", "metadata": {}},
+                    "create_time": ts + 2,
+                    "update_time": ts + 2,
+                    "content": {"content_type": "text", "parts": ["c"]},
+                    "status": "finished_successfully",
+                    "end_turn": True,
+                    "weight": 1.0,
+                    "metadata": {"invoked_plugin": {"name": "no_namespace"}},
+                    "recipient": "all",
+                },
+                "parent": "tool_b",
+                "children": [],
+            },
+        },
+        moderation_results=[],
+        current_node="tool_missing",
+        conversation_id="plugins_conv",
+    )
+
+    assert conv.plugins == ["alpha", "zeta"]
+
+
+def test_internal_citation_map_ignores_non_dict_ref_id() -> None:
+    """Test that malformed citation entries are ignored safely."""
+    ts = datetime(2024, 1, 1, tzinfo=UTC)
+    msg = Message(
+        id="msg",
+        author=MessageAuthor(role="assistant"),
+        content=MessageContent(
+            content_type="text",
+            parts=[{"type": "search_result", "ref_id": "turn0search1"}],
+        ),
+        metadata=MessageMetadata(),
+        create_time=ts,
+        update_time=ts,
+        status="finished_successfully",
+        end_turn=True,
+        weight=1.0,
+        recipient="all",
+    )
+    assert msg.internal_citation_map == {}
+
+
 def test_timestamps(mock_conversation: Conversation) -> None:
     """Test timestamps method."""
     timestamps = mock_conversation.timestamps("user")

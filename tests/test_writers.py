@@ -3,7 +3,7 @@
 from datetime import UTC, datetime
 from pathlib import Path
 
-from convoviz.config import AuthorHeaders, ConversationConfig, FolderOrganization
+from convoviz.config import AuthorHeaders, ConversationConfig, FolderOrganization, YAMLConfig
 from convoviz.io.writers import get_date_folder_path, save_collection, save_conversation
 from convoviz.models import Conversation, ConversationCollection
 
@@ -227,6 +227,70 @@ class TestSaveCollectionWithDateOrganization:
 
         expected_filename = "2024-03-21_15-30-05 - My Chat.md"
         assert (tmp_path / expected_filename).exists()
+
+
+def test_save_conversation_overwrite_with_large_frontmatter(tmp_path: Path) -> None:
+    """Ensure conversation ID detection works even with large frontmatter."""
+    ts = datetime(2024, 1, 1, 10, 0, tzinfo=UTC)
+    large_text = "x" * 6000
+    conv = Conversation(
+        title="Big YAML",
+        create_time=ts,
+        update_time=ts,
+        mapping={
+            "root": {"id": "root", "message": None, "parent": None, "children": ["sys_node"]},
+            "sys_node": {
+                "id": "sys_node",
+                "message": {
+                    "id": "sys_node",
+                    "author": {"role": "system", "metadata": {}},
+                    "create_time": ts.timestamp(),
+                    "update_time": ts.timestamp(),
+                    "content": {"content_type": "text", "parts": ["System"]},
+                    "status": "finished_successfully",
+                    "end_turn": True,
+                    "weight": 1.0,
+                    "metadata": {
+                        "is_user_system_message": True,
+                        "user_context_message_data": {"about_user": large_text},
+                    },
+                    "recipient": "all",
+                },
+                "parent": "root",
+                "children": ["user_node"],
+            },
+            "user_node": {
+                "id": "user_node",
+                "message": {
+                    "id": "user_node",
+                    "author": {"role": "user", "metadata": {}},
+                    "create_time": ts.timestamp(),
+                    "update_time": ts.timestamp(),
+                    "content": {"content_type": "text", "parts": ["Hello"]},
+                    "status": "finished_successfully",
+                    "end_turn": True,
+                    "weight": 1.0,
+                    "metadata": {},
+                    "recipient": "all",
+                },
+                "parent": "sys_node",
+                "children": [],
+            },
+        },
+        moderation_results=[],
+        current_node="user_node",
+        conversation_id="big_yaml_conv",
+    )
+
+    config = ConversationConfig(yaml=YAMLConfig(custom_instructions=True))
+    headers = AuthorHeaders()
+    path = tmp_path / "Big YAML.md"
+
+    save_conversation(conv, path, config, headers)
+    save_conversation(conv, path, config, headers)
+
+    assert path.exists()
+    assert not (tmp_path / "Big YAML (1).md").exists()
 
 
 class TestSaveConversation:

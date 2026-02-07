@@ -106,7 +106,7 @@ class Conversation(BaseModel):
     @property
     def content_types(self) -> list[str]:
         """Get all unique content types in the conversation (excluding hidden messages)."""
-        return list(
+        return sorted(
             {
                 node.message.content.content_type
                 for node in self.visible_message_nodes
@@ -130,14 +130,18 @@ class Conversation(BaseModel):
     @property
     def plugins(self) -> list[str]:
         """Get all plugins used in this conversation."""
-        plugins = {
-            node.message.metadata.invoked_plugin["namespace"]
-            for node in self._sorted_message_nodes(include_hidden=True)
-            if node.message
-            and node.message.author.role == "tool"
-            and node.message.metadata.invoked_plugin
-        }
-        return list(plugins)
+        plugins = set()
+        for node in self._sorted_message_nodes(include_hidden=True):
+            message = node.message
+            if not message or message.author.role != "tool":
+                continue
+            invoked = message.metadata.invoked_plugin
+            if not isinstance(invoked, dict):
+                continue
+            namespace = invoked.get("namespace")
+            if namespace:
+                plugins.add(namespace)
+        return sorted(plugins)
 
     @property
     def custom_instructions(self) -> dict[str, str]:

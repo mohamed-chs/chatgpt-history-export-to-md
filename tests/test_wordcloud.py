@@ -1,5 +1,6 @@
 """Tests for word cloud generation and stop words."""
 
+from datetime import UTC, datetime
 from pathlib import Path
 from unittest.mock import patch
 
@@ -13,7 +14,7 @@ from convoviz.analysis.wordcloud import (
     parse_custom_stopwords,
 )
 from convoviz.config import WordCloudConfig
-from convoviz.models import ConversationCollection
+from convoviz.models import Conversation, ConversationCollection
 
 
 def test_load_nltk_stopwords():
@@ -101,6 +102,45 @@ def test_generate_wordclouds_single_worker(tmp_path: Path, mock_conversation):
 
     png_files = list(tmp_path.glob("*.png"))
     assert len(png_files) >= 1
+
+
+def test_wordcloud_week_naming_uses_iso_week(tmp_path: Path) -> None:
+    """Ensure weekly filenames use ISO week year/number."""
+    ts = datetime(2021, 1, 1, 12, 0, tzinfo=UTC)
+    conv = Conversation(
+        title="ISO Week",
+        create_time=ts,
+        update_time=ts,
+        mapping={
+            "root": {"id": "root", "message": None, "parent": None, "children": ["user_node"]},
+            "user_node": {
+                "id": "user_node",
+                "message": {
+                    "id": "user_node",
+                    "author": {"role": "user", "metadata": {}},
+                    "create_time": ts.timestamp(),
+                    "update_time": ts.timestamp(),
+                    "content": {"content_type": "text", "parts": ["hello world"]},
+                    "status": "finished_successfully",
+                    "end_turn": True,
+                    "weight": 1.0,
+                    "metadata": {},
+                    "recipient": "all",
+                },
+                "parent": "root",
+                "children": [],
+            },
+        },
+        moderation_results=[],
+        current_node="user_node",
+        conversation_id="iso_week_conv",
+    )
+    collection = ConversationCollection(conversations=[conv])
+    config = WordCloudConfig(max_workers=1)
+
+    generate_wordclouds(collection, tmp_path, config)
+
+    assert (tmp_path / "2020-W53.png").exists()
 
 
 @pytest.mark.parametrize("max_workers", [None, 1, 2, 4])

@@ -4,6 +4,12 @@
 
 ## Recent Updates (February 7, 2026)
 
+- **Citation Map Hardening**: Robustly ignore malformed citation entries (non-dict `ref_id`) instead of raising errors.
+- **Canvas Extraction**: Canvas document detection now scans all parts, not just the first part.
+- **Deterministic Metadata**: Plugin namespaces and content types are sorted to produce stable YAML output.
+- **Conversation Identity Scan**: Markdown overwrite detection now scans a larger frontmatter prefix for conversation IDs.
+- **Wordcloud ISO Weeks**: Weekly wordcloud filenames now use ISO week year/number (e.g., `2020-W53.png`).
+
 - **CLI Path Expansion**: CLI `--input`, `--output`, and `--config` now expand `~`/env vars; improved help text for ZIP/JSON/dir inputs.
 - **Output Path Validation**: Interactive and CLI runs now validate output directories are writable before processing.
 - **Extras Visibility**: Canvas and `custom_instructions.json` exports now print explicit output locations.

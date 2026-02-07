@@ -60,35 +60,38 @@ def get_date_folder_path(conversation: Conversation) -> Path:
     return Path(year) / month
 
 
+_ID_SCAN_LIMIT = 128 * 1024
+
+
 def _get_conversation_id_from_file(filepath: Path) -> str | None:
     """Extract conversation_id from an existing markdown file's YAML frontmatter.
 
-    Reads only the first few KB of the file for performance.
+    Scans a bounded prefix of the file to avoid loading huge files.
     """
     try:
         with filepath.open("r", encoding="utf-8") as f:
-            # Read first 2048 bytes - enough for frontmatter and markers
-            content = f.read(2048)
-            # Check hidden marker first
-            marker = re.search(
-                r"<!--\s*convoviz:conversation_id=([^>\s]+)\s*-->",
-                content,
-                re.IGNORECASE,
-            )
-            if marker:
-                return marker.group(1)
-            # Look for conversation_id: "id"
-            match = re.search(r'^conversation_id:\s*"([^"]+)"', content, re.MULTILINE)
-            if match:
-                return match.group(1)
-            # Fallback: check chat_link
-            match = re.search(
-                r'^chat_link:\s*"https://(?:chatgpt\.com|chat\.openai\.com)/c/([^"]+)"',
-                content,
-                re.MULTILINE,
-            )
-            if match:
-                return match.group(1)
+            content = f.read(_ID_SCAN_LIMIT)
+
+        # Check hidden marker first
+        marker = re.search(
+            r"<!--\s*convoviz:conversation_id=([^>\s]+)\s*-->",
+            content,
+            re.IGNORECASE,
+        )
+        if marker:
+            return marker.group(1)
+        # Look for conversation_id: "id"
+        match = re.search(r'^conversation_id:\s*"([^"]+)"', content, re.MULTILINE)
+        if match:
+            return match.group(1)
+        # Fallback: check chat_link
+        match = re.search(
+            r'^chat_link:\s*"https://(?:chatgpt\.com|chat\.openai\.com)/c/([^"]+)"',
+            content,
+            re.MULTILINE,
+        )
+        if match:
+            return match.group(1)
     except Exception:
         pass
     return None

@@ -156,6 +156,29 @@ def test_canvas_json_string_in_parts() -> None:
     assert "### Canvas: string_part" in msg.text
 
 
+def test_canvas_document_in_non_first_part() -> None:
+    """Test extracting Canvas document when it is not the first part."""
+    ts = datetime(2025, 1, 1, tzinfo=UTC)
+    canvas_data = {"name": "later_part", "type": "code/html", "content": "<div>ok</div>"}
+
+    msg = Message(
+        id="msg_late_part",
+        author=MessageAuthor(role="assistant"),
+        content=MessageContent(content_type="text", parts=[{"text": "prefix"}, canvas_data]),
+        metadata=MessageMetadata(),
+        create_time=ts,
+        update_time=ts,
+        status="finished_successfully",
+        end_turn=True,
+        weight=1.0,
+        recipient="canmore.create_textdoc",
+    )
+
+    doc = msg.canvas_document
+    assert doc is not None
+    assert doc["name"] == "later_part"
+
+
 def test_canvas_json_string_in_text() -> None:
     """Test extracting Canvas document from a JSON string in content.text."""
     ts = datetime(2025, 1, 1, tzinfo=UTC)
