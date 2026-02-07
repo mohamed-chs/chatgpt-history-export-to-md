@@ -425,7 +425,7 @@ def render_conversation(
         pandoc_pdf=config.pandoc_pdf,
         markdown_flavor=flavor,
     )
-    markdown += f"<!-- convoviz:conversation_id={conversation.conversation_id} -->\n"
+    markdown += f"<!-- conversation_id={conversation.conversation_id} -->\n"
 
     # Pre-calculate citation map for the conversation
     citation_map = conversation.citation_map

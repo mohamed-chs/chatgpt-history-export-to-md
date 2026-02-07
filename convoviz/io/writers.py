@@ -74,7 +74,7 @@ def _get_conversation_id_from_file(filepath: Path) -> str | None:
 
         # Check hidden marker first
         marker = re.search(
-            r"<!--\s*convoviz:conversation_id=([^>\s]+)\s*-->",
+            r"<!--\s*conversation_id=([^>\s]+)\s*-->",
             content,
             re.IGNORECASE,
         )
