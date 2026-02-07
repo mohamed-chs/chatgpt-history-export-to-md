@@ -106,6 +106,7 @@ uv run ruff check convoviz tests && uv run ty check convoviz && uv run pytest
 7.  **Render Order**: Markdown output defaults to active-branch traversal; `conversation.markdown.render_order = "full"` renders all DAG nodes.
 8.  **Identity Matching**: Markdown overwrite detection scans the first ~128KB for the hidden conversation ID marker/frontmatter.
 9.  **Wordcloud Weeks**: Weekly wordcloud filenames use ISO week year/number (week starts Monday).
+10. **Tool Noise Filtering**: `web.search` tool outputs are hidden (like `web.run` and `bio`), while `browser` `tether_quote` remains visible.
 
 ## What's NOT Done (Roadmap)
 

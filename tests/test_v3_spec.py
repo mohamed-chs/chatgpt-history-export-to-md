@@ -41,6 +41,17 @@ class TestContentFiltering:
         )
         assert msg.is_hidden
 
+    def test_web_search_tool_hidden(self):
+        msg = Message(
+            id="3b",
+            author=MessageAuthor(role="tool", name="web.search"),
+            content=MessageContent(content_type="text", text="Search results"),
+            status="finished_successfully",
+            weight=1.0,
+            metadata=MessageMetadata(),
+        )
+        assert msg.is_hidden
+
     def test_browser_tool_tether_quote_visible(self):
         msg = Message(
             id="4",
@@ -133,6 +144,20 @@ class TestCitationParsing:
         ]
 
         result = replace_citations(text, citations, flavor="pandoc")
+        assert "[Source 1](http://example.com/1)" in result
+        assert "[[Source 1](http://example.com/1)]" not in result
+
+    def test_replace_citations_obsidian_format(self):
+        text = "Claim 【1†source】."
+        citations = [
+            {
+                "start_ix": 6,
+                "end_ix": 16,
+                "metadata": {"title": "Source 1", "url": "http://example.com/1"},
+            }
+        ]
+
+        result = replace_citations(text, citations, flavor="obsidian")
         assert "[Source 1](http://example.com/1)" in result
         assert "[[Source 1](http://example.com/1)]" not in result
 

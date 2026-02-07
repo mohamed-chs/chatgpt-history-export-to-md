@@ -220,7 +220,7 @@ def is_message_hidden(message: Any) -> bool:
 
     if message.author.role == "tool":
         # Hide memory updates (bio) and internal search orchestration (web.run)
-        if message.author.name in ("bio", "web.run"):
+        if message.author.name in ("bio", "web.run", "web.search"):
             return True
 
         # Hide browser tool outputs (intermediate search steps)

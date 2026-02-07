@@ -88,6 +88,11 @@
 - **Logging Isolation**: Logging setup now removes only convoviz-installed handlers, avoiding interference with host apps.
 - **ZIP Temp Cleanup**: Extracted ZIP folders are cleaned up on process exit to prevent disk leaks.
 
+## Recent Updates (February 7, 2026)
+
+- **Content Filtering**: Hide `web.search` tool outputs (internal search results) from Markdown to reduce noise.
+- **Obsidian Citations**: Fixed citation formatting to use standard Markdown links so Obsidian renders them correctly.
+
 ## Recent Updates (February 5, 2026)
 
 - **Custom Instructions & Canvas Support**:
