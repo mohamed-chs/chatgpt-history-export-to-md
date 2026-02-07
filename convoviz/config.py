@@ -16,7 +16,10 @@ from convoviz.utils import deep_merge_dicts, normalize_optional_path
 
 DEFAULT_CONFIG_RESOURCE = "assets/default_config.toml"
 PATH_KEYS = {"input_path", "bookmarklet_path", "output_folder", "font_path"}
-NONE_IF_EMPTY_KEYS = {"background_color", "max_workers"}
+NONE_IF_EMPTY_KEYS = {
+    "background_color",
+    "max_workers",
+}
 
 
 class FolderOrganization(StrEnum):
@@ -55,6 +58,12 @@ class MarkdownConfig(BaseModel):
     show_timestamp: bool = True
 
 
+class PandocPdfConfig(BaseModel):
+    """Configuration for Pandoc-friendly PDF frontmatter (Typst)."""
+
+    enabled: bool = True
+
+
 class YAMLConfig(BaseModel):
     """Configuration for YAML frontmatter in markdown files."""
 
@@ -79,6 +88,7 @@ class ConversationConfig(BaseModel):
 
     markdown: MarkdownConfig = Field(default_factory=MarkdownConfig)
     yaml: YAMLConfig = Field(default_factory=YAMLConfig)
+    pandoc_pdf: PandocPdfConfig = Field(default_factory=PandocPdfConfig)
 
 
 class MessageConfig(BaseModel):

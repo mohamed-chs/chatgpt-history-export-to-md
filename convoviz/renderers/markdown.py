@@ -251,7 +251,7 @@ def render_node(
         headers: Configuration for author headers
         use_dollar_latex: Whether to convert LaTeX delimiters to dollars
         asset_resolver: Function to resolve asset IDs to paths, optionally renaming them
-        flavor: Markdown flavor ("standard" or "obsidian")
+        flavor: Markdown flavor ("standard", "obsidian", or "pandoc")
         citation_map: Global map of citations
         show_timestamp: Whether to show the message timestamp
         last_timestamp: The timestamp of the previous message (for conditional date display)
@@ -397,7 +397,12 @@ def render_conversation(
     show_timestamp = config.markdown.show_timestamp
 
     # Start with YAML header
-    markdown = render_yaml_header(conversation, config.yaml)
+    markdown = render_yaml_header(
+        conversation,
+        config.yaml,
+        pandoc_pdf=config.pandoc_pdf,
+        markdown_flavor=flavor,
+    )
 
     # Pre-calculate citation map for the conversation
     citation_map = conversation.citation_map

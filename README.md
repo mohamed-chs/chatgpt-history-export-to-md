@@ -179,7 +179,9 @@ convoviz --config path/to/config.toml
 Markdown flavor options in config:
 1. `standard` (default)
 2. `obsidian` (collapsible callouts for reasoning content)
-3. `pandoc` (Pandoc/Quarto-friendly citation links)
+3. `pandoc` (Pandoc-friendly citation links)
+
+When using the `pandoc` flavor, Convoviz can inject PDF frontmatter (Typst) via `conversation.pandoc_pdf`. See `docs/pandoc-pdf-guide.md` for details.
 
 YAML frontmatter titles are sanitized; the original title is preserved in `aliases` when it changes.
 

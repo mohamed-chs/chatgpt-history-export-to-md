@@ -197,6 +197,17 @@ def run_interactive_config(initial_config: ConvovizConfig | None = None) -> Conv
             config.conversation.markdown.flavor = flavor_result
         logger.debug(f"User selected flavor: {config.conversation.markdown.flavor}")
 
+        if config.conversation.markdown.flavor == "pandoc":
+            enable_pdf: bool = _ask_or_cancel(
+                confirm(
+                    "Inject PDF frontmatter (Typst) for pandoc flavor?",
+                    default=config.conversation.pandoc_pdf.enabled,
+                    style=CUSTOM_STYLE,
+                )
+            )
+            config.conversation.pandoc_pdf.enabled = enable_pdf
+            logger.debug(f"User selected Pandoc PDF frontmatter: {enable_pdf}")
+
         # Prompt for YAML headers
         yaml_config = config.conversation.yaml
         yaml_fields = list(YAMLConfig.model_fields.keys())

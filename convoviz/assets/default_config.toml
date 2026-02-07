@@ -27,6 +27,9 @@ latex_delimiters = "dollars" # "default" or "dollars"
 flavor = "standard" # "standard", "obsidian", or "pandoc"
 show_timestamp = true
 
+[conversation.pandoc_pdf]
+enabled = true
+
 [conversation.yaml]
 title = true
 aliases = true

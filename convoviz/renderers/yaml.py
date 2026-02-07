@@ -5,7 +5,7 @@ from __future__ import annotations
 import re
 from datetime import datetime
 
-from convoviz.config import YAMLConfig
+from convoviz.config import PandocPdfConfig, YAMLConfig
 from convoviz.models import Conversation
 from convoviz.utils import sanitize_title
 
@@ -80,12 +80,26 @@ def _default_tags(conversation: Conversation) -> list[str]:
     return normalized
 
 
-def render_yaml_header(conversation: Conversation, config: YAMLConfig) -> str:
+def _pandoc_pdf_frontmatter(config: PandocPdfConfig) -> dict[str, object]:
+    if not config.enabled:
+        return {}
+    return {"format": "typst"}
+
+
+def render_yaml_header(
+    conversation: Conversation,
+    config: YAMLConfig,
+    *,
+    pandoc_pdf: PandocPdfConfig | None = None,
+    markdown_flavor: str = "standard",
+) -> str:
     """Render the YAML frontmatter for a conversation.
 
     Args:
         conversation: The conversation to render
         config: YAML configuration specifying which fields to include
+        pandoc_pdf: Optional Pandoc PDF frontmatter configuration
+        markdown_flavor: Markdown flavor to determine PDF frontmatter injection behavior
 
     Returns:
         YAML frontmatter string with --- delimiters, or empty string if no fields enabled
@@ -121,6 +135,9 @@ def render_yaml_header(conversation: Conversation, config: YAMLConfig) -> str:
         yaml_fields["voice"] = conversation.voice
     if config.conversation_id:
         yaml_fields["conversation_id"] = conversation.conversation_id
+
+    if pandoc_pdf and markdown_flavor == "pandoc":
+        yaml_fields.update(_pandoc_pdf_frontmatter(pandoc_pdf))
 
     if not yaml_fields:
         return ""

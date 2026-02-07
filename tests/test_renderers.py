@@ -2,7 +2,7 @@
 
 from datetime import datetime, timedelta
 
-from convoviz.config import AuthorHeaders, ConversationConfig, YAMLConfig
+from convoviz.config import AuthorHeaders, ConversationConfig, PandocPdfConfig, YAMLConfig
 from convoviz.models import Conversation
 from convoviz.renderers import render_conversation
 from convoviz.renderers.markdown import (
@@ -191,6 +191,61 @@ class TestRenderYamlHeader:
         assert 'title: "My Title WithChars"' in yaml
         assert "aliases:" in yaml
         assert '- "My @Title: With/Chars"' in yaml
+
+    def test_pandoc_pdf_frontmatter_for_pandoc(self, mock_conversation: Conversation) -> None:
+        """Test that Pandoc PDF frontmatter is injected for pandoc flavor."""
+        yaml_config = YAMLConfig(
+            title=False,
+            aliases=False,
+            tags=False,
+            chat_link=False,
+            create_time=False,
+            update_time=False,
+            model=False,
+            used_plugins=False,
+            message_count=False,
+            content_types=False,
+            custom_instructions=False,
+            is_starred=False,
+            voice=False,
+            conversation_id=False,
+        )
+        yaml = render_yaml_header(
+            mock_conversation,
+            yaml_config,
+            pandoc_pdf=PandocPdfConfig(),
+            markdown_flavor="pandoc",
+        )
+        assert "format:" in yaml
+        assert 'format: "typst"' in yaml
+
+    def test_pandoc_pdf_frontmatter_skipped_for_standard(
+        self, mock_conversation: Conversation
+    ) -> None:
+        """Test that Pandoc PDF frontmatter is skipped for non-pandoc flavors."""
+        yaml_config = YAMLConfig(
+            title=False,
+            aliases=False,
+            tags=False,
+            chat_link=False,
+            create_time=False,
+            update_time=False,
+            model=False,
+            used_plugins=False,
+            message_count=False,
+            content_types=False,
+            custom_instructions=False,
+            is_starred=False,
+            voice=False,
+            conversation_id=False,
+        )
+        yaml = render_yaml_header(
+            mock_conversation,
+            yaml_config,
+            pandoc_pdf=PandocPdfConfig(),
+            markdown_flavor="standard",
+        )
+        assert yaml == ""
 
 
 class TestRenderConversation:

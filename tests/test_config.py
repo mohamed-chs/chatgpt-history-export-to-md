@@ -11,6 +11,7 @@ from convoviz.config import (
     MarkdownConfig,
     MessageConfig,
     OutputKind,
+    PandocPdfConfig,
     WordCloudConfig,
     YAMLConfig,
     get_default_config,
@@ -55,6 +56,12 @@ def test_markdown_config_defaults() -> None:
     """Test MarkdownConfig default values."""
     md = MarkdownConfig()
     assert md.latex_delimiters == "dollars"
+
+
+def test_pandoc_pdf_config_defaults() -> None:
+    """Test PandocPdfConfig default values."""
+    pdf = PandocPdfConfig()
+    assert pdf.enabled is True
 
 
 def test_wordcloud_config_defaults() -> None:

@@ -133,11 +133,18 @@
 - Bar plot graphs showing usage patterns
 - JSON export of custom instructions
 
+## Recent Updates (February 7, 2026)
+
+**Pandoc/PDF Integration**:
+- Added a `conversation.pandoc_pdf` config block to inject minimal Typst frontmatter for `pandoc` flavor output.
+- Added an interactive prompt to enable PDF frontmatter (Typst).
+- Added `docs/pandoc-pdf-guide.md` and updated README/AGENTS/HANDOFF docs.
+
 ## Recent Updates (February 6, 2026)
 
-**Pandoc/Quarto Markdown Flavor**:
-- Added `pandoc` markdown flavor to emit standard citation links (`[Title](URL)`) for better Pandoc/Quarto compatibility.
-- Added Quarto/Pandoc PDF guide at `docs/quarto-guide.md`.
+**Pandoc Markdown Flavor**:
+- Added `pandoc` markdown flavor to emit standard citation links (`[Title](URL)`) for better Pandoc compatibility.
+- Added Pandoc PDF guide at `docs/pandoc-pdf-guide.md`.
 - Tests updated to cover the new flavor behavior.
 - YAML frontmatter now sanitizes `title` and stores the original in `aliases` when changed.
 
