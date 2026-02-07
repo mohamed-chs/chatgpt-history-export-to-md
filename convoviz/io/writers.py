@@ -120,7 +120,12 @@ def save_conversation(
             src_file = resolve_asset_path(source_path, asset_id)
             if src_file:
                 # Copy to output directory (relative to the markdown file's directory)
-                return copy_asset(src_file, final_path.parent, target_name)
+                return copy_asset(
+                    src_file,
+                    final_path.parent,
+                    target_name,
+                    convert_webp_to_png=config.markdown.flavor == "pandoc",
+                )
 
         return None
 

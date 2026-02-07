@@ -139,6 +139,7 @@
 - Added a `conversation.pandoc_pdf` config block to inject minimal Typst frontmatter for `pandoc` flavor output.
 - Added an interactive prompt to enable PDF frontmatter (Typst).
 - Added `docs/pandoc-pdf-guide.md` and updated README/AGENTS/HANDOFF docs.
+- **Pandoc Asset Compatibility**: WebP assets are now converted to PNG when using `pandoc` markdown flavor (best-effort), keeping Quarto/Pandoc PDF generation from failing on unsupported WebP files.
 
 ## Recent Updates (February 6, 2026)
 

@@ -85,13 +85,20 @@ def resolve_asset_path(source_dir: Path, asset_id: str) -> Path | None:
     return None
 
 
-def copy_asset(source_path: Path, dest_dir: Path, target_name: str | None = None) -> str:
+def copy_asset(
+    source_path: Path,
+    dest_dir: Path,
+    target_name: str | None = None,
+    *,
+    convert_webp_to_png: bool = False,
+) -> str:
     """Copy an asset to the destination directory.
 
     Args:
         source_path: The source file path
         dest_dir: The root output directory (assets will be in dest_dir/assets)
         target_name: Optional name to rename the file to
+        convert_webp_to_png: Convert WebP images to PNG (best-effort)
 
     Returns:
         Relative path to the asset (e.g., "assets/image.png")
@@ -101,6 +108,27 @@ def copy_asset(source_path: Path, dest_dir: Path, target_name: str | None = None
 
     filename = sanitize(target_name) if target_name else source_path.name
     dest_path = assets_dir / filename
+
+    if convert_webp_to_png and source_path.suffix.lower() == ".webp":
+        png_path = dest_path.with_suffix(".png")
+        png_filename = png_path.name
+        if not png_path.exists():
+            try:
+                from PIL import Image
+
+                with Image.open(source_path) as image:
+                    image.save(png_path, format="PNG")
+                logger.debug(f"Converted asset: {source_path.name} -> {png_filename}")
+            except Exception as e:
+                logger.warning(
+                    "Failed to convert WebP asset %s to PNG: %s. Copying original.",
+                    source_path,
+                    e,
+                )
+            else:
+                return f"assets/{png_filename}"
+        else:
+            return f"assets/{png_filename}"
 
     if not dest_path.exists():
         try:

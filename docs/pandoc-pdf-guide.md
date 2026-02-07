@@ -40,3 +40,9 @@ enabled = true
 ```
 
 This frontmatter is only injected when the markdown flavor is `pandoc`.
+
+## WebP Assets
+
+When using the `pandoc` markdown flavor, Convoviz will attempt to convert WebP
+assets to PNG during export. This keeps Quarto/Pandoc PDF generation from
+failing on unsupported WebP files.
