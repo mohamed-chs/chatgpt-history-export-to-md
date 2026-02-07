@@ -1,7 +1,6 @@
 """Interactive configuration prompts using questionary."""
 
 import logging
-from pathlib import Path
 from typing import Literal, Protocol, cast
 
 from questionary import Choice, Style, checkbox, confirm, select
@@ -9,8 +8,15 @@ from questionary import path as qst_path
 from questionary import text as qst_text
 
 from convoviz.config import ConvovizConfig, OutputKind, YAMLConfig, get_default_config
-from convoviz.io.loaders import find_latest_zip, find_script_export, validate_zip
-from convoviz.utils import colormaps, default_font_path, font_names, font_path, validate_header
+from convoviz.io.loaders import find_latest_valid_zip, find_script_export, validate_zip
+from convoviz.utils import (
+    colormaps,
+    default_font_path,
+    expand_path,
+    font_names,
+    font_path,
+    validate_header,
+)
 
 OUTPUT_TITLES = {
     OutputKind.MARKDOWN: "Markdown conversations",
@@ -55,7 +61,7 @@ def _ask_or_cancel[T](prompt: _QuestionaryPrompt[T]) -> T:
 
 
 def _validate_input_path(raw: str) -> bool | str:
-    path = Path(raw)
+    path = expand_path(raw)
     if not path.exists():
         return "Path must exist"
 
@@ -87,7 +93,7 @@ def run_interactive_config(initial_config: ConvovizConfig | None = None) -> Conv
 
     # Set sensible defaults if not already set
     if not config.input_path:
-        latest = find_latest_zip()
+        latest = find_latest_valid_zip()
         if latest:
             config.input_path = latest
 
@@ -106,7 +112,7 @@ def run_interactive_config(initial_config: ConvovizConfig | None = None) -> Conv
     )
 
     if input_result:
-        config.input_path = Path(input_result)
+        config.input_path = expand_path(input_result)
     logger.debug(f"User selected input: {config.input_path}")
     # Prompt to merge script export if detected (and not already selected as primary input)
     script_export = find_script_export()
@@ -136,29 +142,67 @@ def run_interactive_config(initial_config: ConvovizConfig | None = None) -> Conv
     )
 
     if output_result:
-        config.output_folder = Path(output_result)
+        config.output_folder = expand_path(output_result)
     logger.debug(f"User selected output: {config.output_folder}")
 
     # Prompt for outputs to generate
-    output_choices = [
-        Choice(
-            title=OUTPUT_TITLES.get(kind, kind.value.title()),
-            value=kind,
-            checked=kind in config.outputs,
-        )
-        for kind in OutputKind
-    ]
+    while True:
+        output_choices = [
+            Choice(
+                title=OUTPUT_TITLES.get(kind, kind.value.title()),
+                value=kind,
+                checked=kind in config.outputs,
+            )
+            for kind in OutputKind
+        ]
 
-    selected_outputs: list[OutputKind] = _ask_or_cancel(
+        selected_outputs: list[OutputKind] = _ask_or_cancel(
+            checkbox(
+                "Select outputs to generate:",
+                choices=output_choices,
+                style=CUSTOM_STYLE,
+            )
+        )
+
+        if selected_outputs:
+            config.outputs = set(selected_outputs)
+            break
+
+        proceed_empty: bool = _ask_or_cancel(
+            confirm(
+                "No outputs selected. Continue anyway?",
+                default=False,
+                style=CUSTOM_STYLE,
+            )
+        )
+        if proceed_empty:
+            config.outputs = set()
+            break
+    logger.debug(f"User selected outputs: {config.outputs}")
+
+    extra_choices = [
+        Choice(title="Canvas documents", value="canvas", checked=config.export_canvas),
+        Choice(
+            title="Custom instructions (custom_instructions.json)",
+            value="custom_instructions",
+            checked=config.export_custom_instructions,
+        ),
+    ]
+    selected_extras: list[str] = _ask_or_cancel(
         checkbox(
-            "Select outputs to generate:",
-            choices=output_choices,
+            "Select extra exports:",
+            choices=extra_choices,
             style=CUSTOM_STYLE,
         )
     )
-
-    config.outputs = set(selected_outputs) if selected_outputs else set()
-    logger.debug(f"User selected outputs: {config.outputs}")
+    selected_extras_set = set(selected_extras)
+    config.export_canvas = "canvas" in selected_extras_set
+    config.export_custom_instructions = "custom_instructions" in selected_extras_set
+    logger.debug(
+        "User selected extras: canvas=%s, custom_instructions=%s",
+        config.export_canvas,
+        config.export_custom_instructions,
+    )
 
     # Prompt for markdown settings (only if markdown output is selected)
     if OutputKind.MARKDOWN in config.outputs:

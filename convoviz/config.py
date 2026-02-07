@@ -104,7 +104,7 @@ class WordCloudConfig(BaseModel):
 
     font_path: Path | None = None
     colormap: str = "RdYlBu"
-    custom_stopwords: str = "use, file, "
+    custom_stopwords: str = ""
     exclude_programming_keywords: bool = True
     background_color: str | None = None
     mode: Literal["RGB", "RGBA"] = "RGBA"
@@ -134,6 +134,7 @@ class ConvovizConfig(BaseModel):
     input_path: Path | None = None
     bookmarklet_path: Path | None = None
     output_folder: Path = Field(default_factory=lambda: Path.home() / "Documents" / "ChatGPT-Data")
+    quiet: bool = False
     folder_organization: FolderOrganization = FolderOrganization.DATE
     outputs: set[OutputKind] = Field(default_factory=lambda: set(ALL_OUTPUTS))
     prepend_timestamp_to_filename: bool = False

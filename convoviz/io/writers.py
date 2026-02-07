@@ -180,6 +180,28 @@ def _generate_year_index(year_dir: Path, year: str) -> None:
     logger.debug(f"Generated year index: {index_path}")
 
 
+def _generate_root_index(root_dir: Path) -> None:
+    """Generate a top-level _index.md that links to year indexes."""
+    years = sorted([d.name for d in root_dir.iterdir() if d.is_dir() and d.name.isdigit()])
+    if not years:
+        return
+
+    lines = [
+        "# ChatGPT Conversations",
+        "",
+        "## Years",
+        "",
+    ]
+
+    for year in years:
+        encoded = quote(f"{year}/_index.md")
+        lines.append(f"- [{year}]({encoded})")
+
+    index_path = root_dir / "_index.md"
+    index_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+    logger.debug(f"Generated root index: {index_path}")
+
+
 def _generate_month_index(month_dir: Path, year: str, month: str) -> None:
     """Generate a _index.md file for a month folder.
 
@@ -273,6 +295,7 @@ def save_collection(
                     if month_dir.is_dir():
                         _generate_month_index(month_dir, year_dir.name, month_dir.name)
                 _generate_year_index(year_dir, year_dir.name)
+        _generate_root_index(directory)
 
 
 def save_custom_instructions(

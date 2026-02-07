@@ -6,6 +6,7 @@
 input_path = ""
 bookmarklet_path = ""
 output_folder = "~/Documents/ChatGPT-Data"
+quiet = false
 
 # Output organization
 folder_organization = "date" # "date" or "flat"
@@ -50,7 +51,7 @@ conversation_id = true
 [wordcloud]
 font_path = "" # Leave empty for auto
 colormap = "RdYlBu"
-custom_stopwords = "use, file, "
+custom_stopwords = ""
 exclude_programming_keywords = true
 background_color = "" # Empty means transparent
 mode = "RGBA" # "RGB" or "RGBA"

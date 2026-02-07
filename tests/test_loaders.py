@@ -9,6 +9,7 @@ import pytest
 
 from convoviz.exceptions import InvalidZipError
 from convoviz.io.loaders import (
+    find_latest_valid_zip,
     find_latest_zip,
     find_script_export,
     load_collection_from_json,
@@ -144,6 +145,32 @@ class TestFindLatestZip:
         empty_dir.mkdir()
 
         result = find_latest_zip(empty_dir)
+        assert result is None
+
+
+class TestFindLatestValidZip:
+    """Tests for the find_latest_valid_zip function."""
+
+    def test_ignores_invalid_zips(self, tmp_path: Path) -> None:
+        """Test that invalid ZIPs are ignored."""
+        invalid_zip = tmp_path / "invalid.zip"
+        with ZipFile(invalid_zip, "w") as zf:
+            zf.writestr("other.txt", "content")
+
+        valid_zip = tmp_path / "valid.zip"
+        with ZipFile(valid_zip, "w") as zf:
+            zf.writestr("conversations.json", "[]")
+
+        result = find_latest_valid_zip(tmp_path)
+        assert result == valid_zip
+
+    def test_returns_none_when_no_valid_zips(self, tmp_path: Path) -> None:
+        """Test that None is returned when no valid ZIP files exist."""
+        invalid_zip = tmp_path / "invalid.zip"
+        with ZipFile(invalid_zip, "w") as zf:
+            zf.writestr("other.txt", "content")
+
+        result = find_latest_valid_zip(tmp_path)
         assert result is None
 
 

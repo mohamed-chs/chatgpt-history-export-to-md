@@ -33,13 +33,14 @@ def test_run_pipeline(mock_zip_file: Path, tmp_path: Path) -> None:
         assert output_dir.exists()
         assert (output_dir / "Markdown").exists()
         assert (output_dir / "Graphs").exists()
-        assert (output_dir / "Word-Clouds").exists()
+        assert (output_dir / "Wordclouds").exists()
 
         # Check if markdown file was created (in date folder by default)
         # The mock conversation is dated July 29, 2023 -> 2023/07-July/
         assert (output_dir / "Markdown" / "2023" / "07-July" / "conversation 111.md").exists()
 
         # Check that index files were generated
+        assert (output_dir / "Markdown" / "_index.md").exists()
         assert (output_dir / "Markdown" / "2023" / "_index.md").exists()
         assert (output_dir / "Markdown" / "2023" / "07-July" / "_index.md").exists()
 
@@ -79,7 +80,7 @@ def test_run_pipeline_markdown_only(mock_zip_file: Path, tmp_path: Path) -> None
 
     # Check that graphs and wordclouds were NOT created
     assert not (output_dir / "Graphs").exists()
-    assert not (output_dir / "Word-Clouds").exists()
+    assert not (output_dir / "Wordclouds").exists()
 
     # Check markdown file exists
     assert (output_dir / "Markdown" / "2023" / "07-July" / "conversation 111.md").exists()
@@ -102,7 +103,7 @@ def test_run_pipeline_graphs_only(mock_zip_file: Path, tmp_path: Path) -> None:
 
     # Check that markdown and wordclouds were NOT created
     assert not (output_dir / "Markdown").exists()
-    assert not (output_dir / "Word-Clouds").exists()
+    assert not (output_dir / "Wordclouds").exists()
 
 
 def test_run_pipeline_no_outputs(mock_zip_file: Path, tmp_path: Path) -> None:
@@ -120,7 +121,7 @@ def test_run_pipeline_no_outputs(mock_zip_file: Path, tmp_path: Path) -> None:
     assert output_dir.exists()
     assert not (output_dir / "Markdown").exists()
     assert not (output_dir / "Graphs").exists()
-    assert not (output_dir / "Word-Clouds").exists()
+    assert not (output_dir / "Wordclouds").exists()
 
 
 def test_run_pipeline_additive_output(mock_zip_file: Path, tmp_path: Path) -> None:

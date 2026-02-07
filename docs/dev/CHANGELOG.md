@@ -4,6 +4,18 @@
 
 ## Recent Updates (February 7, 2026)
 
+- **Safer Latest ZIP Discovery**: Auto-detection now prefers ZIPs that actually contain `conversations.json`, avoiding unrelated downloads.
+- **Interactive Path Expansion**: Input/output prompts now expand `~` and environment variables so casual users can paste common paths.
+- **Extra Exports Prompt**: Interactive mode now lets users choose Canvas and Custom Instructions exports explicitly.
+- **No-Output Guardrails**: Interactive mode confirms before proceeding with zero outputs; pipeline warns when there is nothing to generate.
+- **Top-Level Index**: Date-organized Markdown output now includes a root `_index.md` linking to yearly indexes.
+- **Wordclouds Folder Name**: Output folder renamed to `Wordclouds` for consistency.
+- **Cleaner Defaults**: Wordcloud custom stopwords default to empty.
+- **Dependency Guidance**: Missing visualization dependencies now show `pip` and `uv pip` install hints.
+- **Quiet Mode**: Added `--quiet/-q` to reduce console output for scripted runs.
+
+## Recent Updates (February 7, 2026)
+
 - **YAML Frontmatter**: Switched to PyYAML for frontmatter rendering with explicit string quoting and multiline literal blocks for correctness.
 - **Citations (Standard Markdown)**: Standard flavor now emits `[Title](URL)` links (Pandoc and Standard aligned); Obsidian keeps wiki-style formatting.
 - **ZIP Temp Cleanup**: ZIP extraction temp folders are now explicitly cleaned after pipeline completion (in addition to atexit cleanup).

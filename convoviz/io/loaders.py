@@ -199,6 +199,31 @@ def find_latest_zip(directory: Path | None = None) -> Path | None:
     return max(zip_files, key=lambda p: p.stat().st_mtime)
 
 
+def find_latest_valid_zip(directory: Path | None = None) -> Path | None:
+    """Find the most recent valid ChatGPT export ZIP in a directory.
+
+    A valid ZIP is one that contains conversations.json.
+
+    Args:
+        directory: Directory to search (defaults to ~/Downloads)
+
+    Returns:
+        Path to the most recent valid ZIP, or None if none found
+    """
+    if directory is None:
+        directory = Path.home() / "Downloads"
+
+    zip_files = [p for p in directory.iterdir() if p.is_file() and p.suffix.lower() == ".zip"]
+    if not zip_files:
+        return None
+
+    valid = [p for p in zip_files if validate_zip(p)]
+    if not valid:
+        return None
+
+    return max(valid, key=lambda p: p.stat().st_mtime)
+
+
 def find_script_export(directory: Path | None = None) -> Path | None:
     """Find the most recent script-generated export in a directory.
 

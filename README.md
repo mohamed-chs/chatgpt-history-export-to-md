@@ -143,6 +143,7 @@ Available options: `markdown`, `graphs`, `wordclouds`
 | `--config PATH` | Use a specific TOML config file (otherwise the user config is used if present) |
 | `--verbose` / `-v` | Enable detailed logging (use `-vv` for debug logs) |
 | `--log-file PATH` | Specify a custom log file location |
+| `--quiet` / `-q` | Reduce console output (still logs to file) |
 
 For a complete list of options:
 

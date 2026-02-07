@@ -23,7 +23,7 @@ class FakePrompt[T]:
 def test_ctrl_c_on_first_prompt_aborts_interactive(monkeypatch: pytest.MonkeyPatch) -> None:
     import convoviz.interactive as interactive
 
-    monkeypatch.setattr(interactive, "find_latest_zip", lambda: None)
+    monkeypatch.setattr(interactive, "find_latest_valid_zip", lambda: None)
     monkeypatch.setattr(interactive, "find_script_export", lambda: None)
     monkeypatch.setattr(interactive, "qst_path", lambda *_a, **_k: FakePrompt(None))
 
@@ -36,7 +36,7 @@ def test_ctrl_c_mid_flow_aborts_interactive(
 ) -> None:
     import convoviz.interactive as interactive
 
-    monkeypatch.setattr(interactive, "find_latest_zip", lambda: None)
+    monkeypatch.setattr(interactive, "find_latest_valid_zip", lambda: None)
     monkeypatch.setattr(interactive, "find_script_export", lambda: None)
 
     path_answers = iter(["dummy.zip", str(tmp_path / "out")])
@@ -58,7 +58,7 @@ def test_ctrl_c_on_outputs_checkbox_aborts_interactive(
     """Test Ctrl+C on the outputs checkbox prompt aborts."""
     import convoviz.interactive as interactive
 
-    monkeypatch.setattr(interactive, "find_latest_zip", lambda: None)
+    monkeypatch.setattr(interactive, "find_latest_valid_zip", lambda: None)
     monkeypatch.setattr(interactive, "find_script_export", lambda: None)
 
     path_answers = iter(["dummy.zip", str(tmp_path / "out")])
@@ -77,7 +77,7 @@ def test_outputs_selection_sets_config(monkeypatch: pytest.MonkeyPatch, tmp_path
     """Test that output selection correctly sets config.outputs."""
     import convoviz.interactive as interactive
 
-    monkeypatch.setattr(interactive, "find_latest_zip", lambda: None)
+    monkeypatch.setattr(interactive, "find_latest_valid_zip", lambda: None)
     monkeypatch.setattr(interactive, "find_script_export", lambda: None)
 
     path_answers = iter(["dummy.zip", str(tmp_path / "out")])
@@ -92,9 +92,11 @@ def test_outputs_selection_sets_config(monkeypatch: pytest.MonkeyPatch, tmp_path
         if checkbox_call_count[0] == 1:
             # First checkbox is the outputs selection - only select markdown
             return FakePrompt([OutputKind.MARKDOWN])
-        else:
-            # Second checkbox is YAML fields
-            return FakePrompt(["title", "chat_link"])
+        if checkbox_call_count[0] == 2:
+            # Second checkbox is extras
+            return FakePrompt(["canvas", "custom_instructions"])
+        # Third checkbox is YAML fields
+        return FakePrompt(["title", "chat_link"])
 
     monkeypatch.setattr(interactive, "qst_path", fake_qst_path)
     monkeypatch.setattr(interactive, "checkbox", fake_checkbox)
@@ -113,7 +115,7 @@ def test_wordcloud_prompts_skipped_when_not_selected(
     """Test that wordcloud prompts are skipped when wordclouds output is not selected."""
     import convoviz.interactive as interactive
 
-    monkeypatch.setattr(interactive, "find_latest_zip", lambda: None)
+    monkeypatch.setattr(interactive, "find_latest_valid_zip", lambda: None)
     monkeypatch.setattr(interactive, "find_script_export", lambda: None)
     monkeypatch.setattr(interactive, "font_names", lambda: ["Font1", "Font2"])
     monkeypatch.setattr(interactive, "colormaps", lambda: ["cmap1", "cmap2"])
@@ -130,9 +132,11 @@ def test_wordcloud_prompts_skipped_when_not_selected(
         if checkbox_call_count[0] == 1:
             # First checkbox: select only markdown (no wordclouds)
             return FakePrompt([OutputKind.MARKDOWN])
-        else:
-            # Second checkbox: YAML fields
-            return FakePrompt(["title"])
+        if checkbox_call_count[0] == 2:
+            # Second checkbox: extras
+            return FakePrompt(["canvas", "custom_instructions"])
+        # Third checkbox: YAML fields
+        return FakePrompt(["title"])
 
     select_call_count = [0]
 
@@ -166,7 +170,7 @@ def test_markdown_prompts_skipped_when_not_selected(
     """Test that markdown prompts are skipped when markdown output is not selected."""
     import convoviz.interactive as interactive
 
-    monkeypatch.setattr(interactive, "find_latest_zip", lambda: None)
+    monkeypatch.setattr(interactive, "find_latest_valid_zip", lambda: None)
     monkeypatch.setattr(interactive, "find_script_export", lambda: None)
     monkeypatch.setattr(interactive, "font_names", lambda: ["Font1", "Font2"])
     monkeypatch.setattr(interactive, "colormaps", lambda: ["cmap1", "cmap2"])
@@ -180,8 +184,11 @@ def test_markdown_prompts_skipped_when_not_selected(
 
     def fake_checkbox(*_a, **_k):
         checkbox_call_count[0] += 1
-        # Only checkbox: select only graphs (no markdown, no wordclouds)
-        return FakePrompt([OutputKind.GRAPHS])
+        if checkbox_call_count[0] == 1:
+            # Outputs: select only graphs (no markdown, no wordclouds)
+            return FakePrompt([OutputKind.GRAPHS])
+        # Extras
+        return FakePrompt(["canvas", "custom_instructions"])
 
     select_call_count = [0]
 
@@ -206,8 +213,8 @@ def test_markdown_prompts_skipped_when_not_selected(
     assert select_call_count[0] == 0
     # No text calls (no author headers, no stopwords)
     assert text_call_count[0] == 0
-    # Only 1 checkbox call (output selection), no YAML fields checkbox
-    assert checkbox_call_count[0] == 1
+    # Only 2 checkbox calls (output selection + extras), no YAML fields checkbox
+    assert checkbox_call_count[0] == 2
     # Verify only graphs selected
     assert config.outputs == {OutputKind.GRAPHS}
 
@@ -217,7 +224,7 @@ def test_outputs_prompt_respects_existing_config(monkeypatch: pytest.MonkeyPatch
     import convoviz.interactive as interactive
 
     # Setup mocks
-    monkeypatch.setattr(interactive, "find_latest_zip", lambda: None)
+    monkeypatch.setattr(interactive, "find_latest_valid_zip", lambda: None)
     monkeypatch.setattr(interactive, "find_script_export", lambda: None)
 
     captured_choices = []
@@ -261,12 +268,20 @@ def test_script_export_merge_prompt(monkeypatch: pytest.MonkeyPatch, tmp_path: P
     export_path = tmp_path / "convoviz_export.json"
     export_path.write_text("[]")
     monkeypatch.setattr(interactive, "find_script_export", lambda: export_path)
-    monkeypatch.setattr(interactive, "find_latest_zip", lambda: None)
+    monkeypatch.setattr(interactive, "find_latest_valid_zip", lambda: None)
 
     # Mock other prompts
     path_answers = iter(["dummy.zip", str(tmp_path / "out")])
     monkeypatch.setattr(interactive, "qst_path", lambda *_a, **_k: FakePrompt(next(path_answers)))
-    monkeypatch.setattr(interactive, "checkbox", lambda *_a, **_k: FakePrompt([]))
+    checkbox_call_count = [0]
+
+    def fake_checkbox(*_a, **_k):
+        checkbox_call_count[0] += 1
+        if checkbox_call_count[0] == 1:
+            return FakePrompt([OutputKind.GRAPHS])
+        return FakePrompt(["canvas", "custom_instructions"])
+
+    monkeypatch.setattr(interactive, "checkbox", fake_checkbox)
 
     # Mock confirm prompt - User says YES
     monkeypatch.setattr(interactive, "confirm", lambda *_a, **_k: FakePrompt(True))
@@ -286,12 +301,20 @@ def test_script_export_merge_prompt_declined(
     export_path = tmp_path / "convoviz_export.json"
     export_path.write_text("[]")
     monkeypatch.setattr(interactive, "find_script_export", lambda: export_path)
-    monkeypatch.setattr(interactive, "find_latest_zip", lambda: None)
+    monkeypatch.setattr(interactive, "find_latest_valid_zip", lambda: None)
 
     # Mock other prompts
     path_answers = iter(["dummy.zip", str(tmp_path / "out")])
     monkeypatch.setattr(interactive, "qst_path", lambda *_a, **_k: FakePrompt(next(path_answers)))
-    monkeypatch.setattr(interactive, "checkbox", lambda *_a, **_k: FakePrompt([]))
+    checkbox_call_count = [0]
+
+    def fake_checkbox(*_a, **_k):
+        checkbox_call_count[0] += 1
+        if checkbox_call_count[0] == 1:
+            return FakePrompt([OutputKind.GRAPHS])
+        return FakePrompt(["canvas", "custom_instructions"])
+
+    monkeypatch.setattr(interactive, "checkbox", fake_checkbox)
 
     # Mock confirm prompt - User says NO
     monkeypatch.setattr(interactive, "confirm", lambda *_a, **_k: FakePrompt(False))
@@ -311,12 +334,20 @@ def test_script_export_merge_prompt_skipped_if_manually_selected(
     export_path = tmp_path / "convoviz_export.json"
     export_path.write_text("[]")
     monkeypatch.setattr(interactive, "find_script_export", lambda: export_path)
-    monkeypatch.setattr(interactive, "find_latest_zip", lambda: export_path)
+    monkeypatch.setattr(interactive, "find_latest_valid_zip", lambda: export_path)
 
     # Mock other prompts
     # User selects the export_path as their main input
     monkeypatch.setattr(interactive, "qst_path", lambda *_a, **_k: FakePrompt(str(export_path)))
-    monkeypatch.setattr(interactive, "checkbox", lambda *_a, **_k: FakePrompt([]))
+    checkbox_call_count = [0]
+
+    def fake_checkbox(*_a, **_k):
+        checkbox_call_count[0] += 1
+        if checkbox_call_count[0] == 1:
+            return FakePrompt([OutputKind.GRAPHS])
+        return FakePrompt(["canvas", "custom_instructions"])
+
+    monkeypatch.setattr(interactive, "checkbox", fake_checkbox)
 
     # Mock confirm prompt - should NOT be called!
     # If it is called, it will crash because we haven't mocked it specifically here or we can monitor it

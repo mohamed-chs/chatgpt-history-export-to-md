@@ -37,7 +37,7 @@ def test_main_with_args(mock_zip_file: Path, tmp_path: Path) -> None:
 def test_main_missing_zip_non_interactive() -> None:
     """Test failing when zip is missing in non-interactive mode."""
     with (
-        patch("convoviz.cli.find_latest_zip", return_value=None),
+        patch("convoviz.cli.find_latest_valid_zip", return_value=None),
         patch("convoviz.cli.run_pipeline") as mock_run,
     ):
         result = runner.invoke(app, ["--output", "foo", "--no-interactive"])

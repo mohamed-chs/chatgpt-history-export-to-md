@@ -48,12 +48,13 @@ def run_pipeline(config: ConvovizConfig) -> None:
         raise InvalidZipError(str(input_path), reason="File does not exist")
 
     logger.info(f"Starting pipeline with input: {input_path}")
-    console.print(f"Loading data from {input_path} [bold yellow]📂[/bold yellow] ...\n")
+    if not config.quiet:
+        console.print(f"Loading data from {input_path} [bold yellow]📂[/bold yellow] ...\n")
 
     output_dir_map: dict[OutputKind, str] = {
         OutputKind.MARKDOWN: "Markdown",
         OutputKind.GRAPHS: "Graphs",
-        OutputKind.WORDCLOUDS: "Word-Clouds",
+        OutputKind.WORDCLOUDS: "Wordclouds",
     }
 
     try:
@@ -76,9 +77,11 @@ def run_pipeline(config: ConvovizConfig) -> None:
         # Try to merge script export if explicitly specified
         if config.bookmarklet_path:
             script_path = config.bookmarklet_path
-            console.print(
-                f"Merging convoviz script export: [bold yellow]{script_path}[/bold yellow] ...\n"
-            )
+            if not config.quiet:
+                console.print(
+                    "Merging convoviz script export: "
+                    f"[bold yellow]{script_path}[/bold yellow] ...\n"
+                )
             try:
                 if script_path.suffix.lower() == ".json":
                     script_collection = load_collection_from_json(script_path)
@@ -97,6 +100,17 @@ def run_pipeline(config: ConvovizConfig) -> None:
 
         # Determine which outputs are selected
         selected_outputs = config.outputs
+        if (
+            not selected_outputs
+            and not config.export_canvas
+            and not config.export_custom_instructions
+        ):
+            if not config.quiet:
+                console.print(
+                    "[bold yellow]Warning:[/bold yellow] "
+                    "No outputs selected and no extra exports enabled. Nothing to do."
+                )
+            return
 
         # Clean only specific sub-directories we manage (only for selected outputs)
         for output_kind, dir_name in output_dir_map.items():
@@ -115,14 +129,15 @@ def run_pipeline(config: ConvovizConfig) -> None:
                 config.message.author_headers,
                 folder_organization=config.folder_organization,
                 prepend_timestamp=config.prepend_timestamp_to_filename,
-                progress_bar=True,
+                progress_bar=not config.quiet,
             )
 
             logger.info("Markdown generation complete")
-            console.print(
-                f"\nDone [bold green]✅[/bold green] ! "
-                f"Check the output [bold blue]📄[/bold blue] here: {_safe_uri(markdown_folder)} 🔗\n"
-            )
+            if not config.quiet:
+                console.print(
+                    f"\nDone [bold green]✅[/bold green] ! "
+                    f"Check the output [bold blue]📄[/bold blue] here: {_safe_uri(markdown_folder)} 🔗\n"
+                )
 
         # Save collection-level metadata if requested
         if config.export_custom_instructions:
@@ -147,7 +162,8 @@ def run_pipeline(config: ConvovizConfig) -> None:
             except ModuleNotFoundError as e:
                 raise ConfigurationError(
                     "Graph generation requires matplotlib. "
-                    'Reinstall with the [viz] extra: uv tool install "convoviz[viz]"'
+                    'Install with `pip install "convoviz[viz]"` '
+                    'or `uv pip install "convoviz[viz]"`.'
                 ) from e
 
             graph_folder = output_folder / output_dir_map[OutputKind.GRAPHS]
@@ -156,13 +172,14 @@ def run_pipeline(config: ConvovizConfig) -> None:
                 collection,
                 graph_folder,
                 config.graph,
-                progress_bar=True,
+                progress_bar=not config.quiet,
             )
             logger.info("Graph generation complete")
-            console.print(
-                f"\nDone [bold green]✅[/bold green] ! "
-                f"Check the output [bold blue]📈[/bold blue] here: {_safe_uri(graph_folder)} 🔗\n"
-            )
+            if not config.quiet:
+                console.print(
+                    f"\nDone [bold green]✅[/bold green] ! "
+                    f"Check the output [bold blue]📈[/bold blue] here: {_safe_uri(graph_folder)} 🔗\n"
+                )
 
         # Generate word clouds (if selected)
         if OutputKind.WORDCLOUDS in selected_outputs:
@@ -172,7 +189,8 @@ def run_pipeline(config: ConvovizConfig) -> None:
             except ModuleNotFoundError as e:
                 raise ConfigurationError(
                     "Word cloud generation requires wordcloud and nltk. "
-                    'Reinstall with the [viz] extra: uv tool install "convoviz[viz]"'
+                    'Install with `pip install "convoviz[viz]"` '
+                    'or `uv pip install "convoviz[viz]"`.'
                 ) from e
 
             wordcloud_folder = output_folder / output_dir_map[OutputKind.WORDCLOUDS]
@@ -181,20 +199,22 @@ def run_pipeline(config: ConvovizConfig) -> None:
                 collection,
                 wordcloud_folder,
                 config.wordcloud,
-                progress_bar=True,
+                progress_bar=not config.quiet,
             )
             logger.info("Wordcloud generation complete")
-            console.print(
-                f"\nDone [bold green]✅[/bold green] ! "
-                f"Check the output [bold blue]🔡☁️[/bold blue] here: {_safe_uri(wordcloud_folder)} 🔗\n"
-            )
+            if not config.quiet:
+                console.print(
+                    f"\nDone [bold green]✅[/bold green] ! "
+                    f"Check the output [bold blue]🔡☁️[/bold blue] here: {_safe_uri(wordcloud_folder)} 🔗\n"
+                )
 
-        console.print(
-            "ALL DONE [bold green]🎉🎉🎉[/bold green] !\n\n"
-            f"Explore the full gallery [bold yellow]🖼️[/bold yellow] at: {_safe_uri(output_folder)} 🔗\n\n"
-            "I hope you enjoy the outcome 🤞.\n\n"
-            "If you appreciate it, kindly give the project a star ⭐ on GitHub:\n\n"
-            "➡️ https://github.com/mohamed-chs/convoviz 🔗\n\n"
-        )
+        if not config.quiet:
+            console.print(
+                "ALL DONE [bold green]🎉🎉🎉[/bold green] !\n\n"
+                f"Explore the full gallery [bold yellow]🖼️[/bold yellow] at: {_safe_uri(output_folder)} 🔗\n\n"
+                "I hope you enjoy the outcome 🤞.\n\n"
+                "If you appreciate it, kindly give the project a star ⭐ on GitHub:\n\n"
+                "➡️ https://github.com/mohamed-chs/convoviz 🔗\n\n"
+            )
     finally:
         cleanup_temp_dirs()

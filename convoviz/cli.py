@@ -17,7 +17,7 @@ from convoviz.config import (
 )
 from convoviz.exceptions import ConfigurationError, InvalidZipError
 from convoviz.interactive import run_interactive_config
-from convoviz.io.loaders import find_latest_zip
+from convoviz.io.loaders import find_latest_valid_zip
 from convoviz.logging_config import setup_logging
 from convoviz.pipeline import run_pipeline
 from convoviz.utils import default_font_path
@@ -93,6 +93,12 @@ def run(
         "--log-file",
         help="Path to log file. Defaults to a temporary file.",
     ),
+    quiet: bool = typer.Option(
+        False,
+        "--quiet",
+        "-q",
+        help="Reduce console output (still logs to file).",
+    ),
     config_path: Path | None = typer.Option(
         None,
         "--config",
@@ -114,7 +120,8 @@ def run(
     # Setup logging immediately
     log_path = setup_logging(verbose, log_file)
     logger = logging.getLogger("convoviz.cli")
-    console.print(f"[dim]Logging to: {log_path}[/dim]")
+    if not quiet:
+        console.print(f"[dim]Logging to: {log_path}[/dim]")
     logger.debug(f"Logging initialized. Output: {log_path}")
 
     if ctx.invoked_subcommand is not None:
@@ -131,6 +138,8 @@ def run(
         config.input_path = input_path
     if output_dir:
         config.output_folder = output_dir
+    if quiet:
+        config.quiet = True
     if outputs:
         config.outputs = set(outputs)
     if flat:
@@ -142,7 +151,8 @@ def run(
     use_interactive = interactive if interactive is not None else (input_path is None)
 
     if use_interactive:
-        console.print("Welcome to ChatGPT Data Visualizer ✨📊!\n")
+        if not config.quiet:
+            console.print("Welcome to ChatGPT Data Visualizer ✨📊!\n")
         try:
             config = run_interactive_config(config)
         except KeyboardInterrupt:
@@ -152,9 +162,10 @@ def run(
         # Non-interactive mode: validate we have what we need
         if not config.input_path:
             # Try to find a default
-            latest = find_latest_zip()
+            latest = find_latest_valid_zip()
             if latest:
-                console.print(f"No input specified, using latest zip found: {latest}")
+                if not config.quiet:
+                    console.print(f"No input specified, using latest zip found: {latest}")
                 config.input_path = latest
             else:
                 console.print(
