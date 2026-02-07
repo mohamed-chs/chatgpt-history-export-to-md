@@ -1,6 +1,7 @@
 # Changelog
 
 > **Note**: This changelog is informal and incomplete. It tracks the primary record of all functional and behavioral updates to Convoviz.
+> **APPEND-ONLY. DO NOT EDIT, REWRITE, OR DELETE PAST ENTRIES. ALL NEW UPDATES MUST BE ADDED TO THE TOP.**
 
 ## Recent Updates (February 7, 2026)
 
