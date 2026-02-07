@@ -256,10 +256,8 @@ def is_message_hidden(message: Any) -> bool:
 
 def extract_internal_citation_map(message: Any) -> dict[str, dict[str, str | None]]:
     """Extract a map of citation IDs to metadata from content parts."""
-    if not message.content.parts:
-        return {}
-
     citation_mapping: dict[str, dict[str, str | None]] = {}
+    parts = message.content.parts or []
 
     def process_entry(entry: Any) -> None:
         if not isinstance(entry, dict):
@@ -280,7 +278,7 @@ def extract_internal_citation_map(message: Any) -> dict[str, dict[str, str | Non
                 "url": entry.get("url"),
             }
 
-    for part in message.content.parts:
+    for part in parts:
         if isinstance(part, dict):
             if part.get("type") == "search_result":
                 process_entry(part)

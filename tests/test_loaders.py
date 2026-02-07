@@ -5,6 +5,7 @@ import time
 from pathlib import Path
 from zipfile import ZipFile
 
+import orjson
 import pytest
 
 from convoviz.exceptions import InvalidZipError
@@ -52,6 +53,14 @@ class TestLoadCollectionFromJson:
         collection = load_collection_from_json(mock_conversations_json)
         assert len(collection.conversations) == 1
         assert collection.conversations[0].title == "conversation 111"
+
+    def test_load_invalid_json_raises(self, tmp_path: Path) -> None:
+        """Invalid JSON should raise a decode error."""
+        json_path = tmp_path / "invalid.json"
+        json_path.write_text("{not: valid", encoding="utf-8")
+
+        with pytest.raises(orjson.JSONDecodeError):
+            load_collection_from_json(json_path)
 
 
 class TestLoadCollectionFromZip:

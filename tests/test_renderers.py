@@ -275,6 +275,78 @@ class TestRenderConversation:
         assert "Sure thing! What do you need?" in markdown
         assert "Of course! How can I assist you?" not in markdown
 
+    def test_render_conversation_full_branch(self, branching_conversation: Conversation) -> None:
+        """Test that full DAG rendering includes alternate branches."""
+        config = ConversationConfig()
+        config.markdown.render_order = "full"
+        headers = AuthorHeaders()
+
+        markdown = render_conversation(branching_conversation, config, headers)
+
+        assert "Hello, can you help?" in markdown
+        assert "Sure thing! What do you need?" in markdown
+        assert "Of course! How can I assist you?" in markdown
+
+    def test_render_conversation_full_includes_orphans(self) -> None:
+        """Test full DAG rendering includes disconnected/orphan nodes."""
+        conv = Conversation(
+            title="Orphan Test",
+            create_time=datetime(2024, 1, 1),
+            update_time=datetime(2024, 1, 1),
+            mapping={
+                "root": {
+                    "id": "root",
+                    "message": None,
+                    "parent": None,
+                    "children": ["user_node"],
+                },
+                "user_node": {
+                    "id": "user_node",
+                    "message": {
+                        "id": "user_node",
+                        "author": {"role": "user", "metadata": {}},
+                        "create_time": datetime(2024, 1, 1).timestamp(),
+                        "update_time": datetime(2024, 1, 1).timestamp(),
+                        "content": {"content_type": "text", "parts": ["Hello"]},
+                        "status": "finished_successfully",
+                        "end_turn": True,
+                        "weight": 1.0,
+                        "metadata": {},
+                        "recipient": "all",
+                    },
+                    "parent": "root",
+                    "children": [],
+                },
+                "orphan": {
+                    "id": "orphan",
+                    "message": {
+                        "id": "orphan",
+                        "author": {"role": "assistant", "metadata": {}},
+                        "create_time": datetime(2024, 1, 1).timestamp(),
+                        "update_time": datetime(2024, 1, 1).timestamp(),
+                        "content": {"content_type": "text", "parts": ["Orphan message"]},
+                        "status": "finished_successfully",
+                        "end_turn": True,
+                        "weight": 1.0,
+                        "metadata": {},
+                        "recipient": "all",
+                    },
+                    "parent": None,
+                    "children": [],
+                },
+            },
+            moderation_results=[],
+            current_node="user_node",
+            conversation_id="orphan_conv",
+        )
+        config = ConversationConfig()
+        config.markdown.render_order = "full"
+        headers = AuthorHeaders()
+
+        markdown = render_conversation(conv, config, headers)
+
+        assert "Orphan message" in markdown
+
     def test_render_conversation_with_images(self, mock_conversation: Conversation) -> None:
         """Test conversation rendering with image assets."""
         config = ConversationConfig()

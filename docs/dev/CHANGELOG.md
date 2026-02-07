@@ -4,6 +4,8 @@
 
 ## Recent Updates (February 7, 2026)
 
+- **Test Coverage Expansion**: Added tests for config path normalization and TOML errors, utils path/writable checks, logging setup, ZIP traversal cases, asset indexing, renderer full-DAG/orphan nodes, citation aggregation/edge cases, pipeline extras and missing dependency handling, and additional Canvas/loader validations.
+- **Citation Map Coverage**: Embedded citation metadata is now aggregated even when message parts are empty (uses `search_result_groups` only).
 - **Citation Map Hardening**: Robustly ignore malformed citation entries (non-dict `ref_id`) instead of raising errors.
 - **Interactive Output Validation**: Output path validation no longer creates directories during interactive typing.
 - **Canvas Extraction**: Canvas document detection now scans all parts, not just the first part.

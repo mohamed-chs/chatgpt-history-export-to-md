@@ -4,7 +4,7 @@ from pathlib import Path
 
 import pytest
 
-from convoviz.io.assets import copy_asset, resolve_asset_path
+from convoviz.io.assets import build_asset_index, copy_asset, resolve_asset_path
 
 
 class TestResolveAssetPath:
@@ -85,6 +85,12 @@ class TestResolveAssetPath:
         assert resolve_asset_path(tmp_path, "dir/inside") is None
         assert resolve_asset_path(tmp_path, "dir\\inside") is None
 
+    def test_resolve_with_index(self, tmp_path: Path) -> None:
+        (tmp_path / "file-999-long.png").touch()
+        index = build_asset_index(tmp_path)
+        result = resolve_asset_path(tmp_path, "file-999", index=index)
+        assert result == tmp_path / "file-999-long.png"
+
 
 class TestCopyAsset:
     """Tests for the copy_asset function."""
@@ -133,6 +139,44 @@ class TestCopyAsset:
         # New file should be created with a distinct name
         assert rel_path == "assets/image (1).png"
         assert (assets_dir / "image (1).png").read_bytes() == b"NEW"
+
+    def test_reuses_existing_when_identical(self, tmp_path: Path) -> None:
+        src_file = tmp_path / "image.png"
+        src_file.write_bytes(b"SAME")
+
+        dest_dir = tmp_path / "output"
+        assets_dir = dest_dir / "assets"
+        assets_dir.mkdir(parents=True)
+        existing = assets_dir / "image.png"
+        existing.write_bytes(b"SAME")
+
+        rel_path = copy_asset(src_file, dest_dir)
+
+        assert rel_path == "assets/image.png"
+        assert list(assets_dir.glob("image*.png")) == [existing]
+
+
+class TestBuildAssetIndex:
+    """Tests for build_asset_index and prefix maps."""
+
+    def test_build_asset_index_prefix_maps(self, tmp_path: Path) -> None:
+        (tmp_path / "file-123-extra.png").touch()
+        (tmp_path / "file-123.png").touch()
+        dalle_dir = tmp_path / "dalle-generations"
+        dalle_dir.mkdir()
+        (dalle_dir / "file-456-gen.webp").touch()
+        user_dir = tmp_path / "user-abc"
+        user_dir.mkdir()
+        (user_dir / "file-789-system.png").touch()
+
+        index = build_asset_index(tmp_path)
+
+        assert "file-123" in index.root_prefix_map
+        assert index.root_prefix_map["file-123"].name in {"file-123.png", "file-123-extra.png"}
+        assert "file-456-gen" in index.dalle_prefix_map
+        assert any(
+            "file-789-system" in prefix_map for prefix_map in index.user_prefix_map_by_dir.values()
+        )
 
     def test_returns_forward_slash_path(self, tmp_path: Path) -> None:
         """Test that returned path uses forward slashes (Markdown compatible)."""

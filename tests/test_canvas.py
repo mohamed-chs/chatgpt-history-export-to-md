@@ -3,7 +3,7 @@
 from datetime import UTC, datetime
 from pathlib import Path
 
-from convoviz.io.canvas import save_canvas_documents
+from convoviz.io.canvas import get_extension, save_canvas_documents
 from convoviz.models import Conversation, ConversationCollection
 from convoviz.models.message import Message, MessageAuthor, MessageContent, MessageMetadata
 
@@ -177,6 +177,11 @@ def test_canvas_document_in_non_first_part() -> None:
     doc = msg.canvas_document
     assert doc is not None
     assert doc["name"] == "later_part"
+
+
+def test_get_extension_defaults() -> None:
+    assert get_extension(None) == ".txt"
+    assert get_extension("unknown/type") == ".txt"
 
 
 def test_canvas_json_string_in_text() -> None:

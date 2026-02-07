@@ -1,12 +1,13 @@
 """Tests for the pipeline module."""
 
+import json
 from pathlib import Path
 from unittest.mock import patch
 
 import pytest
 
 from convoviz.config import OutputKind, get_default_config
-from convoviz.exceptions import InvalidZipError
+from convoviz.exceptions import ConfigurationError, InvalidZipError
 from convoviz.pipeline import run_pipeline
 
 
@@ -147,3 +148,126 @@ def test_run_pipeline_additive_output(mock_zip_file: Path, tmp_path: Path) -> No
     # Check that the old file still exists
     assert preserved_file.exists()
     assert preserved_file.read_text() == "keep me"
+
+
+def test_run_pipeline_extras_without_outputs(tmp_path: Path) -> None:
+    """Extras should run even when outputs list is empty."""
+    input_dir = tmp_path / "input"
+    input_dir.mkdir()
+    conversations = [
+        {
+            "title": "Canvas + Instructions",
+            "create_time": 1700000000.0,
+            "update_time": 1700000000.0,
+            "mapping": {
+                "root": {
+                    "id": "root",
+                    "message": None,
+                    "parent": None,
+                    "children": ["sys", "canvas"],
+                },
+                "sys": {
+                    "id": "sys",
+                    "message": {
+                        "id": "sys",
+                        "author": {"role": "system", "metadata": {}},
+                        "create_time": 1700000000.0,
+                        "update_time": 1700000000.0,
+                        "content": {"content_type": "text", "parts": ["Custom instructions"]},
+                        "status": "finished_successfully",
+                        "end_turn": True,
+                        "weight": 1.0,
+                        "metadata": {
+                            "is_user_system_message": True,
+                            "user_context_message_data": {"about_user": "test"},
+                        },
+                        "recipient": "all",
+                    },
+                    "parent": "root",
+                    "children": [],
+                },
+                "canvas": {
+                    "id": "canvas",
+                    "message": {
+                        "id": "canvas",
+                        "author": {"role": "assistant", "metadata": {}},
+                        "create_time": 1700000000.0,
+                        "update_time": 1700000000.0,
+                        "content": {
+                            "content_type": "text",
+                            "parts": [{"name": "doc", "type": "text/plain", "content": "hi"}],
+                        },
+                        "status": "finished_successfully",
+                        "end_turn": True,
+                        "weight": 1.0,
+                        "metadata": {},
+                        "recipient": "canmore.create_textdoc",
+                    },
+                    "parent": "root",
+                    "children": [],
+                },
+            },
+            "moderation_results": [],
+            "current_node": "canvas",
+            "conversation_id": "conv_extras",
+        }
+    ]
+    (input_dir / "conversations.json").write_text(json.dumps(conversations), encoding="utf-8")
+
+    output_dir = tmp_path / "output"
+    config = get_default_config()
+    config.input_path = input_dir
+    config.output_folder = output_dir
+    config.outputs = set()
+    config.export_canvas = True
+    config.export_custom_instructions = True
+
+    run_pipeline(config)
+
+    assert (output_dir / "custom_instructions.json").exists()
+    assert (output_dir / "canvas").exists()
+    assert any((output_dir / "canvas").glob("*.txt"))
+
+
+def test_run_pipeline_missing_graph_dependency(
+    mock_zip_file: Path, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    output_dir = tmp_path / "output"
+    config = get_default_config()
+    config.input_path = mock_zip_file
+    config.output_folder = output_dir
+    config.outputs = {OutputKind.GRAPHS}
+
+    real_import = __import__
+
+    def fake_import(name, *args, **kwargs):
+        if name == "convoviz.analysis.graphs":
+            raise ModuleNotFoundError("matplotlib")
+        return real_import(name, *args, **kwargs)
+
+    monkeypatch.setattr("builtins.__import__", fake_import)
+
+    with pytest.raises(ConfigurationError):
+        run_pipeline(config)
+
+
+def test_run_pipeline_missing_wordcloud_dependency(
+    mock_zip_file: Path, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    output_dir = tmp_path / "output"
+    config = get_default_config()
+    config.input_path = mock_zip_file
+    config.output_folder = output_dir
+    config.outputs = {OutputKind.WORDCLOUDS}
+
+    real_import = __import__
+
+    def fake_import(name, *args, **kwargs):
+        if name == "convoviz.analysis.wordcloud":
+            raise ModuleNotFoundError("wordcloud")
+        return real_import(name, *args, **kwargs)
+
+    monkeypatch.setattr("builtins.__import__", fake_import)
+
+    with pytest.raises(ConfigurationError):
+        run_pipeline(config)

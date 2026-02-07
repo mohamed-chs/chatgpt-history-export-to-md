@@ -141,6 +141,59 @@ def test_internal_citation_map_ignores_non_dict_ref_id() -> None:
     assert msg.internal_citation_map == {}
 
 
+def test_conversation_citation_map_aggregates_metadata_groups() -> None:
+    """Test that citation_map aggregates from metadata.search_result_groups."""
+    ts = datetime(2024, 1, 1, tzinfo=UTC).timestamp()
+    conv = Conversation(
+        title="Citations",
+        create_time=ts,
+        update_time=ts,
+        mapping={
+            "root": {"id": "root", "message": None, "parent": None, "children": ["tool_node"]},
+            "tool_node": {
+                "id": "tool_node",
+                "message": {
+                    "id": "tool_node",
+                    "author": {"role": "tool", "metadata": {}},
+                    "create_time": ts,
+                    "update_time": ts,
+                    "content": {"content_type": "text", "parts": []},
+                    "status": "finished_successfully",
+                    "end_turn": True,
+                    "weight": 1.0,
+                    "metadata": {
+                        "search_result_groups": [
+                            {
+                                "entries": [
+                                    {
+                                        "ref_id": {
+                                            "ref_type": "search",
+                                            "turn_index": 0,
+                                            "ref_index": 1,
+                                        },
+                                        "title": "Source A",
+                                        "url": "http://example.com/a",
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    "recipient": "all",
+                },
+                "parent": "root",
+                "children": [],
+            },
+        },
+        moderation_results=[],
+        current_node="tool_node",
+        conversation_id="cite_conv",
+    )
+
+    citation_map = conv.citation_map
+    assert citation_map["turn0search1"]["title"] == "Source A"
+    assert citation_map["turn0search1"]["url"] == "http://example.com/a"
+
+
 def test_timestamps(mock_conversation: Conversation) -> None:
     """Test timestamps method."""
     timestamps = mock_conversation.timestamps("user")

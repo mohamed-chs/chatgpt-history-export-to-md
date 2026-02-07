@@ -1,9 +1,19 @@
 """Tests for the utils module."""
 
+from pathlib import Path
+
+import pytest
+
+from convoviz.exceptions import ConfigurationError
 from convoviz.utils import (
+    deep_merge_dicts,
+    ensure_writable_dir,
+    expand_path,
+    normalize_optional_path,
     sanitize,
     sanitize_title,
     validate_header,
+    validate_writable_dir,
 )
 
 
@@ -89,3 +99,69 @@ class TestSanitizeTitle:
     def test_sanitize_title_empty(self) -> None:
         """Test sanitize_title returns untitled on empty result."""
         assert sanitize_title("$$$") == "untitled"
+
+
+class TestDeepMergeDicts:
+    """Tests for deep_merge_dicts."""
+
+    def test_shallow_override(self) -> None:
+        base = {"a": 1, "b": 2}
+        override = {"b": 3}
+        assert deep_merge_dicts(base, override) == {"a": 1, "b": 3}
+
+    def test_nested_override(self) -> None:
+        base = {"a": {"x": 1, "y": 2}, "b": 1}
+        override = {"a": {"y": 99}}
+        assert deep_merge_dicts(base, override) == {"a": {"x": 1, "y": 99}, "b": 1}
+
+
+class TestPathNormalization:
+    """Tests for path helpers."""
+
+    def test_expand_path_env_and_home(self, monkeypatch: pytest.MonkeyPatch) -> None:
+        monkeypatch.setenv("CONVOVIZ_TEST", "abc")
+        result = expand_path("~/$CONVOVIZ_TEST")
+        assert str(result).endswith("/abc")
+
+    def test_normalize_optional_path_none_or_empty(self) -> None:
+        assert normalize_optional_path(None) is None
+        assert normalize_optional_path("") is None
+        assert normalize_optional_path("   ") is None
+
+    def test_normalize_optional_path_expands(self, monkeypatch: pytest.MonkeyPatch) -> None:
+        monkeypatch.setenv("CONVOVIZ_TEST", "xyz")
+        result = normalize_optional_path("$CONVOVIZ_TEST")
+        assert isinstance(result, Path)
+        assert result.name == "xyz"
+
+
+class TestWritableDirChecks:
+    """Tests for writable directory validation helpers."""
+
+    def test_ensure_writable_dir_creates(self, tmp_path: Path) -> None:
+        target = tmp_path / "new" / "out"
+        ensure_writable_dir(target)
+        assert target.exists()
+        assert target.is_dir()
+
+    def test_ensure_writable_dir_rejects_file(self, tmp_path: Path) -> None:
+        target = tmp_path / "file.txt"
+        target.write_text("nope", encoding="utf-8")
+        with pytest.raises(ConfigurationError):
+            ensure_writable_dir(target)
+
+    def test_validate_writable_dir_existing(self, tmp_path: Path) -> None:
+        target = tmp_path / "existing"
+        target.mkdir()
+        validate_writable_dir(target)
+
+    def test_validate_writable_dir_does_not_create(self, tmp_path: Path) -> None:
+        target = tmp_path / "new" / "out"
+        validate_writable_dir(target)
+        assert not target.exists()
+
+    def test_validate_writable_dir_rejects_file(self, tmp_path: Path) -> None:
+        target = tmp_path / "file.txt"
+        target.write_text("nope", encoding="utf-8")
+        with pytest.raises(ConfigurationError):
+            validate_writable_dir(target)

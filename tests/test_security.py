@@ -26,6 +26,20 @@ def test_zip_slip_protection(tmp_path):
         extract_archive(zip_path)
 
 
+def test_zip_slip_protection_absolute_and_drive_paths(tmp_path):
+    zip_buffer = io.BytesIO()
+    with ZipFile(zip_buffer, "w") as zf:
+        zf.writestr("/abs.txt", "malicious content")
+        zf.writestr("C:\\evil.txt", "malicious content")
+        zf.writestr("\\\\server\\share\\evil.txt", "malicious content")
+
+    zip_path = tmp_path / "malicious_abs.zip"
+    zip_path.write_bytes(zip_buffer.getvalue())
+
+    with pytest.raises(InvalidZipError, match="Malicious path in ZIP"):
+        extract_archive(zip_path)
+
+
 def test_sanitize_path_traversal():
     assert sanitize("../../etc/passwd") == "____etc_passwd"
     assert sanitize("..\\..\\windows\\system32") == "____windows_system32"

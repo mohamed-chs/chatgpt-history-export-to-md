@@ -161,6 +161,24 @@ class TestCitationParsing:
         assert "[Source 1](http://example.com/1)" in result
         assert "[[Source 1](http://example.com/1)]" not in result
 
+    def test_replace_citations_out_of_bounds_ignored(self):
+        text = "Short text."
+        citations = [
+            {
+                "start_ix": 100,
+                "end_ix": 110,
+                "metadata": {"title": "Source", "url": "http://example.com"},
+            }
+        ]
+        result = replace_citations(text, citations)
+        assert result == text
+
+    def test_replace_citations_missing_metadata(self):
+        text = "Claim 【1†source】."
+        citations = [{"start_ix": 6, "end_ix": 16, "metadata": {}}]
+        result = replace_citations(text, citations)
+        assert "【1†source】" not in result
+
 
 class TestMetadataEnrichment:
     def test_render_yaml_header_new_fields(self):

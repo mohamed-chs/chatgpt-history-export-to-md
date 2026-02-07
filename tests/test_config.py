@@ -2,6 +2,8 @@
 
 from pathlib import Path
 
+import pytest
+
 from convoviz.config import (
     ALL_OUTPUTS,
     AuthorHeaders,
@@ -17,6 +19,7 @@ from convoviz.config import (
     get_default_config,
     load_config_from_path,
 )
+from convoviz.exceptions import ConfigurationError
 
 
 def test_get_default_config() -> None:
@@ -142,4 +145,33 @@ font_path = ""
     assert config.folder_organization.value == "flat"
     assert config.outputs == {OutputKind.MARKDOWN}
     assert config.wordcloud.colormap == "viridis"
+    assert config.wordcloud.font_path is None
+
+
+def test_load_config_from_path_invalid_toml(tmp_path: Path) -> None:
+    config_path = tmp_path / "config.toml"
+    config_path.write_text("not = [toml", encoding="utf-8")
+    with pytest.raises(ConfigurationError):
+        load_config_from_path(config_path)
+
+
+def test_load_config_from_path_expands_paths(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setenv("CONVOVIZ_TEST_PATH", str(tmp_path / "data"))
+    config_path = tmp_path / "config.toml"
+    config_path.write_text(
+        """
+input_path = "$CONVOVIZ_TEST_PATH"
+output_folder = "$CONVOVIZ_TEST_PATH"
+
+[wordcloud]
+font_path = ""
+""".strip(),
+        encoding="utf-8",
+    )
+
+    config = load_config_from_path(config_path)
+    assert config.input_path == tmp_path / "data"
+    assert config.output_folder == tmp_path / "data"
     assert config.wordcloud.font_path is None
