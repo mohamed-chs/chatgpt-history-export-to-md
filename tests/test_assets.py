@@ -116,7 +116,7 @@ class TestCopyAsset:
         assert (dest_dir / "assets").is_dir()
 
     def test_skip_existing_file(self, tmp_path: Path) -> None:
-        """Test that existing files are not overwritten."""
+        """Test that existing files are not overwritten and new names are used."""
         src_file = tmp_path / "image.png"
         src_file.write_bytes(b"NEW")
 
@@ -126,10 +126,13 @@ class TestCopyAsset:
         existing = assets_dir / "image.png"
         existing.write_bytes(b"OLD")
 
-        copy_asset(src_file, dest_dir)
+        rel_path = copy_asset(src_file, dest_dir)
 
         # Original file should be preserved
         assert existing.read_bytes() == b"OLD"
+        # New file should be created with a distinct name
+        assert rel_path == "assets/image (1).png"
+        assert (assets_dir / "image (1).png").read_bytes() == b"NEW"
 
     def test_returns_forward_slash_path(self, tmp_path: Path) -> None:
         """Test that returned path uses forward slashes (Markdown compatible)."""

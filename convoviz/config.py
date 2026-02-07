@@ -56,6 +56,7 @@ class MarkdownConfig(BaseModel):
     latex_delimiters: Literal["default", "dollars"] = "dollars"
     flavor: Literal["standard", "obsidian", "pandoc"] = "standard"
     show_timestamp: bool = True
+    render_order: Literal["active", "full"] = "active"
 
 
 class PandocPdfConfig(BaseModel):

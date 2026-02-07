@@ -345,7 +345,7 @@ def render_node(
     return f"\n{header}{timestamp_str}{content}\n***\n"
 
 
-def _ordered_nodes(conversation: Conversation) -> list[Node]:
+def _ordered_nodes_full(conversation: Conversation) -> list[Node]:
     """Return nodes in a deterministic depth-first traversal order.
 
     ChatGPT exports store nodes in a mapping; dict iteration order is not a
@@ -362,7 +362,7 @@ def _ordered_nodes(conversation: Conversation) -> list[Node]:
             return
         visited.add(node.id)
         ordered.append(node)
-        for child in node.children_nodes:
+        for child in sorted(node.children_nodes, key=lambda n: n.id):
             dfs(child)
 
     for root in roots:
@@ -373,6 +373,11 @@ def _ordered_nodes(conversation: Conversation) -> list[Node]:
         dfs(node)
 
     return ordered
+
+
+def _ordered_nodes_active(conversation: Conversation) -> list[Node]:
+    """Return nodes in the active branch order."""
+    return conversation.ordered_nodes
 
 
 def render_conversation(
@@ -407,9 +412,14 @@ def render_conversation(
     # Pre-calculate citation map for the conversation
     citation_map = conversation.citation_map
 
-    # Render message nodes in a deterministic traversal order.
+    # Render message nodes based on configured order.
     last_timestamp = None
-    for node in _ordered_nodes(conversation):
+    if config.markdown.render_order == "active":
+        nodes = _ordered_nodes_active(conversation)
+    else:
+        nodes = _ordered_nodes_full(conversation)
+
+    for node in nodes:
         if node.message:
             markdown += render_node(
                 node,

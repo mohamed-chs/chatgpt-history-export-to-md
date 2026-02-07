@@ -154,8 +154,8 @@ def test_wordcloud_prompts_skipped_when_not_selected(
 
     run_interactive_config(get_default_config())
 
-    # Only 1 select call (markdown flavor), not 3 (flavor + font + colormap)
-    assert select_call_count[0] == 1
+    # Only 2 select calls (markdown flavor + render order), not 4 (add font/colormap)
+    assert select_call_count[0] == 2
     # Only 2 text calls (user header + assistant header), not 3 (+ stopwords)
     assert text_call_count[0] == 2
 
@@ -202,7 +202,7 @@ def test_markdown_prompts_skipped_when_not_selected(
 
     config = run_interactive_config(get_default_config())
 
-    # No select calls (no markdown flavor, no font, no colormap)
+    # No select calls (no markdown flavor/render order, no font, no colormap)
     assert select_call_count[0] == 0
     # No text calls (no author headers, no stopwords)
     assert text_call_count[0] == 0

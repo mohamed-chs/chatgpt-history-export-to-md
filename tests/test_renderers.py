@@ -263,6 +263,18 @@ class TestRenderConversation:
         assert "# ChatGPT" in markdown
         assert "assistant message 111" in markdown
 
+    def test_render_conversation_active_branch(self, branching_conversation: Conversation) -> None:
+        """Test that active-branch rendering excludes alternate branches."""
+        config = ConversationConfig()
+        config.markdown.render_order = "active"
+        headers = AuthorHeaders()
+
+        markdown = render_conversation(branching_conversation, config, headers)
+
+        assert "Hello, can you help?" in markdown
+        assert "Sure thing! What do you need?" in markdown
+        assert "Of course! How can I assist you?" not in markdown
+
     def test_render_conversation_with_images(self, mock_conversation: Conversation) -> None:
         """Test conversation rendering with image assets."""
         config = ConversationConfig()

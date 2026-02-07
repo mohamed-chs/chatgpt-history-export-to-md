@@ -16,7 +16,7 @@ def test_leaf_count(mock_conversation: Conversation) -> None:
 
 def test_url(mock_conversation: Conversation) -> None:
     """Test url property."""
-    assert mock_conversation.url == "https://chat.openai.com/c/conversation_111"
+    assert mock_conversation.url == "https://chatgpt.com/c/conversation_111"
 
 
 def test_content_types(mock_conversation: Conversation) -> None:

@@ -181,6 +181,10 @@ Markdown flavor options in config:
 2. `obsidian` (collapsible callouts for reasoning content)
 3. `pandoc` (Pandoc-friendly citation links)
 
+Markdown render order (config):
+1. `active` (default, current branch)
+2. `full` (all DAG branches)
+
 When using the `pandoc` flavor, Convoviz can inject PDF frontmatter (Typst) via `conversation.pandoc_pdf`. See `docs/pandoc-pdf-guide.md` for details.
 
 YAML frontmatter titles are sanitized; the original title is preserved in `aliases` when it changes.

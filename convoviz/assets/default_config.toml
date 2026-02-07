@@ -26,6 +26,7 @@ tool = "### Tool output"
 latex_delimiters = "dollars" # "default" or "dollars"
 flavor = "standard" # "standard", "obsidian", or "pandoc"
 show_timestamp = true
+render_order = "active" # "active" (current branch) or "full" (all nodes)
 
 [conversation.pandoc_pdf]
 enabled = true

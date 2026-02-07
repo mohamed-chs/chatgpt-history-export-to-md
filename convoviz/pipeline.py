@@ -58,7 +58,7 @@ def run_pipeline(config: ConvovizConfig) -> None:
                 str(input_path), reason="Directory must contain conversations.json"
             )
         collection = load_collection_from_json(json_path)
-    elif input_path.suffix == ".json":
+    elif input_path.suffix.lower() == ".json":
         collection = load_collection_from_json(input_path)
     else:
         # Assume zip
@@ -117,26 +117,26 @@ def run_pipeline(config: ConvovizConfig) -> None:
             progress_bar=True,
         )
 
-        # Save collection-level metadata if requested
-        if config.export_custom_instructions:
-            from convoviz.io import save_custom_instructions
-
-            save_custom_instructions(collection, output_folder / "custom_instructions.json")
-            logger.info("Custom instructions exported")
-
-        # Extract Canvas documents if requested
-        if config.export_canvas:
-            from convoviz.io import save_canvas_documents
-
-            count = save_canvas_documents(collection, output_folder)
-            if count > 0:
-                logger.info(f"Extracted {count} Canvas documents")
-
         logger.info("Markdown generation complete")
         console.print(
             f"\nDone [bold green]✅[/bold green] ! "
             f"Check the output [bold blue]📄[/bold blue] here: {_safe_uri(markdown_folder)} 🔗\n"
         )
+
+    # Save collection-level metadata if requested
+    if config.export_custom_instructions:
+        from convoviz.io import save_custom_instructions
+
+        save_custom_instructions(collection, output_folder / "custom_instructions.json")
+        logger.info("Custom instructions exported")
+
+    # Extract Canvas documents if requested
+    if config.export_canvas:
+        from convoviz.io import save_canvas_documents
+
+        count = save_canvas_documents(collection, output_folder)
+        if count > 0:
+            logger.info(f"Extracted {count} Canvas documents")
 
     # Generate graphs (if selected)
     if OutputKind.GRAPHS in selected_outputs:

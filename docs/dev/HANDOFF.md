@@ -14,6 +14,7 @@ convoviz/
 ├── config.py            # Pydantic configuration models
 ├── exceptions.py        # Custom exception hierarchy
 ├── interactive.py       # Questionary prompts
+├── message_logic.py     # Message extraction/visibility utilities
 ├── pipeline.py          # Main processing pipeline
 ├── utils.py             # Utility functions
 ├── models/              # Pure data models (Pydantic)
@@ -76,6 +77,7 @@ Conversation + Config → render_conversation() → Markdown string
 | `convoviz/assets/default_config.toml` | Bundled TOML defaults (source of truth for defaults) |
 | `convoviz/pipeline.py` | Main processing flow - start here to understand the app |
 | `convoviz/io/assets.py`| Logic for finding and copying image assets |
+| `convoviz/message_logic.py` | Message extraction/visibility logic (kept out of models) |
 | `AGENTS.md` | Context and operational guidelines for AI agents |
 
 ## Running the Project
@@ -101,6 +103,7 @@ uv run ruff check convoviz tests && uv run ty check convoviz && uv run pytest
 4.  **Asset Pointer Protocols**: Modern exports use `sediment://` protocol; legacy used `file-service://`.
 5.  **New Content Types (2025)**: `reasoning_recap`, `thoughts`, `tether_quote` for o1/o3 reasoning models — now supported.
 6.  **New Asset Folders (2025)**: `user-{id}/` directories contain system-generated images in PNG format — now supported.
+7.  **Render Order**: Markdown output defaults to active-branch traversal; `conversation.markdown.render_order = "full"` renders all DAG nodes.
 
 ## What's NOT Done (Roadmap)
 

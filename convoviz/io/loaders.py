@@ -1,6 +1,7 @@
 """Loading functions for conversations and collections."""
 
 import logging
+import tempfile
 from pathlib import Path, PurePosixPath
 from zipfile import ZipFile
 
@@ -47,8 +48,7 @@ def extract_archive(filepath: Path) -> Path:
     Raises:
         InvalidZipError: If extraction fails or a security risk is detected
     """
-    folder = filepath.with_suffix("")
-    folder.mkdir(parents=True, exist_ok=True)
+    folder = Path(tempfile.mkdtemp(prefix=f"{filepath.stem}_", dir=filepath.parent))
     logger.info(f"Extracting archive: {filepath} to {folder}")
 
     with ZipFile(filepath) as zf:
@@ -82,7 +82,7 @@ def validate_zip(filepath: Path) -> bool:
     Returns:
         True if valid, False otherwise
     """
-    if not filepath.is_file() or filepath.suffix != ".zip":
+    if not filepath.is_file() or filepath.suffix.lower() != ".zip":
         return False
     try:
         with ZipFile(filepath) as zf:
@@ -165,7 +165,7 @@ def find_latest_zip(directory: Path | None = None) -> Path | None:
     if directory is None:
         directory = Path.home() / "Downloads"
 
-    zip_files = list(directory.glob("*.zip"))
+    zip_files = [p for p in directory.iterdir() if p.is_file() and p.suffix.lower() == ".zip"]
     if not zip_files:
         return None
 

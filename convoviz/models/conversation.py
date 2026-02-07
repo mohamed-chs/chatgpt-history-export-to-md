@@ -61,6 +61,23 @@ class Conversation(BaseModel):
             if node.has_message and node.message is not None and not node.message.is_hidden
         ]
 
+    def _sorted_message_nodes(self, *, include_hidden: bool) -> list[Node]:
+        """Return message nodes sorted by create_time, then node id."""
+        nodes = self.all_message_nodes if include_hidden else self.visible_message_nodes
+
+        def sort_key(node: Node) -> tuple[float, str]:
+            msg = node.message
+            if msg and msg.create_time:
+                try:
+                    ts = msg.create_time.timestamp()
+                except Exception:
+                    ts = 0.0
+            else:
+                ts = 0.0
+            return (ts, node.id)
+
+        return sorted(nodes, key=sort_key)
+
     def nodes_by_author(self, *authors: AuthorRole, include_hidden: bool = False) -> list[Node]:
         """Get nodes with messages from specified authors.
 
@@ -81,7 +98,7 @@ class Conversation(BaseModel):
     @property
     def url(self) -> str:
         """Get the ChatGPT URL for this conversation."""
-        return f"https://chat.openai.com/c/{self.conversation_id}"
+        return f"https://chatgpt.com/c/{self.conversation_id}"
 
     @property
     def content_types(self) -> list[str]:
@@ -101,22 +118,27 @@ class Conversation(BaseModel):
     @property
     def model(self) -> str | None:
         """Get the ChatGPT model used for this conversation."""
-        assistant_nodes = self.nodes_by_author("assistant")
-        if not assistant_nodes:
-            return None
-        message = assistant_nodes[0].message
-        return message.metadata.model_slug if message else None
+        for node in self._sorted_message_nodes(include_hidden=True):
+            message = node.message
+            if (
+                message
+                and message.author.role == "assistant"
+                and message.metadata.model_slug
+            ):
+                return message.metadata.model_slug
+        return None
 
     @property
     def plugins(self) -> list[str]:
         """Get all plugins used in this conversation."""
-        return list(
-            {
-                node.message.metadata.invoked_plugin["namespace"]
-                for node in self.nodes_by_author("tool")
-                if node.message and node.message.metadata.invoked_plugin
-            }
-        )
+        plugins = {
+            node.message.metadata.invoked_plugin["namespace"]
+            for node in self._sorted_message_nodes(include_hidden=True)
+            if node.message
+            and node.message.author.role == "tool"
+            and node.message.metadata.invoked_plugin
+        }
+        return list(plugins)
 
     @property
     def custom_instructions(self) -> dict[str, str]:

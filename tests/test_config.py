@@ -56,6 +56,7 @@ def test_markdown_config_defaults() -> None:
     """Test MarkdownConfig default values."""
     md = MarkdownConfig()
     assert md.latex_delimiters == "dollars"
+    assert md.render_order == "active"
 
 
 def test_pandoc_pdf_config_defaults() -> None:

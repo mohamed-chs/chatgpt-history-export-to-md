@@ -10,3 +10,4 @@
 2.  **Functional Rendering**: Renderers (`convoviz/renderers/`) accept a Model + Config and return artifacts (strings, bytes). They do not write to disk.
 3.  **IO Isolation**: File reading/writing is strictly limited to `convoviz/io/`.
 4.  **Configuration**: All user settings must be typed in `convoviz/config.py`.
+5.  **Message Interpretation**: Complex message extraction/visibility logic lives in `convoviz/message_logic.py` (models remain thin).

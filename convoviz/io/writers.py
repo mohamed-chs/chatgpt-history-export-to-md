@@ -10,7 +10,7 @@ from orjson import OPT_INDENT_2, dumps
 from tqdm import tqdm
 
 from convoviz.config import AuthorHeaders, ConversationConfig, FolderOrganization
-from convoviz.io.assets import copy_asset, resolve_asset_path
+from convoviz.io.assets import AssetIndex, build_asset_index, copy_asset, resolve_asset_path
 from convoviz.models import Conversation, ConversationCollection
 from convoviz.renderers import render_conversation
 from convoviz.utils import sanitize
@@ -74,7 +74,9 @@ def _get_conversation_id_from_file(filepath: Path) -> str | None:
                 return match.group(1)
             # Fallback: check chat_link
             match = re.search(
-                r'^chat_link:\s*"https://chatgpt\.com/c/([^"]+)"', content, re.MULTILINE
+                r'^chat_link:\s*"https://(?:chatgpt\.com|chat\.openai\.com)/c/([^"]+)"',
+                content,
+                re.MULTILINE,
             )
             if match:
                 return match.group(1)
@@ -111,13 +113,19 @@ def save_conversation(
         counter += 1
         final_path = filepath.with_name(f"{base_name} ({counter}){filepath.suffix}")
 
+    asset_indexes: dict[Path, AssetIndex] = {}
+    if source_paths:
+        asset_indexes = {path: build_asset_index(path) for path in source_paths}
+
     # Define asset resolver
     def asset_resolver(asset_id: str, target_name: str | None = None) -> str | None:
         if not source_paths:
             return None
 
         for source_path in source_paths:
-            src_file = resolve_asset_path(source_path, asset_id)
+            src_file = resolve_asset_path(
+                source_path, asset_id, index=asset_indexes.get(source_path)
+            )
             if src_file:
                 # Copy to output directory (relative to the markdown file's directory)
                 return copy_asset(

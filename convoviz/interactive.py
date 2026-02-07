@@ -98,7 +98,7 @@ def run_interactive_config(initial_config: ConvovizConfig | None = None) -> Conv
     input_default = str(config.input_path) if config.input_path else ""
     input_result: str = _ask_or_cancel(
         qst_path(
-            "Enter the path to the export ZIP:",  # , conversations JSON, or extracted directory:",
+            "Enter the path to the export ZIP, JSON, or extracted directory:",
             default=input_default,
             validate=_validate_input_path,
             style=CUSTOM_STYLE,
@@ -196,6 +196,24 @@ def run_interactive_config(initial_config: ConvovizConfig | None = None) -> Conv
         if flavor_result:
             config.conversation.markdown.flavor = flavor_result
         logger.debug(f"User selected flavor: {config.conversation.markdown.flavor}")
+
+        render_order_result = cast(
+            Literal["active", "full"],
+            _ask_or_cancel(
+                select(
+                    "Select conversation render order:",
+                    choices=[
+                        Choice(title="Active branch only (recommended)", value="active"),
+                        Choice(title="Full DAG (all branches)", value="full"),
+                    ],
+                    default=config.conversation.markdown.render_order,
+                    style=CUSTOM_STYLE,
+                )
+            ),
+        )
+        if render_order_result:
+            config.conversation.markdown.render_order = render_order_result
+        logger.debug(f"User selected render order: {config.conversation.markdown.render_order}")
 
         if config.conversation.markdown.flavor == "pandoc":
             enable_pdf: bool = _ask_or_cancel(

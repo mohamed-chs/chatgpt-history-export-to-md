@@ -26,7 +26,22 @@
     - **Message Timestamps**: Added timestamps to message headers in markdown output (enabled by default).
     - **Smart Date Display**: Message timestamps show full date (`YYYY-MM-DD HH:MM:SS`) for the first message and when the date changes; otherwise, only the time (`HH:MM:SS`) is shown.
     - **Configuration**: Added `show_timestamp` to `MarkdownConfig` (default: True) and `prepend_timestamp_to_filename` to `ConvovizConfig` (default: False).
-    - **Identity Protection**: Maintained identity-based overwriting logic; conversations are still correctly identified even if filenames change due to timestamp flags.
+- **Identity Protection**: Maintained identity-based overwriting logic; conversations are still correctly identified even if filenames change due to timestamp flags.
+
+## Recent Updates (February 7, 2026)
+
+- **Render Order Configuration**: Added `conversation.markdown.render_order` with `active` (current branch, default) or `full` (entire DAG) traversal.
+- **URL Consistency**: Conversation links now use `chatgpt.com`, while identity parsing accepts both `chatgpt.com` and legacy `chat.openai.com`.
+- **Deterministic Metadata**: Model and plugin detection now use sorted message timestamps to avoid nondeterministic picks.
+- **Asset Handling**:
+    - Introduced asset indexing to reduce repeated filesystem scans during resolution.
+    - Asset copy now avoids collisions by creating unique filenames when contents differ.
+- **Export Decoupling**: Custom instructions and Canvas documents are exported independent of markdown output selection.
+- **ZIP Handling**:
+    - Case-insensitive ZIP detection.
+    - ZIP extraction uses unique temp folders to avoid stale data reuse.
+- **Interactive UX**: Input prompt now mentions JSON/dir support, plus render-order selection in markdown prompts.
+- **Model Purity**: Complex message extraction logic moved to `convoviz/message_logic.py` to keep models lean.
 
 ## Recent Updates (February 5, 2026)
 
