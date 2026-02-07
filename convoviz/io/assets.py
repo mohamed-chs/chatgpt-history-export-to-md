@@ -17,17 +17,17 @@ class AssetIndex:
 
     root_files: tuple[Path, ...]
     dalle_files: tuple[Path, ...]
-    user_files: tuple[Path, ...]
+    user_files_by_dir: dict[Path, tuple[Path, ...]]
 
 
 def build_asset_index(source_dir: Path) -> AssetIndex:
     """Scan asset directories once and return an index."""
     root_files: list[Path] = []
     dalle_files: list[Path] = []
-    user_files: list[Path] = []
+    user_files_by_dir: dict[Path, tuple[Path, ...]] = {}
 
     if not source_dir.exists():
-        return AssetIndex((), (), ())
+        return AssetIndex((), (), {})
 
     source_dir = source_dir.resolve()
 
@@ -47,13 +47,14 @@ def build_asset_index(source_dir: Path) -> AssetIndex:
         for user_dir in source_dir.glob("user-*"):
             if user_dir.is_dir():
                 try:
-                    user_files.extend([p.resolve() for p in user_dir.iterdir() if p.is_file()])
+                    files = tuple(p.resolve() for p in user_dir.iterdir() if p.is_file())
+                    user_files_by_dir[user_dir.resolve()] = files
                 except Exception:
                     continue
     except Exception:
-        user_files = []
+        user_files_by_dir = {}
 
-    return AssetIndex(tuple(root_files), tuple(dalle_files), tuple(user_files))
+    return AssetIndex(tuple(root_files), tuple(dalle_files), user_files_by_dir)
 
 
 def _prefix_match(files: tuple[Path, ...], asset_id: str, root: Path) -> Path | None:
@@ -138,13 +139,11 @@ def resolve_asset_path(
 
     # 4. Try prefix match in user-* directories (new 2025 format)
     if index:
-        for user_dir in source_dir.glob("user-*"):
-            if user_dir.is_dir():
-                user_dir = user_dir.resolve()
-                match = _prefix_match(index.user_files, asset_id, user_dir)
-                if match:
-                    logger.debug(f"Resolved asset (user dir): {asset_id} -> {match}")
-                    return match
+        for user_dir, files in index.user_files_by_dir.items():
+            match = _prefix_match(files, asset_id, user_dir)
+            if match:
+                logger.debug(f"Resolved asset (user dir): {asset_id} -> {match}")
+                return match
     else:
         try:
             for user_dir in source_dir.glob("user-*"):
@@ -186,10 +185,9 @@ def _resolve_unique_dest(
 
     while candidate.exists():
         try:
-            if (
-                candidate.stat().st_size == source_path.stat().st_size
-                and _hash_file(candidate) == _hash_file(source_path)
-            ):
+            if candidate.stat().st_size == source_path.stat().st_size and _hash_file(
+                candidate
+            ) == _hash_file(source_path):
                 return candidate
         except Exception:
             pass

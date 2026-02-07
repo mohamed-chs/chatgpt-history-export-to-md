@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import tomllib
 from enum import StrEnum
+from functools import lru_cache
 from importlib import resources
 from pathlib import Path
 from typing import Any, Literal
@@ -189,11 +190,13 @@ def _normalize_config_data(data: Any) -> Any:
     return data
 
 
+@lru_cache(maxsize=1)
 def get_default_config_text() -> str:
     """Return the default TOML configuration text bundled with the package."""
     return _read_default_config_text()
 
 
+@lru_cache(maxsize=1)
 def get_default_config_data() -> dict[str, Any]:
     """Return the default configuration data loaded from TOML."""
     return _normalize_config_data(_load_toml_bytes(get_default_config_text().encode("utf-8")))

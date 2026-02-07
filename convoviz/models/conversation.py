@@ -6,7 +6,7 @@ Object path: conversations.json -> conversation (one of the list items)
 from datetime import datetime, timedelta
 from typing import Any
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, PrivateAttr
 
 from convoviz.models.message import AuthorRole
 from convoviz.models.node import Node, build_node_tree
@@ -30,11 +30,14 @@ class Conversation(BaseModel):
     conversation_id: str
     conversation_template_id: str | None = None
     id: str | None = None
+    _node_mapping_cache: dict[str, Node] | None = PrivateAttr(default=None)
 
     @property
     def node_mapping(self) -> dict[str, Node]:
         """Get the connected node tree."""
-        return build_node_tree(self.mapping)
+        if self._node_mapping_cache is None:
+            self._node_mapping_cache = build_node_tree(self.mapping)
+        return self._node_mapping_cache
 
     @property
     def ordered_nodes(self) -> list[Node]:
@@ -120,11 +123,7 @@ class Conversation(BaseModel):
         """Get the ChatGPT model used for this conversation."""
         for node in self._sorted_message_nodes(include_hidden=True):
             message = node.message
-            if (
-                message
-                and message.author.role == "assistant"
-                and message.metadata.model_slug
-            ):
+            if message and message.author.role == "assistant" and message.metadata.model_slug:
                 return message.metadata.model_slug
         return None
 

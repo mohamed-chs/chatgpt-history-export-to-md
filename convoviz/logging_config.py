@@ -20,9 +20,11 @@ def setup_logging(
     Returns:
         Path to the log file used.
     """
-    # clear existing handlers
     root_logger = logging.getLogger()
-    root_logger.handlers.clear()
+    # Remove only handlers that convoviz previously installed.
+    for handler in list(root_logger.handlers):
+        if getattr(handler, "_convoviz_handler", False):
+            root_logger.removeHandler(handler)
 
     # Determine log level for console
     if verbosity >= 2:
@@ -40,6 +42,7 @@ def setup_logging(
         show_path=False,
     )
     console_handler.setLevel(console_level)
+    setattr(console_handler, "_convoviz_handler", True)
 
     # File handler
     if log_file is None:
@@ -55,6 +58,7 @@ def setup_logging(
     file_handler.setLevel(logging.DEBUG)  # Always log DEBUG to file
     file_formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
     file_handler.setFormatter(file_formatter)
+    setattr(file_handler, "_convoviz_handler", True)
 
     # Configure root logger
     # We set root level to DEBUG so that the handlers can filter as they please

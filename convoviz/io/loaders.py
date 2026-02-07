@@ -1,6 +1,8 @@
 """Loading functions for conversations and collections."""
 
+import atexit
 import logging
+import shutil
 import tempfile
 from pathlib import Path, PurePosixPath
 from zipfile import ZipFile
@@ -11,6 +13,24 @@ from convoviz.exceptions import InvalidZipError
 from convoviz.models import Conversation, ConversationCollection
 
 logger = logging.getLogger(__name__)
+_TEMP_DIRS: list[Path] = []
+_CLEANUP_REGISTERED = False
+
+
+def _cleanup_temp_dirs() -> None:
+    for path in list(_TEMP_DIRS):
+        try:
+            shutil.rmtree(path, ignore_errors=True)
+        except Exception:
+            continue
+
+
+def _register_temp_dir(path: Path) -> None:
+    global _CLEANUP_REGISTERED
+    _TEMP_DIRS.append(path)
+    if not _CLEANUP_REGISTERED:
+        atexit.register(_cleanup_temp_dirs)
+        _CLEANUP_REGISTERED = True
 
 
 def _is_safe_zip_member_name(name: str) -> bool:
@@ -48,7 +68,8 @@ def extract_archive(filepath: Path) -> Path:
     Raises:
         InvalidZipError: If extraction fails or a security risk is detected
     """
-    folder = Path(tempfile.mkdtemp(prefix=f"{filepath.stem}_", dir=filepath.parent))
+    folder = Path(tempfile.mkdtemp(prefix=f"{filepath.stem}_"))
+    _register_temp_dir(folder)
     logger.info(f"Extracting archive: {filepath} to {folder}")
 
     with ZipFile(filepath) as zf:

@@ -14,6 +14,7 @@ from convoviz.exceptions import MessageContentError
 def extract_message_images(message: Any) -> list[str]:
     """Extract image asset pointers from the message content."""
     image_ids: list[str] = []
+    image_id_set: set[str] = set()
 
     if message.content.parts:
         for part in message.content.parts:
@@ -25,14 +26,21 @@ def extract_message_images(message: Any) -> list[str]:
                 elif pointer.startswith("sediment://"):
                     pointer = pointer[len("sediment://") :]
 
-                if pointer:
+                if pointer and pointer not in image_id_set:
                     image_ids.append(pointer)
+                    image_id_set.add(pointer)
 
     # Also check metadata.attachments for images/files that should be rendered
     if message.metadata.attachments:
         for att in message.metadata.attachments:
-            if (att_id := att.get("id")) and att_id not in image_ids:
+            if not isinstance(att, dict):
+                continue
+            att_id = att.get("id")
+            if not att_id or att_id in image_id_set:
+                continue
+            if _is_image_attachment(att):
                 image_ids.append(att_id)
+                image_id_set.add(att_id)
 
     return image_ids
 
@@ -68,9 +76,11 @@ def _render_tether_quote(content: Any) -> str:
 
 def extract_message_text(message: Any) -> str:
     """Extract the text content of the message."""
+    had_parts = False
     if message.content.parts is not None:
         # Handle multimodal content where parts can be mixed strings and dicts
         text_parts = []
+        had_parts = bool(message.content.parts)
         for part in message.content.parts:
             if isinstance(part, str):
                 # Check if this string is actually a JSON-encoded Canvas document
@@ -95,9 +105,6 @@ def extract_message_text(message: Any) -> str:
         if text_parts:
             return "".join(text_parts)
 
-        if message.content.parts:
-            return ""
-
     # tether_quote: render as a blockquote with attribution (check before .text)
     if message.content.content_type == "tether_quote":
         return _render_tether_quote(message.content)
@@ -121,7 +128,33 @@ def extract_message_text(message: Any) -> str:
     # thoughts content type uses 'thoughts' field (list of thought objects)
     if message.content.thoughts is not None:
         return _render_thoughts(message.content.thoughts)
+    if had_parts:
+        return ""
     raise MessageContentError(message.id)
+
+
+_IMAGE_EXTS = {
+    ".png",
+    ".jpg",
+    ".jpeg",
+    ".gif",
+    ".webp",
+    ".bmp",
+    ".tiff",
+    ".svg",
+}
+
+
+def _is_image_attachment(att: dict[str, Any]) -> bool:
+    """Return True if attachment metadata looks like an image."""
+    mime = att.get("mime_type") or att.get("content_type") or att.get("file_type")
+    if isinstance(mime, str) and mime.lower().startswith("image/"):
+        return True
+    name = att.get("name")
+    if isinstance(name, str):
+        lower = name.lower()
+        return any(lower.endswith(ext) for ext in _IMAGE_EXTS)
+    return False
 
 
 def extract_canvas_document(message: Any) -> dict[str, Any] | None:

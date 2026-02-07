@@ -91,6 +91,7 @@ def save_conversation(
     config: ConversationConfig,
     headers: AuthorHeaders,
     source_paths: list[Path] | None = None,
+    asset_indexes: dict[Path, AssetIndex] | None = None,
 ) -> Path:
     """Save a conversation to a markdown file.
 
@@ -113,9 +114,10 @@ def save_conversation(
         counter += 1
         final_path = filepath.with_name(f"{base_name} ({counter}){filepath.suffix}")
 
-    asset_indexes: dict[Path, AssetIndex] = {}
-    if source_paths:
-        asset_indexes = {path: build_asset_index(path) for path in source_paths}
+    if asset_indexes is None:
+        asset_indexes = {}
+        if source_paths:
+            asset_indexes = {path: build_asset_index(path) for path in source_paths}
 
     # Define asset resolver
     def asset_resolver(asset_id: str, target_name: str | None = None) -> str | None:
@@ -229,6 +231,10 @@ def save_collection(
     """
     directory.mkdir(parents=True, exist_ok=True)
 
+    asset_indexes: dict[Path, AssetIndex] | None = None
+    if collection.source_paths:
+        asset_indexes = {path: build_asset_index(path) for path in collection.source_paths}
+
     for conv in tqdm(
         collection.conversations,
         desc="Writing Markdown 📄 files",
@@ -250,7 +256,14 @@ def save_collection(
             filename = f"{sanitized_title}.md"
 
         filepath = target_dir / filename
-        save_conversation(conv, filepath, config, headers, source_paths=collection.source_paths)
+        save_conversation(
+            conv,
+            filepath,
+            config,
+            headers,
+            source_paths=collection.source_paths,
+            asset_indexes=asset_indexes,
+        )
 
     # Generate index files for date organization
     if folder_organization == FolderOrganization.DATE:

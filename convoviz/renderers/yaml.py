@@ -139,6 +139,8 @@ def render_yaml_header(
     if pandoc_pdf and markdown_flavor == "pandoc":
         yaml_fields.update(_pandoc_pdf_frontmatter(pandoc_pdf))
 
+    yaml_fields = {k: v for k, v in yaml_fields.items() if v is not None}
+
     if not yaml_fields:
         return ""
 

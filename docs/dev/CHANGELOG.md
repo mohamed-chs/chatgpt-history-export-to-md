@@ -43,6 +43,17 @@
 - **Interactive UX**: Input prompt now mentions JSON/dir support, plus render-order selection in markdown prompts.
 - **Model Purity**: Complex message extraction logic moved to `convoviz/message_logic.py` to keep models lean.
 
+## Recent Updates (February 7, 2026)
+
+- **Asset Index Caching**: Asset indexes are built once per run and reused for all conversations, reducing repeated filesystem scans.
+- **Image Attachment Filtering**: Only attachments that look like images are rendered as markdown images; non-image files are skipped.
+- **Message Text Extraction**: Multimodal messages now fall back to other text fields when parts contain no text.
+- **Full DAG Ordering**: Full-branch render order now prefers message timestamps over node IDs for more natural output ordering.
+- **Node Mapping Cache**: Conversation node trees are built once per instance and cached to avoid repeated relinking.
+- **YAML Cleanup**: YAML frontmatter now omits fields with `null` values.
+- **Logging Isolation**: Logging setup now removes only convoviz-installed handlers, avoiding interference with host apps.
+- **ZIP Temp Cleanup**: Extracted ZIP folders are cleaned up on process exit to prevent disk leaks.
+
 ## Recent Updates (February 5, 2026)
 
 - **Custom Instructions & Canvas Support**:

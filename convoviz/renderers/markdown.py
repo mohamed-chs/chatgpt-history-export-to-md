@@ -352,7 +352,18 @@ def _ordered_nodes_full(conversation: Conversation) -> list[Node]:
     reliable semantic ordering. For markdown output, we traverse from roots.
     """
     mapping = conversation.node_mapping
-    roots = sorted((n for n in mapping.values() if n.parent is None), key=lambda n: n.id)
+
+    def sort_key(node: Node) -> tuple[float, str]:
+        if node.message and node.message.create_time:
+            try:
+                ts = node.message.create_time.timestamp()
+            except Exception:
+                ts = 0.0
+        else:
+            ts = 0.0
+        return (ts, node.id)
+
+    roots = sorted((n for n in mapping.values() if n.parent is None), key=sort_key)
 
     visited: set[str] = set()
     ordered: list[Node] = []
@@ -362,14 +373,14 @@ def _ordered_nodes_full(conversation: Conversation) -> list[Node]:
             return
         visited.add(node.id)
         ordered.append(node)
-        for child in sorted(node.children_nodes, key=lambda n: n.id):
+        for child in sorted(node.children_nodes, key=sort_key):
             dfs(child)
 
     for root in roots:
         dfs(root)
 
     # Include any disconnected/orphan nodes deterministically at the end.
-    for node in sorted(mapping.values(), key=lambda n: n.id):
+    for node in sorted(mapping.values(), key=sort_key):
         dfs(node)
 
     return ordered

@@ -184,3 +184,33 @@ def test_copy_asset_sanitizes_name(tmp_path: Path) -> None:
 
     # Verify file existence
     assert (dest_dir / "assets" / sanitized_name).exists()
+
+
+def test_non_image_attachment_not_rendered() -> None:
+    """Non-image attachments should not be rendered as images."""
+
+    content = MessageContent(content_type="text", text="Hello")
+    metadata = MessageMetadata(
+        attachments=[{"id": "file-999", "name": "report.pdf", "mime_type": "application/pdf"}]
+    )
+    message = Message(
+        id="msg-3",
+        author=MessageAuthor(role="user"),
+        content=content,
+        status="finished_successfully",
+        weight=1.0,
+        metadata=metadata,
+    )
+    node = Node(id="node-3", message=message, parent=None, children=[])
+
+    resolver_calls: list[tuple[str, str | None]] = []
+
+    def mock_resolver(asset_id: str, name: str | None = None) -> str | None:
+        resolver_calls.append((asset_id, name))
+        return f"assets/{name or asset_id}"
+
+    headers = AuthorHeaders()
+    result = render_node(node, headers, asset_resolver=mock_resolver)
+
+    assert resolver_calls == []
+    assert "![Image]" not in result
