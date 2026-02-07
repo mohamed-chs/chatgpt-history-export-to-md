@@ -152,10 +152,86 @@ def replace_latex_delimiters(text: str) -> str:
     Returns:
         Text with $$ and $ delimiters
     """
-    text = re.sub(r"\\\[", "$$", text)
-    text = re.sub(r"\\\]", "$$", text)
-    text = re.sub(r"\\\(", "$", text)
-    return re.sub(r"\\\)", "$", text)
+
+    def replace_outside_inline_code(line: str) -> str:
+        result: list[str] = []
+        i = 0
+        in_code = False
+        code_len = 0
+        segment_start = 0
+
+        while i < len(line):
+            if line[i] == "`" and (i == 0 or line[i - 1] != "\\"):
+                run_len = 1
+                while i + run_len < len(line) and line[i + run_len] == "`":
+                    run_len += 1
+                if in_code:
+                    if run_len == code_len:
+                        if segment_start < i:
+                            result.append(line[segment_start:i])
+                        result.append(line[i : i + run_len])
+                        i += run_len
+                        in_code = False
+                        code_len = 0
+                        segment_start = i
+                        continue
+                else:
+                    if segment_start < i:
+                        segment = line[segment_start:i]
+                        segment = re.sub(r"\\\[", "$$", segment)
+                        segment = re.sub(r"\\\]", "$$", segment)
+                        segment = re.sub(r"\\\(", "$", segment)
+                        segment = re.sub(r"\\\)", "$", segment)
+                        result.append(segment)
+                    result.append(line[i : i + run_len])
+                    i += run_len
+                    in_code = True
+                    code_len = run_len
+                    segment_start = i
+                    continue
+                i += run_len
+                continue
+            i += 1
+
+        if segment_start < len(line):
+            tail = line[segment_start:]
+            if not in_code:
+                tail = re.sub(r"\\\[", "$$", tail)
+                tail = re.sub(r"\\\]", "$$", tail)
+                tail = re.sub(r"\\\(", "$", tail)
+                tail = re.sub(r"\\\)", "$", tail)
+            result.append(tail)
+        return "".join(result)
+
+    lines = text.split("\n")
+    fence_pattern = re.compile(r"^[ \t]{0,3}(`{3,}|~{3,})(.*)$")
+    open_fences: list[tuple[str, int]] = []
+    output_lines: list[str] = []
+
+    for line in lines:
+        match = fence_pattern.match(line)
+        if match:
+            fence = match.group(1)
+            rest = match.group(2)
+            fence_char = fence[0]
+            fence_len = len(fence)
+
+            if open_fences:
+                open_char, open_len = open_fences[-1]
+                if fence_char == open_char and fence_len >= open_len and rest.strip() == "":
+                    open_fences.pop()
+            else:
+                open_fences.append((fence_char, fence_len))
+            output_lines.append(line)
+            continue
+
+        if open_fences:
+            output_lines.append(line)
+            continue
+
+        output_lines.append(replace_outside_inline_code(line))
+
+    return "\n".join(output_lines)
 
 
 def code_block(text: str, lang: str = "python") -> str:

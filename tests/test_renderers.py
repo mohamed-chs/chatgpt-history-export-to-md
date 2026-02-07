@@ -76,6 +76,17 @@ class TestReplaceLatexDelimiters:
         text = r"Inline \(x\) and block \[y\]"
         assert replace_latex_delimiters(text) == "Inline $x$ and block $$y$$"
 
+    def test_ignores_inline_code(self) -> None:
+        """Test that inline code is left untouched."""
+        text = r"Inline \(x\) and `\(literal\)`"
+        assert replace_latex_delimiters(text) == "Inline $x$ and `\\(literal\\)`"
+
+    def test_ignores_code_fence(self) -> None:
+        """Test that fenced code blocks are left untouched."""
+        text = '```python\nvalue = r"\\(x\\)"\n```\nOutside \\(y\\)'
+        expected = '```python\nvalue = r"\\(x\\)"\n```\nOutside $y$'
+        assert replace_latex_delimiters(text) == expected
+
 
 class TestCodeBlock:
     """Tests for the code_block function."""

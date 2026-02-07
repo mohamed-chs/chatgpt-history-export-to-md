@@ -5,6 +5,10 @@
 
 ## Recent Updates (February 7, 2026)
 
+- **LaTeX Conversion Safety**: LaTeX delimiter conversion now skips fenced code blocks and inline code spans. Added tests to cover these cases.
+
+## Recent Updates (February 7, 2026)
+
 - **Wordcloud Defaults**: Added `use` and `file` to the default `wordcloud.custom_stopwords` list to reduce noise.
 
 ## Recent Updates (February 7, 2026)
