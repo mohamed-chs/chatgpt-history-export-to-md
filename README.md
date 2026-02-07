@@ -186,6 +186,10 @@ Markdown render order (config):
 1. `active` (default, current branch)
 2. `full` (all DAG branches)
 
+Markdown timestamps can be toggled with `conversation.markdown.show_timestamp`.
+
+Word clouds can be limited to your messages by setting `wordcloud.include_assistant_text = false`.
+
 When using the `pandoc` flavor, Convoviz can inject PDF frontmatter (Typst) via `conversation.pandoc_pdf`. See `docs/pandoc-pdf-guide.md` for details.
 
 YAML frontmatter titles are sanitized; the original title is preserved in `aliases` when it changes.

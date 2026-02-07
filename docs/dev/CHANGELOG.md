@@ -4,6 +4,13 @@
 
 ## Recent Updates (February 7, 2026)
 
+- **CLI Path Expansion**: CLI `--input`, `--output`, and `--config` now expand `~`/env vars; improved help text for ZIP/JSON/dir inputs.
+- **Output Path Validation**: Interactive and CLI runs now validate output directories are writable before processing.
+- **Extras Visibility**: Canvas and `custom_instructions.json` exports now print explicit output locations.
+- **Stable Identity Marker**: Markdown output now embeds a hidden conversation ID marker to prevent duplicate files even when YAML frontmatter is disabled.
+- **Wordcloud Control**: Added `wordcloud.include_assistant_text` (with interactive prompt) to allow user-only word clouds.
+- **Script Export Recency**: Script export detection now uses modification time for more reliable “latest” behavior.
+
 - **Safer Latest ZIP Discovery**: Auto-detection now prefers ZIPs that actually contain `conversations.json`, avoiding unrelated downloads.
 - **Interactive Path Expansion**: Input/output prompts now expand `~` and environment variables so casual users can paste common paths.
 - **Extra Exports Prompt**: Interactive mode now lets users choose Canvas and Custom Instructions exports explicitly.

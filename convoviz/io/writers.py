@@ -2,6 +2,7 @@
 
 import logging
 import re
+from datetime import datetime
 from os import utime as os_utime
 from pathlib import Path
 from urllib.parse import quote
@@ -66,8 +67,16 @@ def _get_conversation_id_from_file(filepath: Path) -> str | None:
     """
     try:
         with filepath.open("r", encoding="utf-8") as f:
-            # Read first 1024 bytes - enough for typical frontmatter
-            content = f.read(1024)
+            # Read first 2048 bytes - enough for frontmatter and markers
+            content = f.read(2048)
+            # Check hidden marker first
+            marker = re.search(
+                r"<!--\s*convoviz:conversation_id=([^>\s]+)\s*-->",
+                content,
+                re.IGNORECASE,
+            )
+            if marker:
+                return marker.group(1)
             # Look for conversation_id: "id"
             match = re.search(r'^conversation_id:\s*"([^"]+)"', content, re.MULTILINE)
             if match:
@@ -83,6 +92,26 @@ def _get_conversation_id_from_file(filepath: Path) -> str | None:
     except Exception:
         pass
     return None
+
+
+def _build_markdown_filename(
+    title: str,
+    *,
+    prepend_timestamp: bool,
+    create_time: datetime,
+    suffix: str = ".md",
+    max_length: int = 255,
+) -> str:
+    sanitized_title = sanitize(title)
+    prefix = f"{create_time.strftime('%Y-%m-%d_%H-%M-%S')} - " if prepend_timestamp else ""
+    available = max_length - len(prefix) - len(suffix)
+    if available < 1:
+        truncated = "untitled"
+    else:
+        truncated = (
+            sanitized_title[:available] if len(sanitized_title) > available else sanitized_title
+        )
+    return f"{prefix}{truncated}{suffix}"
 
 
 def save_conversation(
@@ -270,12 +299,11 @@ def save_collection(
             target_dir = directory
 
         # Determine filename
-        sanitized_title = sanitize(conv.title)
-        if prepend_timestamp:
-            timestamp_prefix = conv.create_time.strftime("%Y-%m-%d_%H-%M-%S")
-            filename = f"{timestamp_prefix} - {sanitized_title}.md"
-        else:
-            filename = f"{sanitized_title}.md"
+        filename = _build_markdown_filename(
+            conv.title,
+            prepend_timestamp=prepend_timestamp,
+            create_time=conv.create_time,
+        )
 
         filepath = target_dir / filename
         save_conversation(

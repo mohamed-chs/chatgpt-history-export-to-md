@@ -157,6 +157,7 @@ def generate_wordclouds(
     week_groups = collection.group_by_week()
     month_groups = collection.group_by_month()
     year_groups = collection.group_by_year()
+    authors = ("user", "assistant") if config.include_assistant_text else ("user",)
 
     # Pre-load/download NLTK stopwords in the main process to avoid race conditions in workers
     load_nltk_stopwords()
@@ -165,19 +166,19 @@ def generate_wordclouds(
     tasks: list[tuple[str, str, Path, WordCloudConfig]] = []
 
     for week, group in week_groups.items():
-        text = group.plaintext("user", "assistant")
+        text = group.plaintext(*authors)
         # Format: 2024-W15.png (ISO week format)
         filename = f"{week.strftime('%Y-W%W')}.png"
         tasks.append((text, filename, output_dir, config))
 
     for month, group in month_groups.items():
-        text = group.plaintext("user", "assistant")
+        text = group.plaintext(*authors)
         # Format: 2024-03-March.png (consistent with folder naming)
         filename = f"{month.strftime('%Y-%m-%B')}.png"
         tasks.append((text, filename, output_dir, config))
 
     for year, group in year_groups.items():
-        text = group.plaintext("user", "assistant")
+        text = group.plaintext(*authors)
         # Format: 2024.png
         filename = f"{year.strftime('%Y')}.png"
         tasks.append((text, filename, output_dir, config))

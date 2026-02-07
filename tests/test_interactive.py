@@ -102,6 +102,7 @@ def test_outputs_selection_sets_config(monkeypatch: pytest.MonkeyPatch, tmp_path
     monkeypatch.setattr(interactive, "checkbox", fake_checkbox)
     monkeypatch.setattr(interactive, "qst_text", lambda *_a, **_k: FakePrompt("# Me"))
     monkeypatch.setattr(interactive, "select", lambda *_a, **_k: FakePrompt("standard"))
+    monkeypatch.setattr(interactive, "confirm", lambda *_a, **_k: FakePrompt(True))
 
     config = run_interactive_config(get_default_config())
 
@@ -155,6 +156,7 @@ def test_wordcloud_prompts_skipped_when_not_selected(
     monkeypatch.setattr(interactive, "checkbox", fake_checkbox)
     monkeypatch.setattr(interactive, "select", fake_select)
     monkeypatch.setattr(interactive, "qst_text", fake_text)
+    monkeypatch.setattr(interactive, "confirm", lambda *_a, **_k: FakePrompt(True))
 
     run_interactive_config(get_default_config())
 
@@ -242,6 +244,7 @@ def test_outputs_prompt_respects_existing_config(monkeypatch: pytest.MonkeyPatch
     # Mock text/select just in case
     monkeypatch.setattr(interactive, "qst_text", lambda *_a, **_k: FakePrompt("val"))
     monkeypatch.setattr(interactive, "select", lambda *_a, **_k: FakePrompt("val"))
+    monkeypatch.setattr(interactive, "confirm", lambda *_a, **_k: FakePrompt(True))
 
     # Create a config with ONLY Markdown selected
     initial_config = get_default_config()

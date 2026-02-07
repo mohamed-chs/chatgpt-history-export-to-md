@@ -106,6 +106,7 @@ class WordCloudConfig(BaseModel):
     colormap: str = "RdYlBu"
     custom_stopwords: str = ""
     exclude_programming_keywords: bool = True
+    include_assistant_text: bool = True
     background_color: str | None = None
     mode: Literal["RGB", "RGBA"] = "RGBA"
     include_numbers: bool = False

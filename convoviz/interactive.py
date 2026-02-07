@@ -8,10 +8,12 @@ from questionary import path as qst_path
 from questionary import text as qst_text
 
 from convoviz.config import ConvovizConfig, OutputKind, YAMLConfig, get_default_config
+from convoviz.exceptions import ConfigurationError
 from convoviz.io.loaders import find_latest_valid_zip, find_script_export, validate_zip
 from convoviz.utils import (
     colormaps,
     default_font_path,
+    ensure_writable_dir,
     expand_path,
     font_names,
     font_path,
@@ -79,6 +81,15 @@ def _validate_input_path(raw: str) -> bool | str:
     return "Input must be a .zip, a .json, or a directory containing conversations.json"
 
 
+def _validate_output_path(raw: str) -> bool | str:
+    path = expand_path(raw)
+    try:
+        ensure_writable_dir(path)
+    except ConfigurationError as exc:
+        return str(exc)
+    return True
+
+
 def run_interactive_config(initial_config: ConvovizConfig | None = None) -> ConvovizConfig:
     """Run interactive prompts to configure convoviz.
 
@@ -137,6 +148,7 @@ def run_interactive_config(initial_config: ConvovizConfig | None = None) -> Conv
         qst_path(
             "Enter the path to the output folder:",
             default=str(config.output_folder),
+            validate=_validate_output_path,
             style=CUSTOM_STYLE,
         )
     )
@@ -259,6 +271,16 @@ def run_interactive_config(initial_config: ConvovizConfig | None = None) -> Conv
             config.conversation.markdown.render_order = render_order_result
         logger.debug(f"User selected render order: {config.conversation.markdown.render_order}")
 
+        show_timestamps: bool = _ask_or_cancel(
+            confirm(
+                "Show message timestamps in markdown?",
+                default=config.conversation.markdown.show_timestamp,
+                style=CUSTOM_STYLE,
+            )
+        )
+        config.conversation.markdown.show_timestamp = show_timestamps
+        logger.debug(f"User selected show_timestamp: {show_timestamps}")
+
         if config.conversation.markdown.flavor == "pandoc":
             enable_pdf: bool = _ask_or_cancel(
                 confirm(
@@ -338,5 +360,14 @@ def run_interactive_config(initial_config: ConvovizConfig | None = None) -> Conv
         )
 
         config.wordcloud.custom_stopwords = stopwords_result
+
+        include_assistant: bool = _ask_or_cancel(
+            confirm(
+                "Include assistant messages in word clouds?",
+                default=config.wordcloud.include_assistant_text,
+                style=CUSTOM_STYLE,
+            )
+        )
+        config.wordcloud.include_assistant_text = include_assistant
 
     return config

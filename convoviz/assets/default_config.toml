@@ -53,6 +53,7 @@ font_path = "" # Leave empty for auto
 colormap = "RdYlBu"
 custom_stopwords = ""
 exclude_programming_keywords = true
+include_assistant_text = true
 background_color = "" # Empty means transparent
 mode = "RGBA" # "RGB" or "RGBA"
 include_numbers = false

@@ -249,4 +249,4 @@ def find_script_export(directory: Path | None = None) -> Path | None:
     if not export_files:
         return None
 
-    return max(export_files, key=lambda p: p.stat().st_ctime)
+    return max(export_files, key=lambda p: p.stat().st_mtime)

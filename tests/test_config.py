@@ -72,6 +72,7 @@ def test_wordcloud_config_defaults() -> None:
     assert wc.width == 600
     assert wc.height == 600
     assert wc.mode == "RGBA"
+    assert wc.include_assistant_text is True
 
 
 def test_convoviz_config_nested() -> None:

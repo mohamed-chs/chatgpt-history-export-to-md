@@ -145,6 +145,11 @@ def run_pipeline(config: ConvovizConfig) -> None:
 
             save_custom_instructions(collection, output_folder / "custom_instructions.json")
             logger.info("Custom instructions exported")
+            if not config.quiet:
+                console.print(
+                    "Custom instructions saved to "
+                    f"[bold blue]{_safe_uri(output_folder / 'custom_instructions.json')}[/bold blue]\n"
+                )
 
         # Extract Canvas documents if requested
         if config.export_canvas:
@@ -153,6 +158,10 @@ def run_pipeline(config: ConvovizConfig) -> None:
             count = save_canvas_documents(collection, output_folder)
             if count > 0:
                 logger.info(f"Extracted {count} Canvas documents")
+                if not config.quiet:
+                    console.print(
+                        f"Canvas documents saved to [bold blue]{_safe_uri(output_folder / 'canvas')}[/bold blue]\n"
+                    )
 
         # Generate graphs (if selected)
         if OutputKind.GRAPHS in selected_outputs:

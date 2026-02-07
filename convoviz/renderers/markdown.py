@@ -33,6 +33,16 @@ def replace_citations(
     Returns:
         Text with all placeholders replaced by markdown links
     """
+
+    def maybe_prefix_space(original: str, start_idx: int, replacement: str) -> str:
+        if not replacement:
+            return replacement
+        if start_idx <= 0:
+            return replacement
+        if original[start_idx - 1].isspace():
+            return replacement
+        return f" {replacement}"
+
     # 1. Handle Tether v4 (Index-based replacements)
     if citations:
         # Sort citations by start_ix descending to replace safely from end
@@ -50,6 +60,7 @@ def replace_citations(
 
             # Only replace if strictly positive indices and bounds check
             if 0 <= start < end <= len(text):
+                replacement = maybe_prefix_space(text, start, replacement)
                 text = text[:start] + replacement + text[end:]
 
     # 2. Handle Embedded Citations (Regex-based)
@@ -72,7 +83,8 @@ def replace_citations(
                     if link:
                         links.append(link)
 
-            return "".join(links)
+            replacement = " ".join(links)
+            return maybe_prefix_space(text, match.start(), replacement)
 
         text = pattern.sub(replacer, text)
 
@@ -83,20 +95,20 @@ def _format_link(title: str | None, url: str | None, flavor: str = "standard") -
     """Format a title and URL into a concise markdown link."""
     if flavor in ("pandoc", "standard"):
         if title and url:
-            return f" [{title}]({url})"
+            return f"[{title}]({url})"
         if url:
-            return f" [Source]({url})"
+            return f"[Source]({url})"
         if title:
-            return f" {title}"
+            return title
         return ""
 
     # Obsidian/wiki-style link variant
     if title and url:
-        return f" [[{title}]({url})]"
+        return f"[[{title}]({url})]"
     if url:
-        return f" [[Source]({url})]"
+        return f"[[Source]({url})]"
     if title:
-        return f" [{title}]"
+        return f"[{title}]"
     return ""
 
 
@@ -420,6 +432,7 @@ def render_conversation(
         pandoc_pdf=config.pandoc_pdf,
         markdown_flavor=flavor,
     )
+    markdown += f"<!-- convoviz:conversation_id={conversation.conversation_id} -->\n"
 
     # Pre-calculate citation map for the conversation
     citation_map = conversation.citation_map

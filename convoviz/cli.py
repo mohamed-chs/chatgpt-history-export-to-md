@@ -20,7 +20,7 @@ from convoviz.interactive import run_interactive_config
 from convoviz.io.loaders import find_latest_valid_zip
 from convoviz.logging_config import setup_logging
 from convoviz.pipeline import run_pipeline
-from convoviz.utils import default_font_path
+from convoviz.utils import default_font_path, ensure_writable_dir, expand_path
 
 app = typer.Typer(
     add_completion=False,
@@ -41,17 +41,14 @@ def _version_callback(value: bool) -> None:
 @app.callback(invoke_without_command=True)
 def run(
     ctx: typer.Context,
-    input_path: Path | None = typer.Option(
+    input_path: str | None = typer.Option(
         None,
         "--input",
         "--zip",
         "-z",
-        help="Path to the ChatGPT export zip file, JSON file, or extracted directory.",
-        exists=True,
-        file_okay=True,
-        dir_okay=True,
+        help="Path to the ChatGPT export ZIP, JSON file, or extracted directory.",
     ),
-    output_dir: Path | None = typer.Option(
+    output_dir: str | None = typer.Option(
         None,
         "--output",
         "-o",
@@ -99,13 +96,10 @@ def run(
         "-q",
         help="Reduce console output (still logs to file).",
     ),
-    config_path: Path | None = typer.Option(
+    config_path: str | None = typer.Option(
         None,
         "--config",
         help="Path to a TOML config file. Defaults to the user config if present.",
-        exists=True,
-        file_okay=True,
-        dir_okay=False,
     ),
     _version: bool = typer.Option(
         False,
@@ -127,17 +121,24 @@ def run(
     if ctx.invoked_subcommand is not None:
         return
 
+    config_path_obj: Path | None = None
+    if config_path:
+        config_path_obj = expand_path(config_path)
+        if not config_path_obj.exists() or not config_path_obj.is_file():
+            console.print(f"[bold red]Error:[/bold red] Config file not found: {config_path_obj}")
+            raise typer.Exit(code=1)
+
     try:
-        config = load_config(config_path)
+        config = load_config(config_path_obj)
     except ConfigurationError as e:
         console.print(f"[bold red]Error:[/bold red] {escape(str(e))}")
         raise typer.Exit(code=1) from None
 
     # Override with CLI args
     if input_path:
-        config.input_path = input_path
+        config.input_path = expand_path(input_path)
     if output_dir:
-        config.output_folder = output_dir
+        config.output_folder = expand_path(output_dir)
     if quiet:
         config.quiet = True
     if outputs:
@@ -183,6 +184,12 @@ def run(
         # Set default font if not set
         if not config.wordcloud.font_path:
             config.wordcloud.font_path = default_font_path()
+
+    try:
+        ensure_writable_dir(config.output_folder)
+    except ConfigurationError as e:
+        console.print(f"[bold red]Error:[/bold red] {escape(str(e))}")
+        raise typer.Exit(code=1) from None
 
     # Run the pipeline
     try:

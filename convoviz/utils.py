@@ -4,9 +4,12 @@ from __future__ import annotations
 
 import os
 import re
+import tempfile
 from collections.abc import Mapping
 from pathlib import Path
 from typing import Any
+
+from convoviz.exceptions import ConfigurationError
 
 
 def sanitize(filename: str) -> str:
@@ -198,3 +201,24 @@ def deep_merge_dicts(base: Mapping[str, Any], override: Mapping[str, Any]) -> di
         else:
             merged[key] = value
     return merged
+
+
+def ensure_writable_dir(path: Path) -> None:
+    """Ensure a directory exists and is writable.
+
+    Raises:
+        ConfigurationError: If the directory cannot be created or written to.
+    """
+    if path.exists() and not path.is_dir():
+        raise ConfigurationError(f"Output path must be a directory: {path}")
+
+    try:
+        path.mkdir(parents=True, exist_ok=True)
+    except OSError as exc:
+        raise ConfigurationError(f"Cannot create output directory: {path}") from exc
+
+    try:
+        with tempfile.NamedTemporaryFile(dir=path, prefix=".convoviz_write_test_", delete=True):
+            pass
+    except OSError as exc:
+        raise ConfigurationError(f"Cannot write to output directory: {path}") from exc
