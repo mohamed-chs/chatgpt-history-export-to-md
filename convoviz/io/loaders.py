@@ -40,7 +40,7 @@ def _register_temp_dir(path: Path) -> None:
 
 
 def _is_safe_zip_member_name(name: str) -> bool:
-    """Return True if a ZIP entry name is safe to extract.
+    r"""Return True if a ZIP entry name is safe to extract.
 
     This is intentionally OS-agnostic: it treats both ``/`` and ``\\`` as path
     separators and rejects absolute paths, drive-letter paths, and ``..`` parts.

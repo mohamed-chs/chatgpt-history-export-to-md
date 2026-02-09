@@ -167,9 +167,11 @@ def _load_toml_path(path: Path) -> dict[str, Any]:
         with path.open("rb") as handle:
             return tomllib.load(handle)
     except FileNotFoundError as exc:
-        raise ConfigurationError(f"Configuration file not found: {path}") from exc
+        msg = f"Configuration file not found: {path}"
+        raise ConfigurationError(msg) from exc
     except tomllib.TOMLDecodeError as exc:
-        raise ConfigurationError(f"Failed to parse TOML configuration: {path}") from exc
+        msg = f"Failed to parse TOML configuration: {path}"
+        raise ConfigurationError(msg) from exc
 
 
 def _normalize_config_data(data: Any) -> Any:
@@ -240,7 +242,8 @@ def load_config(config_path: Path | None = None) -> ConvovizConfig:
 def write_default_config(path: Path, overwrite: bool = False) -> Path:
     """Write the bundled default configuration to the provided path."""
     if path.exists() and not overwrite:
-        raise ConfigurationError(f"Configuration file already exists: {path}")
+        msg = f"Configuration file already exists: {path}"
+        raise ConfigurationError(msg)
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(get_default_config_text(), encoding="utf-8")
     return path

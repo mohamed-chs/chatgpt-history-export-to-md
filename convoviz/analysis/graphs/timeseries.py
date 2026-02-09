@@ -4,12 +4,17 @@ from __future__ import annotations
 
 from collections import defaultdict
 from datetime import datetime
+from typing import TYPE_CHECKING
 
 import matplotlib.dates as mdates
-from matplotlib.figure import Figure
 
-from convoviz.config import GraphConfig, get_default_config
-from convoviz.models import ConversationCollection
+from convoviz.config import get_default_config
+
+if TYPE_CHECKING:
+    from matplotlib.figure import Figure
+
+    from convoviz.config import GraphConfig
+    from convoviz.models import ConversationCollection
 
 from .common import (
     WEEKDAYS,

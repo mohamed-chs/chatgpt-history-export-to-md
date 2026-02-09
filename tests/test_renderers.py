@@ -220,7 +220,8 @@ class TestRenderConversation:
         assert "assistant message 111" in markdown
 
     def test_render_conversation_active_branch(
-        self, branching_conversation: Conversation
+        self,
+        branching_conversation: Conversation,
     ) -> None:
         """Test that active-branch rendering excludes alternate branches."""
         config = ConversationConfig()
@@ -234,7 +235,8 @@ class TestRenderConversation:
         assert "Of course! How can I assist you?" not in markdown
 
     def test_render_conversation_full_branch(
-        self, branching_conversation: Conversation
+        self,
+        branching_conversation: Conversation,
     ) -> None:
         """Test that full DAG rendering includes alternate branches."""
         config = ConversationConfig()
@@ -311,7 +313,8 @@ class TestRenderConversation:
         assert "Orphan message" in markdown
 
     def test_render_conversation_with_images(
-        self, mock_conversation: Conversation
+        self,
+        mock_conversation: Conversation,
     ) -> None:
         """Test conversation rendering with image assets."""
         config = ConversationConfig()
@@ -323,7 +326,7 @@ class TestRenderConversation:
             {
                 "content_type": "image_asset_pointer",
                 "asset_pointer": "file-service://file-123",
-            }
+            },
         ]
 
         def mock_resolver(asset_id: str, _name: str | None = None) -> str | None:
@@ -332,13 +335,17 @@ class TestRenderConversation:
             return None
 
         markdown = render_conversation(
-            mock_conversation, config, headers, asset_resolver=mock_resolver
+            mock_conversation,
+            config,
+            headers,
+            asset_resolver=mock_resolver,
         )
 
         assert "![Image](assets/file-123.png)" in markdown
 
     def test_render_conversation_timestamps(
-        self, mock_conversation: Conversation
+        self,
+        mock_conversation: Conversation,
     ) -> None:
         """Test timestamp rendering in conversation."""
         config = ConversationConfig()
@@ -363,7 +370,8 @@ class TestRenderConversation:
         )  # Twice in YAML (create/update), once in User message
 
     def test_render_conversation_no_timestamps(
-        self, mock_conversation: Conversation
+        self,
+        mock_conversation: Conversation,
     ) -> None:
         """Test that timestamps can be disabled."""
         config = ConversationConfig()
@@ -375,7 +383,8 @@ class TestRenderConversation:
         assert "*08:05:00*" not in markdown
 
     def test_render_conversation_date_change(
-        self, mock_conversation: Conversation
+        self,
+        mock_conversation: Conversation,
     ) -> None:
         """Test that full date is shown when it changes between messages."""
         # Modify assistant message to be on the next day

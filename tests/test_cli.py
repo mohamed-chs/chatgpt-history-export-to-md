@@ -15,7 +15,8 @@ runner = CliRunner()
 @pytest.fixture(autouse=True)
 def _isolate_user_config(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
     monkeypatch.setattr(
-        "convoviz.config.get_user_config_path", lambda: tmp_path / "convoviz.toml"
+        "convoviz.config.get_user_config_path",
+        lambda: tmp_path / "convoviz.toml",
     )
 
 

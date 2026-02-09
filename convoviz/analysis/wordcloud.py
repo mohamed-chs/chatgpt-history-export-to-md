@@ -1,6 +1,7 @@
 """Word cloud generation for conversation text."""
 
 import logging
+import multiprocessing
 import os
 from concurrent.futures import ProcessPoolExecutor
 from functools import lru_cache
@@ -40,7 +41,7 @@ def load_programming_stopwords() -> frozenset[str]:
     if not stopwords_path.exists():
         return frozenset()
 
-    with open(stopwords_path, encoding="utf-8") as f:
+    with stopwords_path.open(encoding="utf-8") as f:
         return frozenset(
             line.strip().lower()
             for line in f
@@ -162,7 +163,8 @@ def generate_wordclouds(
     year_groups = collection.group_by_year()
     authors = ("user", "assistant") if config.include_assistant_text else ("user",)
 
-    # Pre-load/download NLTK stopwords in the main process to avoid race conditions in workers
+    # Pre-load/download NLTK stopwords in the main process to avoid
+    # race conditions in workers.
     load_nltk_stopwords()
 
     # Build list of all tasks: (text, filename, output_dir, config)
@@ -197,12 +199,13 @@ def generate_wordclouds(
         max_workers = max(1, cpu_count // 2)
 
     # Use parallel processing for speedup on multi-core systems.
-    # Use 'spawn' context to avoid DeprecationWarning about fork in multi-threaded processes.
-    import multiprocessing
+    # Use 'spawn' context to avoid DeprecationWarning about fork in
+    # multi-threaded processes.
 
     mp_context = multiprocessing.get_context("spawn")
     logger.debug(
-        f"Starting wordcloud generation with {max_workers} workers for {len(tasks)} tasks"
+        f"Starting wordcloud generation with {max_workers} "
+        f"workers for {len(tasks)} tasks"
     )
     with ProcessPoolExecutor(
         max_workers=max_workers, mp_context=mp_context

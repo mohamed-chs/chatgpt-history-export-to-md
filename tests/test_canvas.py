@@ -186,7 +186,8 @@ def test_canvas_document_in_non_first_part() -> None:
         id="msg_late_part",
         author=MessageAuthor(role="assistant"),
         content=MessageContent(
-            content_type="text", parts=[{"text": "prefix"}, canvas_data]
+            content_type="text",
+            parts=[{"text": "prefix"}, canvas_data],
         ),
         metadata=MessageMetadata(),
         create_time=ts,

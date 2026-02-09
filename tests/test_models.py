@@ -183,10 +183,10 @@ def test_conversation_citation_map_aggregates_metadata_groups() -> None:
                                         },
                                         "title": "Source A",
                                         "url": "http://example.com/a",
-                                    }
-                                ]
-                            }
-                        ]
+                                    },
+                                ],
+                            },
+                        ],
                     },
                     "recipient": "all",
                 },
@@ -290,7 +290,8 @@ def test_message_visibility() -> None:
     msg = Message(
         author=MessageAuthor(role="assistant"),
         content=MessageContent(
-            content_type="tether_browsing_display", parts=["Browsing..."]
+            content_type="tether_browsing_display",
+            parts=["Browsing..."],
         ),
         metadata=MessageMetadata(),
         **base_data,
@@ -317,7 +318,8 @@ def test_message_visibility() -> None:
 
 
 def test_collection_update_merges_new_conversations_even_if_older(
-    mock_conversation: Conversation, mock_conversation_data: dict
+    mock_conversation: Conversation,
+    mock_conversation_data: dict,
 ) -> None:
     """A new conversation should not be skipped just because it's older than last_updated."""
     base = ConversationCollection(conversations=[mock_conversation])
@@ -408,7 +410,8 @@ def test_new_content_types() -> None:
     msg = Message(
         author=MessageAuthor(role="assistant"),
         content=MessageContent(
-            content_type="reasoning_recap", content="I reasoned about X"
+            content_type="reasoning_recap",
+            content="I reasoned about X",
         ),
         metadata=MessageMetadata(),
         **base_data,
@@ -586,7 +589,7 @@ class TestConversationTimeProperties:
                     "message": None,
                     "parent": None,
                     "children": [],
-                }
+                },
             },
             moderation_results=[],
             current_node="root",
@@ -700,7 +703,8 @@ class TestCollectionGrouping:
     """Tests for ConversationCollection grouping methods."""
 
     def _make_collection_with_dates(
-        self, dates: list[datetime]
+        self,
+        dates: list[datetime],
     ) -> ConversationCollection:
         """Helper to create a collection with conversations at specific dates."""
         conversations = []
@@ -715,7 +719,7 @@ class TestCollectionGrouping:
                         "message": None,
                         "parent": None,
                         "children": [],
-                    }
+                    },
                 },
                 moderation_results=[],
                 current_node="root",
@@ -785,10 +789,11 @@ class TestCollectionProperties:
     def test_last_updated_empty(self) -> None:
         """Test last_updated on empty collection."""
         collection = ConversationCollection()
-        assert collection.last_updated == datetime.min
+        assert collection.last_updated == datetime.min.replace(tzinfo=UTC)
 
     def test_last_updated_with_conversations(
-        self, mock_conversation: Conversation
+        self,
+        mock_conversation: Conversation,
     ) -> None:
         """Test last_updated returns most recent update_time."""
         collection = ConversationCollection(conversations=[mock_conversation])

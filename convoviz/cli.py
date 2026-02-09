@@ -57,7 +57,8 @@ def run(
     outputs: list[OutputKind] | None = typer.Option(
         None,
         "--outputs",
-        help="Output types to generate (repeatable). Options: markdown, graphs, wordclouds. "
+        help="Output types to generate (repeatable). "
+        "Options: markdown, graphs, wordclouds. "
         "If not specified, all outputs are generated.",
     ),
     flat: bool = typer.Option(
@@ -70,7 +71,8 @@ def run(
         False,
         "--timestamp",
         "-t",
-        help="Prepend conversation timestamp to the filename (e.g., 2024-03-21_15-30-05 - Title.md).",
+        help="Prepend conversation timestamp to the filename "
+        "(e.g., 2024-03-21_15-30-05 - Title.md).",
     ),
     interactive: bool | None = typer.Option(
         None,
@@ -174,14 +176,16 @@ def run(
                 config.input_path = latest
             else:
                 console.print(
-                    "[bold red]Error:[/bold red] No input file provided and none found in Downloads."
+                    "[bold red]Error:[/bold red] No input file provided and "
+                    "none found in Downloads."
                 )
                 raise typer.Exit(code=1)
 
         # Validate the input (basic check)
         if not config.input_path.exists():
             console.print(
-                f"[bold red]Error:[/bold red] Input path does not exist: {config.input_path}"
+                "[bold red]Error:[/bold red] Input path does not exist: "
+                f"{config.input_path}"
             )
             raise typer.Exit(code=1)
 

@@ -3,11 +3,15 @@
 from __future__ import annotations
 
 from collections import defaultdict
+from typing import TYPE_CHECKING
 
-from matplotlib.figure import Figure
+from convoviz.config import get_default_config
 
-from convoviz.config import GraphConfig, get_default_config
-from convoviz.models import ConversationCollection
+if TYPE_CHECKING:
+    from matplotlib.figure import Figure
+
+    from convoviz.config import GraphConfig
+    from convoviz.models import ConversationCollection
 
 from .common import apply_tick_font, setup_single_axes
 

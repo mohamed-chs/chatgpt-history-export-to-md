@@ -176,7 +176,7 @@ def colormaps() -> list[str]:
 
 def expand_path(value: str) -> Path:
     """Expand environment variables and user home in a path string."""
-    expanded = os.path.expandvars(os.path.expanduser(value))
+    expanded = os.path.expandvars(str(Path(value).expanduser()))
     return Path(expanded)
 
 
@@ -223,17 +223,20 @@ def validate_writable_dir(path: Path, create: bool = False) -> None:
             ):
                 pass
         except OSError as exc:
-            raise ConfigurationError(f"Directory not writable: {target}") from exc
+            msg = f"Directory not writable: {target}"
+            raise ConfigurationError(msg) from exc
 
     if create:
         try:
             path.mkdir(parents=True, exist_ok=True)
         except OSError as exc:
-            raise ConfigurationError(f"Cannot create directory: {path}") from exc
+            msg = f"Cannot create directory: {path}"
+            raise ConfigurationError(msg) from exc
 
     if path.exists():
         if not path.is_dir():
-            raise ConfigurationError(f"Not a directory: {path}")
+            msg = f"Not a directory: {path}"
+            raise ConfigurationError(msg)
         test_write(path)
         return
 
@@ -241,6 +244,7 @@ def validate_writable_dir(path: Path, create: bool = False) -> None:
     for parent in path.parents:
         if parent.exists():
             if not parent.is_dir():
-                raise ConfigurationError(f"Parent is not a directory: {parent}")
+                msg = f"Parent is not a directory: {parent}"
+                raise ConfigurationError(msg)
             test_write(parent)
             return

@@ -127,14 +127,16 @@ def run_interactive_config(
     if input_result:
         config.input_path = expand_path(input_result)
     logger.debug(f"User selected input: {config.input_path}")
-    # Prompt to merge script export if detected (and not already selected as primary input)
+    # Prompt to merge script export if detected (and not already
+    # selected as primary input)
     script_export = find_script_export()
     if script_export and (
         not config.input_path or script_export.resolve() != config.input_path.resolve()
     ):
         merge_it: bool = _ask_or_cancel(
             confirm(
-                f"Found recent convoviz script export: {script_export.name}\n  Merge it with your main input?",
+                f"Found recent convoviz script export: {script_export.name}\n"
+                "  Merge it with your main input?",
                 default=True,
                 style=CUSTOM_STYLE,
             )

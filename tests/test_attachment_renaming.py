@@ -28,7 +28,7 @@ def create_message_with_attachment(
             {
                 "content_type": "image_asset_pointer",
                 "asset_pointer": f"file-service://{attachment_id}",
-            }
+            },
         ],
     )
 
@@ -48,7 +48,6 @@ def create_message_with_attachment(
 
 def test_render_node_renames_attachment() -> None:
     """Test that render_node passes the correct target name to the asset resolver."""
-
     # Setup
     attachment_id = "file-123"
     target_name = "cool_image.png"
@@ -75,7 +74,6 @@ def test_render_node_renames_attachment() -> None:
 
 def test_render_node_no_rename_if_no_metadata() -> None:
     """Test that render_node passes None as name if metadata is missing."""
-
     # Setup
     attachment_id = "file-456"
     message = create_message_with_attachment("msg-2", attachment_id, None)
@@ -100,7 +98,6 @@ def test_render_node_no_rename_if_no_metadata() -> None:
 
 def test_copy_asset_uses_target_name(tmp_path: Path) -> None:
     """Test that copy_asset uses the target name for the destination file."""
-
     # Setup
     source_file = tmp_path / "original.png"
     source_file.write_bytes(b"DATA")
@@ -125,7 +122,6 @@ def test_copy_asset_uses_target_name(tmp_path: Path) -> None:
 
 def test_copy_asset_defaults_to_source_name(tmp_path: Path) -> None:
     """Test that copy_asset uses source name if target_name is None."""
-
     # Setup
     source_file = tmp_path / "original.png"
     source_file.write_bytes(b"DATA")
@@ -144,7 +140,6 @@ def test_copy_asset_defaults_to_source_name(tmp_path: Path) -> None:
 
 def test_render_node_encodes_spaces() -> None:
     """Test that render_node URL-encodes asset paths with spaces."""
-
     # Setup
     attachment_id = "file-123"
     target_name = "image with spaces.png"
@@ -167,7 +162,6 @@ def test_render_node_encodes_spaces() -> None:
 
 def test_copy_asset_sanitizes_name(tmp_path: Path) -> None:
     """Test that copy_asset sanitizes the target name."""
-
     # Setup
     source_file = tmp_path / "original.png"
     source_file.write_bytes(b"DATA")
@@ -188,12 +182,11 @@ def test_copy_asset_sanitizes_name(tmp_path: Path) -> None:
 
 def test_non_image_attachment_not_rendered() -> None:
     """Non-image attachments should not be rendered as images."""
-
     content = MessageContent(content_type="text", text="Hello")
     metadata = MessageMetadata(
         attachments=[
-            {"id": "file-999", "name": "report.pdf", "mime_type": "application/pdf"}
-        ]
+            {"id": "file-999", "name": "report.pdf", "mime_type": "application/pdf"},
+        ],
     )
     message = Message(
         id="msg-3",

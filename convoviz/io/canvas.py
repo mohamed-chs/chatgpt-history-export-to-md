@@ -4,8 +4,11 @@ from __future__ import annotations
 
 import logging
 from pathlib import Path
+from typing import TYPE_CHECKING
 
-from convoviz.models import ConversationCollection
+if TYPE_CHECKING:
+    from convoviz.models import ConversationCollection
+
 from convoviz.utils import sanitize
 
 logger = logging.getLogger(__name__)
@@ -61,7 +64,8 @@ def save_canvas_documents(
         conv_id = doc["conversation_id"][:8]  # Short ID for prefix
 
         ext = get_extension(mime_type)
-        # Prefix with short conversation ID to avoid collisions between identically named docs
+        # Prefix with short conversation ID to avoid collisions
+        # between identically named docs
         filename = sanitize(f"[{conv_id}] {name}{ext}")
         filepath = canvas_dir / filename
 

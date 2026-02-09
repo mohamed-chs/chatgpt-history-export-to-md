@@ -97,13 +97,13 @@ class TestLoadCollectionFromJsonFormats:
                             "message": None,
                             "parent": None,
                             "children": [],
-                        }
+                        },
                     },
                     "moderation_results": [],
                     "current_node": "root",
                     "conversation_id": "test_id",
-                }
-            ]
+                },
+            ],
         }
         json_path = tmp_path / "wrapped.json"
         json_path.write_text(json.dumps(data))

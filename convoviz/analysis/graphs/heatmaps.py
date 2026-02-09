@@ -2,11 +2,16 @@
 
 from __future__ import annotations
 
-from matplotlib.figure import Figure
-from matplotlib.image import AxesImage
+from typing import TYPE_CHECKING
 
-from convoviz.config import GraphConfig, get_default_config
-from convoviz.models import ConversationCollection
+from convoviz.config import get_default_config
+
+if TYPE_CHECKING:
+    from matplotlib.figure import Figure
+    from matplotlib.image import AxesImage
+
+    from convoviz.config import GraphConfig
+    from convoviz.models import ConversationCollection
 
 from .common import WEEKDAYS, setup_single_axes, ts_to_dt, tz_label
 
@@ -15,7 +20,7 @@ def generate_activity_heatmap(
     collection: ConversationCollection,
     config: GraphConfig | None = None,
 ) -> Figure:
-    """Create a heatmap of activity by weekday × hour (user prompts)."""
+    """Create a heatmap of activity by weekday × hour (user prompts)."""  # noqa: RUF002
     cfg = config or get_default_config().graph
     timestamps = collection.timestamps("user")
 
@@ -40,7 +45,7 @@ def generate_activity_heatmap(
     )
 
     ax.set_title(
-        f"Activity heatmap (weekday × hour, {tz_label(cfg)})",
+        f"Activity heatmap (weekday × hour, {tz_label(cfg)})",  # noqa: RUF001
         fontproperties=font_prop,
         fontsize=14,
         pad=14,

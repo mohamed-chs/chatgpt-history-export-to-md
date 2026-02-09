@@ -37,7 +37,8 @@ def test_parse_custom_stopwords():
 def test_generate_wordcloud_no_programming_stopwords(mock_wc):
     """Test that generate_wordcloud respects exclude_programming_keywords=False."""
     config = WordCloudConfig(
-        custom_stopwords="python", exclude_programming_keywords=False
+        custom_stopwords="python",
+        exclude_programming_keywords=False,
     )
     text = "This is a test with def class and int"
 

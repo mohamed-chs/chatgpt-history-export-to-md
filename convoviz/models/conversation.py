@@ -108,7 +108,10 @@ class Conversation(BaseModel):
 
     @property
     def content_types(self) -> list[str]:
-        """Get all unique content types in the conversation (excluding hidden messages)."""
+        """Get all unique content types in the conversation.
+
+        Excludes hidden messages.
+        """
         return sorted(
             {
                 node.message.content.content_type
@@ -153,7 +156,8 @@ class Conversation(BaseModel):
     @property
     def custom_instructions(self) -> dict[str, str]:
         """Get custom instructions used for this conversation."""
-        # Custom instructions are often hidden system messages, so we must include hidden nodes.
+        # Custom instructions are often hidden system messages,
+        # so we must include hidden nodes.
         system_nodes = self.nodes_by_author("system", include_hidden=True)
         for node in system_nodes:
             context_message = node.message
@@ -166,7 +170,8 @@ class Conversation(BaseModel):
         """Get all Canvas documents created in this conversation's active branch.
 
         Returns:
-            List of dicts with {name, type, content, conversation_id, conversation_title}
+            List of dicts with {name, type, content,
+            conversation_id, conversation_title}
         """
         docs: list[dict[str, Any]] = []
         for node in self.ordered_nodes:
@@ -233,8 +238,8 @@ class Conversation(BaseModel):
     def citation_map(self) -> dict[str, dict[str, str | None]]:
         """Aggregate citation metadata from all messages in the conversation.
 
-        Traverses all nodes (including hidden ones) to collect embedded citation definitions
-        from tool outputs (e.g. search results).
+        Traverses all nodes (including hidden ones) to collect embedded
+        citation definitions from tool outputs (e.g. search results).
         """
         aggregated_map = {}
         for node in self.all_message_nodes:

@@ -3,7 +3,7 @@
 This is a pure data model - I/O and visualization logic are in separate modules.
 """
 
-from datetime import datetime
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
@@ -41,7 +41,7 @@ class ConversationCollection(BaseModel):
     def last_updated(self) -> datetime:
         """Get the latest update time in the collection."""
         if not self.conversations:
-            return datetime.min
+            return datetime.min.replace(tzinfo=UTC)
         return max(c.update_time for c in self.conversations)
 
     @property

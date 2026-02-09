@@ -15,14 +15,14 @@ from typing import TYPE_CHECKING
 
 import matplotlib.font_manager as fm
 import matplotlib.ticker as mticker
-from matplotlib.axes import Axes
 from matplotlib.figure import Figure
 
-from convoviz.config import GraphConfig
 from convoviz.utils import get_asset_path
 
 if TYPE_CHECKING:
-    pass
+    from matplotlib.axes import Axes
+
+    from convoviz.config import GraphConfig
 
 logger = logging.getLogger(__name__)
 

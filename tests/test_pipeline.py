@@ -203,7 +203,7 @@ def test_run_pipeline_extras_without_outputs(tmp_path: Path) -> None:
                         "content": {
                             "content_type": "text",
                             "parts": [
-                                {"name": "doc", "type": "text/plain", "content": "hi"}
+                                {"name": "doc", "type": "text/plain", "content": "hi"},
                             ],
                         },
                         "status": "finished_successfully",
@@ -219,10 +219,11 @@ def test_run_pipeline_extras_without_outputs(tmp_path: Path) -> None:
             "moderation_results": [],
             "current_node": "canvas",
             "conversation_id": "conv_extras",
-        }
+        },
     ]
     (input_dir / "conversations.json").write_text(
-        json.dumps(conversations), encoding="utf-8"
+        json.dumps(conversations),
+        encoding="utf-8",
     )
 
     output_dir = tmp_path / "output"
@@ -241,7 +242,9 @@ def test_run_pipeline_extras_without_outputs(tmp_path: Path) -> None:
 
 
 def test_run_pipeline_missing_graph_dependency(
-    mock_zip_file: Path, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    mock_zip_file: Path,
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     output_dir = tmp_path / "output"
     config = get_default_config()
@@ -263,7 +266,9 @@ def test_run_pipeline_missing_graph_dependency(
 
 
 def test_run_pipeline_missing_wordcloud_dependency(
-    mock_zip_file: Path, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    mock_zip_file: Path,
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     output_dir = tmp_path / "output"
     config = get_default_config()

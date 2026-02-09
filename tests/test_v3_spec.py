@@ -73,7 +73,8 @@ class TestContentFiltering:
             id="5",
             author=MessageAuthor(role="tool", name="browser"),
             content=MessageContent(
-                content_type="execution_output", text="Searching..."
+                content_type="execution_output",
+                text="Searching...",
             ),
             status="finished_successfully",
             weight=1.0,
@@ -86,7 +87,8 @@ class TestContentFiltering:
             id="6",
             author=MessageAuthor(role="tool", name="dalle.text2im"),
             content=MessageContent(
-                content_type="text", text="DALL·E displayed 1 images..."
+                content_type="text",
+                text="DALL·E displayed 1 images...",
             ),
             status="finished_successfully",
             weight=1.0,
@@ -124,7 +126,7 @@ class TestCitationParsing:
             "turn0search18": {
                 "title": "My Source",
                 "url": "http://example.com/embedded",
-            }
+            },
         }
 
         result = replace_citations(text, citation_map=citation_map)
@@ -152,7 +154,7 @@ class TestCitationParsing:
                 "start_ix": 6,
                 "end_ix": 16,
                 "metadata": {"title": "Source 1", "url": "http://example.com/1"},
-            }
+            },
         ]
 
         result = replace_citations(text, citations, flavor="obsidian")
@@ -166,7 +168,7 @@ class TestCitationParsing:
                 "start_ix": 100,
                 "end_ix": 110,
                 "metadata": {"title": "Source", "url": "http://example.com"},
-            }
+            },
         ]
         result = replace_citations(text, citations)
         assert result == text

@@ -7,13 +7,17 @@ from collections import defaultdict
 from collections.abc import Callable
 from datetime import datetime
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 import matplotlib.dates as mdates
 from matplotlib.figure import Figure
 from tqdm import tqdm
 
-from convoviz.config import GraphConfig, get_default_config
-from convoviz.models import ConversationCollection
+from convoviz.config import get_default_config
+
+if TYPE_CHECKING:
+    from convoviz.config import GraphConfig
+    from convoviz.models import ConversationCollection
 
 from .common import (
     WEEKDAYS,
@@ -89,7 +93,8 @@ def generate_summary_dashboard(
     fig.text(
         0.01,
         0.955,
-        f"{conv_count} conversations · {prompt_count} user prompts · {date_range} · {tz_label(cfg)}",
+        f"{conv_count} conversations · {prompt_count} user prompts · "
+        f"{date_range} · {tz_label(cfg)}",
         fontproperties=font_prop,
         fontsize=10,
         va="top",
@@ -137,7 +142,7 @@ def generate_summary_dashboard(
             ax_heat.spines[side].set_visible(False)
         img = ax_heat.imshow(grid, aspect="auto", cmap="Blues", interpolation="nearest")
         ax_heat.set_title(
-            f"Weekday × hour heatmap ({tz_label(cfg)})",
+            f"Weekday × hour heatmap ({tz_label(cfg)})",  # noqa: RUF001
             fontproperties=font_prop,
             fontsize=13,
             pad=10,

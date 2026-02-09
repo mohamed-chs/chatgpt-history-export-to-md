@@ -14,6 +14,7 @@ class FakePrompt[T]:
     """Minimal stand-in for a questionary prompt object."""
 
     def __init__(self, result: T | None) -> None:
+        """Initialize with a fixed result."""
         self._result = result
 
     def ask(self) -> T | None:
@@ -34,7 +35,8 @@ def test_ctrl_c_on_first_prompt_aborts_interactive(
 
 
 def test_ctrl_c_mid_flow_aborts_interactive(
-    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
 ) -> None:
     import convoviz.interactive as interactive
 
@@ -55,7 +57,8 @@ def test_ctrl_c_mid_flow_aborts_interactive(
 
 
 def test_ctrl_c_on_outputs_checkbox_aborts_interactive(
-    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
 ) -> None:
     """Test Ctrl+C on the outputs checkbox prompt aborts."""
     import convoviz.interactive as interactive
@@ -76,7 +79,8 @@ def test_ctrl_c_on_outputs_checkbox_aborts_interactive(
 
 
 def test_outputs_selection_sets_config(
-    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
 ) -> None:
     """Test that output selection correctly sets config.outputs."""
     import convoviz.interactive as interactive
@@ -115,7 +119,8 @@ def test_outputs_selection_sets_config(
 
 
 def test_wordcloud_prompts_skipped_when_not_selected(
-    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
 ) -> None:
     """Test that wordcloud prompts are skipped when wordclouds output is not selected."""
     import convoviz.interactive as interactive
@@ -171,7 +176,8 @@ def test_wordcloud_prompts_skipped_when_not_selected(
 
 
 def test_markdown_prompts_skipped_when_not_selected(
-    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
 ) -> None:
     """Test that markdown prompts are skipped when markdown output is not selected."""
     import convoviz.interactive as interactive
@@ -270,7 +276,8 @@ def test_outputs_prompt_respects_existing_config(
 
 
 def test_script_export_merge_prompt(
-    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
 ) -> None:
     """Test that the script export merge prompt appears and sets config."""
     import convoviz.interactive as interactive
@@ -284,7 +291,9 @@ def test_script_export_merge_prompt(
     # Mock other prompts
     path_answers = iter(["dummy.zip", str(tmp_path / "out")])
     monkeypatch.setattr(
-        interactive, "qst_path", lambda *_a, **_k: FakePrompt(next(path_answers))
+        interactive,
+        "qst_path",
+        lambda *_a, **_k: FakePrompt(next(path_answers)),
     )
     checkbox_call_count = [0]
 
@@ -305,7 +314,8 @@ def test_script_export_merge_prompt(
 
 
 def test_script_export_merge_prompt_declined(
-    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
 ) -> None:
     """Test that declining the script export merge prompt does not set config."""
     import convoviz.interactive as interactive
@@ -319,7 +329,9 @@ def test_script_export_merge_prompt_declined(
     # Mock other prompts
     path_answers = iter(["dummy.zip", str(tmp_path / "out")])
     monkeypatch.setattr(
-        interactive, "qst_path", lambda *_a, **_k: FakePrompt(next(path_answers))
+        interactive,
+        "qst_path",
+        lambda *_a, **_k: FakePrompt(next(path_answers)),
     )
     checkbox_call_count = [0]
 
@@ -340,7 +352,8 @@ def test_script_export_merge_prompt_declined(
 
 
 def test_script_export_merge_prompt_skipped_if_manually_selected(
-    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
 ) -> None:
     """Test that the script export merge prompt is skipped if it's already the input."""
     import convoviz.interactive as interactive
@@ -354,7 +367,9 @@ def test_script_export_merge_prompt_skipped_if_manually_selected(
     # Mock other prompts
     # User selects the export_path as their main input
     monkeypatch.setattr(
-        interactive, "qst_path", lambda *_a, **_k: FakePrompt(str(export_path))
+        interactive,
+        "qst_path",
+        lambda *_a, **_k: FakePrompt(str(export_path)),
     )
     checkbox_call_count = [0]
 

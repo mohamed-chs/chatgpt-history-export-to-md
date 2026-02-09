@@ -4,12 +4,14 @@ from __future__ import annotations
 
 import re
 from datetime import datetime
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import yaml
 
-from convoviz.config import YAMLConfig
-from convoviz.models import Conversation
+if TYPE_CHECKING:
+    from convoviz.config import YAMLConfig
+    from convoviz.models import Conversation
+
 from convoviz.utils import sanitize_title
 
 _TAG_SAFE_RE = re.compile(r"[^a-z0-9/_\-]+")
@@ -28,7 +30,12 @@ def _normalize_yaml_value(value: Any) -> Any:
 class _YamlDumper(yaml.SafeDumper):
     _in_key = False
 
-    def represent_mapping(self, tag, mapping, flow_style=None):
+    def represent_mapping(
+        self,
+        tag: str,
+        mapping: Any,
+        flow_style: bool | None = None,
+    ) -> yaml.nodes.MappingNode:
         value = []
         node = yaml.nodes.MappingNode(tag, value, flow_style=flow_style)
         if self.alias_key is not None:
@@ -87,7 +94,8 @@ def render_yaml_header(
         conversation: The conversation to render
         config: YAML configuration specifying which fields to include
     Returns:
-        YAML frontmatter string with --- delimiters, or empty string if no fields enabled
+        YAML frontmatter string with --- delimiters, or empty string if
+        no fields enabled
     """
     yaml_fields: dict[str, object] = {}
 

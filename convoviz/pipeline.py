@@ -7,6 +7,7 @@ from rich.console import Console
 
 from convoviz.config import ConvovizConfig, OutputKind
 from convoviz.exceptions import ConfigurationError, InvalidZipError
+from convoviz.io import save_canvas_documents, save_custom_instructions
 from convoviz.io.loaders import (
     cleanup_temp_dirs,
     load_collection_from_json,
@@ -96,7 +97,8 @@ def run_pipeline(config: ConvovizConfig) -> None:
                 logger.info(f"Merged script data from {script_path}")
             except Exception as e:
                 console.print(
-                    f"[bold yellow]Warning:[/bold yellow] Failed to load script export data: {e}"
+                    "[bold yellow]Warning:[/bold yellow] "
+                    f"Failed to load script export data: {e}"
                 )
 
         output_folder = config.output_folder
@@ -140,40 +142,40 @@ def run_pipeline(config: ConvovizConfig) -> None:
             if not config.quiet:
                 console.print(
                     f"\nDone [bold green]✅[/bold green] ! "
-                    f"Check the output [bold blue]📄[/bold blue] here: {_safe_uri(markdown_folder)} 🔗\n"
+                    "Check the output [bold blue]📄[/bold blue] here: "
+                    f"{_safe_uri(markdown_folder)} 🔗\n"
                 )
 
         # Save collection-level metadata if requested
         if config.export_custom_instructions:
-            from convoviz.io import save_custom_instructions
-
             save_custom_instructions(
                 collection, output_folder / "custom_instructions.json"
             )
             logger.info("Custom instructions exported")
             if not config.quiet:
                 console.print(
-                    "Custom instructions saved to "
-                    f"[bold blue]{_safe_uri(output_folder / 'custom_instructions.json')}[/bold blue]\n"
+                    "Custom instructions saved to [bold blue]"
+                    f"{_safe_uri(output_folder / 'custom_instructions.json')}"
+                    "[/bold blue]\n"
                 )
 
         # Extract Canvas documents if requested
         if config.export_canvas:
-            from convoviz.io import save_canvas_documents
-
             count = save_canvas_documents(collection, output_folder)
             if count > 0:
                 logger.info(f"Extracted {count} Canvas documents")
                 if not config.quiet:
                     console.print(
-                        f"Canvas documents saved to [bold blue]{_safe_uri(output_folder / 'canvas')}[/bold blue]\n"
+                        "Canvas documents saved to [bold blue]"
+                        f"{_safe_uri(output_folder / 'canvas')}"
+                        "[/bold blue]\n"
                     )
 
         # Generate graphs (if selected)
         if OutputKind.GRAPHS in selected_outputs:
             # Lazy import to allow markdown-only usage without matplotlib
             try:
-                from convoviz.analysis.graphs import generate_graphs
+                from convoviz.analysis.graphs import generate_graphs  # noqa: PLC0415
             except ModuleNotFoundError as e:
                 raise ConfigurationError(
                     "Graph generation requires matplotlib. "
@@ -193,14 +195,17 @@ def run_pipeline(config: ConvovizConfig) -> None:
             if not config.quiet:
                 console.print(
                     f"\nDone [bold green]✅[/bold green] ! "
-                    f"Check the output [bold blue]📈[/bold blue] here: {_safe_uri(graph_folder)} 🔗\n"
+                    "Check the output [bold blue]📈[/bold blue] here: "
+                    f"{_safe_uri(graph_folder)} 🔗\n"
                 )
 
         # Generate word clouds (if selected)
         if OutputKind.WORDCLOUDS in selected_outputs:
             # Lazy import to allow markdown-only usage without wordcloud/nltk
             try:
-                from convoviz.analysis.wordcloud import generate_wordclouds
+                from convoviz.analysis.wordcloud import (  # noqa: PLC0415
+                    generate_wordclouds,
+                )
             except ModuleNotFoundError as e:
                 raise ConfigurationError(
                     "Word cloud generation requires wordcloud and nltk. "
@@ -220,13 +225,15 @@ def run_pipeline(config: ConvovizConfig) -> None:
             if not config.quiet:
                 console.print(
                     f"\nDone [bold green]✅[/bold green] ! "
-                    f"Check the output [bold blue]🔡☁️[/bold blue] here: {_safe_uri(wordcloud_folder)} 🔗\n"
+                    "Check the output [bold blue]🔡☁️[/bold blue] here: "
+                    f"{_safe_uri(wordcloud_folder)} 🔗\n"
                 )
 
         if not config.quiet:
             console.print(
                 "ALL DONE [bold green]🎉🎉🎉[/bold green] !\n\n"
-                f"Explore the full gallery [bold yellow]🖼️[/bold yellow] at: {_safe_uri(output_folder)} 🔗\n\n"
+                "Explore the full gallery [bold yellow]🖼️[/bold yellow] at: "
+                f"{_safe_uri(output_folder)} 🔗\n\n"
                 "I hope you enjoy the outcome 🤞.\n\n"
                 "If you appreciate it, kindly give the project a star ⭐ on GitHub:\n\n"
                 "➡️ https://github.com/mohamed-chs/convoviz 🔗\n\n"

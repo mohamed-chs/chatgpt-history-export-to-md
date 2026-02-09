@@ -21,13 +21,15 @@ def replace_citations(
     """Replace citation placeholders in text with markdown links.
 
     Supports two formats:
-    1. Tether v4 (metadata.citations): Placed at specific indices (【...】 placeholders).
+    1. Tether v4 (metadata.citations): Placed at specific indices
+       (【...】 placeholders).
     2. Embedded (Tether v3?): Unicode markers citeturnXsearchY.
 
     Args:
         text: The original message text
         citations: List of tether v4 citation objects (start_ix/end_ix)
-        citation_map: Map of internal citation IDs to metadata (turnXsearchY -> {title, url})
+        citation_map: Map of internal citation IDs to metadata
+            (turnXsearchY -> {title, url})
         flavor: Markdown flavor for link formatting ("standard", "obsidian")
 
     Returns:
@@ -148,7 +150,7 @@ def close_code_blocks(text: str) -> str:
 
 
 def replace_latex_delimiters(text: str) -> str:
-    """Replace LaTeX bracket delimiters with dollar sign delimiters.
+    r"""Replace LaTeX bracket delimiters with dollar sign delimiters.
 
     Args:
         text: Text with \\[ \\] \\( \\) delimiters

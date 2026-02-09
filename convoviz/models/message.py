@@ -122,7 +122,8 @@ class Message(BaseModel):
         5. It is a redundant DALL-E textual status update.
         6. It is from internal bio (memory) or web.run orchestration tools.
         7. It is code interpreter input (content_type="code").
-        8. It is browsing status, internal reasoning (o1/o3), or massive web scraps (sonic_webpage).
+        8. It is browsing status, internal reasoning (o1/o3), or massive
+           web scraps (sonic_webpage).
         """
         return is_message_hidden(self)
 

@@ -1,4 +1,4 @@
-"""Allow running convoviz as a module: python -m convoviz"""
+"""Allow running convoviz as a module: python -m convoviz."""
 
 from convoviz.cli import main_entry
 

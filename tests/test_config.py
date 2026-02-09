@@ -156,7 +156,8 @@ def test_load_config_from_path_invalid_toml(tmp_path: Path) -> None:
 
 
 def test_load_config_from_path_expands_paths(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     monkeypatch.setenv("CONVOVIZ_TEST_PATH", str(tmp_path / "data"))
     config_path = tmp_path / "config.toml"
