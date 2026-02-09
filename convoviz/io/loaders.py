@@ -10,7 +10,7 @@ from zipfile import ZipFile
 from orjson import loads
 
 from convoviz.exceptions import InvalidZipError
-from convoviz.models import Conversation, ConversationCollection
+from convoviz.models import ConversationCollection
 
 logger = logging.getLogger(__name__)
 _TEMP_DIRS: list[Path] = []
@@ -118,21 +118,6 @@ def validate_zip(filepath: Path) -> bool:
         return False
 
 
-def load_conversation_from_json(filepath: Path | str) -> Conversation:
-    """Load a single conversation from a JSON file.
-
-    Args:
-        filepath: Path to the JSON file
-
-    Returns:
-        Loaded Conversation object
-    """
-    filepath = Path(filepath)
-    with filepath.open(encoding="utf-8") as f:
-        data = loads(f.read())
-    return Conversation(**data)
-
-
 def load_collection_from_json(filepath: Path | str) -> ConversationCollection:
     """Load a conversation collection from a JSON file.
 
@@ -178,25 +163,6 @@ def load_collection_from_zip(filepath: Path | str) -> ConversationCollection:
     conversations_path = extracted_folder / "conversations.json"
 
     return load_collection_from_json(conversations_path)
-
-
-def find_latest_zip(directory: Path | None = None) -> Path | None:
-    """Find the most recently created ZIP file in a directory.
-
-    Args:
-        directory: Directory to search (defaults to ~/Downloads)
-
-    Returns:
-        Path to the most recent ZIP, or None if none found
-    """
-    if directory is None:
-        directory = Path.home() / "Downloads"
-
-    zip_files = [p for p in directory.iterdir() if p.is_file() and p.suffix.lower() == ".zip"]
-    if not zip_files:
-        return None
-
-    return max(zip_files, key=lambda p: p.stat().st_mtime)
 
 
 def find_latest_valid_zip(directory: Path | None = None) -> Path | None:

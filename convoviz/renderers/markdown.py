@@ -316,6 +316,45 @@ OBSIDIAN_COLLAPSIBLE_TYPES: dict[str, tuple[str, str]] = {
 }
 
 
+def _render_timestamp(
+    msg_time: datetime | None,
+    last_time: datetime | None,
+    enabled: bool,
+) -> str:
+    """Format the message timestamp."""
+    if not enabled or not msg_time:
+        return ""
+    # Show full date if it's the first message or if the date has changed
+    fmt = "%Y-%m-%d %H:%M:%S" if (not last_time or msg_time.date() != last_time.date()) else "%H:%M:%S"
+    return f"*{msg_time.strftime(fmt)}*\n"
+
+
+def _render_images(
+    message: Any,
+    asset_resolver: Callable[[str, str | None], str | None] | None,
+) -> str:
+    """Format images as markdown."""
+    if not asset_resolver or not message.images:
+        return ""
+
+    attachment_map = {}
+    if message.metadata.attachments:
+        attachment_map = {
+            att["id"]: att["name"]
+            for att in message.metadata.attachments
+            if isinstance(att, dict) and att.get("id") and att.get("name")
+        }
+
+    image_markdown = []
+    for image_id in message.images:
+        target_name = attachment_map.get(image_id)
+        if rel_path := asset_resolver(image_id, target_name):
+            encoded_path = quote(rel_path)
+            image_markdown.append(f"\n![Image]({encoded_path})\n")
+
+    return "".join(image_markdown)
+
+
 def render_node(
     node: Node,
     headers: AuthorHeaders,
@@ -326,105 +365,53 @@ def render_node(
     show_timestamp: bool = True,
     last_timestamp: datetime | None = None,
 ) -> str:
-    """Render a complete node as markdown.
-
-    Args:
-        node: The node to render
-        headers: Configuration for author headers
-        use_dollar_latex: Whether to convert LaTeX delimiters to dollars
-        asset_resolver: Function to resolve asset IDs to paths, optionally renaming them
-        flavor: Markdown flavor ("standard" or "obsidian")
-        citation_map: Global map of citations
-        show_timestamp: Whether to show the message timestamp
-        last_timestamp: The timestamp of the previous message (for conditional date display)
-    """
-    if node.message is None:
+    """Render a complete node as markdown."""
+    if (message := node.message) is None:
         return ""
 
-    content_type = node.message.content.content_type
+    content_type = message.content.content_type
 
-    # For Obsidian flavor, render certain hidden types as collapsible callouts
-    # No separator (***) since these are visually distinct and may appear consecutively
-    if flavor == "obsidian" and content_type in OBSIDIAN_COLLAPSIBLE_TYPES:
+    # 1. Obsidian-specific collapsible callouts for "hidden" reasoning types
+    if flavor == "obsidian" and (callout_info := OBSIDIAN_COLLAPSIBLE_TYPES.get(content_type)):
         try:
-            text = node.message.text
+            text = message.text
+            if text.strip():
+                ctype, title = callout_info
+                return f"\n{render_obsidian_callout(text, title, ctype, True)}\n"
         except MessageContentError:
-            text = ""
+            pass
 
-        if text.strip():
-            callout_type, title = OBSIDIAN_COLLAPSIBLE_TYPES[content_type]
-            callout = render_obsidian_callout(
-                content=text,
-                title=title,
-                callout_type=callout_type,
-                collapsed=True,
-            )
-            return f"\n{callout}\n"
-
-    if node.message.is_hidden:
+    if message.is_hidden:
         return ""
 
+    # 2. Main message rendering
     header = render_node_header(node, headers)
+    timestamp = _render_timestamp(message.create_time, last_timestamp, show_timestamp)
 
-    # Add timestamp if enabled and available
-    timestamp_str = ""
-    if show_timestamp and node.message.create_time:
-        curr_time = node.message.create_time
-        # Show full date if it's the first message or if the date has changed
-        if last_timestamp is None or curr_time.date() != last_timestamp.date():
-            timestamp_str = f"*{curr_time.strftime('%Y-%m-%d %H:%M:%S')}*\n"
-        else:
-            timestamp_str = f"*{curr_time.strftime('%H:%M:%S')}*\n"
-
-    # Get and process content
     try:
-        text = node.message.text
+        text = message.text
     except MessageContentError:
-        # Some message types only contain non-text parts; those still may have images.
         text = ""
 
-    # Process citations if present (Tether v4 metadata or Embedded v3)
-    # Use global citation_map if provided, merging/falling back to local if needed.
-    # Actually, local internal map is subset of global map if we aggregated correctly.
-    # So we prefer the passed global map.
-    effective_map = citation_map or node.message.internal_citation_map
-
-    if node.message.metadata.citations or effective_map:
+    # Process Citations
+    effective_map = citation_map or message.internal_citation_map
+    if message.metadata.citations or effective_map:
         text = replace_citations(
             text,
-            citations=node.message.metadata.citations,
+            citations=message.metadata.citations,
             citation_map=effective_map,
             flavor=flavor,
         )
 
     content = close_code_blocks(text)
-    content = f"\n{content}\n" if content else ""
-    if use_dollar_latex:
-        content = replace_latex_delimiters(content)
+    if content:
+        content = f"\n{content}\n"
+        if use_dollar_latex:
+            content = replace_latex_delimiters(content)
 
-    # Append images if resolver is provided and images exist
-    if asset_resolver and node.message.images:
-        # Build map of file-id -> desired name from metadata.attachments
-        attachment_map = {}
-        if node.message.metadata.attachments:
-            for att in node.message.metadata.attachments:
-                if (att_id := att.get("id")) and (name := att.get("name")):
-                    attachment_map[att_id] = name
+    images = _render_images(message, asset_resolver)
 
-        for image_id in node.message.images:
-            # Pass the desired name if we have one for this ID
-            target_name = attachment_map.get(image_id)
-            rel_path = asset_resolver(image_id, target_name)
-            if rel_path:
-                # URL-encode the path to handle spaces/special characters in Markdown links
-                # We only encode the filename part if we want to be safe, but rel_path is "assets/..."
-                # quote() by default doesn't encode / which is good.
-                encoded_path = quote(rel_path)
-                # Using standard markdown image syntax.
-                # Obsidian handles this well.
-                content += f"\n![Image]({encoded_path})\n"
-
-    return f"\n{header}{timestamp_str}{content}\n***\n"
+    return f"\n{header}{timestamp}{content}{images}\n***\n"
 
 
 def _ordered_nodes_full(conversation: Conversation) -> list[Node]:

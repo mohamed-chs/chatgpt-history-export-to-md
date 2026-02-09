@@ -20,7 +20,7 @@ from convoviz.interactive import run_interactive_config
 from convoviz.io.loaders import find_latest_valid_zip
 from convoviz.logging_config import setup_logging
 from convoviz.pipeline import run_pipeline
-from convoviz.utils import default_font_path, ensure_writable_dir, expand_path
+from convoviz.utils import default_font_path, expand_path, validate_writable_dir
 
 app = typer.Typer(
     add_completion=False,
@@ -186,7 +186,7 @@ def run(
             config.wordcloud.font_path = default_font_path()
 
     try:
-        ensure_writable_dir(config.output_folder)
+        validate_writable_dir(config.output_folder, create=True)
     except ConfigurationError as e:
         console.print(f"[bold red]Error:[/bold red] {escape(str(e))}")
         raise typer.Exit(code=1) from None

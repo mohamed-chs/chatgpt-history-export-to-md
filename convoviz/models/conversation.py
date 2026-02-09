@@ -94,11 +94,6 @@ class Conversation(BaseModel):
         return [node for node in nodes if node.message and node.message.author.role in authors]
 
     @property
-    def leaf_count(self) -> int:
-        """Count the number of leaf nodes (conversation endpoints)."""
-        return sum(1 for node in self.all_message_nodes if node.is_leaf)
-
-    @property
     def url(self) -> str:
         """Get the ChatGPT URL for this conversation."""
         return f"https://chatgpt.com/c/{self.conversation_id}"

@@ -253,13 +253,6 @@ It was also a great opportunity to learn more about Python and type annotations.
 </details>
 
 <details>
-<summary><strong>Using as a Library</strong></summary>
-
-It should also work as a library, so you can import and use the models and functions. I need to add more documentation for that though. Feel free to reach out if you need help.
-
-</details>
-
-<details>
 <summary><strong>Direct Export (Experimental)</strong></summary>
 
 There's also a JavaScript export flow under `js/` for grabbing additional conversation data directly from the browser outside the official ZIP export. This is experimental.

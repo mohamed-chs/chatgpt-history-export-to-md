@@ -203,54 +203,40 @@ def deep_merge_dicts(base: Mapping[str, Any], override: Mapping[str, Any]) -> di
     return merged
 
 
-def ensure_writable_dir(path: Path) -> None:
-    """Ensure a directory exists and is writable.
+def validate_writable_dir(path: Path, create: bool = False) -> None:
+    """Validate that a directory (or its closest existing parent) is writable.
+
+    Args:
+        path: The directory path to validate.
+        create: If True, creates the directory if it doesn't exist.
 
     Raises:
-        ConfigurationError: If the directory cannot be created or written to.
+        ConfigurationError: If the path is not a directory or is not writable.
     """
-    if path.exists() and not path.is_dir():
-        raise ConfigurationError(f"Output path must be a directory: {path}")
 
-    try:
-        path.mkdir(parents=True, exist_ok=True)
-    except OSError as exc:
-        raise ConfigurationError(f"Cannot create output directory: {path}") from exc
-
-    try:
-        with tempfile.NamedTemporaryFile(dir=path, prefix=".convoviz_write_test_", delete=True):
-            pass
-    except OSError as exc:
-        raise ConfigurationError(f"Cannot write to output directory: {path}") from exc
-
-
-def validate_writable_dir(path: Path) -> None:
-    """Validate that a directory is writable without creating it.
-
-    Raises:
-        ConfigurationError: If the directory cannot be created or written to.
-    """
-    if path.exists():
-        if not path.is_dir():
-            raise ConfigurationError(f"Output path must be a directory: {path}")
+    def test_write(target: Path) -> None:
         try:
-            with tempfile.NamedTemporaryFile(dir=path, prefix=".convoviz_write_test_", delete=True):
+            with tempfile.NamedTemporaryFile(dir=target, prefix=".convoviz_test_", delete=True):
                 pass
         except OSError as exc:
-            raise ConfigurationError(f"Cannot write to output directory: {path}") from exc
+            raise ConfigurationError(f"Directory not writable: {target}") from exc
+
+    if create:
+        try:
+            path.mkdir(parents=True, exist_ok=True)
+        except OSError as exc:
+            raise ConfigurationError(f"Cannot create directory: {path}") from exc
+
+    if path.exists():
+        if not path.is_dir():
+            raise ConfigurationError(f"Not a directory: {path}")
+        test_write(path)
         return
 
+    # If not existing and not creating, check closest existing parent
     for parent in path.parents:
         if parent.exists():
             if not parent.is_dir():
-                raise ConfigurationError(f"Output path must be a directory: {parent}")
-            try:
-                with tempfile.NamedTemporaryFile(
-                    dir=parent, prefix=".convoviz_write_test_", delete=True
-                ):
-                    pass
-            except OSError as exc:
-                raise ConfigurationError(
-                    f"Cannot write to output directory parent: {parent}"
-                ) from exc
+                raise ConfigurationError(f"Parent is not a directory: {parent}")
+            test_write(parent)
             return

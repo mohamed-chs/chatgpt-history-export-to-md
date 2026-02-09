@@ -74,66 +74,64 @@ def _render_tether_quote(content: Any) -> str:
     return blockquote
 
 
+def _render_canvas(name: str, content: str) -> str:
+    """Format a Canvas/canmore document as markdown."""
+    return f"### Canvas: {name}\n\n{content}"
+
+
 def extract_message_text(message: Any) -> str:
     """Extract the text content of the message."""
-    had_parts = False
-    if message.content.parts is not None:
-        # Handle multimodal content where parts can be mixed strings and dicts
-        text_parts = []
-        had_parts = bool(message.content.parts)
-        for part in message.content.parts:
-            if isinstance(part, str):
-                # Check if this string is actually a JSON-encoded Canvas document
-                if message.recipient == "canmore.create_textdoc":
-                    try:
-                        data = json.loads(part)
-                        if isinstance(data, dict) and "content" in data and "name" in data:
-                            text_parts.append(f"### Canvas: {data['name']}\n\n{data['content']}")
-                            continue
-                    except (json.JSONDecodeError, TypeError):
-                        pass
-                text_parts.append(part)
-            elif isinstance(part, dict):
-                # Handle Canvas/canmore documents embedded in parts
-                if (
-                    message.recipient == "canmore.create_textdoc"
-                    and part.get("content")
-                    and part.get("name")
-                ):
-                    text_parts.append(f"### Canvas: {part['name']}\n\n{part['content']}")
-                elif "text" in part:
-                    # Some parts might be dicts wrapping text
-                    text_parts.append(str(part["text"]))
+    content = message.content
 
-        # If we found string parts, join them.
+    # 1. Handle multimodal parts
+    if content.parts is not None:
+        text_parts = []
+        for part in content.parts:
+            match part:
+                case str():
+                    # Check if this string is a JSON Canvas document
+                    if message.recipient == "canmore.create_textdoc":
+                        try:
+                            data = json.loads(part)
+                            if isinstance(data, dict) and "content" in data and "name" in data:
+                                text_parts.append(_render_canvas(data["name"], data["content"]))
+                                continue
+                        except (json.JSONDecodeError, TypeError):
+                            pass
+                    text_parts.append(part)
+                case {"content": str(c), "name": str(n)} if message.recipient == "canmore.create_textdoc":
+                    text_parts.append(_render_canvas(n, c))
+                case {"text": str(t)}:
+                    text_parts.append(t)
+
         if text_parts:
             return "".join(text_parts)
+        if content.parts:  # If we had non-text parts (like images)
+            return ""
 
-    # tether_quote: render as a blockquote with attribution (check before .text)
-    if message.content.content_type == "tether_quote":
-        return _render_tether_quote(message.content)
+    # 2. Handle specific content types via match
+    match content.content_type:
+        case "tether_quote":
+            return _render_tether_quote(content)
+        case "reasoning_recap" if content.content is not None:
+            return content.content
+        case "thoughts" if content.thoughts is not None:
+            return _render_thoughts(content.thoughts)
 
-    # Check if text itself is a JSON-encoded Canvas document
-    if message.content.text is not None:
+    # 3. Fallback to standard text/result fields
+    if content.text is not None:
         if message.recipient == "canmore.create_textdoc":
             try:
-                data = json.loads(message.content.text)
+                data = json.loads(content.text)
                 if isinstance(data, dict) and "content" in data and "name" in data:
-                    return f"### Canvas: {data['name']}\n\n{data['content']}"
+                    return _render_canvas(data["name"], data["content"])
             except (json.JSONDecodeError, TypeError):
                 pass
-        return message.content.text
+        return content.text
 
-    if message.content.result is not None:
-        return message.content.result
-    # reasoning_recap content type uses 'content' field
-    if message.content.content is not None:
-        return message.content.content
-    # thoughts content type uses 'thoughts' field (list of thought objects)
-    if message.content.thoughts is not None:
-        return _render_thoughts(message.content.thoughts)
-    if had_parts:
-        return ""
+    if content.result is not None:
+        return content.result
+
     raise MessageContentError(message.id)
 
 
@@ -202,52 +200,33 @@ def extract_canvas_document(message: Any) -> dict[str, Any] | None:
 
 def is_message_hidden(message: Any) -> bool:
     """Check if message should be hidden in export."""
-    if message.is_empty:
+    if message.is_empty or message.metadata.is_visually_hidden_from_conversation:
         return True
 
-    # Explicitly marked as hidden by OpenAI
-    if message.metadata.is_visually_hidden_from_conversation:
-        return True
+    match message.author.role:
+        case "system":
+            return not message.metadata.is_user_system_message
 
-    # Hide internal system messages
-    if message.author.role == "system":
-        # Only show if explicitly marked as user system message (Custom Instructions)
-        return not message.metadata.is_user_system_message
+        case "tool":
+            match message.author.name:
+                case "bio" | "web.run" | "web.search":
+                    return True
+                case "browser":
+                    return message.content.content_type != "tether_quote"
+                case "dalle.text2im" if message.content.content_type == "text" and not message.images:
+                    return True
 
-    # Hide sonic_webpage (massive scraped text) and system_error
-    if message.content.content_type in ("sonic_webpage", "system_error"):
-        return True
+        case "assistant":
+            # Hide code interpreter input and internal tool calls
+            if message.content.content_type == "code":
+                return True
+            if message.recipient not in ("all", "python", None):
+                return True
 
-    if message.author.role == "tool":
-        # Hide memory updates (bio) and internal search orchestration (web.run)
-        if message.author.name in ("bio", "web.run", "web.search"):
-            return True
-
-        # Hide browser tool outputs (intermediate search steps)
-        # EXCEPTION: tether_quote (citations) should remain visible
-        if message.author.name == "browser":
-            return message.content.content_type != "tether_quote"
-
-        # Hide DALL-E textual status ("DALL·E displayed 1 images...")
-        if (
-            message.author.name == "dalle.text2im"
-            and message.content.content_type == "text"
-            and not message.images
-        ):
-            return True
-
-    # Hide assistant messages targeting tools (e.g., search(...), code input)
-    # recipient="all" or None means it's for the user; anything else is internal
-    # recipient="python" : code interpreter code (still hidden via content_type="code")
-    if message.author.role == "assistant" and message.recipient not in ("all", "python", None):
-        return True
-
-    # Hide code interpreter input (content_type="code")
-    if message.author.role == "assistant" and message.content.content_type == "code":
-        return True
-
-    # Hide browsing status and internal reasoning steps (o1/o3 models)
+    # Generic content type filters
     return message.content.content_type in (
+        "sonic_webpage",
+        "system_error",
         "tether_browsing_display",
         "thoughts",
         "reasoning_recap",

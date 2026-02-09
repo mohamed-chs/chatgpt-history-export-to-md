@@ -11,7 +11,6 @@ import pytest
 from convoviz.exceptions import InvalidZipError
 from convoviz.io.loaders import (
     find_latest_valid_zip,
-    find_latest_zip,
     find_script_export,
     load_collection_from_json,
     load_collection_from_zip,
@@ -117,44 +116,6 @@ class TestLoadCollectionFromJsonFormats:
         """Test that source_path is set correctly."""
         collection = load_collection_from_json(mock_conversations_json)
         assert collection.source_path == mock_conversations_json.parent
-
-
-class TestFindLatestZip:
-    """Tests for the find_latest_zip function."""
-
-    def test_finds_most_recent(self, tmp_path: Path) -> None:
-        """Test that the most recently created ZIP is found."""
-        # Create older zip
-        old_zip = tmp_path / "old_export.zip"
-        with ZipFile(old_zip, "w") as zf:
-            zf.writestr("conversations.json", "[]")
-
-        # Small delay to ensure different timestamps
-        time.sleep(0.01)
-
-        # Create newer zip
-        new_zip = tmp_path / "new_export.zip"
-        with ZipFile(new_zip, "w") as zf:
-            zf.writestr("conversations.json", "[]")
-
-        result = find_latest_zip(tmp_path)
-        assert result == new_zip
-
-    def test_returns_none_when_no_zips(self, tmp_path: Path) -> None:
-        """Test that None is returned when no ZIP files exist."""
-        # Create a non-zip file
-        (tmp_path / "not_a_zip.txt").write_text("hello")
-
-        result = find_latest_zip(tmp_path)
-        assert result is None
-
-    def test_returns_none_for_empty_directory(self, tmp_path: Path) -> None:
-        """Test that None is returned for empty directory."""
-        empty_dir = tmp_path / "empty"
-        empty_dir.mkdir()
-
-        result = find_latest_zip(empty_dir)
-        assert result is None
 
 
 class TestFindLatestValidZip:

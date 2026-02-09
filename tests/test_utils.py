@@ -7,7 +7,6 @@ import pytest
 from convoviz.exceptions import ConfigurationError
 from convoviz.utils import (
     deep_merge_dicts,
-    ensure_writable_dir,
     expand_path,
     normalize_optional_path,
     sanitize,
@@ -138,17 +137,11 @@ class TestPathNormalization:
 class TestWritableDirChecks:
     """Tests for writable directory validation helpers."""
 
-    def test_ensure_writable_dir_creates(self, tmp_path: Path) -> None:
+    def test_validate_writable_dir_creates(self, tmp_path: Path) -> None:
         target = tmp_path / "new" / "out"
-        ensure_writable_dir(target)
+        validate_writable_dir(target, create=True)
         assert target.exists()
         assert target.is_dir()
-
-    def test_ensure_writable_dir_rejects_file(self, tmp_path: Path) -> None:
-        target = tmp_path / "file.txt"
-        target.write_text("nope", encoding="utf-8")
-        with pytest.raises(ConfigurationError):
-            ensure_writable_dir(target)
 
     def test_validate_writable_dir_existing(self, tmp_path: Path) -> None:
         target = tmp_path / "existing"
@@ -157,7 +150,7 @@ class TestWritableDirChecks:
 
     def test_validate_writable_dir_does_not_create(self, tmp_path: Path) -> None:
         target = tmp_path / "new" / "out"
-        validate_writable_dir(target)
+        validate_writable_dir(target, create=False)
         assert not target.exists()
 
     def test_validate_writable_dir_rejects_file(self, tmp_path: Path) -> None:

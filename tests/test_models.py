@@ -9,11 +9,6 @@ from convoviz.models.message import Message, MessageAuthor, MessageContent, Mess
 from convoviz.models.node import Node, build_node_tree
 
 
-def test_leaf_count(mock_conversation: Conversation) -> None:
-    """Test leaf_count property."""
-    assert mock_conversation.leaf_count == 1
-
-
 def test_url(mock_conversation: Conversation) -> None:
     """Test url property."""
     assert mock_conversation.url == "https://chatgpt.com/c/conversation_111"
