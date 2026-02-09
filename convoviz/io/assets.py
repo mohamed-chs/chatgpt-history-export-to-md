@@ -53,9 +53,13 @@ def build_asset_index(source_dir: Path) -> AssetIndex:
         for user_dir in source_dir.glob("user-*"):
             if user_dir.is_dir():
                 try:
-                    files = tuple(p.resolve() for p in user_dir.iterdir() if p.is_file())
+                    files = tuple(
+                        p.resolve() for p in user_dir.iterdir() if p.is_file()
+                    )
                     user_files_by_dir[user_dir.resolve()] = files
-                    user_prefix_map_by_dir[user_dir.resolve()] = _build_prefix_map(files)
+                    user_prefix_map_by_dir[user_dir.resolve()] = _build_prefix_map(
+                        files
+                    )
                 except Exception:
                     continue
     except Exception:
@@ -131,7 +135,11 @@ def resolve_asset_path(
 
     # 1. Try exact match
     exact_path = (source_dir / asset_id).resolve()
-    if exact_path.exists() and exact_path.is_file() and exact_path.is_relative_to(source_dir):
+    if (
+        exact_path.exists()
+        and exact_path.is_file()
+        and exact_path.is_relative_to(source_dir)
+    ):
         logger.debug(f"Resolved asset (exact): {asset_id} -> {exact_path}")
         return exact_path
 
@@ -204,7 +212,9 @@ def resolve_asset_path(
                         if p.is_file() and p.resolve().is_relative_to(user_dir)
                     ]
                     if files:
-                        logger.debug(f"Resolved asset (user dir): {asset_id} -> {files[0]}")
+                        logger.debug(
+                            f"Resolved asset (user dir): {asset_id} -> {files[0]}"
+                        )
                         return files[0]
         except Exception:
             pass

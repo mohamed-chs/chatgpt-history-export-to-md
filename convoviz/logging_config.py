@@ -47,7 +47,9 @@ def setup_logging(
     # File handler
     if log_file is None:
         # Create temp file if not specified
-        with tempfile.NamedTemporaryFile(prefix="convoviz_", suffix=".log", delete=False) as tf:
+        with tempfile.NamedTemporaryFile(
+            prefix="convoviz_", suffix=".log", delete=False
+        ) as tf:
             log_file = Path(tf.name)
 
     # Ensure parent dir exists
@@ -56,7 +58,9 @@ def setup_logging(
 
     file_handler = logging.FileHandler(log_file, encoding="utf-8")
     file_handler.setLevel(logging.DEBUG)  # Always log DEBUG to file
-    file_formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+    file_formatter = logging.Formatter(
+        "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+    )
     file_handler.setFormatter(file_formatter)
     setattr(file_handler, "_convoviz_handler", True)  # noqa: B010
 

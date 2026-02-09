@@ -18,7 +18,10 @@ def extract_message_images(message: Any) -> list[str]:
 
     if message.content.parts:
         for part in message.content.parts:
-            if isinstance(part, dict) and part.get("content_type") == "image_asset_pointer":
+            if (
+                isinstance(part, dict)
+                and part.get("content_type") == "image_asset_pointer"
+            ):
                 pointer = part.get("asset_pointer", "")
                 # Strip prefixes like "file-service://" or "sediment://"
                 if pointer.startswith("file-service://"):
@@ -93,8 +96,14 @@ def extract_message_text(message: Any) -> str:
                     if message.recipient == "canmore.create_textdoc":
                         try:
                             data = json.loads(part)
-                            if isinstance(data, dict) and "content" in data and "name" in data:
-                                text_parts.append(_render_canvas(data["name"], data["content"]))
+                            if (
+                                isinstance(data, dict)
+                                and "content" in data
+                                and "name" in data
+                            ):
+                                text_parts.append(
+                                    _render_canvas(data["name"], data["content"])
+                                )
                                 continue
                         except (json.JSONDecodeError, TypeError):
                             pass

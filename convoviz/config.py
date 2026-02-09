@@ -129,7 +129,9 @@ class ConvovizConfig(BaseModel):
 
     input_path: Path | None = None
     bookmarklet_path: Path | None = None
-    output_folder: Path = Field(default_factory=lambda: Path.home() / "Documents" / "ChatGPT-Data")
+    output_folder: Path = Field(
+        default_factory=lambda: Path.home() / "Documents" / "ChatGPT-Data"
+    )
     quiet: bool = False
     folder_organization: FolderOrganization = FolderOrganization.DATE
     outputs: set[OutputKind] = Field(default_factory=lambda: set(ALL_OUTPUTS))
@@ -177,7 +179,11 @@ def _normalize_config_data(data: Any) -> Any:
             if key in PATH_KEYS:
                 normalized[key] = normalize_optional_path(value)
                 continue
-            if key in NONE_IF_EMPTY_KEYS and isinstance(value, str) and not value.strip():
+            if (
+                key in NONE_IF_EMPTY_KEYS
+                and isinstance(value, str)
+                and not value.strip()
+            ):
                 normalized[key] = None
                 continue
             normalized[key] = _normalize_config_data(value)
@@ -196,7 +202,9 @@ def get_default_config_text() -> str:
 @lru_cache(maxsize=1)
 def get_default_config_data() -> dict[str, Any]:
     """Return the default configuration data loaded from TOML."""
-    return _normalize_config_data(_load_toml_bytes(get_default_config_text().encode("utf-8")))
+    return _normalize_config_data(
+        _load_toml_bytes(get_default_config_text().encode("utf-8"))
+    )
 
 
 def get_default_config() -> ConvovizConfig:

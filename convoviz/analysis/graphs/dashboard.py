@@ -111,13 +111,18 @@ def generate_summary_dashboard(
         ax_ts.xaxis.set_major_locator(locator)
         ax_ts.xaxis.set_major_formatter(mdates.ConciseDateFormatter(locator))
         ax_ts.set_title(
-            "Monthly activity (user prompts)", fontproperties=font_prop, fontsize=13, pad=10
+            "Monthly activity (user prompts)",
+            fontproperties=font_prop,
+            fontsize=13,
+            pad=10,
         )
         ax_ts.set_ylabel("User prompts", fontproperties=font_prop)
         ax_ts.set_xlabel(f"Month ({tz_label(cfg)})", fontproperties=font_prop)
         apply_tick_font(ax_ts, font_prop)
     else:
-        ax_ts.text(0.5, 0.5, "No data", ha="center", va="center", fontproperties=font_prop)
+        ax_ts.text(
+            0.5, 0.5, "No data", ha="center", va="center", fontproperties=font_prop
+        )
         ax_ts.set_axis_off()
 
     # Heatmap
@@ -140,7 +145,9 @@ def generate_summary_dashboard(
         ax_heat.set_xlabel("Hour", fontproperties=font_prop)
         ax_heat.set_ylabel("Weekday", fontproperties=font_prop)
         ax_heat.set_xticks(list(range(0, 24, 3)))
-        ax_heat.set_xticklabels([f"{h:02d}" for h in range(0, 24, 3)], fontproperties=font_prop)
+        ax_heat.set_xticklabels(
+            [f"{h:02d}" for h in range(0, 24, 3)], fontproperties=font_prop
+        )
         ax_heat.set_yticks(list(range(7)))
         ax_heat.set_yticklabels(WEEKDAYS, fontproperties=font_prop)
         cbar = fig.colorbar(img, ax=ax_heat, fraction=0.046, pad=0.04)
@@ -148,7 +155,9 @@ def generate_summary_dashboard(
         for t in cbar.ax.get_yticklabels():
             t.set_fontproperties(font_prop)
     else:
-        ax_heat.text(0.5, 0.5, "No data", ha="center", va="center", fontproperties=font_prop)
+        ax_heat.text(
+            0.5, 0.5, "No data", ha="center", va="center", fontproperties=font_prop
+        )
         ax_heat.set_axis_off()
 
     # Model usage
@@ -180,7 +189,9 @@ def generate_summary_dashboard(
             )
         apply_tick_font(ax_model, font_prop)
     else:
-        ax_model.text(0.5, 0.5, "No data", ha="center", va="center", fontproperties=font_prop)
+        ax_model.text(
+            0.5, 0.5, "No data", ha="center", va="center", fontproperties=font_prop
+        )
         ax_model.set_axis_off()
 
     # Conversation length mini-hist
@@ -198,16 +209,22 @@ def generate_summary_dashboard(
             edgecolor="white",
             linewidth=0.5,
         )
-        ax_len.set_title("Conversation length", fontproperties=font_prop, fontsize=13, pad=10)
+        ax_len.set_title(
+            "Conversation length", fontproperties=font_prop, fontsize=13, pad=10
+        )
         ax_len.set_xlabel("User prompts", fontproperties=font_prop)
         ax_len.set_ylabel("Conversations", fontproperties=font_prop)
         ax_len.set_xlim(left=0, right=cap)
         apply_tick_font(ax_len, font_prop)
     else:
-        ax_len.text(0.5, 0.5, "No data", ha="center", va="center", fontproperties=font_prop)
+        ax_len.text(
+            0.5, 0.5, "No data", ha="center", va="center", fontproperties=font_prop
+        )
         ax_len.set_axis_off()
 
-    fig.subplots_adjust(top=0.93, left=0.06, right=0.98, bottom=0.06, hspace=0.4, wspace=0.25)
+    fig.subplots_adjust(
+        top=0.93, left=0.06, right=0.98, bottom=0.06, hspace=0.4, wspace=0.25
+    )
     return fig
 
 
@@ -234,7 +251,11 @@ def generate_summary_graphs(
     logger.info(f"Generating summary graphs to {output_dir}")
 
     tasks: list[tuple[str, str, Callable[[], Figure]]] = [
-        ("Overview", "overview.png", lambda: generate_summary_dashboard(collection, cfg)),
+        (
+            "Overview",
+            "overview.png",
+            lambda: generate_summary_dashboard(collection, cfg),
+        ),
         (
             "Activity heatmap",
             "activity_heatmap.png",
@@ -250,7 +271,11 @@ def generate_summary_graphs(
             "monthly_activity.png",
             lambda: generate_monthly_activity_barplot(collection, cfg),
         ),
-        ("Model usage", "model_usage.png", lambda: generate_model_piechart(collection, cfg)),
+        (
+            "Model usage",
+            "model_usage.png",
+            lambda: generate_model_piechart(collection, cfg),
+        ),
         (
             "Conversation lengths",
             "conversation_lengths.png",

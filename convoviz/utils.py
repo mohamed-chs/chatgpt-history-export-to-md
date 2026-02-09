@@ -192,7 +192,9 @@ def normalize_optional_path(value: str | Path | None) -> Path | None:
     return expand_path(stripped)
 
 
-def deep_merge_dicts(base: Mapping[str, Any], override: Mapping[str, Any]) -> dict[str, Any]:
+def deep_merge_dicts(
+    base: Mapping[str, Any], override: Mapping[str, Any]
+) -> dict[str, Any]:
     """Deep-merge mapping values, preferring values from override."""
     merged: dict[str, Any] = dict(base)
     for key, value in override.items():
@@ -216,7 +218,9 @@ def validate_writable_dir(path: Path, create: bool = False) -> None:
 
     def test_write(target: Path) -> None:
         try:
-            with tempfile.NamedTemporaryFile(dir=target, prefix=".convoviz_test_", delete=True):
+            with tempfile.NamedTemporaryFile(
+                dir=target, prefix=".convoviz_test_", delete=True
+            ):
                 pass
         except OSError as exc:
             raise ConfigurationError(f"Directory not writable: {target}") from exc

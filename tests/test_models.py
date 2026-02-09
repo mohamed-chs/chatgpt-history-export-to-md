@@ -5,7 +5,12 @@ from datetime import UTC, datetime, timedelta
 
 from convoviz.models import Conversation
 from convoviz.models.collection import ConversationCollection
-from convoviz.models.message import Message, MessageAuthor, MessageContent, MessageMetadata
+from convoviz.models.message import (
+    Message,
+    MessageAuthor,
+    MessageContent,
+    MessageMetadata,
+)
 from convoviz.models.node import Node, build_node_tree
 
 
@@ -54,7 +59,12 @@ def test_plugins_sorted_and_safe_namespace() -> None:
         create_time=ts,
         update_time=ts,
         mapping={
-            "root": {"id": "root", "message": None, "parent": None, "children": ["tool_a"]},
+            "root": {
+                "id": "root",
+                "message": None,
+                "parent": None,
+                "children": ["tool_a"],
+            },
             "tool_a": {
                 "id": "tool_a",
                 "message": {
@@ -144,7 +154,12 @@ def test_conversation_citation_map_aggregates_metadata_groups() -> None:
         create_time=ts,
         update_time=ts,
         mapping={
-            "root": {"id": "root", "message": None, "parent": None, "children": ["tool_node"]},
+            "root": {
+                "id": "root",
+                "message": None,
+                "parent": None,
+                "children": ["tool_node"],
+            },
             "tool_node": {
                 "id": "tool_node",
                 "message": {
@@ -274,7 +289,9 @@ def test_message_visibility() -> None:
     # Case 6: Browsing status (hidden)
     msg = Message(
         author=MessageAuthor(role="assistant"),
-        content=MessageContent(content_type="tether_browsing_display", parts=["Browsing..."]),
+        content=MessageContent(
+            content_type="tether_browsing_display", parts=["Browsing..."]
+        ),
         metadata=MessageMetadata(),
         **base_data,
     )
@@ -320,7 +337,9 @@ def test_collection_update_merges_new_conversations_even_if_older(
     assert "conversation_222" in ids
 
 
-def test_collection_update_keeps_newest_when_ids_collide(mock_conversation: Conversation) -> None:
+def test_collection_update_keeps_newest_when_ids_collide(
+    mock_conversation: Conversation,
+) -> None:
     """When IDs collide, the newest update_time should win."""
     base = ConversationCollection(conversations=[mock_conversation])
 
@@ -328,7 +347,9 @@ def test_collection_update_keeps_newest_when_ids_collide(mock_conversation: Conv
     updated.update_time = updated.update_time.replace(year=updated.update_time.year + 1)
 
     base.update(ConversationCollection(conversations=[updated]))
-    assert base.index[mock_conversation.conversation_id].update_time == updated.update_time
+    assert (
+        base.index[mock_conversation.conversation_id].update_time == updated.update_time
+    )
 
 
 def test_message_visibility_extended() -> None:
@@ -386,7 +407,9 @@ def test_new_content_types() -> None:
     # Case 1: reasoning_recap content type (hidden by default - internal reasoning)
     msg = Message(
         author=MessageAuthor(role="assistant"),
-        content=MessageContent(content_type="reasoning_recap", content="I reasoned about X"),
+        content=MessageContent(
+            content_type="reasoning_recap", content="I reasoned about X"
+        ),
         metadata=MessageMetadata(),
         **base_data,
     )
@@ -639,7 +662,10 @@ class TestConversationCustomInstructions:
                         "author": {"role": "system", "metadata": {}},
                         "create_time": ts,
                         "update_time": ts,
-                        "content": {"content_type": "text", "parts": ["Custom instructions"]},
+                        "content": {
+                            "content_type": "text",
+                            "parts": ["Custom instructions"],
+                        },
                         "status": "finished_successfully",
                         "end_turn": True,
                         "weight": 1.0,
@@ -673,7 +699,9 @@ class TestConversationCustomInstructions:
 class TestCollectionGrouping:
     """Tests for ConversationCollection grouping methods."""
 
-    def _make_collection_with_dates(self, dates: list[datetime]) -> ConversationCollection:
+    def _make_collection_with_dates(
+        self, dates: list[datetime]
+    ) -> ConversationCollection:
         """Helper to create a collection with conversations at specific dates."""
         conversations = []
         for i, dt in enumerate(dates):
@@ -759,7 +787,9 @@ class TestCollectionProperties:
         collection = ConversationCollection()
         assert collection.last_updated == datetime.min
 
-    def test_last_updated_with_conversations(self, mock_conversation: Conversation) -> None:
+    def test_last_updated_with_conversations(
+        self, mock_conversation: Conversation
+    ) -> None:
         """Test last_updated returns most recent update_time."""
         collection = ConversationCollection(conversations=[mock_conversation])
         assert collection.last_updated == mock_conversation.update_time

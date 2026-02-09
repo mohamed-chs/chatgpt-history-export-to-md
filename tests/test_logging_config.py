@@ -25,12 +25,16 @@ def test_setup_logging_replaces_handlers(tmp_path: Path) -> None:
     log_path = tmp_path / "convoviz.log"
     setup_logging(log_file=log_path)
     first_handlers = [
-        h for h in logging.getLogger().handlers if getattr(h, "_convoviz_handler", False)
+        h
+        for h in logging.getLogger().handlers
+        if getattr(h, "_convoviz_handler", False)
     ]
 
     setup_logging(log_file=log_path)
     second_handlers = [
-        h for h in logging.getLogger().handlers if getattr(h, "_convoviz_handler", False)
+        h
+        for h in logging.getLogger().handlers
+        if getattr(h, "_convoviz_handler", False)
     ]
 
     assert len(second_handlers) == 2

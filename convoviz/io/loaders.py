@@ -179,7 +179,9 @@ def find_latest_valid_zip(directory: Path | None = None) -> Path | None:
     if directory is None:
         directory = Path.home() / "Downloads"
 
-    zip_files = [p for p in directory.iterdir() if p.is_file() and p.suffix.lower() == ".zip"]
+    zip_files = [
+        p for p in directory.iterdir() if p.is_file() and p.suffix.lower() == ".zip"
+    ]
     if not zip_files:
         return None
 

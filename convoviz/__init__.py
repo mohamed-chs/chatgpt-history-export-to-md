@@ -6,22 +6,19 @@ from convoviz.models import Conversation, ConversationCollection, Message, Node
 from convoviz.pipeline import run_pipeline
 
 __all__ = [
-    # Submodules
-    "analysis",
-    "config",
-    "io",
-    "models",
-    "renderers",
-    "utils",
-    # Main classes
     "Conversation",
     "ConversationCollection",
     "ConvovizConfig",
     "Message",
     "Node",
-    # Functions
+    "analysis",
+    "config",
     "get_default_config",
+    "io",
+    "models",
+    "renderers",
     "run_pipeline",
+    "utils",
 ]
 
 

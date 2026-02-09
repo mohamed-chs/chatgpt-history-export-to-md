@@ -104,13 +104,20 @@ def test_output_kind_enum() -> None:
 
 def test_all_outputs_constant() -> None:
     """Test ALL_OUTPUTS contains all output kinds."""
-    assert frozenset({OutputKind.MARKDOWN, OutputKind.GRAPHS, OutputKind.WORDCLOUDS}) == ALL_OUTPUTS
+    assert (
+        frozenset({OutputKind.MARKDOWN, OutputKind.GRAPHS, OutputKind.WORDCLOUDS})
+        == ALL_OUTPUTS
+    )
 
 
 def test_default_outputs() -> None:
     """Test that default config includes all outputs."""
     config = get_default_config()
-    assert config.outputs == {OutputKind.MARKDOWN, OutputKind.GRAPHS, OutputKind.WORDCLOUDS}
+    assert config.outputs == {
+        OutputKind.MARKDOWN,
+        OutputKind.GRAPHS,
+        OutputKind.WORDCLOUDS,
+    }
 
 
 def test_outputs_can_be_modified() -> None:

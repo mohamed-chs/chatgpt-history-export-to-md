@@ -11,7 +11,12 @@ from orjson import OPT_INDENT_2, dumps
 from tqdm import tqdm
 
 from convoviz.config import AuthorHeaders, ConversationConfig, FolderOrganization
-from convoviz.io.assets import AssetIndex, build_asset_index, copy_asset, resolve_asset_path
+from convoviz.io.assets import (
+    AssetIndex,
+    build_asset_index,
+    copy_asset,
+    resolve_asset_path,
+)
 from convoviz.models import Conversation, ConversationCollection
 from convoviz.renderers import render_conversation
 from convoviz.utils import sanitize
@@ -106,13 +111,17 @@ def _build_markdown_filename(
     max_length: int = 255,
 ) -> str:
     sanitized_title = sanitize(title)
-    prefix = f"{create_time.strftime('%Y-%m-%d_%H-%M-%S')} - " if prepend_timestamp else ""
+    prefix = (
+        f"{create_time.strftime('%Y-%m-%d_%H-%M-%S')} - " if prepend_timestamp else ""
+    )
     available = max_length - len(prefix) - len(suffix)
     if available < 1:
         truncated = "untitled"
     else:
         truncated = (
-            sanitized_title[:available] if len(sanitized_title) > available else sanitized_title
+            sanitized_title[:available]
+            if len(sanitized_title) > available
+            else sanitized_title
         )
     return f"{prefix}{truncated}{suffix}"
 
@@ -171,7 +180,9 @@ def save_conversation(
         return None
 
     # Render and write
-    markdown = render_conversation(conversation, config, headers, asset_resolver=asset_resolver)
+    markdown = render_conversation(
+        conversation, config, headers, asset_resolver=asset_resolver
+    )
     with final_path.open("w", encoding="utf-8") as f:
         f.write(markdown)
     logger.debug(f"Saved conversation: {final_path}")
@@ -213,7 +224,9 @@ def _generate_year_index(year_dir: Path, year: str) -> None:
 
 def _generate_root_index(root_dir: Path) -> None:
     """Generate a top-level _index.md that links to year indexes."""
-    years = sorted([d.name for d in root_dir.iterdir() if d.is_dir() and d.name.isdigit()])
+    years = sorted(
+        [d.name for d in root_dir.iterdir() if d.is_dir() and d.name.isdigit()]
+    )
     if not years:
         return
 
@@ -286,7 +299,9 @@ def save_collection(
 
     asset_indexes: dict[Path, AssetIndex] | None = None
     if collection.source_paths:
-        asset_indexes = {path: build_asset_index(path) for path in collection.source_paths}
+        asset_indexes = {
+            path: build_asset_index(path) for path in collection.source_paths
+        }
 
     for conv in tqdm(
         collection.conversations,

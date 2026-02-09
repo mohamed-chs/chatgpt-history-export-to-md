@@ -219,7 +219,9 @@ class TestRenderConversation:
         assert "# ChatGPT" in markdown
         assert "assistant message 111" in markdown
 
-    def test_render_conversation_active_branch(self, branching_conversation: Conversation) -> None:
+    def test_render_conversation_active_branch(
+        self, branching_conversation: Conversation
+    ) -> None:
         """Test that active-branch rendering excludes alternate branches."""
         config = ConversationConfig()
         config.markdown.render_order = "active"
@@ -231,7 +233,9 @@ class TestRenderConversation:
         assert "Sure thing! What do you need?" in markdown
         assert "Of course! How can I assist you?" not in markdown
 
-    def test_render_conversation_full_branch(self, branching_conversation: Conversation) -> None:
+    def test_render_conversation_full_branch(
+        self, branching_conversation: Conversation
+    ) -> None:
         """Test that full DAG rendering includes alternate branches."""
         config = ConversationConfig()
         config.markdown.render_order = "full"
@@ -280,7 +284,10 @@ class TestRenderConversation:
                         "author": {"role": "assistant", "metadata": {}},
                         "create_time": datetime(2024, 1, 1).timestamp(),
                         "update_time": datetime(2024, 1, 1).timestamp(),
-                        "content": {"content_type": "text", "parts": ["Orphan message"]},
+                        "content": {
+                            "content_type": "text",
+                            "parts": ["Orphan message"],
+                        },
                         "status": "finished_successfully",
                         "end_turn": True,
                         "weight": 1.0,
@@ -303,7 +310,9 @@ class TestRenderConversation:
 
         assert "Orphan message" in markdown
 
-    def test_render_conversation_with_images(self, mock_conversation: Conversation) -> None:
+    def test_render_conversation_with_images(
+        self, mock_conversation: Conversation
+    ) -> None:
         """Test conversation rendering with image assets."""
         config = ConversationConfig()
         headers = AuthorHeaders()
@@ -311,7 +320,10 @@ class TestRenderConversation:
         # Mock an image in the message (use a user node as system nodes are hidden by default)
         user_nodes = mock_conversation.nodes_by_author("user")
         user_nodes[0].message.content.parts = [
-            {"content_type": "image_asset_pointer", "asset_pointer": "file-service://file-123"}
+            {
+                "content_type": "image_asset_pointer",
+                "asset_pointer": "file-service://file-123",
+            }
         ]
 
         def mock_resolver(asset_id: str, _name: str | None = None) -> str | None:
@@ -325,7 +337,9 @@ class TestRenderConversation:
 
         assert "![Image](assets/file-123.png)" in markdown
 
-    def test_render_conversation_timestamps(self, mock_conversation: Conversation) -> None:
+    def test_render_conversation_timestamps(
+        self, mock_conversation: Conversation
+    ) -> None:
         """Test timestamp rendering in conversation."""
         config = ConversationConfig()
         headers = AuthorHeaders()
@@ -348,7 +362,9 @@ class TestRenderConversation:
             markdown.count("2023-07-29") == 3
         )  # Twice in YAML (create/update), once in User message
 
-    def test_render_conversation_no_timestamps(self, mock_conversation: Conversation) -> None:
+    def test_render_conversation_no_timestamps(
+        self, mock_conversation: Conversation
+    ) -> None:
         """Test that timestamps can be disabled."""
         config = ConversationConfig()
         config.markdown.show_timestamp = False
@@ -358,7 +374,9 @@ class TestRenderConversation:
         assert "*2023-07-29 08:00:00*" not in markdown
         assert "*08:05:00*" not in markdown
 
-    def test_render_conversation_date_change(self, mock_conversation: Conversation) -> None:
+    def test_render_conversation_date_change(
+        self, mock_conversation: Conversation
+    ) -> None:
         """Test that full date is shown when it changes between messages."""
         # Modify assistant message to be on the next day
         assistant_node = mock_conversation.mapping["assistant_node_111"]

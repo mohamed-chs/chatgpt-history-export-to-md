@@ -125,7 +125,9 @@ def run(
     if config_path:
         config_path_obj = expand_path(config_path)
         if not config_path_obj.exists() or not config_path_obj.is_file():
-            console.print(f"[bold red]Error:[/bold red] Config file not found: {config_path_obj}")
+            console.print(
+                f"[bold red]Error:[/bold red] Config file not found: {config_path_obj}"
+            )
             raise typer.Exit(code=1)
 
     try:
@@ -166,7 +168,9 @@ def run(
             latest = find_latest_valid_zip()
             if latest:
                 if not config.quiet:
-                    console.print(f"No input specified, using latest zip found: {latest}")
+                    console.print(
+                        f"No input specified, using latest zip found: {latest}"
+                    )
                 config.input_path = latest
             else:
                 console.print(

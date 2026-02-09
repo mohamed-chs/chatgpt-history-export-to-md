@@ -61,7 +61,9 @@ class Conversation(BaseModel):
         return [
             node
             for node in self.node_mapping.values()
-            if node.has_message and node.message is not None and not node.message.is_hidden
+            if node.has_message
+            and node.message is not None
+            and not node.message.is_hidden
         ]
 
     def _sorted_message_nodes(self, *, include_hidden: bool) -> list[Node]:
@@ -81,7 +83,9 @@ class Conversation(BaseModel):
 
         return sorted(nodes, key=sort_key)
 
-    def nodes_by_author(self, *authors: AuthorRole, include_hidden: bool = False) -> list[Node]:
+    def nodes_by_author(
+        self, *authors: AuthorRole, include_hidden: bool = False
+    ) -> list[Node]:
         """Get nodes with messages from specified authors.
 
         Args:
@@ -91,7 +95,11 @@ class Conversation(BaseModel):
         if not authors:
             authors = ("user",)
         nodes = self.all_message_nodes if include_hidden else self.visible_message_nodes
-        return [node for node in nodes if node.message and node.message.author.role in authors]
+        return [
+            node
+            for node in nodes
+            if node.message and node.message.author.role in authors
+        ]
 
     @property
     def url(self) -> str:
@@ -118,7 +126,11 @@ class Conversation(BaseModel):
         """Get the ChatGPT model used for this conversation."""
         for node in self._sorted_message_nodes(include_hidden=True):
             message = node.message
-            if message and message.author.role == "assistant" and message.metadata.model_slug:
+            if (
+                message
+                and message.author.role == "assistant"
+                and message.metadata.model_slug
+            ):
                 return message.metadata.model_slug
         return None
 
@@ -206,12 +218,16 @@ class Conversation(BaseModel):
     @property
     def month_start(self) -> datetime:
         """Get the first day of the month this conversation was created."""
-        return self.create_time.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+        return self.create_time.replace(
+            day=1, hour=0, minute=0, second=0, microsecond=0
+        )
 
     @property
     def year_start(self) -> datetime:
         """Get January 1st of the year this conversation was created."""
-        return self.create_time.replace(month=1, day=1, hour=0, minute=0, second=0, microsecond=0)
+        return self.create_time.replace(
+            month=1, day=1, hour=0, minute=0, second=0, microsecond=0
+        )
 
     @property
     def citation_map(self) -> dict[str, dict[str, str | None]]:

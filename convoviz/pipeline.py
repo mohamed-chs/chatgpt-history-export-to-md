@@ -49,7 +49,9 @@ def run_pipeline(config: ConvovizConfig) -> None:
 
     logger.info(f"Starting pipeline with input: {input_path}")
     if not config.quiet:
-        console.print(f"Loading data from {input_path} [bold yellow]📂[/bold yellow] ...\n")
+        console.print(
+            f"Loading data from {input_path} [bold yellow]📂[/bold yellow] ...\n"
+        )
 
     output_dir_map: dict[OutputKind, str] = {
         OutputKind.MARKDOWN: "Markdown",
@@ -72,7 +74,9 @@ def run_pipeline(config: ConvovizConfig) -> None:
         else:
             # Assume zip
             collection = load_collection_from_zip(input_path)
-        logger.info(f"Loaded collection with {len(collection.conversations)} conversations")
+        logger.info(
+            f"Loaded collection with {len(collection.conversations)} conversations"
+        )
 
         # Try to merge script export if explicitly specified
         if config.bookmarklet_path:
@@ -143,7 +147,9 @@ def run_pipeline(config: ConvovizConfig) -> None:
         if config.export_custom_instructions:
             from convoviz.io import save_custom_instructions
 
-            save_custom_instructions(collection, output_folder / "custom_instructions.json")
+            save_custom_instructions(
+                collection, output_folder / "custom_instructions.json"
+            )
             logger.info("Custom instructions exported")
             if not config.quiet:
                 console.print(

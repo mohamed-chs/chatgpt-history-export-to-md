@@ -99,7 +99,10 @@ def mock_conversation_data() -> dict:
                     "author": {"role": "system", "metadata": {}},
                     "create_time": DATETIME_111.timestamp(),
                     "update_time": DATETIME_111.timestamp(),
-                    "content": {"content_type": "text", "parts": ["system message 111"]},
+                    "content": {
+                        "content_type": "text",
+                        "parts": ["system message 111"],
+                    },
                     "status": "finished_successfully",
                     "end_turn": True,
                     "weight": 1.0,
@@ -133,7 +136,10 @@ def mock_conversation_data() -> dict:
                     "author": {"role": "assistant", "metadata": {}},
                     "create_time": DATETIME_112.timestamp(),
                     "update_time": DATETIME_112.timestamp(),
-                    "content": {"content_type": "text", "parts": ["assistant message 111"]},
+                    "content": {
+                        "content_type": "text",
+                        "parts": ["assistant message 111"],
+                    },
                     "status": "finished_successfully",
                     "end_turn": True,
                     "weight": 1.0,

@@ -46,7 +46,9 @@ def replace_citations(
     # 1. Handle Tether v4 (Index-based replacements)
     if citations:
         # Sort citations by start_ix descending to replace safely from end
-        sorted_citations = sorted(citations, key=lambda c: c.get("start_ix", 0), reverse=True)
+        sorted_citations = sorted(
+            citations, key=lambda c: c.get("start_ix", 0), reverse=True
+        )
 
         for cit in sorted_citations:
             start = cit.get("start_ix")
@@ -137,7 +139,9 @@ def close_code_blocks(text: str) -> str:
         open_fences.append((fence_char, fence_len))
 
     if open_fences:
-        closures = "\n".join(f"{char * length}" for char, length in reversed(open_fences))
+        closures = "\n".join(
+            f"{char * length}" for char, length in reversed(open_fences)
+        )
         text += f"\n{closures}"
 
     return text
@@ -218,7 +222,11 @@ def replace_latex_delimiters(text: str) -> str:
 
             if open_fences:
                 open_char, open_len = open_fences[-1]
-                if fence_char == open_char and fence_len >= open_len and rest.strip() == "":
+                if (
+                    fence_char == open_char
+                    and fence_len >= open_len
+                    and rest.strip() == ""
+                ):
                     open_fences.pop()
             else:
                 open_fences.append((fence_char, fence_len))
@@ -376,7 +384,9 @@ def render_node(
     content_type = message.content.content_type
 
     # 1. Obsidian-specific collapsible callouts for "hidden" reasoning types
-    if flavor == "obsidian" and (callout_info := OBSIDIAN_COLLAPSIBLE_TYPES.get(content_type)):
+    if flavor == "obsidian" and (
+        callout_info := OBSIDIAN_COLLAPSIBLE_TYPES.get(content_type)
+    ):
         try:
             text = message.text
             if text.strip():

@@ -20,7 +20,9 @@ class FakePrompt[T]:
         return self._result
 
 
-def test_ctrl_c_on_first_prompt_aborts_interactive(monkeypatch: pytest.MonkeyPatch) -> None:
+def test_ctrl_c_on_first_prompt_aborts_interactive(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     import convoviz.interactive as interactive
 
     monkeypatch.setattr(interactive, "find_latest_valid_zip", lambda: None)
@@ -73,7 +75,9 @@ def test_ctrl_c_on_outputs_checkbox_aborts_interactive(
         run_interactive_config(get_default_config())
 
 
-def test_outputs_selection_sets_config(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+def test_outputs_selection_sets_config(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
     """Test that output selection correctly sets config.outputs."""
     import convoviz.interactive as interactive
 
@@ -221,7 +225,9 @@ def test_markdown_prompts_skipped_when_not_selected(
     assert config.outputs == {OutputKind.GRAPHS}
 
 
-def test_outputs_prompt_respects_existing_config(monkeypatch: pytest.MonkeyPatch) -> None:
+def test_outputs_prompt_respects_existing_config(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     """Test that the outputs prompt respects the pre-existing configuration."""
     import convoviz.interactive as interactive
 
@@ -263,7 +269,9 @@ def test_outputs_prompt_respects_existing_config(monkeypatch: pytest.MonkeyPatch
     assert graphs_choice.checked is False
 
 
-def test_script_export_merge_prompt(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+def test_script_export_merge_prompt(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
     """Test that the script export merge prompt appears and sets config."""
     import convoviz.interactive as interactive
 
@@ -275,7 +283,9 @@ def test_script_export_merge_prompt(monkeypatch: pytest.MonkeyPatch, tmp_path: P
 
     # Mock other prompts
     path_answers = iter(["dummy.zip", str(tmp_path / "out")])
-    monkeypatch.setattr(interactive, "qst_path", lambda *_a, **_k: FakePrompt(next(path_answers)))
+    monkeypatch.setattr(
+        interactive, "qst_path", lambda *_a, **_k: FakePrompt(next(path_answers))
+    )
     checkbox_call_count = [0]
 
     def fake_checkbox(*_a, **_k):
@@ -308,7 +318,9 @@ def test_script_export_merge_prompt_declined(
 
     # Mock other prompts
     path_answers = iter(["dummy.zip", str(tmp_path / "out")])
-    monkeypatch.setattr(interactive, "qst_path", lambda *_a, **_k: FakePrompt(next(path_answers)))
+    monkeypatch.setattr(
+        interactive, "qst_path", lambda *_a, **_k: FakePrompt(next(path_answers))
+    )
     checkbox_call_count = [0]
 
     def fake_checkbox(*_a, **_k):
@@ -341,7 +353,9 @@ def test_script_export_merge_prompt_skipped_if_manually_selected(
 
     # Mock other prompts
     # User selects the export_path as their main input
-    monkeypatch.setattr(interactive, "qst_path", lambda *_a, **_k: FakePrompt(str(export_path)))
+    monkeypatch.setattr(
+        interactive, "qst_path", lambda *_a, **_k: FakePrompt(str(export_path))
+    )
     checkbox_call_count = [0]
 
     def fake_checkbox(*_a, **_k):

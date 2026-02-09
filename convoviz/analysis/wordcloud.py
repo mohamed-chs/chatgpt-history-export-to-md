@@ -42,7 +42,9 @@ def load_programming_stopwords() -> frozenset[str]:
 
     with open(stopwords_path, encoding="utf-8") as f:
         return frozenset(
-            line.strip().lower() for line in f if line.strip() and not line.strip().startswith("#")
+            line.strip().lower()
+            for line in f
+            if line.strip() and not line.strip().startswith("#")
         )
 
 
@@ -199,8 +201,12 @@ def generate_wordclouds(
     import multiprocessing
 
     mp_context = multiprocessing.get_context("spawn")
-    logger.debug(f"Starting wordcloud generation with {max_workers} workers for {len(tasks)} tasks")
-    with ProcessPoolExecutor(max_workers=max_workers, mp_context=mp_context) as executor:
+    logger.debug(
+        f"Starting wordcloud generation with {max_workers} workers for {len(tasks)} tasks"
+    )
+    with ProcessPoolExecutor(
+        max_workers=max_workers, mp_context=mp_context
+    ) as executor:
         list(
             tqdm(
                 executor.map(_generate_and_save_wordcloud, tasks),

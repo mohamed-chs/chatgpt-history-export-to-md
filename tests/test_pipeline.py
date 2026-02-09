@@ -38,7 +38,9 @@ def test_run_pipeline(mock_zip_file: Path, tmp_path: Path) -> None:
 
         # Check if markdown file was created (in date folder by default)
         # The mock conversation is dated July 29, 2023 -> 2023/07-July/
-        assert (output_dir / "Markdown" / "2023" / "07-July" / "conversation 111.md").exists()
+        assert (
+            output_dir / "Markdown" / "2023" / "07-July" / "conversation 111.md"
+        ).exists()
 
         # Check that index files were generated
         assert (output_dir / "Markdown" / "_index.md").exists()
@@ -84,7 +86,9 @@ def test_run_pipeline_markdown_only(mock_zip_file: Path, tmp_path: Path) -> None
     assert not (output_dir / "Wordclouds").exists()
 
     # Check markdown file exists
-    assert (output_dir / "Markdown" / "2023" / "07-July" / "conversation 111.md").exists()
+    assert (
+        output_dir / "Markdown" / "2023" / "07-July" / "conversation 111.md"
+    ).exists()
 
 
 def test_run_pipeline_graphs_only(mock_zip_file: Path, tmp_path: Path) -> None:
@@ -173,7 +177,10 @@ def test_run_pipeline_extras_without_outputs(tmp_path: Path) -> None:
                         "author": {"role": "system", "metadata": {}},
                         "create_time": 1700000000.0,
                         "update_time": 1700000000.0,
-                        "content": {"content_type": "text", "parts": ["Custom instructions"]},
+                        "content": {
+                            "content_type": "text",
+                            "parts": ["Custom instructions"],
+                        },
                         "status": "finished_successfully",
                         "end_turn": True,
                         "weight": 1.0,
@@ -195,7 +202,9 @@ def test_run_pipeline_extras_without_outputs(tmp_path: Path) -> None:
                         "update_time": 1700000000.0,
                         "content": {
                             "content_type": "text",
-                            "parts": [{"name": "doc", "type": "text/plain", "content": "hi"}],
+                            "parts": [
+                                {"name": "doc", "type": "text/plain", "content": "hi"}
+                            ],
                         },
                         "status": "finished_successfully",
                         "end_turn": True,
@@ -212,7 +221,9 @@ def test_run_pipeline_extras_without_outputs(tmp_path: Path) -> None:
             "conversation_id": "conv_extras",
         }
     ]
-    (input_dir / "conversations.json").write_text(json.dumps(conversations), encoding="utf-8")
+    (input_dir / "conversations.json").write_text(
+        json.dumps(conversations), encoding="utf-8"
+    )
 
     output_dir = tmp_path / "output"
     config = get_default_config()

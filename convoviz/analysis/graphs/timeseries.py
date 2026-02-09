@@ -51,9 +51,13 @@ def generate_week_barplot(
 
     bars = ax.bar(x, y, color=cfg.color, alpha=0.9, width=0.72)
     if cfg.show_counts:
-        ax.bar_label(bars, padding=3, fontsize=9, fontproperties=font_prop, color="#24292f")
+        ax.bar_label(
+            bars, padding=3, fontsize=9, fontproperties=font_prop, color="#24292f"
+        )
 
-    ax.set_title(f"{title} · Weekday pattern", fontproperties=font_prop, fontsize=14, pad=14)
+    ax.set_title(
+        f"{title} · Weekday pattern", fontproperties=font_prop, fontsize=14, pad=14
+    )
     ax.set_xlabel("Weekday", fontproperties=font_prop)
     ax.set_ylabel("User prompts", fontproperties=font_prop)
     ax.set_xticks(x)
@@ -91,7 +95,9 @@ def generate_hour_barplot(
 
     bars = ax.bar(range(24), y, color=cfg.color, alpha=0.9, width=0.72)
     if cfg.show_counts:
-        ax.bar_label(bars, padding=2, fontsize=7, fontproperties=font_prop, color="#24292f")
+        ax.bar_label(
+            bars, padding=2, fontsize=7, fontproperties=font_prop, color="#24292f"
+        )
 
     ax.set_title(
         f"{title} · Hourly pattern ({tz_label(cfg)})",
@@ -103,7 +109,9 @@ def generate_hour_barplot(
     ax.set_ylabel("User prompts", fontproperties=font_prop)
 
     ax.set_xticks(range(0, 24, 2))
-    ax.set_xticklabels([f"{i:02d}:00" for i in range(0, 24, 2)], fontproperties=font_prop)
+    ax.set_xticklabels(
+        [f"{i:02d}:00" for i in range(0, 24, 2)], fontproperties=font_prop
+    )
     apply_tick_font(ax, font_prop)
 
     fig.tight_layout()
@@ -146,7 +154,9 @@ def generate_monthly_activity_barplot(
     ax.xaxis.set_major_locator(locator)
     ax.xaxis.set_major_formatter(mdates.ConciseDateFormatter(locator))
 
-    ax.set_title("Monthly activity (user prompts)", fontproperties=font_prop, fontsize=14, pad=14)
+    ax.set_title(
+        "Monthly activity (user prompts)", fontproperties=font_prop, fontsize=14, pad=14
+    )
     ax.set_xlabel(f"Month ({tz_label(cfg)})", fontproperties=font_prop)
     ax.set_ylabel("User prompts", fontproperties=font_prop)
     apply_tick_font(ax, font_prop)
@@ -188,7 +198,9 @@ def generate_daily_activity_lineplot(
     locator = mdates.AutoDateLocator()
     ax.xaxis.set_major_locator(locator)
     ax.xaxis.set_major_formatter(mdates.ConciseDateFormatter(locator))
-    ax.set_title("Daily activity (user prompts)", fontproperties=font_prop, fontsize=14, pad=14)
+    ax.set_title(
+        "Daily activity (user prompts)", fontproperties=font_prop, fontsize=14, pad=14
+    )
     ax.set_xlabel(f"Day ({tz_label(cfg)})", fontproperties=font_prop)
     ax.set_ylabel("User prompts", fontproperties=font_prop)
 

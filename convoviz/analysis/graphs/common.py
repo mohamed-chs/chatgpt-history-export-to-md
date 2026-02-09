@@ -26,13 +26,25 @@ if TYPE_CHECKING:
 
 logger = logging.getLogger(__name__)
 
-WEEKDAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+WEEKDAYS = [
+    "Monday",
+    "Tuesday",
+    "Wednesday",
+    "Thursday",
+    "Friday",
+    "Saturday",
+    "Sunday",
+]
 
 
 def load_font(config: GraphConfig) -> fm.FontProperties:
     """Load font from config or fall back to system default."""
     font_path = get_asset_path(f"fonts/{config.font_name}")
-    return fm.FontProperties(fname=str(font_path)) if font_path.exists() else fm.FontProperties()
+    return (
+        fm.FontProperties(fname=str(font_path))
+        if font_path.exists()
+        else fm.FontProperties()
+    )
 
 
 def style_axes(ax: Axes, config: GraphConfig) -> None:
@@ -100,11 +112,17 @@ def iter_month_starts(start: datetime, end: datetime) -> list[datetime]:
     while cur <= end:
         months.append(cur)
         year, month = cur.year, cur.month
-        cur = cur.replace(year=year + 1, month=1) if month == 12 else cur.replace(month=month + 1)
+        cur = (
+            cur.replace(year=year + 1, month=1)
+            if month == 12
+            else cur.replace(month=month + 1)
+        )
     return months
 
 
-def fill_missing_months(counts: dict[datetime, int]) -> tuple[list[datetime], list[int]]:
+def fill_missing_months(
+    counts: dict[datetime, int],
+) -> tuple[list[datetime], list[int]]:
     """Fill in zero counts for missing months in a range."""
     if not counts:
         return [], []

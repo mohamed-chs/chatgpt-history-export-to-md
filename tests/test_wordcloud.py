@@ -36,7 +36,9 @@ def test_parse_custom_stopwords():
 @patch("convoviz.analysis.wordcloud.WordCloud")
 def test_generate_wordcloud_no_programming_stopwords(mock_wc):
     """Test that generate_wordcloud respects exclude_programming_keywords=False."""
-    config = WordCloudConfig(custom_stopwords="python", exclude_programming_keywords=False)
+    config = WordCloudConfig(
+        custom_stopwords="python", exclude_programming_keywords=False
+    )
     text = "This is a test with def class and int"
 
     generate_wordcloud(text, config)
@@ -113,7 +115,12 @@ def test_wordcloud_week_naming_uses_iso_week(tmp_path: Path) -> None:
         create_time=ts,
         update_time=ts,
         mapping={
-            "root": {"id": "root", "message": None, "parent": None, "children": ["user_node"]},
+            "root": {
+                "id": "root",
+                "message": None,
+                "parent": None,
+                "children": ["user_node"],
+            },
             "user_node": {
                 "id": "user_node",
                 "message": {

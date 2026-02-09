@@ -39,9 +39,14 @@ class _YamlDumper(yaml.SafeDumper):
             node_key = self.represent_data(item_key)
             self._in_key = False
             node_value = self.represent_data(item_value)
-            if not (isinstance(node_key, yaml.nodes.ScalarNode) and node_key.style is None):
+            if not (
+                isinstance(node_key, yaml.nodes.ScalarNode) and node_key.style is None
+            ):
                 best_style = False
-            if not (isinstance(node_value, yaml.nodes.ScalarNode) and node_value.style is None):
+            if not (
+                isinstance(node_value, yaml.nodes.ScalarNode)
+                and node_value.style is None
+            ):
                 best_style = False
             value.append((node_key, node_value))
         if flow_style is None:

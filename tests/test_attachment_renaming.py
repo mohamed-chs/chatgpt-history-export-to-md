@@ -191,7 +191,9 @@ def test_non_image_attachment_not_rendered() -> None:
 
     content = MessageContent(content_type="text", text="Hello")
     metadata = MessageMetadata(
-        attachments=[{"id": "file-999", "name": "report.pdf", "mime_type": "application/pdf"}]
+        attachments=[
+            {"id": "file-999", "name": "report.pdf", "mime_type": "application/pdf"}
+        ]
     )
     message = Message(
         id="msg-3",

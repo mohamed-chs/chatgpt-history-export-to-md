@@ -145,7 +145,10 @@ def generate_length_histogram(
     )
 
     ax.set_title(
-        "Conversation length (user prompts)", fontproperties=font_prop, fontsize=14, pad=14
+        "Conversation length (user prompts)",
+        fontproperties=font_prop,
+        fontsize=14,
+        pad=14,
     )
     ax.set_xlabel("User prompts per conversation", fontproperties=font_prop)
     ax.set_ylabel("Conversations", fontproperties=font_prop)
@@ -193,7 +196,9 @@ def generate_conversation_lifetime_histogram(
     ax.axvline(p50, color="#24292f", linewidth=1.2, alpha=0.8)
     ax.axvline(p90, color="#cf222e", linewidth=1.2, alpha=0.8)
 
-    ax.set_title("Conversation lifetimes (days)", fontproperties=font_prop, fontsize=14, pad=14)
+    ax.set_title(
+        "Conversation lifetimes (days)", fontproperties=font_prop, fontsize=14, pad=14
+    )
     ax.set_xlabel("Days between first and last message", fontproperties=font_prop)
     ax.set_ylabel("Conversations", fontproperties=font_prop)
     ax.set_xlim(left=0, right=cap)

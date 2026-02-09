@@ -127,7 +127,9 @@ class TestPathNormalization:
         assert normalize_optional_path("") is None
         assert normalize_optional_path("   ") is None
 
-    def test_normalize_optional_path_expands(self, monkeypatch: pytest.MonkeyPatch) -> None:
+    def test_normalize_optional_path_expands(
+        self, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
         monkeypatch.setenv("CONVOVIZ_TEST", "xyz")
         result = normalize_optional_path("$CONVOVIZ_TEST")
         assert isinstance(result, Path)

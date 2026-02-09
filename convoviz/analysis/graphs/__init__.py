@@ -34,22 +34,16 @@ from .timeseries import (
 )
 
 __all__ = [
-    # Main entry points
-    "generate_graphs",
-    "generate_summary_graphs",
-    # Dashboard
-    "generate_summary_dashboard",
-    # Timeseries
-    "generate_week_barplot",
-    "generate_hour_barplot",
-    "generate_monthly_activity_barplot",
-    "generate_daily_activity_lineplot",
-    # Distributions
-    "generate_model_piechart",
-    "generate_length_histogram",
-    "generate_conversation_lifetime_histogram",
-    # Heatmaps
-    "generate_activity_heatmap",
-    # Constants
     "WEEKDAYS",
+    "generate_activity_heatmap",
+    "generate_conversation_lifetime_histogram",
+    "generate_daily_activity_lineplot",
+    "generate_graphs",
+    "generate_hour_barplot",
+    "generate_length_histogram",
+    "generate_model_piechart",
+    "generate_monthly_activity_barplot",
+    "generate_summary_dashboard",
+    "generate_summary_graphs",
+    "generate_week_barplot",
 ]

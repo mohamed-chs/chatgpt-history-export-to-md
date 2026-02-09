@@ -2,7 +2,12 @@ from datetime import datetime
 
 from convoviz.config import YAMLConfig
 from convoviz.models import Conversation
-from convoviz.models.message import Message, MessageAuthor, MessageContent, MessageMetadata
+from convoviz.models.message import (
+    Message,
+    MessageAuthor,
+    MessageContent,
+    MessageMetadata,
+)
 from convoviz.renderers.markdown import replace_citations
 from convoviz.renderers.yaml import render_yaml_header
 
@@ -67,7 +72,9 @@ class TestContentFiltering:
         msg = Message(
             id="5",
             author=MessageAuthor(role="tool", name="browser"),
-            content=MessageContent(content_type="execution_output", text="Searching..."),
+            content=MessageContent(
+                content_type="execution_output", text="Searching..."
+            ),
             status="finished_successfully",
             weight=1.0,
             metadata=MessageMetadata(),
@@ -78,7 +85,9 @@ class TestContentFiltering:
         msg = Message(
             id="6",
             author=MessageAuthor(role="tool", name="dalle.text2im"),
-            content=MessageContent(content_type="text", text="DALL·E displayed 1 images..."),
+            content=MessageContent(
+                content_type="text", text="DALL·E displayed 1 images..."
+            ),
             status="finished_successfully",
             weight=1.0,
             metadata=MessageMetadata(),
@@ -112,7 +121,10 @@ class TestCitationParsing:
         # \uE200cite\uE202turn0search18\uE201
         text = "Check this source: \ue200cite\ue202turn0search18\ue201."
         citation_map = {
-            "turn0search18": {"title": "My Source", "url": "http://example.com/embedded"}
+            "turn0search18": {
+                "title": "My Source",
+                "url": "http://example.com/embedded",
+            }
         }
 
         result = replace_citations(text, citation_map=citation_map)

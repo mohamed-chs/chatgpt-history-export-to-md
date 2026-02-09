@@ -35,7 +35,9 @@ def generate_activity_heatmap(
     for side in ["top", "right", "left", "bottom"]:
         ax.spines[side].set_visible(False)
 
-    img: AxesImage = ax.imshow(grid, aspect="auto", cmap="Blues", interpolation="nearest")
+    img: AxesImage = ax.imshow(
+        grid, aspect="auto", cmap="Blues", interpolation="nearest"
+    )
 
     ax.set_title(
         f"Activity heatmap (weekday × hour, {tz_label(cfg)})",

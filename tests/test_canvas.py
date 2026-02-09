@@ -5,7 +5,12 @@ from pathlib import Path
 
 from convoviz.io.canvas import get_extension, save_canvas_documents
 from convoviz.models import Conversation, ConversationCollection
-from convoviz.models.message import Message, MessageAuthor, MessageContent, MessageMetadata
+from convoviz.models.message import (
+    Message,
+    MessageAuthor,
+    MessageContent,
+    MessageMetadata,
+)
 
 
 def test_canvas_document_extraction() -> None:
@@ -53,7 +58,12 @@ def test_conversation_canvas_documents() -> None:
         create_time=ts,
         update_time=ts,
         mapping={
-            "root": {"id": "root", "message": None, "parent": None, "children": ["msg_1"]},
+            "root": {
+                "id": "root",
+                "message": None,
+                "parent": None,
+                "children": ["msg_1"],
+            },
             "msg_1": {
                 "id": "msg_1",
                 "message": {
@@ -93,7 +103,12 @@ def test_save_canvas_documents(tmp_path: Path) -> None:
         create_time=ts,
         update_time=ts,
         mapping={
-            "root": {"id": "root", "message": None, "parent": None, "children": ["msg_1"]},
+            "root": {
+                "id": "root",
+                "message": None,
+                "parent": None,
+                "children": ["msg_1"],
+            },
             "msg_1": {
                 "id": "msg_1",
                 "message": {
@@ -134,7 +149,9 @@ def test_save_canvas_documents(tmp_path: Path) -> None:
 def test_canvas_json_string_in_parts() -> None:
     """Test extracting Canvas document from a JSON string in parts."""
     ts = datetime(2025, 1, 1, tzinfo=UTC)
-    canvas_json = '{"name": "string_part", "type": "code/python", "content": "print(123)"}'
+    canvas_json = (
+        '{"name": "string_part", "type": "code/python", "content": "print(123)"}'
+    )
 
     msg = Message(
         id="msg_json_parts",
@@ -159,12 +176,18 @@ def test_canvas_json_string_in_parts() -> None:
 def test_canvas_document_in_non_first_part() -> None:
     """Test extracting Canvas document when it is not the first part."""
     ts = datetime(2025, 1, 1, tzinfo=UTC)
-    canvas_data = {"name": "later_part", "type": "code/html", "content": "<div>ok</div>"}
+    canvas_data = {
+        "name": "later_part",
+        "type": "code/html",
+        "content": "<div>ok</div>",
+    }
 
     msg = Message(
         id="msg_late_part",
         author=MessageAuthor(role="assistant"),
-        content=MessageContent(content_type="text", parts=[{"text": "prefix"}, canvas_data]),
+        content=MessageContent(
+            content_type="text", parts=[{"text": "prefix"}, canvas_data]
+        ),
         metadata=MessageMetadata(),
         create_time=ts,
         update_time=ts,

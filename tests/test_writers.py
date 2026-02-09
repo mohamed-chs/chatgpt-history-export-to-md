@@ -3,12 +3,19 @@
 from datetime import UTC, datetime
 from pathlib import Path
 
-from convoviz.config import AuthorHeaders, ConversationConfig, FolderOrganization, YAMLConfig
+from convoviz.config import (
+    AuthorHeaders,
+    ConversationConfig,
+    FolderOrganization,
+    YAMLConfig,
+)
 from convoviz.io.writers import get_date_folder_path, save_collection, save_conversation
 from convoviz.models import Conversation, ConversationCollection
 
 
-def create_conversation(title: str, create_time: datetime, conversation_id: str) -> Conversation:
+def create_conversation(
+    title: str, create_time: datetime, conversation_id: str
+) -> Conversation:
     """Create a minimal conversation for testing."""
     return Conversation(
         title=title,
@@ -50,32 +57,44 @@ class TestGetDateFolderPath:
 
     def test_january(self) -> None:
         """Test path for early January date."""
-        conv = create_conversation("Test", datetime(2024, 1, 3, 10, 0, tzinfo=UTC), "test1")
+        conv = create_conversation(
+            "Test", datetime(2024, 1, 3, 10, 0, tzinfo=UTC), "test1"
+        )
         path = get_date_folder_path(conv)
         assert path == Path("2024/01-January")
 
     def test_january_late(self) -> None:
         """Test path for late January (same month folder)."""
-        conv = create_conversation("Test", datetime(2024, 1, 28, 10, 0, tzinfo=UTC), "test2")
+        conv = create_conversation(
+            "Test", datetime(2024, 1, 28, 10, 0, tzinfo=UTC), "test2"
+        )
         path = get_date_folder_path(conv)
         assert path == Path("2024/01-January")
 
     def test_march(self) -> None:
         """Test path for mid-March date."""
-        conv = create_conversation("Test", datetime(2024, 3, 18, 10, 0, tzinfo=UTC), "test3")
+        conv = create_conversation(
+            "Test", datetime(2024, 3, 18, 10, 0, tzinfo=UTC), "test3"
+        )
         path = get_date_folder_path(conv)
         assert path == Path("2024/03-March")
 
     def test_december(self) -> None:
         """Test path for end of December."""
-        conv = create_conversation("Test", datetime(2024, 12, 30, 10, 0, tzinfo=UTC), "test4")
+        conv = create_conversation(
+            "Test", datetime(2024, 12, 30, 10, 0, tzinfo=UTC), "test4"
+        )
         path = get_date_folder_path(conv)
         assert path == Path("2024/12-December")
 
     def test_different_years(self) -> None:
         """Test that different years produce different paths."""
-        conv_2023 = create_conversation("Test", datetime(2023, 6, 15, 10, 0, tzinfo=UTC), "test5")
-        conv_2024 = create_conversation("Test", datetime(2024, 6, 15, 10, 0, tzinfo=UTC), "test6")
+        conv_2023 = create_conversation(
+            "Test", datetime(2023, 6, 15, 10, 0, tzinfo=UTC), "test5"
+        )
+        conv_2024 = create_conversation(
+            "Test", datetime(2024, 6, 15, 10, 0, tzinfo=UTC), "test6"
+        )
         assert get_date_folder_path(conv_2023) == Path("2023/06-June")
         assert get_date_folder_path(conv_2024) == Path("2024/06-June")
 
@@ -85,8 +104,12 @@ class TestSaveCollectionWithDateOrganization:
 
     def test_flat_organization(self, tmp_path: Path) -> None:
         """Test that flat organization puts all files in root directory."""
-        conv1 = create_conversation("Conv Jan", datetime(2024, 1, 5, 10, 0, tzinfo=UTC), "conv1")
-        conv2 = create_conversation("Conv Mar", datetime(2024, 3, 15, 10, 0, tzinfo=UTC), "conv2")
+        conv1 = create_conversation(
+            "Conv Jan", datetime(2024, 1, 5, 10, 0, tzinfo=UTC), "conv1"
+        )
+        conv2 = create_conversation(
+            "Conv Mar", datetime(2024, 3, 15, 10, 0, tzinfo=UTC), "conv2"
+        )
         collection = ConversationCollection(conversations=[conv1, conv2])
 
         save_collection(
@@ -103,8 +126,12 @@ class TestSaveCollectionWithDateOrganization:
 
     def test_date_organization(self, tmp_path: Path) -> None:
         """Test that date organization creates nested folders."""
-        conv1 = create_conversation("Conv Jan", datetime(2024, 1, 5, 10, 0, tzinfo=UTC), "conv1")
-        conv2 = create_conversation("Conv Mar", datetime(2024, 3, 15, 10, 0, tzinfo=UTC), "conv2")
+        conv1 = create_conversation(
+            "Conv Jan", datetime(2024, 1, 5, 10, 0, tzinfo=UTC), "conv1"
+        )
+        conv2 = create_conversation(
+            "Conv Mar", datetime(2024, 3, 15, 10, 0, tzinfo=UTC), "conv2"
+        )
         collection = ConversationCollection(conversations=[conv1, conv2])
 
         save_collection(
@@ -165,9 +192,15 @@ class TestSaveCollectionWithDateOrganization:
 
     def test_date_organization_generates_index_files(self, tmp_path: Path) -> None:
         """Test that date organization generates _index.md files."""
-        conv1 = create_conversation("Chat One", datetime(2024, 1, 5, 10, 0, tzinfo=UTC), "conv1")
-        conv2 = create_conversation("Chat Two", datetime(2024, 1, 15, 10, 0, tzinfo=UTC), "conv2")
-        conv3 = create_conversation("Chat Three", datetime(2024, 3, 10, 10, 0, tzinfo=UTC), "conv3")
+        conv1 = create_conversation(
+            "Chat One", datetime(2024, 1, 5, 10, 0, tzinfo=UTC), "conv1"
+        )
+        conv2 = create_conversation(
+            "Chat Two", datetime(2024, 1, 15, 10, 0, tzinfo=UTC), "conv2"
+        )
+        conv3 = create_conversation(
+            "Chat Three", datetime(2024, 3, 10, 10, 0, tzinfo=UTC), "conv3"
+        )
         collection = ConversationCollection(conversations=[conv1, conv2, conv3])
 
         save_collection(
@@ -196,7 +229,9 @@ class TestSaveCollectionWithDateOrganization:
 
     def test_flat_organization_no_index_files(self, tmp_path: Path) -> None:
         """Test that flat organization does not generate index files."""
-        conv = create_conversation("Test Chat", datetime(2024, 1, 5, 10, 0, tzinfo=UTC), "conv1")
+        conv = create_conversation(
+            "Test Chat", datetime(2024, 1, 5, 10, 0, tzinfo=UTC), "conv1"
+        )
         collection = ConversationCollection(conversations=[conv])
 
         save_collection(
@@ -213,7 +248,9 @@ class TestSaveCollectionWithDateOrganization:
 
     def test_prepend_timestamp_to_filename(self, tmp_path: Path) -> None:
         """Test that timestamps are prepended to filenames when requested."""
-        conv = create_conversation("My Chat", datetime(2024, 3, 21, 15, 30, 5, tzinfo=UTC), "conv1")
+        conv = create_conversation(
+            "My Chat", datetime(2024, 3, 21, 15, 30, 5, tzinfo=UTC), "conv1"
+        )
         collection = ConversationCollection(conversations=[conv])
 
         save_collection(
@@ -238,7 +275,12 @@ def test_save_conversation_overwrite_with_large_frontmatter(tmp_path: Path) -> N
         create_time=ts,
         update_time=ts,
         mapping={
-            "root": {"id": "root", "message": None, "parent": None, "children": ["sys_node"]},
+            "root": {
+                "id": "root",
+                "message": None,
+                "parent": None,
+                "children": ["sys_node"],
+            },
             "sys_node": {
                 "id": "sys_node",
                 "message": {
@@ -298,10 +340,14 @@ class TestSaveConversation:
 
     def test_save_creates_file(self, tmp_path: Path) -> None:
         """Test that save_conversation creates a file."""
-        conv = create_conversation("Test Conv", datetime(2024, 1, 5, 10, 0, tzinfo=UTC), "conv1")
+        conv = create_conversation(
+            "Test Conv", datetime(2024, 1, 5, 10, 0, tzinfo=UTC), "conv1"
+        )
         filepath = tmp_path / "test.md"
 
-        result = save_conversation(conv, filepath, ConversationConfig(), AuthorHeaders())
+        result = save_conversation(
+            conv, filepath, ConversationConfig(), AuthorHeaders()
+        )
 
         assert result.exists()
         assert result == filepath
@@ -309,13 +355,19 @@ class TestSaveConversation:
     def test_save_handles_conflict_different_id(self, tmp_path: Path) -> None:
         """Test that same title but different ID results in increments."""
         # Save first conversation
-        conv1 = create_conversation("Test Conv", datetime(2024, 1, 5, 10, 0, tzinfo=UTC), "id1")
+        conv1 = create_conversation(
+            "Test Conv", datetime(2024, 1, 5, 10, 0, tzinfo=UTC), "id1"
+        )
         filepath = tmp_path / "test.md"
         save_conversation(conv1, filepath, ConversationConfig(), AuthorHeaders())
 
         # Save second conversation with SAME title but DIFFERENT id
-        conv2 = create_conversation("Test Conv", datetime(2024, 1, 5, 10, 0, tzinfo=UTC), "id2")
-        result = save_conversation(conv2, filepath, ConversationConfig(), AuthorHeaders())
+        conv2 = create_conversation(
+            "Test Conv", datetime(2024, 1, 5, 10, 0, tzinfo=UTC), "id2"
+        )
+        result = save_conversation(
+            conv2, filepath, ConversationConfig(), AuthorHeaders()
+        )
 
         # Should increment
         assert result.name == "test (1).md"
@@ -324,7 +376,9 @@ class TestSaveConversation:
     def test_save_overwrites_same_identity(self, tmp_path: Path) -> None:
         """Test that same title AND same ID results in overwrite."""
         # Save first version
-        conv1 = create_conversation("Test Conv", datetime(2024, 1, 5, 10, 0, tzinfo=UTC), "id1")
+        conv1 = create_conversation(
+            "Test Conv", datetime(2024, 1, 5, 10, 0, tzinfo=UTC), "id1"
+        )
         filepath = tmp_path / "test.md"
         save_conversation(conv1, filepath, ConversationConfig(), AuthorHeaders())
 
@@ -337,7 +391,9 @@ class TestSaveConversation:
         # Use a completely different content to check overwrite
         conv1_updated.mapping["user_node"].message.content.parts = ["Something Else"]
 
-        result = save_conversation(conv1_updated, filepath, ConversationConfig(), AuthorHeaders())
+        result = save_conversation(
+            conv1_updated, filepath, ConversationConfig(), AuthorHeaders()
+        )
 
         # Should OVERWRITE (same path, no counter)
         assert result == filepath

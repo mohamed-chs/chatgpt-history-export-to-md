@@ -90,7 +90,9 @@ def _validate_output_path(raw: str) -> bool | str:
     return True
 
 
-def run_interactive_config(initial_config: ConvovizConfig | None = None) -> ConvovizConfig:
+def run_interactive_config(
+    initial_config: ConvovizConfig | None = None,
+) -> ConvovizConfig:
     """Run interactive prompts to configure convoviz.
 
     Args:
@@ -227,7 +229,8 @@ def run_interactive_config(initial_config: ConvovizConfig | None = None) -> Conv
                     f"Enter the message header for '{role}':",
                     default=current,
                     validate=lambda t: (
-                        validate_header(t) or "Must be a valid markdown header (e.g., # Title)"
+                        validate_header(t)
+                        or "Must be a valid markdown header (e.g., # Title)"
                     ),
                     style=CUSTOM_STYLE,
                 )
@@ -259,7 +262,9 @@ def run_interactive_config(initial_config: ConvovizConfig | None = None) -> Conv
                 select(
                     "Select conversation render order:",
                     choices=[
-                        Choice(title="Active branch only (recommended)", value="active"),
+                        Choice(
+                            title="Active branch only (recommended)", value="active"
+                        ),
                         Choice(title="Full DAG (all branches)", value="full"),
                     ],
                     default=config.conversation.markdown.render_order,
@@ -269,7 +274,9 @@ def run_interactive_config(initial_config: ConvovizConfig | None = None) -> Conv
         )
         if render_order_result:
             config.conversation.markdown.render_order = render_order_result
-        logger.debug(f"User selected render order: {config.conversation.markdown.render_order}")
+        logger.debug(
+            f"User selected render order: {config.conversation.markdown.render_order}"
+        )
 
         show_timestamps: bool = _ask_or_cancel(
             confirm(
@@ -285,7 +292,8 @@ def run_interactive_config(initial_config: ConvovizConfig | None = None) -> Conv
         yaml_config = config.conversation.yaml
         yaml_fields = list(YAMLConfig.model_fields.keys())
         yaml_choices = [
-            Choice(title=field, checked=getattr(yaml_config, field)) for field in yaml_fields
+            Choice(title=field, checked=getattr(yaml_config, field))
+            for field in yaml_fields
         ]
 
         selected: list[str] = _ask_or_cancel(
@@ -314,7 +322,9 @@ def run_interactive_config(initial_config: ConvovizConfig | None = None) -> Conv
                 select(
                     "Select the font for word clouds:",
                     choices=available_fonts,
-                    default=current_font if current_font in available_fonts else available_fonts[0],
+                    default=current_font
+                    if current_font in available_fonts
+                    else available_fonts[0],
                     style=CUSTOM_STYLE,
                 )
             )

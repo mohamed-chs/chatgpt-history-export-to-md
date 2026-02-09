@@ -32,7 +32,9 @@ class ConversationCollection(BaseModel):
     def index(self) -> dict[str, Conversation]:
         """Get conversations indexed by conversation_id."""
         if self._index_cache is None:
-            self._index_cache = {conv.conversation_id: conv for conv in self.conversations}
+            self._index_cache = {
+                conv.conversation_id: conv for conv in self.conversations
+            }
         return self._index_cache
 
     @property

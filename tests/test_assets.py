@@ -170,10 +170,14 @@ class TestBuildAssetIndex:
         index = build_asset_index(tmp_path)
 
         assert "file-123" in index.root_prefix_map
-        assert index.root_prefix_map["file-123"].name in {"file-123.png", "file-123-extra.png"}
+        assert index.root_prefix_map["file-123"].name in {
+            "file-123.png",
+            "file-123-extra.png",
+        }
         assert "file-456-gen" in index.dalle_prefix_map
         assert any(
-            "file-789-system" in prefix_map for prefix_map in index.user_prefix_map_by_dir.values()
+            "file-789-system" in prefix_map
+            for prefix_map in index.user_prefix_map_by_dir.values()
         )
 
     def test_returns_forward_slash_path(self, tmp_path: Path) -> None:
