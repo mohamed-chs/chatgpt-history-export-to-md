@@ -25,6 +25,7 @@ This is **MANDATORY AND NON-NEGOTIABLE**, regardless of how simple, small, or st
 - **Verification**: **ALWAYS** run the full quality gate (tests, type checking, linting, formatting) and **FIX ALL ISSUES** before submitting changes.
 - **Cohesion Pass**: **MANDATORY.** After changes, perform a targeted sanity/consistency sweep to ensure the new behavior is **fully wired** across configs, prompts/CLI, defaults, tests, and docs. **Do not stop** until the change is coherent end-to-end.
 - **Documentation**: **REFLEXIVELY** keep all relevant `.md` files updated. Record all functional and behavioral changes in `docs/dev/CHANGELOG.md`. This is a **CRITICAL REQUIREMENT**.
+- **Changelog Hygiene**: **DO NOT READ** `docs/dev/CHANGELOG.md` during a session. Only open it at the end to append a new entry if needed.
 - **Persistence**: If you leave incomplete work or change the system state, **UPDATE `docs/dev/HANDOFF.md`** with the *current* status and architecture (do not store a history of changes here).
 - **Commits**: **PREFER SMALL, LOGICALLY-SCOPED COMMITS** with tests for behavioral changes.
 
