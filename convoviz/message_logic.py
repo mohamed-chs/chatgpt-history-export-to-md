@@ -99,7 +99,9 @@ def extract_message_text(message: Any) -> str:
                         except (json.JSONDecodeError, TypeError):
                             pass
                     text_parts.append(part)
-                case {"content": str(c), "name": str(n)} if message.recipient == "canmore.create_textdoc":
+                case {"content": str(c), "name": str(n)} if (
+                    message.recipient == "canmore.create_textdoc"
+                ):
                     text_parts.append(_render_canvas(n, c))
                 case {"text": str(t)}:
                     text_parts.append(t)
@@ -213,7 +215,9 @@ def is_message_hidden(message: Any) -> bool:
                     return True
                 case "browser":
                     return message.content.content_type != "tether_quote"
-                case "dalle.text2im" if message.content.content_type == "text" and not message.images:
+                case "dalle.text2im" if (
+                    message.content.content_type == "text" and not message.images
+                ):
                     return True
 
         case "assistant":

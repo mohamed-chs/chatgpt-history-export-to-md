@@ -325,7 +325,11 @@ def _render_timestamp(
     if not enabled or not msg_time:
         return ""
     # Show full date if it's the first message or if the date has changed
-    fmt = "%Y-%m-%d %H:%M:%S" if (not last_time or msg_time.date() != last_time.date()) else "%H:%M:%S"
+    fmt = (
+        "%Y-%m-%d %H:%M:%S"
+        if (not last_time or msg_time.date() != last_time.date())
+        else "%H:%M:%S"
+    )
     return f"*{msg_time.strftime(fmt)}*\n"
 
 
