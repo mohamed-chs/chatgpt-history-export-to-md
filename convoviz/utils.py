@@ -5,31 +5,54 @@ from __future__ import annotations
 import os
 import re
 import tempfile
+import unicodedata
 from collections.abc import Mapping
+from importlib import resources
 from pathlib import Path
 from typing import Any
 
 from convoviz.exceptions import ConfigurationError
 
 
-def sanitize(filename: str) -> str:
-    """Sanitize a string to be safe for use as a filename.
+def sanitize(text: str) -> str:
+    """Sanitize a string to be safe for filenames and YAML titles.
 
-    Replaces invalid characters with underscores, handles reserved names,
-    and prevents path traversal characters.
+    - Transliterates non-ASCII to ASCII when possible.
+    - Removes non-ASCII that cannot be converted.
+    - Replaces invalid characters with spaces.
+    - Prevents path traversal.
+    - Collapses multiple spaces and trims.
 
     Args:
-        filename: The string to sanitize
+        text: The string to sanitize
 
     Returns:
-        A filename-safe string, or "untitled" if empty or invalid
+        A safe ASCII string, or "untitled" if empty or invalid
     """
-    # Replace invalid characters
-    pattern = re.compile(r'[<>:"/\\|?*\n\r\t\f\v]+')
-    result = pattern.sub("_", filename.strip())
+    # 1. Transliterate to ASCII (e.g. 'é' -> 'e')
+    # NFKD decomposes characters (e.g. 'é' to 'e' + '`')
+    # then we encode to ascii and ignore non-ascii parts.
+    normalized = unicodedata.normalize("NFKD", text)
+    ascii_text = normalized.encode("ascii", "ignore").decode("ascii")
 
-    # Prevent path traversal
-    result = result.replace("..", "_")
+    # 2. Replace single quotes with spaces
+    ascii_text = ascii_text.replace("'", " ")
+
+    # 3. Replace invalid characters with spaces
+    # (including @ which messes with some PDF tools)
+    pattern = re.compile(r'[@<>:"/\\|?*\n\r\t\f\v]+')
+    result = pattern.sub(" ", ascii_text)
+
+    # 4. Prevent path traversal by replacing dots with spaces
+    result = result.replace("..", " ")
+
+    # 5. Collapse multiple spaces and trim
+    # This also "removes" trouble characters from beginning/end
+    result = re.sub(r"\s+", " ", result).strip()
+
+    # 6. Remove leading/trailing dots (can cause issues on some systems)
+    result = result.strip(".")
+    result = result.strip()  # Final trim in case dots left spaces
 
     # Windows reserved names
     reserved = {
@@ -59,34 +82,15 @@ def sanitize(filename: str) -> str:
     if result.upper() in reserved:
         result = f"_{result}_"
 
-    # Enforce length limit (255 is common for many filesystems)
+    # Enforce length limit
     if len(result) > 255:
         result = result[:255]
 
     return result or "untitled"
 
 
-def sanitize_title(title: str) -> str:
-    """Sanitize a title for YAML frontmatter.
-
-    Keeps only letters, digits, space, hyphen, underscore.
-    Collapses repeated spaces and trims. Returns "untitled" if empty.
-    """
-    cleaned = re.sub(r"[^A-Za-z0-9 _-]+", "", title)
-    cleaned = re.sub(r"\s+", " ", cleaned).strip()
-    return cleaned or "untitled"
-
-
 def validate_header(text: str) -> bool:
-    """Check if text is a valid markdown header.
-
-    Args:
-        text: The text to validate
-
-    Returns:
-        True if it's a valid header (1-6 # followed by space and content)
-    """
-    max_header_level = 6
+    """Check if text is a valid markdown header (1-6 # followed by space)."""
     if not text.startswith("#"):
         return False
 
@@ -95,83 +99,50 @@ def validate_header(text: str) -> bool:
         return False
 
     hashes = parts[0]
-    return hashes == "#" * len(hashes) and 1 <= len(hashes) <= max_header_level
+    return hashes == "#" * len(hashes) and 1 <= len(hashes) <= 6
 
 
-def root_dir() -> Path:
-    """Get the path to the convoviz package directory.
-
-    Returns:
-        Path to the package root
-    """
-    return Path(__file__).parent
-
-
-def get_asset_path(relative_path: str) -> Path:
-    """Get the absolute path to an asset file.
+def get_resource_path(relative_path: str) -> Path:
+    """Get the absolute path to a bundled resource.
 
     Args:
         relative_path: Path relative to convoviz root (e.g., "assets/fonts/foo.ttf")
 
     Returns:
-        Absolute Path to the asset
+        Absolute Path to the resource
     """
-    return root_dir() / relative_path
+    pkg_path = resources.files("convoviz")
+    for part in relative_path.split("/"):
+        pkg_path = pkg_path.joinpath(part)
 
-
-def font_dir() -> Path:
-    """Get the path to the fonts directory.
-
-    Returns:
-        Path to the assets/fonts directory
-    """
-    return root_dir() / "assets" / "fonts"
+    with resources.as_file(pkg_path) as path:
+        return Path(path).resolve()
 
 
 def font_names() -> list[str]:
-    """Get available font names.
-
-    Returns:
-        List of font names (without .ttf extension)
-    """
-    fonts_path = font_dir()
-    if not fonts_path.exists():
+    """Get available font names (without .ttf extension)."""
+    fonts_dir = resources.files("convoviz").joinpath("assets/fonts")
+    if not fonts_dir.is_dir():
         return []
-    return [font.stem for font in fonts_path.glob("*.ttf")]
+    return [Path(p.name).stem for p in fonts_dir.iterdir() if p.name.endswith(".ttf")]
 
 
 def font_path(font_name: str) -> Path:
-    """Get the path to a font file.
-
-    Args:
-        font_name: Name of the font (without extension)
-
-    Returns:
-        Path to the font file
-    """
-    return font_dir() / f"{font_name}.ttf"
+    """Get the path to a bundled font file."""
+    return get_resource_path(f"assets/fonts/{font_name}.ttf")
 
 
 def default_font_path() -> Path:
-    """Get the path to the default font.
-
-    Returns:
-        Path to Kalam-Regular.ttf
-    """
+    """Get the path to the default font (Kalam-Regular)."""
     return font_path("Kalam-Regular")
 
 
 def colormaps() -> list[str]:
-    """Get available colormap names.
-
-    Returns:
-        List of colormap names from colormaps.txt
-    """
-    colormaps_path = root_dir() / "assets" / "colormaps.txt"
-    if not colormaps_path.exists():
+    """Get available colormap names from colormaps.txt."""
+    path = get_resource_path("assets/colormaps.txt")
+    if not path.exists():
         return []
-    with colormaps_path.open(encoding="utf-8") as f:
-        return f.read().splitlines()
+    return path.read_text(encoding="utf-8").splitlines()
 
 
 def expand_path(value: str) -> Path:

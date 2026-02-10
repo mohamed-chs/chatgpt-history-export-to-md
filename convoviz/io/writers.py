@@ -246,13 +246,19 @@ def _generate_root_index(root_dir: Path) -> None:
     logger.debug(f"Generated root index: {index_path}")
 
 
-def _generate_month_index(month_dir: Path, year: str, month: str) -> None:
+def _generate_month_index(
+    month_dir: Path,
+    year: str,
+    month: str,
+    filename_to_title: dict[str, str] | None = None,
+) -> None:
     """Generate a _index.md file for a month folder.
 
     Args:
         month_dir: Path to the month directory
         year: The year string (e.g., "2024")
         month: The month folder name (e.g., "03-March")
+        filename_to_title: Mapping of filename to original conversation title
     """
     month_name = month.split("-", 1)[1] if "-" in month else month
     files = sorted([f.name for f in month_dir.glob("*.md") if f.name != "_index.md"])
@@ -265,7 +271,10 @@ def _generate_month_index(month_dir: Path, year: str, month: str) -> None:
     ]
 
     for file in files:
-        title = file[:-3]  # Remove .md extension
+        title = file[:-3]  # Fallback to filename
+        if filename_to_title and file in filename_to_title:
+            title = filename_to_title[file]
+
         encoded_file = quote(file)
         lines.append(f"- [{title}]({encoded_file})")
 
@@ -303,6 +312,10 @@ def save_collection(
             path: build_asset_index(path) for path in collection.source_paths
         }
 
+    # Track original titles for index generation
+    # Key: "year/month/filename" (relative to directory)
+    filename_to_title: dict[str, str] = {}
+
     for conv in tqdm(
         collection.conversations,
         desc="Writing Markdown 📄 files",
@@ -310,7 +323,8 @@ def save_collection(
     ):
         # Determine target directory based on organization setting
         if folder_organization == FolderOrganization.DATE:
-            target_dir = directory / get_date_folder_path(conv)
+            date_folder = get_date_folder_path(conv)
+            target_dir = directory / date_folder
             target_dir.mkdir(parents=True, exist_ok=True)
         else:
             target_dir = directory
@@ -323,7 +337,7 @@ def save_collection(
         )
 
         filepath = target_dir / filename
-        save_conversation(
+        saved_path = save_conversation(
             conv,
             filepath,
             config,
@@ -332,13 +346,29 @@ def save_collection(
             asset_indexes=asset_indexes,
         )
 
+        # Update title mapping with the FINAL filename (after deduplication)
+        rel_path = saved_path.relative_to(directory)
+        filename_to_title[str(rel_path)] = conv.title
+
     # Generate index files for date organization
     if folder_organization == FolderOrganization.DATE:
         for year_dir in directory.iterdir():
             if year_dir.is_dir() and year_dir.name.isdigit():
                 for month_dir in year_dir.iterdir():
                     if month_dir.is_dir():
-                        _generate_month_index(month_dir, year_dir.name, month_dir.name)
+                        # Filter mapping for this specific month
+                        month_rel = month_dir.relative_to(directory)
+                        month_mapping = {
+                            Path(p).name: t
+                            for p, t in filename_to_title.items()
+                            if p.startswith(str(month_rel))
+                        }
+                        _generate_month_index(
+                            month_dir,
+                            year_dir.name,
+                            month_dir.name,
+                            filename_to_title=month_mapping,
+                        )
                 _generate_year_index(year_dir, year_dir.name)
         _generate_root_index(directory)
 

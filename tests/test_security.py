@@ -23,7 +23,7 @@ def test_zip_slip_protection(tmp_path):
     zip_path.write_bytes(zip_buffer.getvalue())
 
     with pytest.raises(InvalidZipError, match="Malicious path in ZIP"):
-        extract_archive(zip_path)
+        extract_archive(zip_path, tmp_path / "extracted")
 
 
 def test_zip_slip_protection_absolute_and_drive_paths(tmp_path):
@@ -37,12 +37,12 @@ def test_zip_slip_protection_absolute_and_drive_paths(tmp_path):
     zip_path.write_bytes(zip_buffer.getvalue())
 
     with pytest.raises(InvalidZipError, match="Malicious path in ZIP"):
-        extract_archive(zip_path)
+        extract_archive(zip_path, tmp_path / "extracted")
 
 
 def test_sanitize_path_traversal():
-    assert sanitize("../../etc/passwd") == "____etc_passwd"
-    assert sanitize("..\\..\\windows\\system32") == "____windows_system32"
+    assert sanitize("../../etc/passwd") == "etc passwd"
+    assert sanitize("..\\..\\windows\\system32") == "windows system32"
 
 
 def test_sanitize_reserved_names():

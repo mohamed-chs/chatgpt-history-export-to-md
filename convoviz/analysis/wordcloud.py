@@ -16,6 +16,7 @@ from wordcloud import WordCloud
 
 from convoviz.config import WordCloudConfig
 from convoviz.models import ConversationCollection
+from convoviz.utils import get_resource_path
 
 logger = logging.getLogger(__name__)
 
@@ -37,7 +38,7 @@ def load_programming_stopwords() -> frozenset[str]:
     Returns:
         Frozen set of programming stop words
     """
-    stopwords_path = Path(__file__).parent.parent / "assets" / "stopwords.txt"
+    stopwords_path = get_resource_path("assets/stopwords.txt")
     if not stopwords_path.exists():
         return frozenset()
 

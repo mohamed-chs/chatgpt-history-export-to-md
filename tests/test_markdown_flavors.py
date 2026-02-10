@@ -161,10 +161,8 @@ class TestObsidianReasoningContent:
                     "children": [],
                 },
             },
-            moderation_results=[],
             current_node="reasoning_node",
             conversation_id="test_conv",
-            id="test_conv",
         )
 
     def test_obsidian_renders_reasoning_recap_as_callout(self) -> None:

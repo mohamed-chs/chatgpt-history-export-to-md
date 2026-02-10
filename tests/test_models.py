@@ -117,7 +117,6 @@ def test_plugins_sorted_and_safe_namespace() -> None:
                 "children": [],
             },
         },
-        moderation_results=[],
         current_node="tool_missing",
         conversation_id="plugins_conv",
     )
@@ -194,7 +193,6 @@ def test_conversation_citation_map_aggregates_metadata_groups() -> None:
                 "children": [],
             },
         },
-        moderation_results=[],
         current_node="tool_node",
         conversation_id="cite_conv",
     )
@@ -327,7 +325,6 @@ def test_collection_update_merges_new_conversations_even_if_older(
     older_new_data = copy.deepcopy(mock_conversation_data)
     older_new_data["title"] = "conversation 222"
     older_new_data["conversation_id"] = "conversation_222"
-    older_new_data["id"] = "conversation_222"
     # Deliberately set update_time earlier than base.last_updated
     older_new_data["update_time"] = older_new_data["create_time"]
 
@@ -591,7 +588,6 @@ class TestConversationTimeProperties:
                     "children": [],
                 },
             },
-            moderation_results=[],
             current_node="root",
             conversation_id="test_conv",
         )
@@ -682,7 +678,6 @@ class TestConversationCustomInstructions:
                     "children": [],
                 },
             },
-            moderation_results=[],
             current_node="system_node",
             conversation_id="test_conv",
         )
@@ -721,7 +716,6 @@ class TestCollectionGrouping:
                         "children": [],
                     },
                 },
-                moderation_results=[],
                 current_node="root",
                 conversation_id=f"conv_{i}",
             )

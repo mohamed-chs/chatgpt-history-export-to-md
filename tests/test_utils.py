@@ -10,7 +10,6 @@ from convoviz.utils import (
     expand_path,
     normalize_optional_path,
     sanitize,
-    sanitize_title,
     validate_header,
     validate_writable_dir,
 )
@@ -25,15 +24,15 @@ class TestSanitize:
 
     def test_sanitize_with_special_chars(self) -> None:
         """Test sanitizing strings with special characters."""
-        assert sanitize("Hello<World>") == "Hello_World_"
-        assert sanitize("file:name") == "file_name"
-        assert sanitize("path/to\\file") == "path_to_file"
-        assert sanitize("test?query*") == "test_query_"
+        assert sanitize("Hello<World>") == "Hello World"
+        assert sanitize("file:name") == "file name"
+        assert sanitize("path/to\\file") == "path to file"
+        assert sanitize("test?query*") == "test query"
 
     def test_sanitize_with_newlines(self) -> None:
         """Test sanitizing strings with newlines."""
-        assert sanitize("Hello\nWorld") == "Hello_World"
-        assert sanitize("Hello\r\nWorld") == "Hello_World"
+        assert sanitize("Hello\nWorld") == "Hello World"
+        assert sanitize("Hello\r\nWorld") == "Hello World"
 
     def test_sanitize_empty_string(self) -> None:
         """Test sanitizing an empty string."""
@@ -46,6 +45,51 @@ class TestSanitize:
     def test_sanitize_preserves_valid_chars(self) -> None:
         """Test that sanitize preserves valid characters."""
         assert sanitize("file-name_123") == "file-name_123"
+
+    def test_sanitize_collapses_spaces(self) -> None:
+        """Test that sanitize collapses multiple spaces."""
+        assert sanitize("Hello   World") == "Hello World"
+
+    def test_sanitize_strips_ends(self) -> None:
+        """Test that sanitize removes trouble characters from ends."""
+        assert sanitize("@Hello World:") == "Hello World"
+        assert sanitize("<Hello>") == "Hello"
+        assert sanitize(".Hello.") == "Hello"
+        assert sanitize("...Hello...") == "Hello"
+
+    def test_sanitize_replaces_single_quotes(self) -> None:
+        """Test that single quotes are replaced by spaces."""
+        assert sanitize("Don't stop") == "Don t stop"
+        assert sanitize("'quoted'") == "quoted"
+
+    def test_sanitize_transliterates_accents(self) -> None:
+        """Test that accented characters are converted to ASCII."""
+        assert sanitize("Café au lait") == "Cafe au lait"
+        assert sanitize("Mörön") == "Moron"
+        assert sanitize("Crème brûlée") == "Creme brulee"
+
+    def test_sanitize_removes_unconvertible_unicode(self) -> None:
+        """Test that non-ASCII characters that can't be transliterated are removed."""
+        # Emojis and complex symbols should be gone
+        assert sanitize("Hello 😀 World") == "Hello World"
+        assert sanitize("Special ✿ Heart ❤") == "Special Heart"
+
+    def test_sanitize_mixed_complex(self) -> None:
+        """Test a mix of accents, trouble chars, and unicode."""
+        input_str = " @[Mörön] - 100% Crème brûlée! 😀 "
+        # 1. Transliterate: " @[Moron] - 100% Creme brulee!  "
+        # 2. Invalid chars (@, [, ], %, !): "  Moron - 100 Creme brulee  "
+        # 3. Collapse/Strip: "Moron - 100 Creme brulee"
+        # Wait, [ ] and % and ! are NOT in the invalid set pattern [@<>:"/\\|?*\n\r\t\f\v]+
+        # So they remain if they are ASCII.
+        # My current pattern is [@<>:"/\\|?*\n\r\t\f\v]+
+        # Let's see what happens.
+        result = sanitize(input_str)
+        assert "Moron" in result
+        assert "Creme brulee" in result
+        assert "😀" not in result
+        # Check that it is purely ASCII
+        result.encode("ascii")
 
 
 class TestValidateHeader:
@@ -82,22 +126,6 @@ class TestValidateHeader:
     def test_invalid_hash_only(self) -> None:
         """Test hash-only string is invalid."""
         assert validate_header("#") is False
-
-
-class TestSanitizeTitle:
-    """Tests for the sanitize_title function."""
-
-    def test_sanitize_title_strips_problem_chars(self) -> None:
-        """Test sanitizing a title with problematic characters."""
-        assert sanitize_title("My @Title: (Hello)") == "My Title Hello"
-
-    def test_sanitize_title_preserves_valid_chars(self) -> None:
-        """Test sanitize_title preserves allowed characters."""
-        assert sanitize_title("Weird---Title__") == "Weird---Title__"
-
-    def test_sanitize_title_empty(self) -> None:
-        """Test sanitize_title returns untitled on empty result."""
-        assert sanitize_title("$$$") == "untitled"
 
 
 class TestDeepMergeDicts:

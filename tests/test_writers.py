@@ -48,7 +48,6 @@ def create_conversation(
                 "children": [],
             },
         },
-        moderation_results=[],
         current_node="user_node",
         conversation_id=conversation_id,
     )
@@ -263,6 +262,34 @@ class TestSaveCollectionWithDateOrganization:
         assert "[Chat One]" in jan_content
         assert "[Chat Two]" in jan_content
 
+    def test_index_uses_original_title(self, tmp_path: Path) -> None:
+        """Test that _index.md uses the original title even if filename is sanitized."""
+        original_title = "My @Title's Case"
+        # Sanitize would be "My Title s Case" (since @ removed, ' replaced by space)
+        conv = create_conversation(
+            original_title,
+            datetime(2024, 1, 5, 10, 0, tzinfo=UTC),
+            "conv1",
+        )
+        collection = ConversationCollection(conversations=[conv])
+
+        save_collection(
+            collection,
+            tmp_path,
+            ConversationConfig(),
+            AuthorHeaders(),
+            folder_organization=FolderOrganization.DATE,
+        )
+
+        jan_index = tmp_path / "2024" / "01-January" / "_index.md"
+        assert jan_index.exists()
+        jan_content = jan_index.read_text()
+
+        # Link should be [Original Title](sanitized_filename.md)
+        # Sanitized filename: "My Title s Case.md" (quoted)
+        expected_link = f"[{original_title}](My%20Title%20s%20Case.md)"
+        assert expected_link in jan_content
+
     def test_flat_organization_no_index_files(self, tmp_path: Path) -> None:
         """Test that flat organization does not generate index files."""
         conv = create_conversation(
@@ -359,7 +386,6 @@ def test_save_conversation_overwrite_with_large_frontmatter(tmp_path: Path) -> N
                 "children": [],
             },
         },
-        moderation_results=[],
         current_node="user_node",
         conversation_id="big_yaml_conv",
     )

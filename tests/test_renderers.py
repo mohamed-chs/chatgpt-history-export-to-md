@@ -199,7 +199,7 @@ class TestRenderYamlHeader:
         )
         config = YAMLConfig(title=True, aliases=True, chat_link=False)
         yaml = render_yaml_header(conv, config)
-        assert 'title: "My Title WithChars"' in yaml
+        assert 'title: "My Title With Chars"' in yaml
         assert "aliases:" in yaml
         assert '- "My @Title: With/Chars"' in yaml
 
@@ -300,7 +300,6 @@ class TestRenderConversation:
                     "children": [],
                 },
             },
-            moderation_results=[],
             current_node="user_node",
             conversation_id="orphan_conv",
         )

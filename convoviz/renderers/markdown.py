@@ -1,5 +1,6 @@
 """Markdown rendering for conversations."""
 
+import contextlib
 import re
 from collections.abc import Callable
 from datetime import datetime
@@ -433,40 +434,45 @@ def render_node(
 def _ordered_nodes_full(conversation: Conversation) -> list[Node]:
     """Return nodes in a deterministic depth-first traversal order.
 
-    ChatGPT exports store nodes in a mapping; dict iteration order is not a
-    reliable semantic ordering. For markdown output, we traverse from roots.
+    Traverses from roots (parent=None) using a stack-based DFS.
+    Includes any disconnected/orphan nodes deterministically at the end.
     """
     mapping = conversation.node_mapping
 
     def sort_key(node: Node) -> tuple[float, str]:
+        ts = 0.0
         if node.message and node.message.create_time:
-            try:
+            with contextlib.suppress(Exception):
                 ts = node.message.create_time.timestamp()
-            except Exception:
-                ts = 0.0
-        else:
-            ts = 0.0
         return (ts, node.id)
 
-    roots = sorted((n for n in mapping.values() if n.parent is None), key=sort_key)
+    # Sort all nodes once by date/ID to ensure deterministic processing
+    all_nodes_sorted = sorted(mapping.values(), key=sort_key)
+    roots = [n for n in all_nodes_sorted if n.parent is None]
 
     visited: set[str] = set()
     ordered: list[Node] = []
 
-    def dfs(node: Node) -> None:
-        if node.id in visited:
-            return
-        visited.add(node.id)
-        ordered.append(node)
-        for child in sorted(node.children_nodes, key=sort_key):
-            dfs(child)
+    def process_stack(initial_nodes: list[Node]) -> None:
+        # Stack for DFS; reversed to process in chronological order
+        stack = list(reversed(initial_nodes))
+        while stack:
+            node = stack.pop()
+            if node.id in visited:
+                continue
+            visited.add(node.id)
+            ordered.append(node)
+            # Add children in reverse sort order so they are popped in sort order
+            children = sorted(node.children_nodes, key=sort_key, reverse=True)
+            stack.extend(children)
 
-    for root in roots:
-        dfs(root)
+    # 1. Process from real roots
+    process_stack(roots)
 
-    # Include any disconnected/orphan nodes deterministically at the end.
-    for node in sorted(mapping.values(), key=sort_key):
-        dfs(node)
+    # 2. Process any remaining orphan nodes
+    remaining = [n for n in all_nodes_sorted if n.id not in visited]
+    if remaining:
+        process_stack(remaining)
 
     return ordered
 

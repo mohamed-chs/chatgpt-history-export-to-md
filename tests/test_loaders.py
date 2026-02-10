@@ -65,9 +65,9 @@ class TestLoadCollectionFromJson:
 class TestLoadCollectionFromZip:
     """Tests for the load_collection_from_zip function."""
 
-    def test_load_valid_zip(self, mock_zip_file: Path) -> None:
+    def test_load_valid_zip(self, mock_zip_file: Path, tmp_path: Path) -> None:
         """Test loading a valid zip file."""
-        collection = load_collection_from_zip(mock_zip_file)
+        collection = load_collection_from_zip(mock_zip_file, tmp_path / "extracted")
         assert len(collection.conversations) == 1
 
     def test_load_invalid_zip(self, tmp_path: Path) -> None:
@@ -77,7 +77,7 @@ class TestLoadCollectionFromZip:
             zf.writestr("other.txt", "content")
 
         with pytest.raises(InvalidZipError):
-            load_collection_from_zip(zip_path)
+            load_collection_from_zip(zip_path, tmp_path / "extracted_invalid")
 
 
 class TestLoadCollectionFromJsonFormats:
@@ -99,7 +99,6 @@ class TestLoadCollectionFromJsonFormats:
                             "children": [],
                         },
                     },
-                    "moderation_results": [],
                     "current_node": "root",
                     "conversation_id": "test_id",
                 },

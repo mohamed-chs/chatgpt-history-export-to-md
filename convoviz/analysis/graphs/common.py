@@ -17,7 +17,7 @@ import matplotlib.font_manager as fm
 import matplotlib.ticker as mticker
 from matplotlib.figure import Figure
 
-from convoviz.utils import get_asset_path
+from convoviz.utils import get_resource_path
 
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
@@ -39,7 +39,7 @@ WEEKDAYS = [
 
 def load_font(config: GraphConfig) -> fm.FontProperties:
     """Load font from config or fall back to system default."""
-    font_path = get_asset_path(f"fonts/{config.font_name}")
+    font_path = get_resource_path(f"assets/fonts/{config.font_name}")
     return (
         fm.FontProperties(fname=str(font_path))
         if font_path.exists()

@@ -1,9 +1,6 @@
 """Loading functions for conversations and collections."""
 
-import atexit
 import logging
-import shutil
-import tempfile
 from pathlib import Path, PurePosixPath
 from zipfile import ZipFile
 
@@ -13,30 +10,6 @@ from convoviz.exceptions import InvalidZipError
 from convoviz.models import ConversationCollection
 
 logger = logging.getLogger(__name__)
-_TEMP_DIRS: list[Path] = []
-_CLEANUP_REGISTERED = False
-
-
-def _cleanup_temp_dirs() -> None:
-    for path in list(_TEMP_DIRS):
-        try:
-            shutil.rmtree(path, ignore_errors=True)
-        except Exception:
-            continue
-    _TEMP_DIRS.clear()
-
-
-def cleanup_temp_dirs() -> None:
-    """Clean up any temp dirs created by ZIP extraction."""
-    _cleanup_temp_dirs()
-
-
-def _register_temp_dir(path: Path) -> None:
-    global _CLEANUP_REGISTERED
-    _TEMP_DIRS.append(path)
-    if not _CLEANUP_REGISTERED:
-        atexit.register(_cleanup_temp_dirs)
-        _CLEANUP_REGISTERED = True
 
 
 def _is_safe_zip_member_name(name: str) -> bool:
@@ -60,29 +33,25 @@ def _is_safe_zip_member_name(name: str) -> bool:
     return ".." not in member_path.parts
 
 
-def extract_archive(filepath: Path) -> Path:
-    """Extract a ZIP file and return the extraction folder path.
+def extract_archive(filepath: Path, target_dir: Path) -> Path:
+    """Extract a ZIP file to the target folder.
 
     Includes safety checks to prevent Path Traversal (Zip-Slip).
 
     Args:
         filepath: Path to the ZIP file
+        target_dir: Path where to extract
 
     Returns:
-        Path to the extracted folder
+        Path to the extracted folder (target_dir)
 
     Raises:
         InvalidZipError: If extraction fails or a security risk is detected
     """
-    folder = Path(tempfile.mkdtemp(prefix=f"{filepath.stem}_"))
-    _register_temp_dir(folder)
-    logger.info(f"Extracting archive: {filepath} to {folder}")
+    logger.info(f"Extracting archive: {filepath} to {target_dir}")
 
     with ZipFile(filepath) as zf:
         for member in zf.infolist():
-            # Check for path traversal (Zip-Slip) in an OS-agnostic way.
-            # ZIP files are typically POSIX-path-like, but malicious archives can
-            # embed backslashes or drive-letter tricks.
             if not _is_safe_zip_member_name(member.filename):
                 raise InvalidZipError(
                     str(filepath), reason=f"Malicious path in ZIP: {member.filename}"
@@ -90,14 +59,14 @@ def extract_archive(filepath: Path) -> Path:
 
             # Additional check using resolved paths
             normalized = member.filename.replace("\\", "/")
-            target_path = (folder / normalized).resolve()
-            if not target_path.is_relative_to(folder.resolve()):
+            target_path = (target_dir / normalized).resolve()
+            if not target_path.is_relative_to(target_dir.resolve()):
                 raise InvalidZipError(
                     str(filepath), reason=f"Malicious path in ZIP: {member.filename}"
                 )
 
-        zf.extractall(folder)
-    return folder
+        zf.extractall(target_dir)
+    return target_dir
 
 
 def validate_zip(filepath: Path) -> bool:
@@ -142,11 +111,14 @@ def load_collection_from_json(filepath: Path | str) -> ConversationCollection:
     return ConversationCollection(conversations=data, source_paths=[filepath.parent])
 
 
-def load_collection_from_zip(filepath: Path | str) -> ConversationCollection:
+def load_collection_from_zip(
+    filepath: Path | str, target_dir: Path
+) -> ConversationCollection:
     """Load a conversation collection from a ChatGPT export ZIP file.
 
     Args:
         filepath: Path to the ZIP file
+        target_dir: Directory to extract the ZIP into
 
     Returns:
         Loaded ConversationCollection object
@@ -159,8 +131,8 @@ def load_collection_from_zip(filepath: Path | str) -> ConversationCollection:
     if not validate_zip(filepath):
         raise InvalidZipError(str(filepath))
 
-    extracted_folder = extract_archive(filepath)
-    conversations_path = extracted_folder / "conversations.json"
+    extract_archive(filepath, target_dir)
+    conversations_path = target_dir / "conversations.json"
 
     return load_collection_from_json(conversations_path)
 

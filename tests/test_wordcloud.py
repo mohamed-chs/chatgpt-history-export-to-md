@@ -140,7 +140,6 @@ def test_wordcloud_week_naming_uses_iso_week(tmp_path: Path) -> None:
                 "children": [],
             },
         },
-        moderation_results=[],
         current_node="user_node",
         conversation_id="iso_week_conv",
     )

@@ -6,7 +6,7 @@ Object path: conversations.json -> conversation (one of the list items)
 from datetime import datetime, timedelta
 from typing import Any
 
-from pydantic import BaseModel, Field, PrivateAttr
+from pydantic import BaseModel, PrivateAttr
 
 from convoviz.models.message import AuthorRole
 from convoviz.models.node import Node, build_node_tree
@@ -22,14 +22,11 @@ class Conversation(BaseModel):
     create_time: datetime
     update_time: datetime
     mapping: dict[str, Node]
-    moderation_results: list[Any] = Field(default_factory=list)
     current_node: str
     is_starred: bool | None = None
     voice: str | dict[str, Any] | None = None
     plugin_ids: list[str] | None = None
     conversation_id: str
-    conversation_template_id: str | None = None
-    id: str | None = None
     _node_mapping_cache: dict[str, Node] | None = PrivateAttr(default=None)
 
     @property

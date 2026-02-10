@@ -150,12 +150,9 @@ def mock_conversation_data() -> dict:
                 "children": [],
             },
         },
-        "moderation_results": [],
         "current_node": "assistant_node_111",
         "plugin_ids": [],
         "conversation_id": "conversation_111",
-        "conversation_template_id": "template_111",
-        "id": "conversation_111",
     }
 
 
@@ -229,7 +226,6 @@ def branching_conversation_data() -> dict:
                 ts + 120,
             ),
         },
-        "moderation_results": [],
         "current_node": "assistant_1b",
         "conversation_id": "branching_conv",
     }
@@ -252,7 +248,6 @@ def empty_conversation_data() -> dict:
         "mapping": {
             "root": make_root_node("root", []),
         },
-        "moderation_results": [],
         "current_node": "root",
         "conversation_id": "empty_conv",
     }

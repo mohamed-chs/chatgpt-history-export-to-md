@@ -7,21 +7,27 @@ from enum import StrEnum
 from functools import lru_cache
 from importlib import resources
 from pathlib import Path
-from typing import Any, Literal
+from typing import Annotated, Any, Literal
 
 from platformdirs import user_config_path
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, BeforeValidator, Field, field_validator
 
 from convoviz.exceptions import ConfigurationError
 from convoviz.utils import deep_merge_dicts, normalize_optional_path
 
+
+def _coerce_none(v: Any) -> Any:
+    if isinstance(v, str) and not v.strip():
+        return None
+    return v
+
+
+# Annotated types for reusable validation
+NormalizedPath = Annotated[Path | None, BeforeValidator(normalize_optional_path)]
+OptionalString = Annotated[str | None, BeforeValidator(_coerce_none)]
+OptionalInt = Annotated[int | None, BeforeValidator(_coerce_none)]
+
 DEFAULT_CONFIG_RESOURCE = "assets/default_config.toml"
-PATH_KEYS = {"input_path", "bookmarklet_path", "output_folder", "font_path"}
-NONE_IF_EMPTY_KEYS = {
-    "background_color",
-    "max_workers",
-    "random_state",
-}
 
 
 class FolderOrganization(StrEnum):
@@ -96,18 +102,18 @@ class MessageConfig(BaseModel):
 class WordCloudConfig(BaseModel):
     """Configuration for word cloud generation."""
 
-    font_path: Path | None = None
+    font_path: NormalizedPath = None
     colormap: str = "RdYlBu"
     custom_stopwords: str = "use, file"
     exclude_programming_keywords: bool = True
     include_assistant_text: bool = True
-    background_color: str | None = None
+    background_color: OptionalString = None
     mode: Literal["RGB", "RGBA"] = "RGBA"
     include_numbers: bool = False
     width: int = 600
     height: int = 600
-    max_workers: int | None = None  # None = use half CPU count
-    random_state: int | None = 42  # None = non-deterministic layouts
+    max_workers: OptionalInt = None  # None = use half CPU count
+    random_state: OptionalInt = 42  # None = non-deterministic layouts
 
 
 class GraphConfig(BaseModel):
@@ -127,8 +133,8 @@ class GraphConfig(BaseModel):
 class ConvovizConfig(BaseModel):
     """Main configuration for convoviz."""
 
-    input_path: Path | None = None
-    bookmarklet_path: Path | None = None
+    input_path: NormalizedPath = None
+    bookmarklet_path: NormalizedPath = None
     output_folder: Path = Field(
         default_factory=lambda: Path.home() / "Documents" / "ChatGPT-Data"
     )
@@ -147,6 +153,15 @@ class ConvovizConfig(BaseModel):
     graph: GraphConfig = Field(default_factory=GraphConfig)
 
     model_config = {"validate_default": True}
+
+    @field_validator("output_folder", mode="before")
+    @classmethod
+    def _validate_output_folder(cls, v: Any) -> Path:
+        norm = normalize_optional_path(v)
+        if norm is None:
+            # Fallback to default if somehow set to empty
+            return Path.home() / "Documents" / "ChatGPT-Data"
+        return norm
 
 
 def _read_default_config_text() -> str:
@@ -174,27 +189,6 @@ def _load_toml_path(path: Path) -> dict[str, Any]:
         raise ConfigurationError(msg) from exc
 
 
-def _normalize_config_data(data: Any) -> Any:
-    if isinstance(data, dict):
-        normalized: dict[str, Any] = {}
-        for key, value in data.items():
-            if key in PATH_KEYS:
-                normalized[key] = normalize_optional_path(value)
-                continue
-            if (
-                key in NONE_IF_EMPTY_KEYS
-                and isinstance(value, str)
-                and not value.strip()
-            ):
-                normalized[key] = None
-                continue
-            normalized[key] = _normalize_config_data(value)
-        return normalized
-    if isinstance(data, list):
-        return [_normalize_config_data(item) for item in data]
-    return data
-
-
 @lru_cache(maxsize=1)
 def get_default_config_text() -> str:
     """Return the default TOML configuration text bundled with the package."""
@@ -204,9 +198,7 @@ def get_default_config_text() -> str:
 @lru_cache(maxsize=1)
 def get_default_config_data() -> dict[str, Any]:
     """Return the default configuration data loaded from TOML."""
-    return _normalize_config_data(
-        _load_toml_bytes(get_default_config_text().encode("utf-8"))
-    )
+    return _load_toml_bytes(get_default_config_text().encode("utf-8"))
 
 
 def get_default_config() -> ConvovizConfig:
@@ -222,7 +214,7 @@ def get_user_config_path() -> Path:
 def load_config_from_path(path: Path) -> ConvovizConfig:
     """Load configuration from a TOML file, merged over defaults."""
     default_data = get_default_config_data()
-    user_data = _normalize_config_data(_load_toml_path(path))
+    user_data = _load_toml_path(path)
     merged = deep_merge_dicts(default_data, user_data)
     return ConvovizConfig.model_validate(merged)
 

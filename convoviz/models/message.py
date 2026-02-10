@@ -53,7 +53,6 @@ class MessageMetadata(BaseModel):
     user_context_message_data: dict[str, Any] | None = None
     citations: list[dict[str, Any]] | None = None
     search_result_groups: list[dict[str, Any]] | None = None
-    content_references: list[dict[str, Any]] | None = None
     attachments: list[dict[str, Any]] | None = None
 
     model_config = ConfigDict(protected_namespaces=())

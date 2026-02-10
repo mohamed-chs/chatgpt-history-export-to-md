@@ -168,7 +168,7 @@ def test_copy_asset_sanitizes_name(tmp_path: Path) -> None:
 
     dest_dir = tmp_path / "output"
     target_name = "image/with:invalid*chars.png"
-    sanitized_name = "image_with_invalid_chars.png"
+    sanitized_name = "image with invalid chars.png"
 
     # Execute
     path = copy_asset(source_file, dest_dir, target_name=target_name)

@@ -82,7 +82,6 @@ def test_conversation_canvas_documents() -> None:
                 "children": [],
             },
         },
-        moderation_results=[],
         current_node="msg_1",
         conversation_id="conv_123",
     )
@@ -127,7 +126,6 @@ def test_save_canvas_documents(tmp_path: Path) -> None:
                 "children": [],
             },
         },
-        moderation_results=[],
         current_node="msg_1",
         conversation_id="conv_abcdefghijk",
     )

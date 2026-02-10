@@ -12,7 +12,7 @@ if TYPE_CHECKING:
     from convoviz.config import YAMLConfig
     from convoviz.models import Conversation
 
-from convoviz.utils import sanitize_title
+from convoviz.utils import sanitize
 
 _TAG_SAFE_RE = re.compile(r"[^a-z0-9/_\-]+")
 
@@ -100,7 +100,7 @@ def render_yaml_header(
     yaml_fields: dict[str, object] = {}
 
     if config.title:
-        sanitized_title = sanitize_title(conversation.title)
+        sanitized_title = sanitize(conversation.title)
         yaml_fields["title"] = sanitized_title
         if config.aliases and sanitized_title != conversation.title:
             yaml_fields["aliases"] = [conversation.title]

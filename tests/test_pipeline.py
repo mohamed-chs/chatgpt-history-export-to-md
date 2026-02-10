@@ -216,7 +216,6 @@ def test_run_pipeline_extras_without_outputs(tmp_path: Path) -> None:
                     "children": [],
                 },
             },
-            "moderation_results": [],
             "current_node": "canvas",
             "conversation_id": "conv_extras",
         },
