@@ -7,7 +7,6 @@ from convoviz.models import Conversation
 from convoviz.renderers import render_conversation
 from convoviz.renderers.markdown import (
     close_code_blocks,
-    code_block,
     render_message_header,
     replace_latex_delimiters,
 )
@@ -86,20 +85,6 @@ class TestReplaceLatexDelimiters:
         text = '```python\nvalue = r"\\(x\\)"\n```\nOutside \\(y\\)'
         expected = '```python\nvalue = r"\\(x\\)"\n```\nOutside $y$'
         assert replace_latex_delimiters(text) == expected
-
-
-class TestCodeBlock:
-    """Tests for the code_block function."""
-
-    def test_default_language(self) -> None:
-        """Test code block with default language."""
-        result = code_block("print('hello')")
-        assert result == "```python\nprint('hello')\n```"
-
-    def test_custom_language(self) -> None:
-        """Test code block with custom language."""
-        result = code_block("console.log('hi')", "javascript")
-        assert result == "```javascript\nconsole.log('hi')\n```"
 
 
 class TestRenderMessageHeader:

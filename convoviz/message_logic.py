@@ -85,6 +85,23 @@ def _render_canvas(name: str, content: str) -> str:
     return f"### Canvas: {name}\n\n{content}"
 
 
+def _parse_canvas_payload(value: Any) -> dict[str, Any] | None:
+    """Parse a Canvas document from dict or JSON string."""
+    if isinstance(value, dict):
+        data = value
+    elif isinstance(value, str):
+        try:
+            data = json.loads(value)
+        except (json.JSONDecodeError, TypeError):
+            return None
+    else:
+        return None
+
+    if isinstance(data, dict) and "content" in data and "name" in data:
+        return data
+    return None
+
+
 def extract_message_text(message: Message) -> str:
     """Extract the text content of the message."""
     content = message.content
@@ -93,30 +110,27 @@ def extract_message_text(message: Message) -> str:
     if content.parts is not None:
         text_parts = []
         for part in content.parts:
-            match part:
-                case str():
-                    # Check if this string is a JSON Canvas document
-                    if message.recipient == "canmore.create_textdoc":
-                        try:
-                            data = json.loads(part)
-                            if (
-                                isinstance(data, dict)
-                                and "content" in data
-                                and "name" in data
-                            ):
-                                text_parts.append(
-                                    _render_canvas(data["name"], data["content"])
-                                )
-                                continue
-                        except (json.JSONDecodeError, TypeError):
-                            pass
-                    text_parts.append(part)
-                case {"content": str(c), "name": str(n)} if (
-                    message.recipient == "canmore.create_textdoc"
-                ):
-                    text_parts.append(_render_canvas(n, c))
-                case {"text": str(t)}:
-                    text_parts.append(t)
+            if isinstance(part, str):
+                if message.recipient == "canmore.create_textdoc":
+                    doc = _parse_canvas_payload(part)
+                    if doc:
+                        text_parts.append(_render_canvas(doc["name"], doc["content"]))
+                        continue
+                text_parts.append(part)
+                continue
+
+            if isinstance(part, dict):
+                if message.recipient == "canmore.create_textdoc":
+                    doc = _parse_canvas_payload(part)
+                    if (
+                        doc
+                        and isinstance(doc.get("name"), str)
+                        and isinstance(doc.get("content"), str)
+                    ):
+                        text_parts.append(_render_canvas(doc["name"], doc["content"]))
+                        continue
+                if isinstance(part.get("text"), str):
+                    text_parts.append(part["text"])
 
         if text_parts:
             return "".join(text_parts)
@@ -135,12 +149,9 @@ def extract_message_text(message: Message) -> str:
     # 3. Fallback to standard text/result fields
     if content.text is not None:
         if message.recipient == "canmore.create_textdoc":
-            try:
-                data = json.loads(content.text)
-                if isinstance(data, dict) and "content" in data and "name" in data:
-                    return _render_canvas(data["name"], data["content"])
-            except (json.JSONDecodeError, TypeError):
-                pass
+            doc = _parse_canvas_payload(content.text)
+            if doc:
+                return _render_canvas(doc["name"], doc["content"])
         return content.text
 
     if content.result is not None:
@@ -178,34 +189,26 @@ def extract_canvas_document(message: Message) -> dict[str, Any] | None:
     if message.recipient != "canmore.create_textdoc":
         return None
 
-    def try_parse_canvas(val: Any) -> dict[str, Any] | None:
-        data = None
-        if isinstance(val, dict):
-            data = val
-        elif isinstance(val, str):
-            try:
-                data = json.loads(val)
-            except (json.JSONDecodeError, TypeError):
-                return None
-
-        if isinstance(data, dict) and "content" in data and "name" in data:
-            return {
-                "name": data["name"],
-                "type": data.get("type", "unknown"),
-                "content": data["content"],
-            }
-        return None
+    def to_doc(val: Any) -> dict[str, Any] | None:
+        data = _parse_canvas_payload(val)
+        if not data:
+            return None
+        return {
+            "name": data["name"],
+            "type": data.get("type", "unknown"),
+            "content": data["content"],
+        }
 
     # Try all parts in order
     if message.content.parts:
         for part in message.content.parts:
-            doc = try_parse_canvas(part)
+            doc = to_doc(part)
             if doc:
                 return doc
 
     # Try content.text
     if message.content.text:
-        doc = try_parse_canvas(message.content.text)
+        doc = to_doc(message.content.text)
         if doc:
             return doc
 

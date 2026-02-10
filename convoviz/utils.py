@@ -25,11 +25,6 @@ WEEKDAYS = [
 ]
 
 
-def day_start(dt: datetime) -> datetime:
-    """Get the start of the day for a datetime."""
-    return dt.replace(hour=0, minute=0, second=0, microsecond=0)
-
-
 def month_start(dt: datetime) -> datetime:
     """Get the start of the month for a datetime."""
     return dt.replace(day=1, hour=0, minute=0, second=0, microsecond=0)

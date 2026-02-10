@@ -10,7 +10,6 @@ import logging
 from collections import defaultdict
 from collections.abc import Iterable
 from datetime import UTC, datetime
-from pathlib import Path
 from typing import TYPE_CHECKING
 
 import matplotlib.font_manager as fm
@@ -134,8 +133,3 @@ def moving_average(values: list[int], window: int) -> list[float]:
         running += values[i] - values[i - window]
         out.append(running / window)
     return out
-
-
-def save_figure(fig: Figure, path: Path) -> None:
-    """Save a figure to disk with consistent settings."""
-    fig.savefig(path, facecolor="white")

@@ -245,19 +245,6 @@ def replace_latex_delimiters(text: str) -> str:
     return "\n".join(output_lines)
 
 
-def code_block(text: str, lang: str = "python") -> str:
-    """Wrap text in a markdown code block.
-
-    Args:
-        text: The code to wrap
-        lang: The language for syntax highlighting
-
-    Returns:
-        Markdown code block string
-    """
-    return f"```{lang}\n{text}\n```"
-
-
 def render_obsidian_callout(
     content: str,
     title: str,
@@ -301,22 +288,6 @@ def render_message_header(role: str, headers: AuthorHeaders) -> str:
         "tool": headers.tool,
     }
     return header_map.get(role, f"### {role.title()}")
-
-
-def render_node_header(node: Node, headers: AuthorHeaders) -> str:
-    """Render the header section of a node.
-
-    Args:
-        node: The node to render
-        headers: Configuration for author headers
-
-    Returns:
-        The header markdown string
-    """
-    if node.message is None:
-        return ""
-
-    return render_message_header(node.message.author.role, headers) + "\n"
 
 
 # Content types that can be rendered as collapsible callouts in Obsidian
@@ -402,7 +373,7 @@ def render_node(
         return ""
 
     # 2. Main message rendering
-    header = render_node_header(node, headers)
+    header = render_message_header(message.author.role, headers) + "\n"
     timestamp = _render_timestamp(message.create_time, last_timestamp, show_timestamp)
 
     try:
