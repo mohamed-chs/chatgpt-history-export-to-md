@@ -7,11 +7,37 @@ import re
 import tempfile
 import unicodedata
 from collections.abc import Mapping
+from datetime import datetime
 from importlib import resources
 from pathlib import Path
 from typing import Any
 
 from convoviz.exceptions import ConfigurationError
+
+WEEKDAYS = [
+    "Monday",
+    "Tuesday",
+    "Wednesday",
+    "Thursday",
+    "Friday",
+    "Saturday",
+    "Sunday",
+]
+
+
+def day_start(dt: datetime) -> datetime:
+    """Get the start of the day for a datetime."""
+    return dt.replace(hour=0, minute=0, second=0, microsecond=0)
+
+
+def month_start(dt: datetime) -> datetime:
+    """Get the start of the month for a datetime."""
+    return dt.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+
+
+def year_start(dt: datetime) -> datetime:
+    """Get the start of the year for a datetime."""
+    return dt.replace(month=1, day=1, hour=0, minute=0, second=0, microsecond=0)
 
 
 def sanitize(text: str) -> str:

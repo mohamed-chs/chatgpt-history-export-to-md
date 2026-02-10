@@ -10,6 +10,7 @@ from pydantic import BaseModel, PrivateAttr
 
 from convoviz.models.message import AuthorRole
 from convoviz.models.node import Node, build_node_tree
+from convoviz.utils import month_start, year_start
 
 
 class Conversation(BaseModel):
@@ -220,16 +221,12 @@ class Conversation(BaseModel):
     @property
     def month_start(self) -> datetime:
         """Get the first day of the month this conversation was created."""
-        return self.create_time.replace(
-            day=1, hour=0, minute=0, second=0, microsecond=0
-        )
+        return month_start(self.create_time)
 
     @property
     def year_start(self) -> datetime:
         """Get January 1st of the year this conversation was created."""
-        return self.create_time.replace(
-            month=1, day=1, hour=0, minute=0, second=0, microsecond=0
-        )
+        return year_start(self.create_time)
 
     @property
     def citation_map(self) -> dict[str, dict[str, str | None]]:

@@ -14,7 +14,8 @@ Usage:
     generate_graphs(collection, output_dir)
 """
 
-from .common import WEEKDAYS
+from convoviz.utils import WEEKDAYS
+
 from .dashboard import (
     generate_graphs,
     generate_summary_dashboard,

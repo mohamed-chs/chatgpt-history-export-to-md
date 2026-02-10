@@ -9,6 +9,7 @@ from typing import TYPE_CHECKING
 import matplotlib.dates as mdates
 
 from convoviz.config import get_default_config
+from convoviz.utils import WEEKDAYS
 
 if TYPE_CHECKING:
     from matplotlib.figure import Figure
@@ -17,7 +18,6 @@ if TYPE_CHECKING:
     from convoviz.models import ConversationCollection
 
 from .common import (
-    WEEKDAYS,
     aggregate_counts_by_month,
     apply_tick_font,
     fill_missing_months,

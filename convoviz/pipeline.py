@@ -9,10 +9,7 @@ from rich.console import Console
 from convoviz.config import ConvovizConfig, OutputKind
 from convoviz.exceptions import ConfigurationError, InvalidZipError
 from convoviz.io import save_canvas_documents, save_custom_instructions
-from convoviz.io.loaders import (
-    load_collection_from_json,
-    load_collection_from_zip,
-)
+from convoviz.io.loaders import load_collection
 from convoviz.io.writers import save_collection
 
 console = Console()
@@ -69,16 +66,8 @@ def run_pipeline(config: ConvovizConfig) -> None:
         with tempfile.TemporaryDirectory(prefix="convoviz_") as tmp_dir:
             tmp_path = Path(tmp_dir)
 
-            # Load collection based on input type
-            if input_path.is_dir():
-                json_path = input_path / "conversations.json"
-                if not json_path.exists():
-                    fail_zip(input_path, "Directory must contain conversations.json")
-                collection = load_collection_from_json(json_path)
-            elif input_path.suffix.lower() == ".json":
-                collection = load_collection_from_json(input_path)
-            else:
-                collection = load_collection_from_zip(input_path, tmp_path)
+            # Load collection
+            collection = load_collection(input_path, tmp_path)
 
             logger.info(
                 f"Loaded collection with {len(collection.conversations)} conversations"
@@ -93,13 +82,10 @@ def run_pipeline(config: ConvovizConfig) -> None:
                         f"[bold yellow]{script_path}[/bold yellow] ...\n"
                     )
                 try:
-                    if script_path.suffix.lower() == ".json":
-                        script_collection = load_collection_from_json(script_path)
-                    else:
-                        # Extract bookmarklet zip into its own sub-temp-dir
-                        b_tmp = tmp_path / "bookmarklet"
-                        b_tmp.mkdir()
-                        script_collection = load_collection_from_zip(script_path, b_tmp)
+                    # Reuse load_collection for script export too
+                    b_tmp = tmp_path / "bookmarklet"
+                    b_tmp.mkdir(exist_ok=True)
+                    script_collection = load_collection(script_path, b_tmp)
 
                     collection.update(script_collection)
                     logger.info(f"Merged script data from {script_path}")

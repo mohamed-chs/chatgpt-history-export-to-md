@@ -137,6 +137,30 @@ def load_collection_from_zip(
     return load_collection_from_json(conversations_path)
 
 
+def load_collection(input_path: Path, tmp_path: Path) -> ConversationCollection:
+    """Load a conversation collection from a directory, JSON, or ZIP.
+
+    Args:
+        input_path: Path to the input (directory, JSON, or ZIP)
+        tmp_path: Temporary directory for ZIP extraction
+
+    Returns:
+        Loaded ConversationCollection object
+    """
+    if input_path.is_dir():
+        json_path = input_path / "conversations.json"
+        if not json_path.exists():
+            raise InvalidZipError(
+                str(input_path), reason="Directory must contain conversations.json"
+            )
+        return load_collection_from_json(json_path)
+
+    if input_path.suffix.lower() == ".json":
+        return load_collection_from_json(input_path)
+
+    return load_collection_from_zip(input_path, tmp_path)
+
+
 def find_latest_valid_zip(directory: Path | None = None) -> Path | None:
     """Find the most recent valid ChatGPT export ZIP in a directory.
 

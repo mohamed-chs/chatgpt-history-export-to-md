@@ -12,10 +12,46 @@ from convoviz.exceptions import InvalidZipError
 from convoviz.io.loaders import (
     find_latest_valid_zip,
     find_script_export,
+    load_collection,
     load_collection_from_json,
     load_collection_from_zip,
     validate_zip,
 )
+
+
+class TestLoadCollection:
+    """Tests for the load_collection helper."""
+
+    def test_load_from_directory(self, tmp_path: Path) -> None:
+        """Test loading from a directory containing conversations.json."""
+        dir_path = tmp_path / "data"
+        dir_path.mkdir()
+        json_path = dir_path / "conversations.json"
+        json_path.write_text("[]")
+
+        collection = load_collection(dir_path, tmp_path / "tmp")
+        assert len(collection.conversations) == 0
+        assert collection.source_path == dir_path
+
+    def test_load_from_json_file(
+        self, mock_conversations_json: Path, tmp_path: Path
+    ) -> None:
+        """Test loading from a JSON file."""
+        collection = load_collection(mock_conversations_json, tmp_path / "tmp")
+        assert len(collection.conversations) == 1
+        assert collection.source_path == mock_conversations_json.parent
+
+    def test_load_from_zip_file(self, mock_zip_file: Path, tmp_path: Path) -> None:
+        """Test loading from a ZIP file."""
+        collection = load_collection(mock_zip_file, tmp_path / "tmp")
+        assert len(collection.conversations) == 1
+
+    def test_invalid_directory_raises(self, tmp_path: Path) -> None:
+        """Test that a directory without conversations.json raises error."""
+        with pytest.raises(
+            InvalidZipError, match=r"Directory must contain conversations.json"
+        ):
+            load_collection(tmp_path, tmp_path / "tmp")
 
 
 class TestValidateZip:

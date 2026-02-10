@@ -6,12 +6,15 @@ Keeps complex extraction and visibility rules outside of pure data models.
 from __future__ import annotations
 
 import json
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from convoviz.exceptions import MessageContentError
 
+if TYPE_CHECKING:
+    from convoviz.models.message import Message
 
-def extract_message_images(message: Any) -> list[str]:
+
+def extract_message_images(message: Message) -> list[str]:
     """Extract image asset pointers from the message content."""
     image_ids: list[str] = []
     image_id_set: set[str] = set()
@@ -82,7 +85,7 @@ def _render_canvas(name: str, content: str) -> str:
     return f"### Canvas: {name}\n\n{content}"
 
 
-def extract_message_text(message: Any) -> str:
+def extract_message_text(message: Message) -> str:
     """Extract the text content of the message."""
     content = message.content
 
@@ -170,7 +173,7 @@ def _is_image_attachment(att: dict[str, Any]) -> bool:
     return False
 
 
-def extract_canvas_document(message: Any) -> dict[str, Any] | None:
+def extract_canvas_document(message: Message) -> dict[str, Any] | None:
     """Extract Canvas document if this message created one."""
     if message.recipient != "canmore.create_textdoc":
         return None
@@ -209,7 +212,7 @@ def extract_canvas_document(message: Any) -> dict[str, Any] | None:
     return None
 
 
-def is_message_hidden(message: Any) -> bool:
+def is_message_hidden(message: Message) -> bool:
     """Check if message should be hidden in export."""
     if message.is_empty or message.metadata.is_visually_hidden_from_conversation:
         return True
@@ -246,7 +249,7 @@ def is_message_hidden(message: Any) -> bool:
     )
 
 
-def extract_internal_citation_map(message: Any) -> dict[str, dict[str, str | None]]:
+def extract_internal_citation_map(message: Message) -> dict[str, dict[str, str | None]]:
     """Extract a map of citation IDs to metadata from content parts."""
     citation_mapping: dict[str, dict[str, str | None]] = {}
     parts = message.content.parts or []

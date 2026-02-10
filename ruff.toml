@@ -1,28 +1,32 @@
 [lint]
 select = ["ALL"]
+ignore = [
+  "ANN001",  # Missing type annotation for function argument
+  "COM812",  # Trailing comma missing
+  "D203",    # One-blank-line-before-class (conflicts with D211)
+  "D213",    # Multi-line-summary-second-line (conflicts with D212)
+  "EM101",   # Exception must not use a string literal
+  "ERA001",  # Found commented-out code
+  "FBT003",  # Boolean positional value in function call
+  "PLR0913", # Too many arguments in function definition
+  "PLR2004", # Magic value used in comparison
+  "TC003",   # Move standard library import into a type-checking block
+]
 
 [lint.per-file-ignores]
 "convoviz/*" = [
   "TRY003",  # Avoid specifying long messages outside the exception class
-  "D203",    # One-blank-line-before-class (conflicts with D211)
-  "D213",    # Multi-line-summary-second-line (conflicts with D212)
-  "TC003",   # Move standard library import into a type-checking block
   "TC005",   # Found empty type-checking block
-  "PLR2004", # Magic value used in comparison
   "C901",    # function is too complex
   "PLR0912", # Too many branches
   "PLR0915", # Too many statements
-  "COM812",  # Trailing comma missing
-  "FBT003",  # Boolean positional value in function call
   "D417",    # Missing argument description in the docstring
   "D413",    # Missing blank line after last section
   "G004",    # Logging statement uses f-string
   "FBT001",  # Boolean-typed positional argument in function definition
   "RSE102",  # Unnecessary parentheses on raised exception
-  "PLR0913", # Too many arguments in function definition
   "B008",    # Do not perform function call in argument defaults
   "TRY400",  # Use logging.exception instead of logging.error
-  "EM101",   # Exception must not use a string literal
   "ANN401",  # Dynamically typed expressions (Any) are disallowed
   "FBT002",  # Boolean default positional argument in function definition
   "D107",    # Missing docstring in __init__
@@ -38,22 +42,14 @@ select = ["ALL"]
   "PLW0603", # Using the global statement is discouraged
   "PIE810",  # Call startswith once with a tuple
   "PERF401", # Use a list comprehension to create a transformed list
-  "ERA001",  # Found commented-out code
-  "ANN001",  # Missing type annotation for function argument
 ]
 
 "tests/*" = [
   "ANN202",  # missing-return-type-private-function
   "PLC0415", # import-outside-top-level
   "E501",    # line-too-long
-  "FBT003",  # boolean-positional-value-in-call
-  "EM101",   # raw-string-in-exception
-  "ERA001",  # commented-out-code
-  "PLR0913", # too-many-arguments
   "PTH123",  # builtin-open
-  "TC003",   # typing-only-standard-library-import
   "S101",    # Use of assert detected
-  "PLR2004", # Magic value used in comparison
   "D100",    # Missing docstring in public module
   "D101",    # Missing docstring in public class
   "D102",    # Missing docstring in public method
@@ -61,7 +57,6 @@ select = ["ALL"]
   "D104",    # Missing docstring in public package
   "D401",    # First line should be in imperative mood
   "ANN201",  # Missing return type annotation for public function
-  "ANN001",  # Missing type annotation for function argument
   "ANN002",  # Missing type annotation for *args
   "ANN003",  # Missing type annotation for **kwargs
   "PLR0402", # Use from ... import ... in lieu of alias

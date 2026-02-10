@@ -17,7 +17,10 @@ import matplotlib.font_manager as fm
 import matplotlib.ticker as mticker
 from matplotlib.figure import Figure
 
-from convoviz.utils import get_resource_path
+from convoviz.utils import (
+    get_resource_path,
+    month_start,
+)
 
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
@@ -25,16 +28,6 @@ if TYPE_CHECKING:
     from convoviz.config import GraphConfig
 
 logger = logging.getLogger(__name__)
-
-WEEKDAYS = [
-    "Monday",
-    "Tuesday",
-    "Wednesday",
-    "Thursday",
-    "Friday",
-    "Saturday",
-    "Sunday",
-]
 
 
 def load_font(config: GraphConfig) -> fm.FontProperties:
@@ -86,21 +79,6 @@ def ts_to_dt(ts: float, config: GraphConfig) -> datetime:
 def tz_label(config: GraphConfig) -> str:
     """Get human-readable timezone label."""
     return "UTC" if config.timezone == "utc" else "Local"
-
-
-def month_start(dt: datetime) -> datetime:
-    """Get the start of the month for a datetime."""
-    return dt.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
-
-
-def year_start(dt: datetime) -> datetime:
-    """Get the start of the year for a datetime."""
-    return dt.replace(month=1, day=1, hour=0, minute=0, second=0, microsecond=0)
-
-
-def day_start(dt: datetime) -> datetime:
-    """Get the start of the day for a datetime."""
-    return dt.replace(hour=0, minute=0, second=0, microsecond=0)
 
 
 def iter_month_starts(start: datetime, end: datetime) -> list[datetime]:

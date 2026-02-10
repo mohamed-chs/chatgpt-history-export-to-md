@@ -477,11 +477,6 @@ def _ordered_nodes_full(conversation: Conversation) -> list[Node]:
     return ordered
 
 
-def _ordered_nodes_active(conversation: Conversation) -> list[Node]:
-    """Return nodes in the active branch order."""
-    return conversation.ordered_nodes
-
-
 def render_conversation(
     conversation: Conversation,
     config: ConversationConfig,
@@ -514,7 +509,7 @@ def render_conversation(
     # Render message nodes based on configured order.
     last_timestamp = None
     if config.markdown.render_order == "active":
-        nodes = _ordered_nodes_active(conversation)
+        nodes = conversation.ordered_nodes
     else:
         nodes = _ordered_nodes_full(conversation)
 

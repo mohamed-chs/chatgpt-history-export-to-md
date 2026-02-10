@@ -5,6 +5,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from convoviz.config import get_default_config
+from convoviz.utils import WEEKDAYS
 
 if TYPE_CHECKING:
     from matplotlib.figure import Figure
@@ -13,7 +14,7 @@ if TYPE_CHECKING:
     from convoviz.config import GraphConfig
     from convoviz.models import ConversationCollection
 
-from .common import WEEKDAYS, setup_single_axes, ts_to_dt, tz_label
+from .common import setup_single_axes, ts_to_dt, tz_label
 
 
 def generate_activity_heatmap(
