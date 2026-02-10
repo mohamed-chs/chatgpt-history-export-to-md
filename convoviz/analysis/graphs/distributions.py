@@ -95,6 +95,7 @@ def generate_length_histogram(
 
     Returns:
         Matplotlib Figure object
+
     """
     cfg = config or get_default_config().graph
     lengths = [conv.message_count("user") for conv in collection.conversations]

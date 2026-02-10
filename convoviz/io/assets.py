@@ -1,4 +1,4 @@
-"Asset management functions."
+"""Asset management functions."""
 
 import hashlib
 import logging
@@ -123,6 +123,7 @@ def resolve_asset_path(
 
     Returns:
         Path to the found file, or None
+
     """
     if not source_dir.exists():
         return None
@@ -268,6 +269,7 @@ def copy_asset(
         target_name: Optional name to rename the file to
     Returns:
         Relative path to the asset (e.g., "assets/image.png")
+
     """
     assets_dir = dest_dir / "assets"
     assets_dir.mkdir(parents=True, exist_ok=True)

@@ -51,6 +51,7 @@ def get_date_folder_path(conversation: Conversation) -> Path:
 
     Returns:
         Relative path for the date-based folder structure
+
     """
     create_time = conversation.create_time
 
@@ -200,6 +201,7 @@ def _generate_year_index(year_dir: Path, year: str) -> None:
     Args:
         year_dir: Path to the year directory
         year: The year string (e.g., "2024")
+
     """
     months = sorted(
         [d.name for d in year_dir.iterdir() if d.is_dir()],
@@ -259,6 +261,7 @@ def _generate_month_index(
         year: The year string (e.g., "2024")
         month: The month folder name (e.g., "03-March")
         filename_to_title: Mapping of filename to original conversation title
+
     """
     month_name = month.split("-", 1)[1] if "-" in month else month
     files = sorted([f.name for f in month_dir.glob("*.md") if f.name != "_index.md"])
@@ -303,6 +306,7 @@ def save_collection(
         folder_organization: How to organize files in folders (flat or by date)
         prepend_timestamp: Whether to prepend the conversation timestamp to the filename
         progress_bar: Whether to show a progress bar
+
     """
     directory.mkdir(parents=True, exist_ok=True)
 
@@ -382,6 +386,7 @@ def save_custom_instructions(
     Args:
         collection: The collection to extract instructions from
         filepath: Target JSON file path
+
     """
     instructions = collection.custom_instructions
     with filepath.open("w", encoding="utf-8") as f:

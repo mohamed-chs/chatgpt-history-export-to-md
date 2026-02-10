@@ -174,7 +174,8 @@ def _load_toml_bytes(data: bytes) -> dict[str, Any]:
     try:
         return tomllib.loads(data.decode("utf-8"))
     except (tomllib.TOMLDecodeError, UnicodeDecodeError) as exc:
-        raise ConfigurationError("Failed to parse TOML configuration.") from exc
+        msg = "Failed to parse TOML configuration."
+        raise ConfigurationError(msg) from exc
 
 
 def _load_toml_path(path: Path) -> dict[str, Any]:

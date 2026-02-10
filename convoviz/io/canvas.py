@@ -3,10 +3,11 @@
 from __future__ import annotations
 
 import logging
-from pathlib import Path
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
+    from pathlib import Path
+
     from convoviz.models import ConversationCollection
 
 from convoviz.utils import sanitize
@@ -47,6 +48,7 @@ def save_canvas_documents(
 
     Returns:
         Number of documents saved
+
     """
     canvas_dir = output_dir / "canvas"
     docs = collection.all_canvas_documents
@@ -74,7 +76,7 @@ def save_canvas_documents(
                 f.write(content)
             saved_count += 1
             logger.debug(f"Saved Canvas doc: {filename}")
-        except Exception as e:
-            logger.error(f"Failed to save Canvas doc {filename}: {e}")
+        except Exception:
+            logger.exception(f"Failed to save Canvas doc {filename}")
 
     return saved_count

@@ -44,7 +44,7 @@ def test_generate_wordcloud_no_programming_stopwords(mock_wc):
 
     generate_wordcloud(text, config)
 
-    args, kwargs = mock_wc.call_args
+    _args, kwargs = mock_wc.call_args
     passed_stopwords = kwargs.get("stopwords")
 
     assert "the" in passed_stopwords  # From NLTK

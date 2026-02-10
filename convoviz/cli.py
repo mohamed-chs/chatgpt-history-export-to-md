@@ -35,7 +35,7 @@ def _version_callback(value: bool) -> None:
     """Print version and exit."""
     if value:
         console.print(f"convoviz {get_version('convoviz')}")
-        raise typer.Exit()
+        raise typer.Exit
 
 
 @app.callback(invoke_without_command=True)
@@ -203,7 +203,7 @@ def run(
     try:
         run_pipeline(config)
     except (InvalidZipError, ConfigurationError) as e:
-        logger.error(f"Known error: {e}")
+        logger.exception("Known error")
         console.print(f"[bold red]Error:[/bold red] {escape(str(e))}")
         raise typer.Exit(code=1) from None
     except Exception as e:

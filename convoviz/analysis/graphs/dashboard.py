@@ -4,9 +4,6 @@ from __future__ import annotations
 
 import logging
 from collections import defaultdict
-from collections.abc import Callable
-from datetime import datetime
-from pathlib import Path
 from typing import TYPE_CHECKING
 
 import matplotlib.dates as mdates
@@ -17,6 +14,10 @@ from convoviz.config import get_default_config
 from convoviz.utils import WEEKDAYS, month_start, year_start
 
 if TYPE_CHECKING:
+    from collections.abc import Callable
+    from datetime import datetime
+    from pathlib import Path
+
     from convoviz.config import GraphConfig
     from convoviz.models import ConversationCollection
 
@@ -244,6 +245,7 @@ def generate_summary_graphs(
         collection: Collection of conversations
         output_dir: Directory to save the graphs
         config: Optional graph configuration
+
     """
     if not collection.conversations:
         return
@@ -330,6 +332,7 @@ def generate_graphs(
         output_dir: Directory to save the graphs
         config: Optional graph configuration
         progress_bar: Whether to show progress bars
+
     """
     output_dir.mkdir(parents=True, exist_ok=True)
     cfg = config or get_default_config().graph

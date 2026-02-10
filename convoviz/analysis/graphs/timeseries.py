@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 from collections import defaultdict
-from datetime import datetime
 from typing import TYPE_CHECKING
 
 import matplotlib.dates as mdates
@@ -12,6 +11,8 @@ from convoviz.config import get_default_config
 from convoviz.utils import WEEKDAYS
 
 if TYPE_CHECKING:
+    from datetime import datetime
+
     from matplotlib.figure import Figure
 
     from convoviz.config import GraphConfig
@@ -42,6 +43,7 @@ def generate_week_barplot(
 
     Returns:
         Matplotlib Figure object
+
     """
     cfg = config or get_default_config().graph
     fig, ax, font_prop = setup_single_axes(cfg)
@@ -87,6 +89,7 @@ def generate_hour_barplot(
 
     Returns:
         Matplotlib Figure object
+
     """
     cfg = config or get_default_config().graph
     fig, ax, font_prop = setup_single_axes(cfg)

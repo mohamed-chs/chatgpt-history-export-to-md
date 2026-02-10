@@ -50,6 +50,7 @@ def build_node_tree(mapping: dict[str, Node]) -> dict[str, Node]:
 
     Returns:
         The same dictionary with nodes connected via parent_node/children_nodes
+
     """
     # Reset connections to avoid duplicates on repeated calls
     for node in mapping.values():

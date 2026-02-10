@@ -8,7 +8,6 @@ from __future__ import annotations
 
 import logging
 from collections import defaultdict
-from collections.abc import Iterable
 from datetime import UTC, datetime
 from typing import TYPE_CHECKING
 
@@ -22,6 +21,8 @@ from convoviz.utils import (
 )
 
 if TYPE_CHECKING:
+    from collections.abc import Iterable
+
     from matplotlib.axes import Axes
 
     from convoviz.config import GraphConfig

@@ -27,7 +27,7 @@ def _is_safe_zip_member_name(name: str) -> bool:
 
     # Windows drive letters / UNC-style prefixes stored in the archive
     first = member_path.parts[0] if member_path.parts else ""
-    if first.endswith(":") or first.startswith("//") or first.startswith("\\\\"):
+    if first.endswith(":") or first.startswith(("//", "\\\\")):
         return False
 
     return ".." not in member_path.parts
@@ -47,6 +47,7 @@ def extract_archive(filepath: Path, target_dir: Path) -> Path:
 
     Raises:
         InvalidZipError: If extraction fails or a security risk is detected
+
     """
     logger.info(f"Extracting archive: {filepath} to {target_dir}")
 
@@ -77,6 +78,7 @@ def validate_zip(filepath: Path) -> bool:
 
     Returns:
         True if valid, False otherwise
+
     """
     if not filepath.is_file() or filepath.suffix.lower() != ".zip":
         return False
@@ -98,6 +100,7 @@ def load_collection_from_json(filepath: Path | str) -> ConversationCollection:
 
     Returns:
         Loaded ConversationCollection object
+
     """
     filepath = Path(filepath)
     logger.debug(f"Loading collection from JSON: {filepath}")
@@ -125,6 +128,7 @@ def load_collection_from_zip(
 
     Raises:
         InvalidZipError: If the ZIP file is invalid or missing conversations.json
+
     """
     filepath = Path(filepath)
 
@@ -146,6 +150,7 @@ def load_collection(input_path: Path, tmp_path: Path) -> ConversationCollection:
 
     Returns:
         Loaded ConversationCollection object
+
     """
     if input_path.is_dir():
         json_path = input_path / "conversations.json"
@@ -171,6 +176,7 @@ def find_latest_valid_zip(directory: Path | None = None) -> Path | None:
 
     Returns:
         Path to the most recent valid ZIP, or None if none found
+
     """
     if directory is None:
         directory = Path.home() / "Downloads"
@@ -198,6 +204,7 @@ def find_script_export(directory: Path | None = None) -> Path | None:
 
     Returns:
         Path to the most recent export, or None if none found
+
     """
     if directory is None:
         directory = Path.home() / "Downloads"

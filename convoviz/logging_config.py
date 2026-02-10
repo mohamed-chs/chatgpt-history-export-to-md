@@ -19,6 +19,7 @@ def setup_logging(
 
     Returns:
         Path to the log file used.
+
     """
     root_logger = logging.getLogger()
     # Remove only handlers that convoviz previously installed.

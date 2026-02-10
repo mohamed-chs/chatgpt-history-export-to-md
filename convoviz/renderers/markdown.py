@@ -35,6 +35,7 @@ def replace_citations(
 
     Returns:
         Text with all placeholders replaced by markdown links
+
     """
 
     def maybe_prefix_space(original: str, start_idx: int, replacement: str) -> str:
@@ -118,6 +119,7 @@ def close_code_blocks(text: str) -> str:
 
     Returns:
         Text with all code blocks properly closed
+
     """
     open_fences: list[tuple[str, int]] = []
     lines = text.split("\n")
@@ -158,6 +160,7 @@ def replace_latex_delimiters(text: str) -> str:
 
     Returns:
         Text with $$ and $ delimiters
+
     """
 
     def replace_outside_inline_code(line: str) -> str:
@@ -264,6 +267,7 @@ def render_obsidian_callout(
 
     Returns:
         Markdown callout string
+
     """
     fold = "-" if collapsed else "+"
     lines = content.strip().split("\n")
@@ -280,6 +284,7 @@ def render_message_header(role: str, headers: AuthorHeaders) -> str:
 
     Returns:
         The markdown header string
+
     """
     header_map = {
         "system": headers.system,
@@ -464,6 +469,7 @@ def render_conversation(
 
     Returns:
         Complete markdown document string
+
     """
     use_dollar_latex = config.markdown.latex_delimiters == "dollars"
     flavor = config.markdown.flavor

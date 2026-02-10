@@ -37,6 +37,7 @@ def run_pipeline(config: ConvovizConfig) -> None:
     Raises:
         InvalidZipError: If the input is invalid
         ConfigurationError: If configuration is incomplete
+
     """
 
     def fail_zip(path: Path, reason: str) -> None:
@@ -172,11 +173,12 @@ def run_pipeline(config: ConvovizConfig) -> None:
                         generate_graphs,
                     )
                 except ModuleNotFoundError as e:
-                    raise ConfigurationError(
+                    msg = (
                         "Graph generation requires matplotlib. "
                         'Install with `pip install "convoviz[viz]"` '
                         'or `uv pip install "convoviz[viz]"`.'
-                    ) from e
+                    )
+                    raise ConfigurationError(msg) from e
 
                 graph_folder = output_folder / output_dir_map[OutputKind.GRAPHS]
                 graph_folder.mkdir(parents=True, exist_ok=True)
@@ -202,11 +204,12 @@ def run_pipeline(config: ConvovizConfig) -> None:
                         generate_wordclouds,
                     )
                 except ModuleNotFoundError as e:
-                    raise ConfigurationError(
+                    msg = (
                         "Word cloud generation requires wordcloud and nltk. "
                         'Install with `pip install "convoviz[viz]"` '
                         'or `uv pip install "convoviz[viz]"`.'
-                    ) from e
+                    )
+                    raise ConfigurationError(msg) from e
 
                 wordcloud_folder = output_folder / output_dir_map[OutputKind.WORDCLOUDS]
                 wordcloud_folder.mkdir(parents=True, exist_ok=True)

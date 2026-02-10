@@ -7,12 +7,14 @@ import re
 import tempfile
 import unicodedata
 from collections.abc import Mapping
-from datetime import datetime
 from importlib import resources
 from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from convoviz.exceptions import ConfigurationError
+
+if TYPE_CHECKING:
+    from datetime import datetime
 
 WEEKDAYS = [
     "Monday",
@@ -49,6 +51,7 @@ def sanitize(text: str) -> str:
 
     Returns:
         A safe ASCII string, or "untitled" if empty or invalid
+
     """
     # 1. Transliterate to ASCII (e.g. 'é' -> 'e')
     # NFKD decomposes characters (e.g. 'é' to 'e' + '`')
@@ -131,6 +134,7 @@ def get_resource_path(relative_path: str) -> Path:
 
     Returns:
         Absolute Path to the resource
+
     """
     pkg_path = resources.files("convoviz")
     for part in relative_path.split("/"):
@@ -206,6 +210,7 @@ def validate_writable_dir(path: Path, create: bool = False) -> None:
 
     Raises:
         ConfigurationError: If the path is not a directory or is not writable.
+
     """
 
     def test_write(target: Path) -> None:

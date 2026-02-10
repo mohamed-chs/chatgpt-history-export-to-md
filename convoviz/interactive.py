@@ -55,7 +55,6 @@ def _ask_or_cancel[T](prompt: _QuestionaryPrompt[T]) -> T:
     convert that to `KeyboardInterrupt` so callers can abort the whole
     interactive session with a single Ctrl+C.
     """
-
     result = prompt.ask()
     if result is None:
         raise KeyboardInterrupt
@@ -100,6 +99,7 @@ def run_interactive_config(
 
     Returns:
         Updated configuration based on user input
+
     """
     config = initial_config or get_default_config()
     logger.info("Starting interactive configuration")
@@ -243,7 +243,7 @@ def run_interactive_config(
 
         # Prompt for markdown flavor
         flavor_result = cast(
-            Literal["standard", "obsidian"],
+            "Literal['standard', 'obsidian']",
             _ask_or_cancel(
                 select(
                     "Select the markdown flavor:",
@@ -259,7 +259,7 @@ def run_interactive_config(
         logger.debug(f"User selected flavor: {config.conversation.markdown.flavor}")
 
         render_order_result = cast(
-            Literal["active", "full"],
+            "Literal['active', 'full']",
             _ask_or_cancel(
                 select(
                     "Select conversation render order:",

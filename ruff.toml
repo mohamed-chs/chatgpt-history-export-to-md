@@ -1,69 +1,50 @@
 [lint]
 select = ["ALL"]
 ignore = [
-  "ANN001",  # Missing type annotation for function argument
   "COM812",  # Trailing comma missing
   "D203",    # One-blank-line-before-class (conflicts with D211)
   "D213",    # Multi-line-summary-second-line (conflicts with D212)
-  "EM101",   # Exception must not use a string literal
   "ERA001",  # Found commented-out code
   "FBT003",  # Boolean positional value in function call
   "PLR0913", # Too many arguments in function definition
   "PLR2004", # Magic value used in comparison
-  "TC003",   # Move standard library import into a type-checking block
 ]
 
 [lint.per-file-ignores]
 "convoviz/*" = [
   "TRY003",  # Avoid specifying long messages outside the exception class
-  "TC005",   # Found empty type-checking block
   "C901",    # function is too complex
   "PLR0912", # Too many branches
   "PLR0915", # Too many statements
   "D417",    # Missing argument description in the docstring
-  "D413",    # Missing blank line after last section
   "G004",    # Logging statement uses f-string
   "FBT001",  # Boolean-typed positional argument in function definition
-  "RSE102",  # Unnecessary parentheses on raised exception
   "B008",    # Do not perform function call in argument defaults
-  "TRY400",  # Use logging.exception instead of logging.error
   "ANN401",  # Dynamically typed expressions (Any) are disallowed
   "FBT002",  # Boolean default positional argument in function definition
   "D107",    # Missing docstring in __init__
-  "D202",    # No blank lines allowed after function docstring
-  "TC006",   # Add quotes to type expression in typing.cast()
-  "D300",    # Use triple double quotes
   "BLE001",  # Do not catch blind exception
   "S112",    # try-except-continue detected
   "PLR0911", # Too many return statements
   "S110",    # try-except-pass detected
   "PLW2901", # for loop variable overwritten by assignment target
-  "PERF101", # Do not cast an iterable to list before iterating over it
-  "PLW0603", # Using the global statement is discouraged
-  "PIE810",  # Call startswith once with a tuple
   "PERF401", # Use a list comprehension to create a transformed list
 ]
 
 "tests/*" = [
+  "ANN001",  # Missing type annotation for function argument
   "ANN202",  # missing-return-type-private-function
   "PLC0415", # import-outside-top-level
   "E501",    # line-too-long
-  "PTH123",  # builtin-open
   "S101",    # Use of assert detected
   "D100",    # Missing docstring in public module
   "D101",    # Missing docstring in public class
   "D102",    # Missing docstring in public method
   "D103",    # Missing docstring in public function
-  "D104",    # Missing docstring in public package
   "D401",    # First line should be in imperative mood
   "ANN201",  # Missing return type annotation for public function
   "ANN002",  # Missing type annotation for *args
   "ANN003",  # Missing type annotation for **kwargs
-  "PLR0402", # Use from ... import ... in lieu of alias
-  "SLF001",  # Private member accessed
   "DTZ005",  # datetime.now() called without a tz argument
   "DTZ001",  # datetime.datetime() called without a tzinfo argument
-  "ARG001",  # Unused function argument
-  "ARG002",  # Unused method argument
-  "RUF059",  # Unused unpacked variable
 ]

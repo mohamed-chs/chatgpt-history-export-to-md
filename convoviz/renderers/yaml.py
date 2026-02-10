@@ -96,6 +96,7 @@ def render_yaml_header(
     Returns:
         YAML frontmatter string with --- delimiters, or empty string if
         no fields enabled
+
     """
     yaml_fields: dict[str, object] = {}
 

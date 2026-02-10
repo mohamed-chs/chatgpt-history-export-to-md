@@ -2,12 +2,15 @@
 
 from __future__ import annotations
 
-from pathlib import Path
+from typing import TYPE_CHECKING
 
 import pytest
 
 from convoviz.config import OutputKind, get_default_config
 from convoviz.interactive import run_interactive_config
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 
 class FakePrompt[T]:
@@ -24,7 +27,7 @@ class FakePrompt[T]:
 def test_ctrl_c_on_first_prompt_aborts_interactive(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    import convoviz.interactive as interactive
+    from convoviz import interactive
 
     monkeypatch.setattr(interactive, "find_latest_valid_zip", lambda: None)
     monkeypatch.setattr(interactive, "find_script_export", lambda: None)
@@ -38,7 +41,7 @@ def test_ctrl_c_mid_flow_aborts_interactive(
     monkeypatch: pytest.MonkeyPatch,
     tmp_path: Path,
 ) -> None:
-    import convoviz.interactive as interactive
+    from convoviz import interactive
 
     monkeypatch.setattr(interactive, "find_latest_valid_zip", lambda: None)
     monkeypatch.setattr(interactive, "find_script_export", lambda: None)
@@ -61,7 +64,7 @@ def test_ctrl_c_on_outputs_checkbox_aborts_interactive(
     tmp_path: Path,
 ) -> None:
     """Test Ctrl+C on the outputs checkbox prompt aborts."""
-    import convoviz.interactive as interactive
+    from convoviz import interactive
 
     monkeypatch.setattr(interactive, "find_latest_valid_zip", lambda: None)
     monkeypatch.setattr(interactive, "find_script_export", lambda: None)
@@ -83,7 +86,7 @@ def test_outputs_selection_sets_config(
     tmp_path: Path,
 ) -> None:
     """Test that output selection correctly sets config.outputs."""
-    import convoviz.interactive as interactive
+    from convoviz import interactive
 
     monkeypatch.setattr(interactive, "find_latest_valid_zip", lambda: None)
     monkeypatch.setattr(interactive, "find_script_export", lambda: None)
@@ -123,7 +126,7 @@ def test_wordcloud_prompts_skipped_when_not_selected(
     tmp_path: Path,
 ) -> None:
     """Test that wordcloud prompts are skipped when wordclouds output is not selected."""
-    import convoviz.interactive as interactive
+    from convoviz import interactive
 
     monkeypatch.setattr(interactive, "find_latest_valid_zip", lambda: None)
     monkeypatch.setattr(interactive, "find_script_export", lambda: None)
@@ -180,7 +183,7 @@ def test_markdown_prompts_skipped_when_not_selected(
     tmp_path: Path,
 ) -> None:
     """Test that markdown prompts are skipped when markdown output is not selected."""
-    import convoviz.interactive as interactive
+    from convoviz import interactive
 
     monkeypatch.setattr(interactive, "find_latest_valid_zip", lambda: None)
     monkeypatch.setattr(interactive, "find_script_export", lambda: None)
@@ -235,7 +238,7 @@ def test_outputs_prompt_respects_existing_config(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     """Test that the outputs prompt respects the pre-existing configuration."""
-    import convoviz.interactive as interactive
+    from convoviz import interactive
 
     # Setup mocks
     monkeypatch.setattr(interactive, "find_latest_valid_zip", lambda: None)
@@ -280,7 +283,7 @@ def test_script_export_merge_prompt(
     tmp_path: Path,
 ) -> None:
     """Test that the script export merge prompt appears and sets config."""
-    import convoviz.interactive as interactive
+    from convoviz import interactive
 
     # Mock script export found
     export_path = tmp_path / "convoviz_export.json"
@@ -318,7 +321,7 @@ def test_script_export_merge_prompt_declined(
     tmp_path: Path,
 ) -> None:
     """Test that declining the script export merge prompt does not set config."""
-    import convoviz.interactive as interactive
+    from convoviz import interactive
 
     # Mock script export found
     export_path = tmp_path / "convoviz_export.json"
@@ -356,7 +359,7 @@ def test_script_export_merge_prompt_skipped_if_manually_selected(
     tmp_path: Path,
 ) -> None:
     """Test that the script export merge prompt is skipped if it's already the input."""
-    import convoviz.interactive as interactive
+    from convoviz import interactive
 
     # Mock script export found
     export_path = tmp_path / "convoviz_export.json"
@@ -402,13 +405,13 @@ def test_script_export_merge_prompt_skipped_if_manually_selected(
 
 def test_output_validation_does_not_create_directories(tmp_path: Path) -> None:
     """Validation should not create output directories during typing."""
-    import convoviz.interactive as interactive
+    from convoviz import interactive
 
     target = tmp_path / "new" / "output"
     assert not target.exists()
     assert not (tmp_path / "new").exists()
 
-    result = interactive._validate_output_path(str(target))
+    result = interactive._validate_output_path(str(target))  # noqa: SLF001
 
     assert result is True
     assert not target.exists()

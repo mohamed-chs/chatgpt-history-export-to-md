@@ -37,6 +37,7 @@ def load_programming_stopwords() -> frozenset[str]:
 
     Returns:
         Frozen set of programming stop words
+
     """
     stopwords_path = get_resource_path("assets/stopwords.txt")
     if not stopwords_path.exists():
@@ -58,6 +59,7 @@ def load_nltk_stopwords() -> frozenset[str]:
 
     Returns:
         Frozen set of stopwords from multiple languages
+
     """
     try:
         nltk_find("corpora/stopwords")
@@ -79,6 +81,7 @@ def parse_custom_stopwords(stopwords_str: str | None) -> set[str]:
 
     Returns:
         Set of lowercase, stripped stopwords
+
     """
     if not stopwords_str:
         return set()
@@ -95,6 +98,7 @@ def generate_wordcloud(text: str, config: WordCloudConfig) -> Image:
 
     Returns:
         PIL Image of the word cloud
+
     """
     # Combine NLTK and custom stopwords
     stopwords = set(load_nltk_stopwords())
@@ -130,6 +134,7 @@ def _generate_and_save_wordcloud(args: tuple[str, str, Path, WordCloudConfig]) -
 
     Returns:
         True if wordcloud was generated, False if skipped (empty text)
+
     """
     text, filename, output_dir, config = args
     if not text.strip():
@@ -155,6 +160,7 @@ def generate_wordclouds(
         output_dir: Directory to save the word clouds
         config: Word cloud configuration
         progress_bar: Whether to show progress bars
+
     """
     output_dir.mkdir(parents=True, exist_ok=True)
     logger.info(f"Generating wordclouds to {output_dir}")

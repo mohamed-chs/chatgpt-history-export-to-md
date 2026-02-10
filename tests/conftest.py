@@ -2,6 +2,7 @@
 
 import json
 from datetime import UTC, datetime, timedelta
+from pathlib import Path
 from zipfile import ZipFile
 
 import pytest
@@ -167,7 +168,7 @@ def mock_conversations_json(mock_conversation_data: dict, tmp_path):
     """Create a temporary conversations.json file."""
     data = [mock_conversation_data]
     file_path = tmp_path / "conversations.json"
-    with open(file_path, "w") as f:
+    with Path.open(file_path, "w") as f:
         json.dump(data, f)
     return file_path
 

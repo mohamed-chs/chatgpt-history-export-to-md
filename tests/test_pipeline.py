@@ -255,7 +255,8 @@ def test_run_pipeline_missing_graph_dependency(
 
     def fake_import(name, *args, **kwargs):
         if name == "convoviz.analysis.graphs":
-            raise ModuleNotFoundError("matplotlib")
+            msg = "matplotlib"
+            raise ModuleNotFoundError(msg)
         return real_import(name, *args, **kwargs)
 
     monkeypatch.setattr("builtins.__import__", fake_import)
@@ -279,7 +280,8 @@ def test_run_pipeline_missing_wordcloud_dependency(
 
     def fake_import(name, *args, **kwargs):
         if name == "convoviz.analysis.wordcloud":
-            raise ModuleNotFoundError("wordcloud")
+            msg = "wordcloud"
+            raise ModuleNotFoundError(msg)
         return real_import(name, *args, **kwargs)
 
     monkeypatch.setattr("builtins.__import__", fake_import)

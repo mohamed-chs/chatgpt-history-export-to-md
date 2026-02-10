@@ -89,6 +89,7 @@ class Conversation(BaseModel):
         Args:
             *authors: Author roles to filter by. Defaults to ("user",) if empty.
             include_hidden: Whether to include hidden/internal messages.
+
         """
         if not authors:
             authors = ("user",)
@@ -170,6 +171,7 @@ class Conversation(BaseModel):
         Returns:
             List of dicts with {name, type, content,
             conversation_id, conversation_title}
+
         """
         docs: list[dict[str, Any]] = []
         for node in self.ordered_nodes:
