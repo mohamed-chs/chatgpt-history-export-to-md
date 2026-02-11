@@ -11,6 +11,7 @@ from rich.markup import escape
 from convoviz.config import (
     FolderOrganization,
     OutputKind,
+    apply_runtime_defaults,
     get_user_config_path,
     load_config,
     write_default_config,
@@ -20,7 +21,7 @@ from convoviz.interactive import run_interactive_config
 from convoviz.io.loaders import find_latest_valid_zip
 from convoviz.logging_config import setup_logging
 from convoviz.pipeline import run_pipeline
-from convoviz.utils import default_font_path, expand_path, validate_writable_dir
+from convoviz.utils import expand_path, validate_writable_dir
 
 app = typer.Typer(
     add_completion=False,
@@ -165,21 +166,19 @@ def run(
             raise typer.Exit(code=0) from None
     else:
         # Non-interactive mode: validate we have what we need
+        latest = find_latest_valid_zip() if not config.input_path else None
+        used_latest = apply_runtime_defaults(config, input_fallback=latest)
+        if used_latest and not config.quiet and config.input_path is not None:
+            console.print(
+                f"No input specified, using latest zip found: {config.input_path}"
+            )
+
         if not config.input_path:
-            # Try to find a default
-            latest = find_latest_valid_zip()
-            if latest:
-                if not config.quiet:
-                    console.print(
-                        f"No input specified, using latest zip found: {latest}"
-                    )
-                config.input_path = latest
-            else:
-                console.print(
-                    "[bold red]Error:[/bold red] No input file provided and "
-                    "none found in Downloads."
-                )
-                raise typer.Exit(code=1)
+            console.print(
+                "[bold red]Error:[/bold red] No input file provided and "
+                "none found in Downloads."
+            )
+            raise typer.Exit(code=1)
 
         # Validate the input (basic check)
         if not config.input_path.exists():
@@ -188,10 +187,6 @@ def run(
                 f"{config.input_path}"
             )
             raise typer.Exit(code=1)
-
-        # Set default font if not set
-        if not config.wordcloud.font_path:
-            config.wordcloud.font_path = default_font_path()
 
     try:
         validate_writable_dir(config.output_folder, create=True)

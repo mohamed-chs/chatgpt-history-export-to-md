@@ -553,18 +553,6 @@ class TestBuildNodeTree:
         result = build_node_tree(mapping)
         assert len(result["root"].children_nodes) == 0
 
-    def test_node_is_leaf(self) -> None:
-        """Test Node.is_leaf property."""
-        mapping = {
-            "root": Node(id="root", parent=None, children=["child"]),
-            "child": Node(id="child", parent="root", children=[]),
-        }
-
-        result = build_node_tree(mapping)
-
-        assert not result["root"].is_leaf
-        assert result["child"].is_leaf
-
 
 # =============================================================================
 # Conversation Date/Time Property Tests

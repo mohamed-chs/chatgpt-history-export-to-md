@@ -8,12 +8,17 @@ from rich.console import Console
 
 from convoviz.config import ConvovizConfig, OutputKind
 from convoviz.exceptions import ConfigurationError, InvalidZipError
-from convoviz.io import save_canvas_documents, save_custom_instructions
-from convoviz.io.loaders import load_collection
+from convoviz.io import load_collection, save_canvas_documents, save_custom_instructions
 from convoviz.io.writers import save_collection
 
 console = Console()
 logger = logging.getLogger(__name__)
+
+OUTPUT_DIR_NAMES: dict[OutputKind, str] = {
+    OutputKind.MARKDOWN: "Markdown",
+    OutputKind.GRAPHS: "Graphs",
+    OutputKind.WORDCLOUDS: "Wordclouds",
+}
 
 
 def _safe_uri(path: Path) -> str:
@@ -26,6 +31,17 @@ def _safe_uri(path: Path) -> str:
         return path.resolve().as_uri()
     except Exception:
         return str(path)
+
+
+def _print_output_done(path: Path, icon: str, *, quiet: bool) -> None:
+    """Print a consistent completion message for an output directory."""
+    if quiet:
+        return
+    console.print(
+        f"\nDone [bold green]✅[/bold green] ! "
+        f"Check the output [bold blue]{icon}[/bold blue] here: "
+        f"{_safe_uri(path)} 🔗\n"
+    )
 
 
 def run_pipeline(config: ConvovizConfig) -> None:
@@ -56,12 +72,6 @@ def run_pipeline(config: ConvovizConfig) -> None:
         console.print(
             f"Loading data from {input_path} [bold yellow]📂[/bold yellow] ...\n"
         )
-
-    output_dir_map: dict[OutputKind, str] = {
-        OutputKind.MARKDOWN: "Markdown",
-        OutputKind.GRAPHS: "Graphs",
-        OutputKind.WORDCLOUDS: "Wordclouds",
-    }
 
     try:
         with tempfile.TemporaryDirectory(prefix="convoviz_") as tmp_dir:
@@ -115,13 +125,13 @@ def run_pipeline(config: ConvovizConfig) -> None:
                 return
 
             # Ensure output sub-directories exist
-            for output_kind, dir_name in output_dir_map.items():
+            for output_kind, dir_name in OUTPUT_DIR_NAMES.items():
                 if output_kind in selected_outputs:
                     (output_folder / dir_name).mkdir(parents=True, exist_ok=True)
 
             # Save markdown files (if selected)
             if OutputKind.MARKDOWN in selected_outputs:
-                markdown_folder = output_folder / output_dir_map[OutputKind.MARKDOWN]
+                markdown_folder = output_folder / OUTPUT_DIR_NAMES[OutputKind.MARKDOWN]
                 save_collection(
                     collection,
                     markdown_folder,
@@ -133,12 +143,7 @@ def run_pipeline(config: ConvovizConfig) -> None:
                 )
 
                 logger.info("Markdown generation complete")
-                if not config.quiet:
-                    console.print(
-                        f"\nDone [bold green]✅[/bold green] ! "
-                        "Check the output [bold blue]📄[/bold blue] here: "
-                        f"{_safe_uri(markdown_folder)} 🔗\n"
-                    )
+                _print_output_done(markdown_folder, "📄", quiet=config.quiet)
 
             # Save collection-level metadata if requested
             if config.export_custom_instructions:
@@ -180,7 +185,7 @@ def run_pipeline(config: ConvovizConfig) -> None:
                     )
                     raise ConfigurationError(msg) from e
 
-                graph_folder = output_folder / output_dir_map[OutputKind.GRAPHS]
+                graph_folder = output_folder / OUTPUT_DIR_NAMES[OutputKind.GRAPHS]
                 graph_folder.mkdir(parents=True, exist_ok=True)
                 generate_graphs(
                     collection,
@@ -189,12 +194,7 @@ def run_pipeline(config: ConvovizConfig) -> None:
                     progress_bar=not config.quiet,
                 )
                 logger.info("Graph generation complete")
-                if not config.quiet:
-                    console.print(
-                        f"\nDone [bold green]✅[/bold green] ! "
-                        "Check the output [bold blue]📈[/bold blue] here: "
-                        f"{_safe_uri(graph_folder)} 🔗\n"
-                    )
+                _print_output_done(graph_folder, "📈", quiet=config.quiet)
 
             # Generate word clouds (if selected)
             if OutputKind.WORDCLOUDS in selected_outputs:
@@ -211,7 +211,9 @@ def run_pipeline(config: ConvovizConfig) -> None:
                     )
                     raise ConfigurationError(msg) from e
 
-                wordcloud_folder = output_folder / output_dir_map[OutputKind.WORDCLOUDS]
+                wordcloud_folder = (
+                    output_folder / OUTPUT_DIR_NAMES[OutputKind.WORDCLOUDS]
+                )
                 wordcloud_folder.mkdir(parents=True, exist_ok=True)
                 generate_wordclouds(
                     collection,
@@ -220,12 +222,7 @@ def run_pipeline(config: ConvovizConfig) -> None:
                     progress_bar=not config.quiet,
                 )
                 logger.info("Wordcloud generation complete")
-                if not config.quiet:
-                    console.print(
-                        f"\nDone [bold green]✅[/bold green] ! "
-                        "Check the output [bold blue]🔡☁️[/bold blue] here: "
-                        f"{_safe_uri(wordcloud_folder)} 🔗\n"
-                    )
+                _print_output_done(wordcloud_folder, "🔡☁️", quiet=config.quiet)
 
             if not config.quiet:
                 console.print(

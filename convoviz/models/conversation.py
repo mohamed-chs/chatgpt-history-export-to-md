@@ -9,7 +9,7 @@ from typing import Any
 from pydantic import BaseModel, PrivateAttr
 
 from convoviz.models.message import AuthorRole
-from convoviz.models.node import Node, build_node_tree
+from convoviz.models.node import Node, build_node_tree, node_sort_key
 from convoviz.utils import month_start, year_start
 
 
@@ -59,27 +59,13 @@ class Conversation(BaseModel):
         return [
             node
             for node in self.node_mapping.values()
-            if node.has_message
-            and node.message is not None
-            and not node.message.is_hidden
+            if (message := node.message) is not None and not message.is_hidden
         ]
 
     def _sorted_message_nodes(self, *, include_hidden: bool) -> list[Node]:
         """Return message nodes sorted by create_time, then node id."""
         nodes = self.all_message_nodes if include_hidden else self.visible_message_nodes
-
-        def sort_key(node: Node) -> tuple[float, str]:
-            msg = node.message
-            if msg and msg.create_time:
-                try:
-                    ts = msg.create_time.timestamp()
-                except Exception:
-                    ts = 0.0
-            else:
-                ts = 0.0
-            return (ts, node.id)
-
-        return sorted(nodes, key=sort_key)
+        return sorted(nodes, key=node_sort_key)
 
     def nodes_by_author(
         self, *authors: AuthorRole, include_hidden: bool = False

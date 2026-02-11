@@ -33,7 +33,7 @@ Contributions are particularly welcome in the following areas:
 
 ### 📊 Enriching Graph Visualizations
 
-The current graph visualizations (`convoviz/analysis/graphs.py`) are kinda lacking. Contributions that make them more meaningful, insightful, and visually appealing are highly appreciated.
+The current graph visualizations (`convoviz/analysis/graphs/`) are kinda lacking. Contributions that make them more meaningful, insightful, and visually appealing are highly appreciated.
 
 ---
 

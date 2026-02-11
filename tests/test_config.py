@@ -15,7 +15,9 @@ from convoviz.config import (
     OutputKind,
     WordCloudConfig,
     YAMLConfig,
+    apply_runtime_defaults,
     get_default_config,
+    get_default_graph_config,
     load_config_from_path,
 )
 from convoviz.exceptions import ConfigurationError
@@ -27,6 +29,39 @@ def test_get_default_config() -> None:
     assert isinstance(config, ConvovizConfig)
     assert config.input_path is None
     assert isinstance(config.output_folder, Path)
+
+
+def test_get_default_graph_config() -> None:
+    """Test that get_default_graph_config returns a valid graph config."""
+    config = get_default_graph_config()
+    assert isinstance(config, GraphConfig)
+    assert config.color == get_default_config().graph.color
+
+
+def test_apply_runtime_defaults_applies_input_and_font() -> None:
+    """Runtime defaults should set fallback input path and font path."""
+    config = get_default_config()
+    fallback = Path("fallback_export.zip")
+
+    used_fallback = apply_runtime_defaults(config, input_fallback=fallback)
+
+    assert used_fallback is True
+    assert config.input_path == fallback
+    assert config.wordcloud.font_path is not None
+
+
+def test_apply_runtime_defaults_preserves_existing_input() -> None:
+    """Runtime defaults should not overwrite existing input_path."""
+    config = get_default_config()
+    existing = Path("already_set.zip")
+    config.input_path = existing
+
+    used_fallback = apply_runtime_defaults(
+        config, input_fallback=Path("other_fallback.zip")
+    )
+
+    assert used_fallback is False
+    assert config.input_path == existing
 
 
 def test_author_headers_defaults() -> None:

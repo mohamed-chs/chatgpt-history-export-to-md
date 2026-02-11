@@ -81,10 +81,26 @@ def tz_label(config: GraphConfig) -> str:
     return "UTC" if config.timezone == "utc" else "Local"
 
 
-def iter_month_starts(start: datetime, end: datetime) -> list[datetime]:
-    """Generate a list of month start datetimes from start to end (inclusive)."""
-    start = month_start(start)
-    end = month_start(end)
+def build_weekday_hour_grid(
+    timestamps: Iterable[float], config: GraphConfig
+) -> list[list[int]]:
+    """Aggregate timestamps into a weekday(0-6) x hour(0-23) activity grid."""
+    grid: list[list[int]] = [[0 for _ in range(24)] for _ in range(7)]
+    for ts in timestamps:
+        dt = ts_to_dt(ts, config)
+        grid[dt.weekday()][dt.hour] += 1
+    return grid
+
+
+def fill_missing_months(
+    counts: dict[datetime, int],
+) -> tuple[list[datetime], list[int]]:
+    """Fill in zero counts for missing months in a range."""
+    if not counts:
+        return [], []
+    keys = sorted(counts.keys())
+    start = month_start(keys[0])
+    end = month_start(keys[-1])
     months: list[datetime] = []
     cur = start
     while cur <= end:
@@ -95,17 +111,6 @@ def iter_month_starts(start: datetime, end: datetime) -> list[datetime]:
             if month == 12
             else cur.replace(month=month + 1)
         )
-    return months
-
-
-def fill_missing_months(
-    counts: dict[datetime, int],
-) -> tuple[list[datetime], list[int]]:
-    """Fill in zero counts for missing months in a range."""
-    if not counts:
-        return [], []
-    keys = sorted(counts.keys())
-    months = iter_month_starts(keys[0], keys[-1])
     return months, [counts.get(m, 0) for m in months]
 
 

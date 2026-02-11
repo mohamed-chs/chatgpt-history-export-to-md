@@ -5,7 +5,7 @@ from __future__ import annotations
 from collections import defaultdict
 from typing import TYPE_CHECKING
 
-from convoviz.config import get_default_config
+from convoviz.config import get_default_graph_config
 
 if TYPE_CHECKING:
     from matplotlib.figure import Figure
@@ -25,7 +25,7 @@ def generate_model_piechart(
     Note: kept for backwards compatibility (historically a pie chart). We now render a
     more readable horizontal bar chart with percentages.
     """
-    cfg = config or get_default_config().graph
+    cfg = config or get_default_graph_config()
     model_counts: defaultdict[str, int] = defaultdict(int)
 
     for conv in collection.conversations:
@@ -97,7 +97,7 @@ def generate_length_histogram(
         Matplotlib Figure object
 
     """
-    cfg = config or get_default_config().graph
+    cfg = config or get_default_graph_config()
     lengths = [conv.message_count("user") for conv in collection.conversations]
     fig, ax, font_prop = setup_single_axes(cfg)
 
@@ -169,7 +169,7 @@ def generate_conversation_lifetime_histogram(
     config: GraphConfig | None = None,
 ) -> Figure:
     """Create a histogram of conversation lifetimes (update_time - create_time)."""
-    cfg = config or get_default_config().graph
+    cfg = config or get_default_graph_config()
     fig, ax, font_prop = setup_single_axes(cfg)
 
     lifetimes_days: list[float] = []

@@ -5,7 +5,6 @@ from convoviz.exceptions import (
     ConvovizError,
     InvalidZipError,
     MessageContentError,
-    RenderingError,
 )
 
 
@@ -50,20 +49,6 @@ class TestConfigurationError:
         """Test error with field attribute."""
         error = ConfigurationError("Invalid value", field="colormap")
         assert error.field == "colormap"
-
-
-class TestRenderingError:
-    """Tests for RenderingError."""
-
-    def test_message(self) -> None:
-        """Test error message."""
-        error = RenderingError("Render failed")
-        assert str(error) == "Render failed"
-
-    def test_with_conversation_id(self) -> None:
-        """Test error with conversation_id."""
-        error = RenderingError("Failed", conversation_id="conv123")
-        assert error.conversation_id == "conv123"
 
 
 class TestMessageContentError:

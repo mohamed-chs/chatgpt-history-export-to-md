@@ -7,12 +7,17 @@ from questionary import Choice, Style, checkbox, confirm, select
 from questionary import path as qst_path
 from questionary import text as qst_text
 
-from convoviz.config import ConvovizConfig, OutputKind, YAMLConfig, get_default_config
+from convoviz.config import (
+    ConvovizConfig,
+    OutputKind,
+    YAMLConfig,
+    apply_runtime_defaults,
+    get_default_config,
+)
 from convoviz.exceptions import ConfigurationError
 from convoviz.io.loaders import find_latest_valid_zip, find_script_export, validate_zip
 from convoviz.utils import (
     colormaps,
-    default_font_path,
     expand_path,
     font_names,
     font_path,
@@ -105,13 +110,8 @@ def run_interactive_config(
     logger.info("Starting interactive configuration")
 
     # Set sensible defaults if not already set
-    if not config.input_path:
-        latest = find_latest_valid_zip()
-        if latest:
-            config.input_path = latest
-
-    if not config.wordcloud.font_path:
-        config.wordcloud.font_path = default_font_path()
+    latest = find_latest_valid_zip() if config.input_path is None else None
+    apply_runtime_defaults(config, input_fallback=latest)
 
     # Prompt for input path
     input_default = str(config.input_path) if config.input_path else ""

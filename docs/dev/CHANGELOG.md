@@ -3,6 +3,16 @@
 > **Note**: This changelog is informal and incomplete. It tracks the primary record of all functional and behavioral updates to Convoviz.
 > **APPEND-ONLY. DO NOT EDIT, REWRITE, OR DELETE PAST ENTRIES. ALL NEW UPDATES MUST BE ADDED TO THE TOP.**
 
+## Recent Updates (February 11, 2026)
+
+- **Dead Code Elimination**: Removed unused `RenderingError` and unused `Node.is_leaf` to shrink exception/model surface area.
+- **Default Flow Simplification**: Added `apply_runtime_defaults()` and reused it in both CLI and interactive paths to unify auto-input and default wordcloud font behavior.
+- **Graph Config Simplification**: Added `get_default_graph_config()` and switched graph modules to use it directly instead of constructing a full app config for graph-only defaults.
+- **Graph Logic De-duplication**: Added shared `build_weekday_hour_grid()` helper and reused it in heatmap/dashboard generation.
+- **Markdown Logic De-duplication**: Centralized code-fence state handling and node sort key logic (`node_sort_key`) to remove repeated parsing/sorting implementations.
+- **Pipeline/IO Cohesion**: Exported `load_collection` at package I/O level and simplified repeated pipeline completion messaging.
+- **Docs Cleanup**: Updated stale graph path reference in `CONTRIBUTING.md` and clarified script-export matcher behavior in loader docs.
+
 ## Recent Updates (February 7, 2026)
 
 - **LaTeX Conversion Safety**: LaTeX delimiter conversion now skips fenced code blocks and inline code spans. Added tests to cover these cases.

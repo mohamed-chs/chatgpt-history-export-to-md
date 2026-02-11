@@ -1,6 +1,5 @@
 """Markdown rendering for conversations."""
 
-import contextlib
 import re
 from collections.abc import Callable
 from datetime import datetime
@@ -10,7 +9,10 @@ from urllib.parse import quote
 from convoviz.config import AuthorHeaders, ConversationConfig
 from convoviz.exceptions import MessageContentError
 from convoviz.models import Conversation, Node
+from convoviz.models.node import node_sort_key
 from convoviz.renderers.yaml import render_yaml_header
+
+_FENCE_PATTERN = re.compile(r"^[ \t]{0,3}(`{3,}|~{3,})(.*)$")
 
 
 def replace_citations(
@@ -99,16 +101,40 @@ def replace_citations(
 
 def _format_link(title: str | None, url: str | None, flavor: str = "standard") -> str:
     """Format a title and URL into a concise markdown link."""
-    if flavor in ("standard", "obsidian"):
-        if title and url:
-            return f"[{title}]({url})"
-        if url:
-            return f"[Source]({url})"
-        if title:
-            return title
+    if flavor not in ("standard", "obsidian"):
         return ""
 
+    if title and url:
+        return f"[{title}]({url})"
+    if url:
+        return f"[Source]({url})"
+    if title:
+        return title
     return ""
+
+
+def _update_fence_stack(line: str, open_fences: list[tuple[str, int]]) -> bool:
+    """Update code-fence stack state for a markdown line.
+
+    Returns True when the line is a fence line.
+    """
+    match = _FENCE_PATTERN.match(line)
+    if not match:
+        return False
+
+    fence = match.group(1)
+    rest = match.group(2)
+    fence_char = fence[0]
+    fence_len = len(fence)
+
+    if open_fences:
+        open_char, open_len = open_fences[-1]
+        if fence_char == open_char and fence_len >= open_len and rest.strip() == "":
+            open_fences.pop()
+        return True
+
+    open_fences.append((fence_char, fence_len))
+    return True
 
 
 def close_code_blocks(text: str) -> str:
@@ -123,25 +149,9 @@ def close_code_blocks(text: str) -> str:
     """
     open_fences: list[tuple[str, int]] = []
     lines = text.split("\n")
-    fence_pattern = re.compile(r"^[ \t]{0,3}(`{3,}|~{3,})(.*)$")
 
     for line in lines:
-        match = fence_pattern.match(line)
-        if not match:
-            continue
-
-        fence = match.group(1)
-        rest = match.group(2)
-        fence_char = fence[0]
-        fence_len = len(fence)
-
-        if open_fences:
-            open_char, open_len = open_fences[-1]
-            if fence_char == open_char and fence_len >= open_len and rest.strip() == "":
-                open_fences.pop()
-            continue
-
-        open_fences.append((fence_char, fence_len))
+        _update_fence_stack(line, open_fences)
 
     if open_fences:
         closures = "\n".join(
@@ -214,28 +224,11 @@ def replace_latex_delimiters(text: str) -> str:
         return "".join(result)
 
     lines = text.split("\n")
-    fence_pattern = re.compile(r"^[ \t]{0,3}(`{3,}|~{3,})(.*)$")
     open_fences: list[tuple[str, int]] = []
     output_lines: list[str] = []
 
     for line in lines:
-        match = fence_pattern.match(line)
-        if match:
-            fence = match.group(1)
-            rest = match.group(2)
-            fence_char = fence[0]
-            fence_len = len(fence)
-
-            if open_fences:
-                open_char, open_len = open_fences[-1]
-                if (
-                    fence_char == open_char
-                    and fence_len >= open_len
-                    and rest.strip() == ""
-                ):
-                    open_fences.pop()
-            else:
-                open_fences.append((fence_char, fence_len))
+        if _update_fence_stack(line, open_fences):
             output_lines.append(line)
             continue
 
@@ -415,15 +408,8 @@ def _ordered_nodes_full(conversation: Conversation) -> list[Node]:
     """
     mapping = conversation.node_mapping
 
-    def sort_key(node: Node) -> tuple[float, str]:
-        ts = 0.0
-        if node.message and node.message.create_time:
-            with contextlib.suppress(Exception):
-                ts = node.message.create_time.timestamp()
-        return (ts, node.id)
-
     # Sort all nodes once by date/ID to ensure deterministic processing
-    all_nodes_sorted = sorted(mapping.values(), key=sort_key)
+    all_nodes_sorted = sorted(mapping.values(), key=node_sort_key)
     roots = [n for n in all_nodes_sorted if n.parent is None]
 
     visited: set[str] = set()
@@ -439,7 +425,7 @@ def _ordered_nodes_full(conversation: Conversation) -> list[Node]:
             visited.add(node.id)
             ordered.append(node)
             # Add children in reverse sort order so they are popped in sort order
-            children = sorted(node.children_nodes, key=sort_key, reverse=True)
+            children = sorted(node.children_nodes, key=node_sort_key, reverse=True)
             stack.extend(children)
 
     # 1. Process from real roots

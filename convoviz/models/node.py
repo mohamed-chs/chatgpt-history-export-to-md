@@ -36,10 +36,16 @@ class Node(BaseModel):
         """Check if this node contains a message."""
         return self.message is not None
 
-    @property
-    def is_leaf(self) -> bool:
-        """Check if this node is a leaf (no children)."""
-        return len(self.children_nodes) == 0
+
+def node_sort_key(node: Node) -> tuple[float, str]:
+    """Sort nodes by message timestamp (fallback 0), then by node ID."""
+    message = node.message
+    if message and message.create_time:
+        try:
+            return (message.create_time.timestamp(), node.id)
+        except Exception:
+            pass
+    return (0.0, node.id)
 
 
 def build_node_tree(mapping: dict[str, Node]) -> dict[str, Node]:

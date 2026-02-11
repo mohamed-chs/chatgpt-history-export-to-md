@@ -197,7 +197,7 @@ def find_latest_valid_zip(directory: Path | None = None) -> Path | None:
 def find_script_export(directory: Path | None = None) -> Path | None:
     """Find the most recent script-generated export in a directory.
 
-    Looks for files with 'convoviz' in the name and .json or .zip extension.
+    Looks for files starting with "convoviz_export" and using .json/.zip.
 
     Args:
         directory: Directory to search (defaults to ~/Downloads)

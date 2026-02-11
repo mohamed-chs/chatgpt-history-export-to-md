@@ -10,7 +10,7 @@ import matplotlib.dates as mdates
 from matplotlib.figure import Figure
 from tqdm import tqdm
 
-from convoviz.config import get_default_config
+from convoviz.config import get_default_graph_config
 from convoviz.utils import WEEKDAYS, month_start, year_start
 
 if TYPE_CHECKING:
@@ -24,6 +24,7 @@ if TYPE_CHECKING:
 from .common import (
     aggregate_counts_by_month,
     apply_tick_font,
+    build_weekday_hour_grid,
     fill_missing_months,
     load_font,
     moving_average,
@@ -52,7 +53,7 @@ def generate_summary_dashboard(
     config: GraphConfig | None = None,
 ) -> Figure:
     """Create a compact, high-signal overview dashboard."""
-    cfg = config or get_default_config().graph
+    cfg = config or get_default_graph_config()
     font_prop = load_font(cfg)
 
     fig = Figure(figsize=(14, 9), dpi=cfg.dpi, facecolor="white")
@@ -131,10 +132,7 @@ def generate_summary_dashboard(
 
     # Heatmap
     if user_ts:
-        grid: list[list[int]] = [[0 for _ in range(24)] for _ in range(7)]
-        for ts in user_ts:
-            dt = ts_to_dt(ts, cfg)
-            grid[dt.weekday()][dt.hour] += 1
+        grid = build_weekday_hour_grid(user_ts, cfg)
 
         ax_heat.grid(False)
         for side in ["top", "right", "left", "bottom"]:
@@ -250,7 +248,7 @@ def generate_summary_graphs(
     if not collection.conversations:
         return
 
-    cfg = config or get_default_config().graph
+    cfg = config or get_default_graph_config()
 
     user_ts = collection.timestamps("user")
     logger.info(f"Generating summary graphs to {output_dir}")
@@ -335,7 +333,7 @@ def generate_graphs(
 
     """
     output_dir.mkdir(parents=True, exist_ok=True)
-    cfg = config or get_default_config().graph
+    cfg = config or get_default_graph_config()
 
     # Summary graphs (default: small, high-signal set)
     generate_summary_graphs(collection, output_dir, cfg, progress_bar=progress_bar)

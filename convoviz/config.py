@@ -13,7 +13,7 @@ from platformdirs import user_config_path
 from pydantic import BaseModel, BeforeValidator, Field, field_validator
 
 from convoviz.exceptions import ConfigurationError
-from convoviz.utils import deep_merge_dicts, normalize_optional_path
+from convoviz.utils import deep_merge_dicts, default_font_path, normalize_optional_path
 
 
 def _coerce_none(v: Any) -> Any:
@@ -205,6 +205,37 @@ def get_default_config_data() -> dict[str, Any]:
 def get_default_config() -> ConvovizConfig:
     """Get a fresh default configuration instance."""
     return ConvovizConfig.model_validate(get_default_config_data())
+
+
+@lru_cache(maxsize=1)
+def get_default_graph_config() -> GraphConfig:
+    """Get a fresh default graph configuration instance."""
+    graph_data = get_default_config_data().get("graph", {})
+    if not isinstance(graph_data, dict):
+        graph_data = {}
+    return GraphConfig.model_validate(graph_data)
+
+
+def apply_runtime_defaults(
+    config: ConvovizConfig,
+    *,
+    input_fallback: Path | None = None,
+) -> bool:
+    """Apply runtime defaults not encoded directly in the static TOML config.
+
+    Returns:
+        True if ``input_fallback`` was applied to ``config.input_path``.
+
+    """
+    used_input_fallback = False
+    if config.input_path is None and input_fallback is not None:
+        config.input_path = input_fallback
+        used_input_fallback = True
+
+    if config.wordcloud.font_path is None:
+        config.wordcloud.font_path = default_font_path()
+
+    return used_input_fallback
 
 
 def get_user_config_path() -> Path:

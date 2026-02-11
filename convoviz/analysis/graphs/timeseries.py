@@ -7,7 +7,7 @@ from typing import TYPE_CHECKING
 
 import matplotlib.dates as mdates
 
-from convoviz.config import get_default_config
+from convoviz.config import get_default_graph_config
 from convoviz.utils import WEEKDAYS
 
 if TYPE_CHECKING:
@@ -45,7 +45,7 @@ def generate_week_barplot(
         Matplotlib Figure object
 
     """
-    cfg = config or get_default_config().graph
+    cfg = config or get_default_graph_config()
     fig, ax, font_prop = setup_single_axes(cfg)
 
     weekday_counts: dict[str, int] = dict.fromkeys(WEEKDAYS, 0)
@@ -91,7 +91,7 @@ def generate_hour_barplot(
         Matplotlib Figure object
 
     """
-    cfg = config or get_default_config().graph
+    cfg = config or get_default_graph_config()
     fig, ax, font_prop = setup_single_axes(cfg)
 
     hour_counts: dict[int, int] = dict.fromkeys(range(24), 0)
@@ -135,7 +135,7 @@ def generate_monthly_activity_barplot(
     Important: this is computed from *message timestamps* (actual activity), not from
     the conversation creation month.
     """
-    cfg = config or get_default_config().graph
+    cfg = config or get_default_graph_config()
     timestamps = collection.timestamps("user")
     fig, ax, font_prop = setup_single_axes(cfg)
 
@@ -178,7 +178,7 @@ def generate_daily_activity_lineplot(
     config: GraphConfig | None = None,
 ) -> Figure:
     """Create a line chart showing user prompt count per day (with a rolling mean)."""
-    cfg = config or get_default_config().graph
+    cfg = config or get_default_graph_config()
     timestamps = collection.timestamps("user")
 
     fig, ax, font_prop = setup_single_axes(cfg)

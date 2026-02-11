@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from convoviz.config import get_default_config
+from convoviz.config import get_default_graph_config
 from convoviz.utils import WEEKDAYS
 
 if TYPE_CHECKING:
@@ -14,7 +14,7 @@ if TYPE_CHECKING:
     from convoviz.config import GraphConfig
     from convoviz.models import ConversationCollection
 
-from .common import setup_single_axes, ts_to_dt, tz_label
+from .common import build_weekday_hour_grid, setup_single_axes, tz_label
 
 
 def generate_activity_heatmap(
@@ -22,7 +22,7 @@ def generate_activity_heatmap(
     config: GraphConfig | None = None,
 ) -> Figure:
     """Create a heatmap of activity by weekday × hour (user prompts)."""  # noqa: RUF002
-    cfg = config or get_default_config().graph
+    cfg = config or get_default_graph_config()
     timestamps = collection.timestamps("user")
 
     fig, ax, font_prop = setup_single_axes(cfg)
@@ -31,10 +31,7 @@ def generate_activity_heatmap(
         ax.set_axis_off()
         return fig
 
-    grid: list[list[int]] = [[0 for _ in range(24)] for _ in range(7)]
-    for ts in timestamps:
-        dt = ts_to_dt(ts, cfg)
-        grid[dt.weekday()][dt.hour] += 1
+    grid = build_weekday_hour_grid(timestamps, cfg)
 
     # Keep the axes frame for the heatmap.
     ax.grid(False)

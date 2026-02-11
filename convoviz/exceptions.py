@@ -22,14 +22,6 @@ class ConfigurationError(ConvovizError):
         super().__init__(message)
 
 
-class RenderingError(ConvovizError):
-    """Raised when rendering fails."""
-
-    def __init__(self, message: str, conversation_id: str | None = None) -> None:
-        self.conversation_id = conversation_id
-        super().__init__(message)
-
-
 class MessageContentError(ConvovizError):
     """Raised when message content cannot be extracted."""
 
