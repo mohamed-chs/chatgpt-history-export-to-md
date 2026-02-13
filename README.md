@@ -7,7 +7,7 @@
     Perfect for archiving, local search, or use with note-taking apps like Obsidian.
   </strong></p>
   <p align="center">
-    Visualize your data with word clouds 🔡☁️ and usage graphs 📈.
+    Visualize your data with word clouds and usage graphs.
   </p>
 </p>
 
@@ -20,23 +20,23 @@
 
 ---
 
-## ✨ Features
+## Features
 
-| Feature | Description |
+|  |  |
 |---------|-------------|
-| 📝 **Markdown Export** | Clean, well-formatted Markdown with optional YAML headers |
-| 🖼️ **Inline Images** | Media attachments rendered directly in your Markdown files |
-| 🔗 **Citations** | Web search results and source links accurately preserved |
-| ☁️ **Word Clouds** | Visual breakdowns of your most-used words and phrases |
-| 📈 **Usage Graphs** | Bar plots and charts showing your conversation patterns |
-| 🎨 **Canvas Support** | OpenAI "Canvas" documents extracted as standalone files (`.py`, `.html`, etc.) |
-| 🛡️ **Custom Instructions** | User/Model system messages exported to `custom_instructions.json` |
+| **Markdown Export** | Clean, well-formatted Markdown with optional YAML headers |
+| **Inline Images** | Media attachments rendered directly in your Markdown files |
+| **Citations** | Web search results and source links accurately preserved |
+| **Word Clouds** | Visual breakdowns of your most-used words and phrases |
+| **Usage Graphs** | Bar plots and charts showing your conversation patterns |
+| **Canvas Support** | OpenAI "Canvas" documents extracted as standalone files (`.py`, `.html`, etc.) |
+| **Custom Instructions** | User/Model system messages exported to `custom_instructions.json` |
 
-> 💡 **See examples in the [`demo/`](https://github.com/mohamed-chs/convoviz/tree/main/demo) folder!**
+> see word cloud examples in the [`demo/`](https://github.com/mohamed-chs/convoviz/tree/main/demo) folder!
 
 ---
 
-## 📖 How to Use
+## How to Use
 
 ### Step 1: Export Your ChatGPT Data
 
@@ -60,7 +60,7 @@ If you want to grab recent conversations quickly or bypass the official export w
 
 ### Step 2: Install Convoviz
 
-### 🚀 Quick Install
+### Quick Install
 
 Run one of the commands below to install **everything** you need automatically.
 
@@ -84,7 +84,7 @@ irm https://raw.githubusercontent.com/mohamed-chs/convoviz/main/install.ps1 | ie
 ```
 
 <details>
-<summary><strong>📦 Alternative: Install with pip</strong></summary>
+<summary><strong>Alternative: Install with pip</strong></summary>
 
 If you prefer using `pip` directly:
 
@@ -118,7 +118,7 @@ convoviz --input path/to/your/export.zip --output path/to/output/folder
 ```
 
 <details>
-<summary><strong>⚙️ Command Line Options</strong></summary>
+<summary><strong>Command Line Options</strong></summary>
 
 #### Selective Output
 
@@ -196,13 +196,13 @@ YAML frontmatter titles are sanitized; the original title is preserved in `alias
 
 ---
 
-### Step 4: Check the Output 🎉
+### Step 4: Check the Output
 
 After running the script, head to your output folder (defaults to `Documents/ChatGPT-Data` if you didn't change it) to see:
-- 📝 Neatly formatted Markdown files
-- 📊 Visualizations and graphs
-- 🎨 Extracted Canvas documents (if any)
-- 🛡️ User "Custom Instructions" (`custom_instructions.json`)
+- Neatly formatted Markdown files
+- Visualizations and graphs
+- Extracted Canvas documents (if any)
+- User "Custom Instructions" (`custom_instructions.json`)
 
 If you've had a great experience, consider giving the project a ⭐ **star**! It keeps me motivated and helps others discover it!
 
@@ -220,13 +220,13 @@ Whether you're a tech wizard or you're new to all this, I'd love to hear about y
 
 ---
 
-## 🤝 Contributing
+## Contributing
 
 Interested in contributing? Check out the **[Contributing Guide](https://github.com/mohamed-chs/convoviz/blob/main/CONTRIBUTING.md)** for development setup, code style, and how to submit a pull request.
 
 ---
 
-## 📝 Notes
+## Notes
 
 <details>
 <summary><strong>Offline</strong></summary>
