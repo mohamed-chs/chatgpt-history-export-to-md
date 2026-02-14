@@ -68,6 +68,7 @@ Input (ZIP/Dir/JSON) → loaders.py → ConversationCollection
 Conversation + Config → render_conversation() → Markdown string
     └── Uses render_yaml_header() for frontmatter
     └── Uses render_node() for each message
+    └── Citation placeholders become per-message footnote refs + footnote block
     └── Uses asset_resolver callback to copy/link images
 ```
 

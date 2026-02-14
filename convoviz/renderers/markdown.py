@@ -20,8 +20,8 @@ def replace_citations(
     citations: list[dict[str, Any]] | None = None,
     citation_map: dict[str, dict[str, str | None]] | None = None,
     flavor: str = "standard",
-) -> str:
-    """Replace citation placeholders in text with markdown links.
+) -> tuple[str, list[str]]:
+    """Replace citation placeholders with footnote refs and definitions.
 
     Supports two formats:
     1. Tether v4 (metadata.citations): Placed at specific indices
@@ -36,67 +36,124 @@ def replace_citations(
         flavor: Markdown flavor for link formatting ("standard", "obsidian")
 
     Returns:
-        Text with all placeholders replaced by markdown links
+        A tuple of:
+        1. Text with placeholders replaced by footnote references (`[^n]`)
+        2. Footnote definitions to append at message bottom (`[^n]: ...`)
 
     """
+    footnotes: list[str] = []
+    footnote_numbers: dict[str, int] = {}
 
-    def maybe_prefix_space(original: str, start_idx: int, replacement: str) -> str:
-        if not replacement:
-            return replacement
-        if start_idx <= 0:
-            return replacement
-        if original[start_idx - 1].isspace():
-            return replacement
-        return f" {replacement}"
+    def register_footnote(title: str | None, url: str | None) -> str:
+        link = _format_link(title, url, flavor)
+        if not link:
+            return ""
+        if link not in footnote_numbers:
+            number = len(footnotes) + 1
+            footnote_numbers[link] = number
+            footnotes.append(f"[^{number}]: {link}")
+        return f"[^{footnote_numbers[link]}]"
 
-    # 1. Handle Tether v4 (Index-based replacements)
+    v4_replacements: list[dict[str, Any]] = []
+    embedded_pattern = re.compile(r"\uE200cite((?:\uE202[a-zA-Z0-9]+)+)\uE201")
+    embedded_occurrences: list[dict[str, Any]] = []
+
+    # Collect valid v4 citations with their source positions.
     if citations:
-        # Sort citations by start_ix descending to replace safely from end
-        sorted_citations = sorted(
-            citations, key=lambda c: c.get("start_ix", 0), reverse=True
-        )
-
-        for cit in sorted_citations:
+        for cit in citations:
             start = cit.get("start_ix")
             end = cit.get("end_ix")
-            meta = cit.get("metadata", {})
-
-            if start is None or end is None:
+            if not isinstance(start, int) or not isinstance(end, int):
                 continue
+            if not (0 <= start < end <= len(text)):
+                continue
+            metadata = cit.get("metadata", {})
+            if not isinstance(metadata, dict):
+                metadata = {}
+            v4_replacements.append(
+                {
+                    "start": start,
+                    "end": end,
+                    "title": metadata.get("title"),
+                    "url": metadata.get("url"),
+                    "replacement": "",
+                }
+            )
 
-            replacement = _format_link(meta.get("title"), meta.get("url"), flavor)
+    # Collect embedded citation occurrences in source order.
+    if citation_map is not None:
+        for match in embedded_pattern.finditer(text):
+            raw_keys = match.group(1).split("\ue202")
+            keys = [k for k in raw_keys if k]
+            embedded_occurrences.append(
+                {
+                    "start": match.start(),
+                    "keys": keys,
+                    "replacement": "",
+                }
+            )
 
-            # Only replace if strictly positive indices and bounds check
-            if 0 <= start < end <= len(text):
-                replacement = maybe_prefix_space(text, start, replacement)
-                text = text[:start] + replacement + text[end:]
+    # Assign footnote numbers by first appearance in source text
+    # across both citation formats.
+    appearance_order: list[tuple[int, str, int]] = []
+    appearance_order.extend(
+        (int(entry["start"]), "v4", i) for i, entry in enumerate(v4_replacements)
+    )
+    appearance_order.extend(
+        (int(entry["start"]), "embedded", i)
+        for i, entry in enumerate(embedded_occurrences)
+    )
+    appearance_order.sort(key=lambda item: item[0])
+
+    for _, kind, idx in appearance_order:
+        if kind == "v4":
+            entry = v4_replacements[idx]
+            entry["replacement"] = register_footnote(
+                entry.get("title"), entry.get("url")
+            )
+            continue
+
+        entry = embedded_occurrences[idx]
+        markers: list[str] = []
+        for key in entry["keys"]:
+            if citation_map is None:
+                continue
+            data = citation_map.get(key)
+            if not isinstance(data, dict):
+                continue
+            marker = register_footnote(data.get("title"), data.get("url"))
+            if marker:
+                markers.append(marker)
+        entry["replacement"] = " ".join(markers)
+
+    # Apply v4 replacements from end of string to start to keep indices stable.
+    for entry in sorted(
+        v4_replacements,
+        key=lambda item: int(item["start"]),
+        reverse=True,
+    ):
+        start = int(entry["start"])
+        end = int(entry["end"])
+        replacement = str(entry["replacement"])
+        text = text[:start] + replacement + text[end:]
 
     # 2. Handle Embedded Citations (Regex-based)
     # Pattern: cite (key)+ 
     # Codepoints: \uE200 (Start), \uE202 (Sep), \uE201 (End)
     if citation_map is not None:
-        pattern = re.compile(r"\uE200cite((?:\uE202[a-zA-Z0-9]+)+)\uE201")
+        replacement_iter = iter(
+            str(entry["replacement"]) for entry in embedded_occurrences
+        )
 
-        def replacer(match: re.Match) -> str:
-            # Group 1 contains string like: turn0search18turn0search3
-            # Split by separator \uE202 (first item will be empty string)
-            raw_keys = match.group(1).split("\ue202")
-            keys = [k for k in raw_keys if k]
+        def replacer(_match: re.Match) -> str:
+            try:
+                return next(replacement_iter)
+            except StopIteration:
+                return ""
 
-            links = []
-            for key in keys:
-                if key in citation_map:
-                    data = citation_map[key]
-                    link = _format_link(data.get("title"), data.get("url"), flavor)
-                    if link:
-                        links.append(link)
+        text = embedded_pattern.sub(replacer, text)
 
-            replacement = " ".join(links)
-            return maybe_prefix_space(text, match.start(), replacement)
-
-        text = pattern.sub(replacer, text)
-
-    return text
+    return text, footnotes
 
 
 def _format_link(title: str | None, url: str | None, flavor: str = "standard") -> str:
@@ -383,8 +440,9 @@ def render_node(
     effective_map = (
         citation_map if citation_map is not None else message.internal_citation_map
     )
+    citation_footnotes: list[str] = []
     if message.metadata.citations or effective_map:
-        text = replace_citations(
+        text, citation_footnotes = replace_citations(
             text,
             citations=message.metadata.citations,
             citation_map=effective_map,
@@ -398,8 +456,11 @@ def render_node(
             content = replace_latex_delimiters(content)
 
     images = _render_images(message, asset_resolver)
+    footnotes = ""
+    if citation_footnotes:
+        footnotes = "\n" + "\n".join(citation_footnotes) + "\n"
 
-    return f"\n{header}{timestamp}{content}{images}\n***\n"
+    return f"\n{header}{timestamp}{content}{images}{footnotes}\n***\n"
 
 
 def _ordered_nodes_full(conversation: Conversation) -> list[Node]:

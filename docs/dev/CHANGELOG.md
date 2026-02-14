@@ -5,6 +5,8 @@
 
 ## Recent Updates (February 14, 2026)
 
+- **Citation Footnotes**: Message citations now render as footnote references in text (`[^n]`) with resolved source definitions emitted at the bottom of each message block, instead of inline links.
+- **Citation Numbering/Deduping**: Footnote numbering now follows source appearance order across indexed and embedded citation formats and reuses numbers for repeated identical sources.
 - **Message Robustness**: Hardened text extraction for image-only messages so they no longer raise `MessageContentError` and get incorrectly hidden. Added regression coverage for attachment-only image visibility.
 - **Canvas Payload Validation**: Canvas parsing now validates `name`/`content` as strings and normalizes `type` fallback to `"unknown"` when malformed.
 - **Traversal Safety**: `Conversation.ordered_nodes` is now cycle-safe on malformed parent graphs, preventing infinite loops in active-branch rendering.

@@ -428,3 +428,45 @@ def test_render_node_respects_explicit_empty_citation_map() -> None:
     rendered = render_node(node, AuthorHeaders(), citation_map={})
     assert marker in rendered
     assert "[Source](https://example.com)" not in rendered
+
+
+def test_render_node_puts_citation_footnotes_at_message_bottom() -> None:
+    """Citation references should render as footnotes below message content."""
+    node = Node(
+        id="n1",
+        message={
+            "id": "m1",
+            "author": {"role": "assistant", "metadata": {}},
+            "create_time": datetime(2024, 1, 1).timestamp(),
+            "update_time": datetime(2024, 1, 1).timestamp(),
+            "content": {
+                "content_type": "text",
+                "parts": ["Claim 【1†source】."],
+            },
+            "status": "finished_successfully",
+            "end_turn": True,
+            "weight": 1.0,
+            "metadata": {
+                "citations": [
+                    {
+                        "start_ix": 6,
+                        "end_ix": 16,
+                        "metadata": {
+                            "title": "Source 1",
+                            "url": "https://example.com/1",
+                        },
+                    }
+                ]
+            },
+            "recipient": "all",
+        },
+        parent=None,
+        children=[],
+    )
+
+    rendered = render_node(node, AuthorHeaders())
+    assert "Claim [^1]." in rendered
+    assert "[^1]: [Source 1](https://example.com/1)" in rendered
+    assert rendered.index("[^1]: [Source 1](https://example.com/1)") > rendered.index(
+        "Claim [^1]."
+    )

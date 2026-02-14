@@ -113,11 +113,13 @@ class TestCitationParsing:
             },
         ]
 
-        result = replace_citations(text, citations)
-        # Expected: "This is a claim [Source 1](http://example.com/1) and another [Source](http://example.com/2)."
-        assert "[Source 1](http://example.com/1)" in result
-        assert "[Source](http://example.com/2)" in result
-        assert "【172†source】" not in result
+        rendered_text, footnotes = replace_citations(text, citations)
+        assert rendered_text == "This is a claim [^1] and another [^2]."
+        assert footnotes == [
+            "[^1]: [Source 1](http://example.com/1)",
+            "[^2]: [Source](http://example.com/2)",
+        ]
+        assert "【172†source】" not in rendered_text
 
     def test_replace_embedded_citations(self):
         # \uE200cite\uE202turn0search18\uE201
@@ -129,9 +131,10 @@ class TestCitationParsing:
             },
         }
 
-        result = replace_citations(text, citation_map=citation_map)
-        assert "[My Source](http://example.com/embedded)" in result
-        assert "\ue200" not in result
+        rendered_text, footnotes = replace_citations(text, citation_map=citation_map)
+        assert rendered_text == "Check this source: [^1]."
+        assert footnotes == ["[^1]: [My Source](http://example.com/embedded)"]
+        assert "\ue200" not in rendered_text
 
     def test_replace_embedded_citations_multiple(self):
         # \uE200cite\uE202key1\uE202key2\uE201
@@ -140,12 +143,22 @@ class TestCitationParsing:
             "key1": {"title": "S1", "url": "http://s1.com"},
             "key2": {"title": "S2", "url": "http://s2.com"},
         }
-        result = replace_citations(text, citation_map=citation_map)
-        assert "[S1](http://s1.com)" in result
-        assert "[S2](http://s2.com)" in result
-        # Check adjacent spacing/concatenation
-        # Expected: "Sources:  [S1](http://s1.com) [S2](http://s2.com)"
-        assert "[S1](http://s1.com)[S2](http://s2.com)" in result.replace(" ", "")
+        rendered_text, footnotes = replace_citations(text, citation_map=citation_map)
+        assert rendered_text == "Sources: [^1] [^2]"
+        assert footnotes == [
+            "[^1]: [S1](http://s1.com)",
+            "[^2]: [S2](http://s2.com)",
+        ]
+
+    def test_replace_embedded_citations_reuses_footnote_numbers(self):
+        text = "First \ue200cite\ue202key1\ue201 then again \ue200cite\ue202key1\ue201"
+        citation_map = {
+            "key1": {"title": "S1", "url": "http://s1.com"},
+        }
+
+        rendered_text, footnotes = replace_citations(text, citation_map=citation_map)
+        assert rendered_text == "First [^1] then again [^1]"
+        assert footnotes == ["[^1]: [S1](http://s1.com)"]
 
     def test_replace_citations_obsidian_format(self):
         text = "Claim 【1†source】."
@@ -157,9 +170,10 @@ class TestCitationParsing:
             },
         ]
 
-        result = replace_citations(text, citations, flavor="obsidian")
-        assert "[Source 1](http://example.com/1)" in result
-        assert "[[Source 1](http://example.com/1)]" not in result
+        rendered_text, footnotes = replace_citations(text, citations, flavor="obsidian")
+        assert rendered_text == "Claim [^1]."
+        assert footnotes == ["[^1]: [Source 1](http://example.com/1)"]
+        assert "[[Source 1](http://example.com/1)]" not in footnotes[0]
 
     def test_replace_citations_out_of_bounds_ignored(self):
         text = "Short text."
@@ -170,14 +184,16 @@ class TestCitationParsing:
                 "metadata": {"title": "Source", "url": "http://example.com"},
             },
         ]
-        result = replace_citations(text, citations)
-        assert result == text
+        rendered_text, footnotes = replace_citations(text, citations)
+        assert rendered_text == text
+        assert footnotes == []
 
     def test_replace_citations_missing_metadata(self):
         text = "Claim 【1†source】."
         citations = [{"start_ix": 6, "end_ix": 16, "metadata": {}}]
-        result = replace_citations(text, citations)
-        assert "【1†source】" not in result
+        rendered_text, footnotes = replace_citations(text, citations)
+        assert "【1†source】" not in rendered_text
+        assert footnotes == []
 
 
 class TestMetadataEnrichment:
