@@ -22,6 +22,8 @@ This is **MANDATORY AND NON-NEGOTIABLE**, regardless of how simple, small, or st
 
 ### 2. Operational Rigor
 - **Critical Mindset**: **DO NOT ASSUME** the codebase is perfectly implemented. Be alert for missing or buggy logic, including features that may appear complete but still require refinement or further work.
+- **Ignore Backward Compatibility**: Prioritize codebase health over legacy support. Perform complete overhauls and rewrites where necessary to improve architecture and quality. Only respect backward compatibility if explicitly and specifically requested.
+- **No Hacks**: Always implement robust, proper solutions. Avoid brittle workarounds or "quick fixes" that compromise long-term maintainability or architectural integrity.
 - **Verification**: **ALWAYS** run the full quality gate (tests, type checking, linting, formatting) and **FIX ALL ISSUES** before submitting changes.
 - **Cohesion Pass**: **MANDATORY.** After changes, perform a targeted sanity/consistency sweep to ensure the new behavior is **fully wired** across configs, prompts/CLI, defaults, tests, and docs. **Do not stop** until the change is coherent end-to-end.
 - **Documentation**: **REFLEXIVELY** keep all relevant `.md` files updated. Record all functional and behavioral changes in `docs/dev/CHANGELOG.md`. This is a **CRITICAL REQUIREMENT**.
