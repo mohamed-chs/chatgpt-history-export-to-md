@@ -206,6 +206,23 @@ After running the script, head to your output folder (defaults to `Documents/Cha
 
 If you've had a great experience, consider giving the project a ⭐ **star**! It keeps me motivated and helps others discover it!
 
+## Export to PDF
+
+Try [`convpdf`](https://github.com/mohamed-chs/convpdf) to convert markdown files to PDFs.
+
+Example:
+
+```bash
+# install with npm
+npm -g install convpdf
+
+# go to output dir (defaults to ~/Documents/ChatGPT-Data/)
+cd ~/Documents/ChatGPT-Data
+
+# run (add '-j 20' for faster conversion)
+convpdf Markdown -o PDF
+```
+
 ![wordcloud example](https://raw.githubusercontent.com/mohamed-chs/convoviz/main/demo/wordcloud-example.png)
 
 ---
