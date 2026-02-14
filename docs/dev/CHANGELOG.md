@@ -3,6 +3,17 @@
 > **Note**: This changelog is informal and incomplete. It tracks the primary record of all functional and behavioral updates to Convoviz.
 > **APPEND-ONLY. DO NOT EDIT, REWRITE, OR DELETE PAST ENTRIES. ALL NEW UPDATES MUST BE ADDED TO THE TOP.**
 
+## Recent Updates (February 14, 2026)
+
+- **Message Robustness**: Hardened text extraction for image-only messages so they no longer raise `MessageContentError` and get incorrectly hidden. Added regression coverage for attachment-only image visibility.
+- **Canvas Payload Validation**: Canvas parsing now validates `name`/`content` as strings and normalizes `type` fallback to `"unknown"` when malformed.
+- **Traversal Safety**: `Conversation.ordered_nodes` is now cycle-safe on malformed parent graphs, preventing infinite loops in active-branch rendering.
+- **Merge Correctness (Tie Case)**: `ConversationCollection.update()` now prefers richer snapshots when `update_time` is equal and the incoming conversation has more nodes.
+- **ZIP Extraction Hardening**: Replaced `extractall()` usage with explicit safe extraction and reject symlink ZIP members to reduce archive-based escape risks.
+- **Renderer Citation Control**: `render_node()` now respects an explicit empty citation map (`{}`) instead of silently falling back to per-message citation metadata.
+- **Pipeline Cleanup**: Removed unreachable post-raise flow and tightened typing around input path handling.
+- **Tests**: Added targeted regressions in `tests/test_models.py`, `tests/test_loaders.py`, and `tests/test_renderers.py` for the new hardening behavior.
+
 ## Recent Updates (February 11, 2026)
 
 - **Dead Code Elimination**: Removed unused `RenderingError` and unused `Node.is_leaf` to shrink exception/model surface area.

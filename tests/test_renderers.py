@@ -3,11 +3,12 @@
 from datetime import datetime, timedelta
 
 from convoviz.config import AuthorHeaders, ConversationConfig, YAMLConfig
-from convoviz.models import Conversation
+from convoviz.models import Conversation, Node
 from convoviz.renderers import render_conversation
 from convoviz.renderers.markdown import (
     close_code_blocks,
     render_message_header,
+    render_node,
     replace_latex_delimiters,
 )
 from convoviz.renderers.yaml import render_yaml_header
@@ -386,3 +387,44 @@ class TestRenderConversation:
         # Assistant message (next day) should have full date
         expected_date = next_day_ts.strftime("%Y-%m-%d")
         assert f"*{expected_date} 08:05:00*" in markdown
+
+
+def test_render_node_respects_explicit_empty_citation_map() -> None:
+    """Passing an explicit empty citation map should disable embedded replacements."""
+    marker = "\ue200cite\ue202turn0search0\ue201"
+    node = Node(
+        id="n1",
+        message={
+            "id": "m1",
+            "author": {"role": "assistant", "metadata": {}},
+            "create_time": datetime(2024, 1, 1).timestamp(),
+            "update_time": datetime(2024, 1, 1).timestamp(),
+            "content": {
+                "content_type": "text",
+                "parts": [
+                    f"With marker {marker}",
+                    {
+                        "type": "search_result",
+                        "ref_id": {
+                            "ref_type": "search",
+                            "turn_index": 0,
+                            "ref_index": 0,
+                        },
+                        "title": "Source",
+                        "url": "https://example.com",
+                    },
+                ],
+            },
+            "status": "finished_successfully",
+            "end_turn": True,
+            "weight": 1.0,
+            "metadata": {},
+            "recipient": "all",
+        },
+        parent=None,
+        children=[],
+    )
+
+    rendered = render_node(node, AuthorHeaders(), citation_map={})
+    assert marker in rendered
+    assert "[Source](https://example.com)" not in rendered

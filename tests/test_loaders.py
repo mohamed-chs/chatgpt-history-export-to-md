@@ -1,9 +1,10 @@
 """Tests for the io/loaders module."""
 
 import json
+import stat
 import time
 from pathlib import Path
-from zipfile import ZipFile
+from zipfile import ZipFile, ZipInfo
 
 import orjson
 import pytest
@@ -114,6 +115,20 @@ class TestLoadCollectionFromZip:
 
         with pytest.raises(InvalidZipError):
             load_collection_from_zip(zip_path, tmp_path / "extracted_invalid")
+
+    def test_rejects_symlink_entries(self, tmp_path: Path) -> None:
+        """ZIP archives containing symlink entries should be rejected."""
+        zip_path = tmp_path / "symlink.zip"
+        with ZipFile(zip_path, "w") as zf:
+            zf.writestr("conversations.json", "[]")
+
+            link = ZipInfo("link-to-outside")
+            link.create_system = 3  # Unix metadata format
+            link.external_attr = (stat.S_IFLNK | 0o777) << 16
+            zf.writestr(link, "../../outside.txt")
+
+        with pytest.raises(InvalidZipError, match="Symlinks are not allowed in ZIP"):
+            load_collection_from_zip(zip_path, tmp_path / "extracted_symlink")
 
 
 class TestLoadCollectionFromJsonFormats:

@@ -43,7 +43,9 @@ class Conversation(BaseModel):
         nodes = []
         mapping = self.node_mapping
         current = mapping.get(self.current_node)
-        while current:
+        seen: set[str] = set()
+        while current and current.id not in seen:
+            seen.add(current.id)
             nodes.append(current)
             current = current.parent_node
         return list(reversed(nodes))
@@ -228,6 +230,5 @@ class Conversation(BaseModel):
             if not node.message:
                 continue
             # Extract citations from message parts
-            if hasattr(node.message, "internal_citation_map"):
-                aggregated_map.update(node.message.internal_citation_map)
+            aggregated_map.update(node.message.internal_citation_map)
         return aggregated_map

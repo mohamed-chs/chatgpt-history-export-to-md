@@ -65,7 +65,18 @@ class ConversationCollection(BaseModel):
 
         for conv_id, incoming in other.index.items():
             existing = merged.get(conv_id)
-            if existing is None or incoming.update_time > existing.update_time:
+            if existing is None:
+                merged[conv_id] = incoming
+                continue
+
+            if incoming.update_time > existing.update_time:
+                merged[conv_id] = incoming
+                continue
+
+            # Some exports share coarse timestamps; prefer the richer snapshot.
+            if incoming.update_time == existing.update_time and len(
+                incoming.mapping
+            ) > len(existing.mapping):
                 merged[conv_id] = incoming
 
         self.conversations = list(merged.values())

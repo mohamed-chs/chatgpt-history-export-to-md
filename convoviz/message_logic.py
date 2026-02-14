@@ -97,9 +97,22 @@ def _parse_canvas_payload(value: Any) -> dict[str, Any] | None:
     else:
         return None
 
-    if isinstance(data, dict) and "content" in data and "name" in data:
-        return data
-    return None
+    if not isinstance(data, dict):
+        return None
+
+    name = data.get("name")
+    content = data.get("content")
+    if not isinstance(name, str) or not isinstance(content, str):
+        return None
+
+    normalized: dict[str, Any] = {
+        "name": name,
+        "content": content,
+    }
+    doc_type = data.get("type")
+    if isinstance(doc_type, str):
+        normalized["type"] = doc_type
+    return normalized
 
 
 def extract_message_text(message: Message) -> str:
@@ -157,6 +170,11 @@ def extract_message_text(message: Message) -> str:
     if content.result is not None:
         return content.result
 
+    if extract_message_images(message):
+        # Image-only/tool-only messages should render as image blocks,
+        # not fail text extraction.
+        return ""
+
     raise MessageContentError(message.id)
 
 
@@ -193,9 +211,10 @@ def extract_canvas_document(message: Message) -> dict[str, Any] | None:
         data = _parse_canvas_payload(val)
         if not data:
             return None
+        doc_type = data.get("type")
         return {
             "name": data["name"],
-            "type": data.get("type", "unknown"),
+            "type": doc_type if isinstance(doc_type, str) else "unknown",
             "content": data["content"],
         }
 

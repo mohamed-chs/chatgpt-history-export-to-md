@@ -71,6 +71,20 @@ Conversation + Config → render_conversation() → Markdown string
     └── Uses asset_resolver callback to copy/link images
 ```
 
+#### Robustness Guardrails
+```
+Message extraction:
+    └── image-only messages return empty text (not exceptions)
+    └── Canvas payloads require string name/content; malformed type falls back safely
+
+Conversation traversal:
+    └── active-branch traversal is cycle-safe (guards malformed parent graphs)
+
+Archive extraction:
+    └── ZIP extraction rejects traversal paths and symlink members
+    └── files are extracted through explicit checked paths (no blind extractall)
+```
+
 ## Key Files to Know
 
 | File | Purpose |

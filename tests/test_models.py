@@ -314,6 +314,21 @@ def test_message_visibility() -> None:
     )
     assert msg.is_hidden
 
+    # Case 9: Image-only attachment should stay visible
+    msg = Message(
+        author=MessageAuthor(role="user"),
+        content=MessageContent(content_type="text"),
+        metadata=MessageMetadata(
+            attachments=[
+                {"id": "file-123", "name": "pic.png", "mime_type": "image/png"},
+            ],
+        ),
+        **base_data,
+    )
+    assert msg.text == ""
+    assert not msg.is_empty
+    assert not msg.is_hidden
+
 
 def test_collection_update_merges_new_conversations_even_if_older(
     mock_conversation: Conversation,
@@ -348,6 +363,26 @@ def test_collection_update_keeps_newest_when_ids_collide(
     base.update(ConversationCollection(conversations=[updated]))
     assert (
         base.index[mock_conversation.conversation_id].update_time == updated.update_time
+    )
+
+
+def test_collection_update_prefers_richer_snapshot_when_timestamps_tie(
+    mock_conversation: Conversation,
+) -> None:
+    """When update_time ties, prefer the snapshot with more nodes."""
+    base = ConversationCollection(conversations=[mock_conversation])
+    incoming = mock_conversation.model_copy(deep=True)
+
+    incoming.mapping["extra_node"] = Node(
+        id="extra_node",
+        parent="assistant_node_111",
+        children=[],
+    )
+    incoming.mapping["assistant_node_111"].children.append("extra_node")
+
+    base.update(ConversationCollection(conversations=[incoming]))
+    assert len(base.index[mock_conversation.conversation_id].mapping) == len(
+        incoming.mapping
     )
 
 
@@ -552,6 +587,34 @@ class TestBuildNodeTree:
         # Should not raise, just skip the missing child
         result = build_node_tree(mapping)
         assert len(result["root"].children_nodes) == 0
+
+
+def test_ordered_nodes_handles_parent_cycles() -> None:
+    """Active-branch ordering should not loop forever on malformed cycles."""
+    conv = Conversation(
+        title="Cycle test",
+        create_time=datetime(2024, 1, 1, tzinfo=UTC),
+        update_time=datetime(2024, 1, 1, tzinfo=UTC),
+        mapping={
+            "root": {
+                "id": "root",
+                "message": None,
+                "parent": "child",
+                "children": ["child"],
+            },
+            "child": {
+                "id": "child",
+                "message": None,
+                "parent": "root",
+                "children": ["root"],
+            },
+        },
+        current_node="child",
+        conversation_id="cycle-conv",
+    )
+
+    ordered = conv.ordered_nodes
+    assert [node.id for node in ordered] == ["root", "child"]
 
 
 # =============================================================================

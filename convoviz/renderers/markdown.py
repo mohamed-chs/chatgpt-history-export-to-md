@@ -380,7 +380,9 @@ def render_node(
         text = ""
 
     # Process Citations
-    effective_map = citation_map or message.internal_citation_map
+    effective_map = (
+        citation_map if citation_map is not None else message.internal_citation_map
+    )
     if message.metadata.citations or effective_map:
         text = replace_citations(
             text,

@@ -1,6 +1,8 @@
 """Loading functions for conversations and collections."""
 
 import logging
+import shutil
+import stat
 from pathlib import Path, PurePosixPath
 from zipfile import ZipFile
 
@@ -50,6 +52,7 @@ def extract_archive(filepath: Path, target_dir: Path) -> Path:
 
     """
     logger.info(f"Extracting archive: {filepath} to {target_dir}")
+    root = target_dir.resolve()
 
     with ZipFile(filepath) as zf:
         for member in zf.infolist():
@@ -58,15 +61,29 @@ def extract_archive(filepath: Path, target_dir: Path) -> Path:
                     str(filepath), reason=f"Malicious path in ZIP: {member.filename}"
                 )
 
+            # Reject symlink entries to prevent extraction-then-traversal attacks.
+            mode = member.external_attr >> 16
+            if stat.S_ISLNK(mode):
+                raise InvalidZipError(
+                    str(filepath),
+                    reason=f"Symlinks are not allowed in ZIP: {member.filename}",
+                )
+
             # Additional check using resolved paths
             normalized = member.filename.replace("\\", "/")
             target_path = (target_dir / normalized).resolve()
-            if not target_path.is_relative_to(target_dir.resolve()):
+            if not target_path.is_relative_to(root):
                 raise InvalidZipError(
                     str(filepath), reason=f"Malicious path in ZIP: {member.filename}"
                 )
 
-        zf.extractall(target_dir)
+            if member.is_dir():
+                target_path.mkdir(parents=True, exist_ok=True)
+                continue
+
+            target_path.parent.mkdir(parents=True, exist_ok=True)
+            with zf.open(member, "r") as src, target_path.open("wb") as dst:
+                shutil.copyfileobj(src, dst)
     return target_dir
 
 
